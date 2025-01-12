@@ -3,8 +3,8 @@ import { render } from 'solid-js/web';
 import { Router } from "@solidjs/router";
 
 import './index.css';
-import App from './App';
 import { lazy } from 'solid-js';
+import { initWS } from './WS/WScontroller';
 
 const root = document.getElementById('root');
 
