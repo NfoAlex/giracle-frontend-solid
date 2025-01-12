@@ -16,12 +16,12 @@ if (import.meta.env.DEV && !(root instanceof HTMLElement)) {
 
 const routes = [
   {
-      path: "/",
-      component: lazy(() => import("./routes/index")),
+    path: "/",
+    component: lazy(() => import("./routes/index")),
   },
   {
-      path: "/hello-world",
-      component: () => <h1>Hello, World!</h1>
+    path: "/auth",
+    component: lazy(() => import("./routes/auth")),
   },
 ];
 
