@@ -1,10 +1,10 @@
 /* @refresh reload */
 import { render } from 'solid-js/web';
-import { Router } from "@solidjs/router";
+import { Route, Router, useNavigate } from "@solidjs/router";
 
 import './index.css';
-import { lazy } from 'solid-js';
-import { initWS } from './WS/WScontroller';
+import { createEffect, type JSX, lazy, onMount } from 'solid-js';
+import { storeAppStatus } from './stores/AppStatus';
 
 const root = document.getElementById('root');
 
@@ -18,6 +18,7 @@ const routes = [
   {
     path: "/",
     component: lazy(() => import("./routes/index")),
+    
   },
   {
     path: "/auth",
@@ -25,4 +26,28 @@ const routes = [
   },
 ];
 
-render(() => <Router>{ routes }</Router>, root!);
+const AuthGuard = (props: {children?: JSX.Element}) => {
+  const navi = useNavigate();
+
+  createEffect(() => {
+    console.log("index :: wrapper : createEffect");
+    if (!storeAppStatus.loggedIn) navi("/auth");
+  });
+
+  return (
+    <div>
+      <p>レイアウトテスト</p>
+      {props.children}
+    </div>
+  );
+}
+
+render(() => 
+  <Router>
+    <Route path="/auth" component={lazy(() => import("./routes/auth"))} />
+    <Route path="/app" component={AuthGuard}>
+      <Route path="/" component={lazy(() => import("./routes/index"))} />
+    </Route>
+  </Router>,
+  root!
+);
