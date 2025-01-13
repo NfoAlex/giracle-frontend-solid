@@ -49,7 +49,7 @@ export const insertHistory = (history: IMessage[]) => {
 
   setStoreHistory(currentHistory);
 
-  console.log("History :: insertHistory : current store->", storeHistory);
+  //console.log("History :: insertHistory : current store->", storeHistory);
 };
 
 /**
