@@ -7,6 +7,9 @@ import { createEffect, type JSX, lazy, onMount, Show, Suspense } from 'solid-js'
 import { storeAppStatus } from './stores/AppStatus';
 import { SidebarProvider } from './components/ui/sidebar';
 import { AppSidebar } from './components/Sidebar';
+import Channel from './routes/channel/[id]';
+import GET_SERVER_CONFIG from './api/SERVER/SERVER_CONFIG';
+import { setStoreServerinfo, storeServerinfo } from './stores/Serverinfo';
 
 const root = document.getElementById('root');
 
@@ -15,6 +18,20 @@ if (import.meta.env.DEV && !(root instanceof HTMLElement)) {
     'Root element not found. Did you forget to add it to your index.html? Or maybe the id attribute got misspelled?',
   );
 }
+
+//サーバー情報を取得
+GET_SERVER_CONFIG()
+  .then((r) => {
+    console.log("AuthGuard : GET_SERVER_CONFIG r->", r);
+    setStoreServerinfo ({
+      ...storeServerinfo,
+      ...r.data,
+    });
+    storeAppStatus.hasServerinfo = true;
+  })
+  .catch((e) => {
+    console.error("AuthGuard :: GET_SERVER_CONFIG e->", e);
+  });
 
 const AuthGuard = (props: {children?: JSX.Element}) => {
   const navi = useNavigate();
@@ -52,7 +69,7 @@ render(() =>
     <Route path="/app" component={AuthGuard}>
       <Route path="/" component={lazy(() => import("./routes/index"))} />
       <Route path="/channel">
-        <Route path="/:channelId" component={lazy(() => import("./routes/channel/[id]"))} />
+        <Route path="/:channelId" component={Channel} />
       </Route>
     </Route>
   </Router>,
