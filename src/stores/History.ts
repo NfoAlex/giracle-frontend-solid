@@ -31,14 +31,18 @@ export const insertHistory = (history: IMessage[]) => {
         .at(-1)
         ?.createdAt.valueOf() || 0)
     ) {
+      //最後だけ切る
+      const trimmedHistory = history.slice(0,-1);
       currentHistory[history[0].channelId] = {
         ...currentHistory[history[0].channelId],
-        history: [...history, ...currentHistory[history[0].channelId].history],
+        history: [...trimmedHistory, ...currentHistory[history[0].channelId].history],
       };
     } else {
+      //先頭だけ切る
+      const trimmedHistory = history.slice(1);
       currentHistory[history[0].channelId] = {
         ...currentHistory[history[0].channelId],
-        history: [...currentHistory[history[0].channelId].history, ...history],
+        history: [...currentHistory[history[0].channelId].history, ...trimmedHistory],
       };
     }
   }
