@@ -19,13 +19,19 @@ if (import.meta.env.DEV && !(root instanceof HTMLElement)) {
 const AuthGuard = (props: {children?: JSX.Element}) => {
   const navi = useNavigate();
 
+  const checkAuth = () => {
+    if (!storeAppStatus.loggedIn) navi("/auth");
+  }
+
+  onMount(checkAuth);
+
   createEffect(() => {
     console.log("index :: wrapper : createEffect");
-    if (!storeAppStatus.loggedIn) navi("/auth");
+    checkAuth();
   });
 
   return (
-    <div>
+    <div class="w-screen h-screen">
       {props.children}
     </div>
   );
