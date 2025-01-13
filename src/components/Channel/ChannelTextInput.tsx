@@ -22,8 +22,8 @@ export default function ChannelTextInput() {
   }
   
   return (
-    <div class="flex items-center">
-      <TextField>
+    <div class="flex items-center gap-1">
+      <TextField class="grow">
         <TextFieldInput
           type="text"
           value={text()}
