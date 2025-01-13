@@ -1,11 +1,13 @@
 import { useParams } from "@solidjs/router";
 import { For, Show, createEffect, createSignal, onCleanup, onMount } from "solid-js";
 import { storeHistory } from "~/stores/History";
-import { storeMessageReadTime } from "~/stores/Readtime";
+import { storeMessageReadTime, updateReadTime } from "~/stores/Readtime";
 import FetchHistory from "~/utils/FethchHistory";
 import { Avatar, AvatarImage } from "../ui/avatar";
 import MessageRender from "./ChannelContent/MessageRender";
 import NewMessageLine from "./ChannelContent/NewMessageLine";
+import POST_MESSAGE_UPDATE_READTIME from "~/api/MESSAGE/MESSAGE_UPDATE_READTIME";
+import { setStoreHasNewMessage } from "~/stores/HasNewMessage";
 
 export default function ChannelContents() {
   const [channelMoved, setChannelMoved] = createSignal(false);
@@ -51,6 +53,24 @@ export default function ChannelContents() {
       //履歴を取得、格納
       await FetchHistory(param.channelId, { messageIdFrom: messageIdNewest }, "newer");
       scrollTo(messageIdNewest);
+    } else if ( //履歴の末端に到達していたら既読時間を更新
+      storeHistory[param.channelId].atEnd &&
+      scrollPos >= el.scrollHeight - el.offsetHeight - 1
+    ) {
+      //すでに既読時間が一緒ならスルー
+      if (
+        storeMessageReadTime.find((c) => c.channelId === param.channelId)?.readTime
+        ===
+        storeHistory[param.channelId].history[0].createdAt
+      ) return;
+
+      POST_MESSAGE_UPDATE_READTIME(param.channelId, storeHistory[param.channelId].history[0].createdAt)
+        .then(() => console.log("ChannelContent :: checkScroll... : 既読時間を更新しました"))
+        .catch((e) => console.error("ChannelContent :: checkScroll... : 既読時間の更新に失敗しました", e));
+      //Storeの既読時間を更新
+      updateReadTime(param.channelId, storeHistory[param.channelId].history[0].createdAt);
+      //新着メッセージがないことと設定
+      setStoreHasNewMessage(param.channelId, false);
     }
   };
 
