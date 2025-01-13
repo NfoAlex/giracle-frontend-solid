@@ -1,4 +1,4 @@
-import { useLocation, useParams } from "@solidjs/router";
+import { useParams } from "@solidjs/router";
 import { For, Show, createEffect, onCleanup, onMount } from "solid-js";
 import { storeHistory } from "~/stores/History";
 import { storeMessageReadTime } from "~/stores/Readtime";
@@ -13,13 +13,12 @@ export default function ChannelContents() {
    * 現在のスクロール位置を確認してから該当する履歴取得をする
    */
   const checkScrollPosAndFetchHistory = async () => {
-    console.log("checkScrollPosAndFetchHistory triggered");
+    //console.log("checkScrollPosAndFetchHistory triggered");
     const el = document.getElementById("history");
     if (el === null) return;
     if (storeHistory[param.channelId] === undefined) return;
 
     const scrollPos = el.scrollTop;
-    //console.log("checkScrollPosAndFetchHistory scrollPos->", scrollPos, storeHistory[param.channelId].atEnd, storeHistory[param.channelId].atTop);
 
     if (!storeHistory[param.channelId].atTop && scrollPos <= 1) {
       //console.log("上だね");
@@ -36,13 +35,13 @@ export default function ChannelContents() {
       scrollTo(messageIdLast);
     }
     if (
-      !storeHistory[param.channelId].atEnd &&
+      !storeHistory[param.channelId]?.atEnd &&
       scrollPos >= el.scrollHeight - el.offsetHeight - 1
     ) {
       //console.log("一番下だね");
 
       //最後のメッセージIdを取得
-      const messageIdNewest = storeHistory[param.channelId].history[0].id;
+      const messageIdNewest = storeHistory[param.channelId].history[0]?.id;
       if (messageIdNewest === undefined)
         console.error(
           "ChannelContent :: checkScrollPosAndFetchHistory : 最新のメッセIdを取得できなかった",
@@ -95,7 +94,7 @@ export default function ChannelContents() {
 
   createEffect(() => {
     if (param.channelId) {
-      console.log("ChannelContents :: createEffect : param.channelId->", param.channelId);
+      //console.log("ChannelContents :: createEffect : param.channelId->", param.channelId);
       //もし履歴の長さが０なら既読時間から取得
       if (
         storeHistory[param.channelId]?.history.length === 0 ||
@@ -119,10 +118,12 @@ export default function ChannelContents() {
     if (el === null) return;
     el.addEventListener("scroll", handleScroll);
 
+    /*
     console.log(
       "ChannelContent :: onMount : storeHistory[param.channelId]?.history.length->",
       storeHistory[param.channelId]?.history.length,
     );
+    */
     //もし履歴の長さが０なら既読時間から取得
     if (
       storeHistory[param.channelId]?.history.length === 0 ||
@@ -144,13 +145,13 @@ export default function ChannelContents() {
   });
 
   return (
-    <div id="history" class="w-full overflow-y-auto p-2 grow">
+    <div id="history" class="w-full overflow-y-auto p-2 grow flex flex-col">
       <p>ここで履歴</p>
       <p class="font-bold">
         atTop:{storeHistory[param.channelId]?.atTop.toString()} atEnd:
         {storeHistory[param.channelId]?.atEnd.toString()}
       </p>
-      <div class="flex flex-col-reverse">
+      <div class="grow flex flex-col-reverse">
         <For each={storeHistory[param.channelId]?.history}>
           {(h, index) => (
             <div
