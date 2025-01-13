@@ -1,5 +1,5 @@
 import { useParams } from "@solidjs/router";
-import { For, Show, createEffect, onCleanup, onMount } from "solid-js";
+import { For, Show, createEffect, createSignal, onCleanup, onMount } from "solid-js";
 import { storeHistory } from "~/stores/History";
 import { storeMessageReadTime } from "~/stores/Readtime";
 import FetchHistory from "~/utils/FethchHistory";
@@ -8,6 +8,7 @@ import MessageRender from "./ChannelContent/MessageRender";
 import NewMessageLine from "./ChannelContent/NewMessageLine";
 
 export default function ChannelContents() {
+  const [channelMoved, setChannelMoved] = createSignal(false);
   const param = useParams();
 
   /**
@@ -78,6 +79,12 @@ export default function ChannelContents() {
     const el = document.getElementById(`messageId::${messageId}`);
     if (el === null) return;
 
+    //ページ移動した後で新着線が有効ならそっちにスクロール
+    if (channelMoved() && document.getElementById("NEW_LINE") !== null) {
+      document.getElementById("NEW_LINE")?.scrollIntoView();
+      return;
+    }
+
     el.scrollIntoView();
   };
 
@@ -95,6 +102,9 @@ export default function ChannelContents() {
 
   createEffect(() => {
     if (param.channelId) {
+      //チャンネルを移動したと設定
+      setChannelMoved(true);
+
       //console.log("ChannelContents :: createEffect : param.channelId->", param.channelId);
       //もし履歴の長さが０なら既読時間から取得
       if (
@@ -110,6 +120,8 @@ export default function ChannelContents() {
           checkScrollPosAndFetchHistory(),
         );
       }
+      //チャンネルを移動したと設定を解除
+      setChannelMoved(false);
     }
   });
 
