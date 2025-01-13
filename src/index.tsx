@@ -26,7 +26,6 @@ const AuthGuard = (props: {children?: JSX.Element}) => {
 
   return (
     <div>
-      <p>レイアウトテスト</p>
       {props.children}
     </div>
   );
