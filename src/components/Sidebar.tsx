@@ -16,6 +16,7 @@ import { storeServerinfo } from "~/stores/Serverinfo";
 import { Avatar, AvatarImage } from "./ui/avatar";
 import ChannelName from "./unique/ChannelName";
 import { storeAppStatus } from "~/stores/AppStatus";
+import { storeHasNewMessage } from "~/stores/HasNewMessage";
 
 export function AppSidebar() {
   return (
@@ -45,8 +46,9 @@ export function AppSidebar() {
               {(c) => (
                 <SidebarMenuItem>
                   <A href={`/app/channel/${c.channelId}`}>
-                    <SidebarMenuButton class="truncate">
+                    <SidebarMenuButton class="truncate flex flex-row items-center">
                       <ChannelName channelId={c.channelId} />
+                      { storeHasNewMessage[c.channelId] && <span class="text-xs text-red-500 ml-auto">●</span> }
                     </SidebarMenuButton>
                   </A>
                 </SidebarMenuItem>

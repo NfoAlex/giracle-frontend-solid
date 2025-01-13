@@ -118,12 +118,6 @@ export default function ChannelContents() {
     if (el === null) return;
     el.addEventListener("scroll", handleScroll);
 
-    /*
-    console.log(
-      "ChannelContent :: onMount : storeHistory[param.channelId]?.history.length->",
-      storeHistory[param.channelId]?.history.length,
-    );
-    */
     //もし履歴の長さが０なら既読時間から取得
     if (
       storeHistory[param.channelId]?.history.length === 0 ||
@@ -153,24 +147,28 @@ export default function ChannelContents() {
       <div class="grow flex flex-col-reverse gap-1">
         <For each={storeHistory[param.channelId]?.history}>
           {(h, index) => (
-            <div
-              id={`messageId::${h.id}`}
-              class="flex flex-row items-start"
-            >
-              <div class="w-[40px] shrink-0">
-                <Show when={!sameSenderAsNext(index())}>
-                  <Avatar class="mx-auto">
-                    <AvatarImage src={`/api/user/icon/${h.userId}`} />
-                  </Avatar>
-                </Show>
+            <>
+              <div
+                id={`messageId::${h.id}`}
+                class="flex flex-row items-start"
+              >
+                <div class="w-[40px] shrink-0">
+                  <Show when={!sameSenderAsNext(index())}>
+                    <Avatar class="mx-auto">
+                      <AvatarImage src={`/api/user/icon/${h.userId}`} />
+                    </Avatar>
+                  </Show>
+                </div>
+                <div class="shrink-0 hover:bg-slate-200 rounded-md px-2 ml-auto" style="width:calc(100% - 45px)">
+                  <MessageRender
+                    message={h}
+                    displayUserName={!sameSenderAsNext(index())}
+                  />
+                </div>
               </div>
-              <div class="shrink-0 hover:bg-slate-200 rounded-md px-2 ml-auto" style="width:calc(100% - 45px)">
-                <MessageRender
-                  message={h}
-                  displayUserName={!sameSenderAsNext(index())}
-                />
-              </div>
-            </div>
+              
+              <p>asdf</p>
+            </>
           )}
         </For>
       </div>
