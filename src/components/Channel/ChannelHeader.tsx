@@ -10,7 +10,7 @@ export default function ChannelHeader() {
   const [channel] = createResource(() => currentChannelId(), getterChannelInfo);
 
   createEffect(() => {
-    setCurrentChannelId(params.id);
+    setCurrentChannelId(params.channelId);
     console.log(
       "ChannelHeader :: createEffect : id->",
       params.id,
