@@ -146,17 +146,16 @@ export default function ChannelContents() {
 
   return (
     <div id="history" class="w-full overflow-y-auto p-2 grow flex flex-col">
-      <p>ここで履歴</p>
       <p class="font-bold">
         atTop:{storeHistory[param.channelId]?.atTop.toString()} atEnd:
         {storeHistory[param.channelId]?.atEnd.toString()}
       </p>
-      <div class="grow flex flex-col-reverse">
+      <div class="grow flex flex-col-reverse gap-1">
         <For each={storeHistory[param.channelId]?.history}>
           {(h, index) => (
             <div
               id={`messageId::${h.id}`}
-              class="flex flex-row items-start gap-3"
+              class="flex flex-row items-start"
             >
               <div class="w-[40px] shrink-0">
                 <Show when={!sameSenderAsNext(index())}>
@@ -165,7 +164,7 @@ export default function ChannelContents() {
                   </Avatar>
                 </Show>
               </div>
-              <div class="shrink-0 hover:bg-slate-200 rounded-md px-2" style="width:calc(100% - 40px)">
+              <div class="shrink-0 hover:bg-slate-200 rounded-md px-2 ml-auto" style="width:calc(100% - 45px)">
                 <MessageRender
                   message={h}
                   displayUserName={!sameSenderAsNext(index())}
