@@ -119,6 +119,8 @@ export default function ChannelContents() {
         FetchHistory(param.channelId, { messageTimeFrom: time }, "older").then(() =>
           checkScrollPosAndFetchHistory(),
         );
+      } else {
+        document.getElementById("NEW_LINE")?.scrollIntoView();
       }
       //チャンネルを移動したと設定を解除
       setChannelMoved(false);
