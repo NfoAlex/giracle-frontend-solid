@@ -13,7 +13,7 @@ export default function ChannelContents() {
    * 現在のスクロール位置を確認してから該当する履歴取得をする
    */
   const checkScrollPosAndFetchHistory = async () => {
-    console.log("checkScrollPosAndFetchHistory triggered");
+    //console.log("checkScrollPosAndFetchHistory triggered");
     const el = document.getElementById("history");
     if (el === null) return;
     if (storeHistory[param.channelId] === undefined) return;
@@ -94,7 +94,7 @@ export default function ChannelContents() {
 
   createEffect(() => {
     if (param.channelId) {
-      console.log("ChannelContents :: createEffect : param.channelId->", param.channelId);
+      //console.log("ChannelContents :: createEffect : param.channelId->", param.channelId);
       //もし履歴の長さが０なら既読時間から取得
       if (
         storeHistory[param.channelId]?.history.length === 0 ||
@@ -118,10 +118,12 @@ export default function ChannelContents() {
     if (el === null) return;
     el.addEventListener("scroll", handleScroll);
 
+    /*
     console.log(
       "ChannelContent :: onMount : storeHistory[param.channelId]?.history.length->",
       storeHistory[param.channelId]?.history.length,
     );
+    */
     //もし履歴の長さが０なら既読時間から取得
     if (
       storeHistory[param.channelId]?.history.length === 0 ||

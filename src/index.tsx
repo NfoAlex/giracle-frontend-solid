@@ -26,7 +26,7 @@ const AuthGuard = (props: {children?: JSX.Element}) => {
   onMount(checkAuth);
 
   createEffect(() => {
-    console.log("index :: wrapper : createEffect");
+    //console.log("index :: wrapper : createEffect");
     checkAuth();
   });
 
