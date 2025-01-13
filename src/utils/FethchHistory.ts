@@ -1,6 +1,8 @@
 import POST_CHANNEL_GET_HISTORY from "~/api/CHANNEL/CHANNEL_GET_HISTORY";
 import { insertHistory, updateHistoryPosition } from "~/stores/History";
 
+let fetching = false;
+
 /**
  * 履歴の取得を行う
  * @param _channelId
@@ -13,6 +15,8 @@ export default async function FetchHistory(
   },
   _direction: "older" | "newer" = "older",
 ) {
+  if (fetching) return;
+  fetching = true;
   await POST_CHANNEL_GET_HISTORY(
     _channelId,
     _dat.messageIdFrom,
@@ -32,4 +36,6 @@ export default async function FetchHistory(
     .catch((e) =>
       console.error("ChannelContent :: fetchHistory : エラー->", e),
     );
+  
+  fetching = false;
 }
