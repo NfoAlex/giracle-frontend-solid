@@ -35,7 +35,7 @@ export default function ChannelContents() {
       scrollTo(messageIdLast);
     }
     if (
-      !storeHistory[param.channelId]?.atEnd &&
+      !storeHistory[param.channelId].atEnd &&
       scrollPos >= el.scrollHeight - el.offsetHeight - 1
     ) {
       //console.log("一番下だね");
