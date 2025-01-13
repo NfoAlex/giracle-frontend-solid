@@ -1,4 +1,4 @@
-import { createStore } from "solid-js/store";
+import { createStore, produce } from "solid-js/store";
 import type { IMessage } from "~/types/Message";
 
 export const [storeHistory, setStoreHistory] = createStore<{
@@ -46,6 +46,21 @@ export const insertHistory = (history: IMessage[]) => {
   setStoreHistory(currentHistory);
 
   console.log("History :: insertHistory : current store->", storeHistory);
+};
+
+/**
+ * メッセージ単体の追加
+ * @param message 挿入するメッセージ
+ * @returns 
+ */
+export const addMessage = (message: IMessage) => {
+  if (message === undefined) console.error("History :: addMessage : message is undefined");
+  if (storeHistory[message.channelId] === undefined) return;
+
+  //格納
+  setStoreHistory(produce((history) => {
+    history[message.channelId].history.unshift(message);
+  }));
 };
 
 /**

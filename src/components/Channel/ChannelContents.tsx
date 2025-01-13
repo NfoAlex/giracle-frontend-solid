@@ -1,4 +1,4 @@
-import { useLocation, useParams } from "@solidjs/router";
+import { useParams } from "@solidjs/router";
 import { For, Show, createEffect, onCleanup, onMount } from "solid-js";
 import { storeHistory } from "~/stores/History";
 import { storeMessageReadTime } from "~/stores/Readtime";
@@ -19,7 +19,6 @@ export default function ChannelContents() {
     if (storeHistory[param.channelId] === undefined) return;
 
     const scrollPos = el.scrollTop;
-    //console.log("checkScrollPosAndFetchHistory scrollPos->", scrollPos, storeHistory[param.channelId].atEnd, storeHistory[param.channelId].atTop);
 
     if (!storeHistory[param.channelId].atTop && scrollPos <= 1) {
       //console.log("上だね");
@@ -36,7 +35,7 @@ export default function ChannelContents() {
       scrollTo(messageIdLast);
     }
     if (
-      !storeHistory[param.channelId].atEnd &&
+      !storeHistory[param.channelId]?.atEnd &&
       scrollPos >= el.scrollHeight - el.offsetHeight - 1
     ) {
       //console.log("一番下だね");
