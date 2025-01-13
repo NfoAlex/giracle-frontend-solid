@@ -22,7 +22,11 @@ export default function Auth() {
       await GET_USER_VERIFY_TOKEN().then((r) => {
         InitLoad(r.data.userId);
         //もともと行こうとしていた場所を指定
-        navi(loc.search.split("?redirect=")[1] || "/");
+        if (loc.search.split("?redirect=")[1]) {
+          navi(`/app/${loc.search.split("?redirect=")[1]}`);
+        } else {
+          navi("/app");
+        }
       });
     }
   });

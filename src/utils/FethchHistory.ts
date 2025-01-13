@@ -22,7 +22,8 @@ export default async function FetchHistory(
   )
     .then((r) => {
       console.log("ChannelContent :: fetchHistory : r->", r);
-      updateHistoryPosition(r.data.history[0].channelId, {
+      //if (r.data.history.length === 0) { console.log("ChannelContent :: fetchHistory : 履歴がありません"); return; }
+      updateHistoryPosition(_channelId, {
         atEnd: r.data.atEnd,
         atTop: r.data.atTop,
       });
