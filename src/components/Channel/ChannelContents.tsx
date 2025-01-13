@@ -41,7 +41,7 @@ export default function ChannelContents() {
       //console.log("一番下だね");
 
       //最後のメッセージIdを取得
-      const messageIdNewest = storeHistory[param.channelId].history[0].id;
+      const messageIdNewest = storeHistory[param.channelId].history[0]?.id;
       if (messageIdNewest === undefined)
         console.error(
           "ChannelContent :: checkScrollPosAndFetchHistory : 最新のメッセIdを取得できなかった",
@@ -143,13 +143,13 @@ export default function ChannelContents() {
   });
 
   return (
-    <div id="history" class="w-full overflow-y-auto p-2 grow">
+    <div id="history" class="w-full overflow-y-auto p-2 grow flex flex-col">
       <p>ここで履歴</p>
       <p class="font-bold">
         atTop:{storeHistory[param.channelId]?.atTop.toString()} atEnd:
         {storeHistory[param.channelId]?.atEnd.toString()}
       </p>
-      <div class="flex flex-col-reverse">
+      <div class="grow flex flex-col-reverse">
         <For each={storeHistory[param.channelId]?.history}>
           {(h, index) => (
             <div
