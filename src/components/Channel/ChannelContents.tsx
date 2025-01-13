@@ -5,6 +5,7 @@ import { storeMessageReadTime } from "~/stores/Readtime";
 import FetchHistory from "~/utils/FethchHistory";
 import { Avatar, AvatarImage } from "../ui/avatar";
 import MessageRender from "./ChannelContent/MessageRender";
+import NewMessageLine from "./ChannelContent/NewMessageLine";
 
 export default function ChannelContents() {
   const param = useParams();
@@ -166,8 +167,9 @@ export default function ChannelContents() {
                   />
                 </div>
               </div>
-              
-              <p>asdf</p>
+
+              {/* 新着線の表示 */}
+              { (storeMessageReadTime.find((c) => c.channelId === param.channelId)?.readTime === h.createdAt && index() !== 0) && (<NewMessageLine />)}
             </>
           )}
         </For>
