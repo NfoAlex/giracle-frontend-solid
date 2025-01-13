@@ -28,6 +28,7 @@ export default function ChannelTextInput() {
           type="text"
           value={text()}
           onInput={(e) => setText(e.currentTarget.value)}
+          onKeyDown={(e) => {e.key === "Enter" && sendMsg()}}
         />
       </TextField>
       <Button onClick={sendMsg}>送信</Button>
