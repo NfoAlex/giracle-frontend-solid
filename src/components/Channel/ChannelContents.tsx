@@ -42,8 +42,6 @@ export default function ChannelContents() {
       !storeHistory[param.channelId].atEnd &&
       scrollPos >= el.scrollHeight - el.offsetHeight - 1
     ) {
-      //console.log("一番下だね");
-
       //最後のメッセージIdを取得
       const messageIdNewest = storeHistory[param.channelId].history[0]?.id;
       if (messageIdNewest === undefined)
@@ -65,7 +63,6 @@ export default function ChannelContents() {
       ) return;
 
       POST_MESSAGE_UPDATE_READTIME(param.channelId, storeHistory[param.channelId].history[0].createdAt)
-        .then(() => console.log("ChannelContent :: checkScroll... : 既読時間を更新しました"))
         .catch((e) => console.error("ChannelContent :: checkScroll... : 既読時間の更新に失敗しました", e));
       //Storeの既読時間を更新
       updateReadTime(param.channelId, storeHistory[param.channelId].history[0].createdAt);
