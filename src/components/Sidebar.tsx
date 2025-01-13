@@ -41,11 +41,6 @@ export function AppSidebar() {
         <SidebarGroup>
           <SidebarGroupLabel>チャンネル</SidebarGroupLabel>
           <SidebarMenu>
-            <SidebarMenuItem>
-              <A href="/app/channel/1234">
-                <SidebarMenuButton>test</SidebarMenuButton>
-              </A>
-            </SidebarMenuItem>
             <For each={storeMyUserinfo.ChannelJoin}>
               {(c) => (
                 <SidebarMenuItem>
