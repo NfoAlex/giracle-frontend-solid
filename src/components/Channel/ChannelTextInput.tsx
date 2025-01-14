@@ -1,7 +1,7 @@
 import { createSignal } from "solid-js";
 import { TextField, TextFieldInput } from "../ui/text-field";
 import { Button } from "../ui/button";
-import { useLocation, useParams } from "@solidjs/router";
+import { useParams } from "@solidjs/router";
 import POST_MESSAGE_SEND from "~/api/MESSAGE/MESSAGE_SEND";
 
 export default function ChannelTextInput() {
