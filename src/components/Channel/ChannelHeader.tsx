@@ -11,11 +11,6 @@ export default function ChannelHeader() {
 
   createEffect(() => {
     setCurrentChannelId(params.channelId);
-    console.log(
-      "ChannelHeader :: createEffect : id->",
-      params.id,
-      currentChannelId(),
-    );
   });
 
   return (
