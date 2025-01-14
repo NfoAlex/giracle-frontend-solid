@@ -8,8 +8,8 @@ export default function WSSendMessage(dat: IMessage) {
   //履歴に追加
   addMessage(dat);
 
-  //もし受け取ったメッセージのチャンネルにいないなら新着設定
-  if (!location.pathname.includes(dat.channelId)) {
+  //もし受け取ったメッセージのチャンネルにいない、あるいはフォーカスしていないなら新着設定
+  if (!location.pathname.includes(dat.channelId) || !document.hasFocus()) {
     setStoreHasNewMessage((hnm) => {
       return {
         ...hnm,

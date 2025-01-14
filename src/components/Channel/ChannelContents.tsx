@@ -11,6 +11,7 @@ import { setStoreHasNewMessage } from "~/stores/HasNewMessage";
 
 export default function ChannelContents() {
   const [channelMoved, setChannelMoved] = createSignal(false);
+  const [isFocused, setIsFocused] = createSignal(true);
   const param = useParams();
 
   /**
@@ -53,7 +54,8 @@ export default function ChannelContents() {
       scrollTo(messageIdNewest);
     } else if ( //履歴の末端に到達していたら既読時間を更新
       storeHistory[param.channelId].atEnd &&
-      scrollPos >= el.scrollHeight - el.offsetHeight - 1
+      scrollPos >= el.scrollHeight - el.offsetHeight - 1 &&
+      isFocused()
     ) {
       //すでに既読時間が一緒ならスルー
       if (
@@ -117,6 +119,22 @@ export default function ChannelContents() {
       checkScrollPosAndFetchHistory();
   };
 
+  //ウィンドウのフォーカス状態の切り替え用
+  const setWindowFocused = () => {
+    //もしフォーカスされていたらスクロール位置を確認して履歴を取得させる
+    let flagWasFocused = false;
+    if (!isFocused()) flagWasFocused = true;
+
+    setIsFocused(true);
+    console.log("ChannelContents :: toggleWindowFocus : isFocused->", isFocused());
+
+    if (flagWasFocused) checkScrollPosAndFetchHistory();
+  }
+  const unSetWindowFocused = () => {
+    setIsFocused(false);
+    console.log("ChannelContents :: toggleWindowFocus : isFocused->", isFocused());
+  }
+
   createEffect(() => {
     if (param.channelId) {
       //チャンネルを移動したと設定
@@ -150,6 +168,9 @@ export default function ChannelContents() {
     if (el === null) return;
     el.addEventListener("scroll", handleScroll);
 
+    window.addEventListener("focus", setWindowFocused);
+    window.addEventListener("blur", unSetWindowFocused);
+
     //もし履歴の長さが０なら既読時間から取得
     if (
       storeHistory[param.channelId]?.history.length === 0 ||
@@ -168,6 +189,8 @@ export default function ChannelContents() {
 
   onCleanup(() => {
     document.removeEventListener("scroll", handleScroll);
+    window.removeEventListener("focus", setWindowFocused);
+    window.removeEventListener("blur", unSetWindowFocused);
   });
 
   return (
