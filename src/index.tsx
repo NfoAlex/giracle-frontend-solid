@@ -54,7 +54,7 @@ const AuthGuard = (props: {children?: JSX.Element}) => {
     on(() => HasAnythingNew(),
     () => {
     if (HasAnythingNew()) {
-      document.title = "新着アリ"
+      document.title = "(*) Giracle"
     } else {
       document.title = "Giracle"
     }
