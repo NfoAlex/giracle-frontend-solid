@@ -3,13 +3,14 @@ import { render } from 'solid-js/web';
 import { Route, Router, useNavigate } from "@solidjs/router";
 
 import './index.css';
-import { createEffect, type JSX, lazy, onMount, Show, Suspense } from 'solid-js';
+import { createEffect, type JSX, lazy, on, onMount, Show, Suspense } from 'solid-js';
 import { storeAppStatus } from './stores/AppStatus';
 import { SidebarProvider } from './components/ui/sidebar';
 import { AppSidebar } from './components/Sidebar';
 import Channel from './routes/channel/[id]';
 import GET_SERVER_CONFIG from './api/SERVER/SERVER_CONFIG';
 import { setStoreServerinfo, storeServerinfo } from './stores/Serverinfo';
+import { HasAnythingNew } from './stores/HasNewMessage';
 
 const root = document.getElementById('root');
 
@@ -42,10 +43,22 @@ const AuthGuard = (props: {children?: JSX.Element}) => {
 
   onMount(checkAuth);
 
+  //ページの移動監視用
   createEffect(() => {
     //console.log("index :: wrapper : createEffect");
     checkAuth();
   });
+
+  //新着状態監視用
+  createEffect(
+    on(() => HasAnythingNew(),
+    () => {
+    if (HasAnythingNew()) {
+      document.title = "新着アリ"
+    } else {
+      document.title = "Giracle"
+    }
+  }));
 
   return (
     <div class="w-screen h-screen">

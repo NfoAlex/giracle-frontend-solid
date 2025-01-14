@@ -7,6 +7,6 @@ export const [storeHasNewMessage, setStoreHasNewMessage] = createStore<{[key: IC
  * すべてのチャンネルにおいて未読メッセージがあるかどうか
  * @returns 
  */
-const HasAnythingNew = () => {
+export const HasAnythingNew = () => {
   return Object.values(storeHasNewMessage).some((v) => v);
 }
