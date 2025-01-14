@@ -60,7 +60,7 @@ export function AppSidebar() {
         <SidebarGroup />
       </SidebarContent>
 
-      <A href="/profile">
+      <A href="/app/profile">
         <SidebarFooter class="py-5">
           <div class="flex items-center gap-2">
             <Avatar class="w-auto h-8">
