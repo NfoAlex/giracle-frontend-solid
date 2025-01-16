@@ -1,7 +1,7 @@
 import { useParams } from "@solidjs/router";
 import { For, Show, createEffect, createSignal, onCleanup, onMount } from "solid-js";
 import { storeHistory } from "~/stores/History";
-import { storeMessageReadTime, storeMessageReadTimeBefore, updateReadTime } from "~/stores/Readtime";
+import { setStoreMessageReadTimeBefore, storeMessageReadTime, storeMessageReadTimeBefore, updateReadTime } from "~/stores/Readtime";
 import FetchHistory from "~/utils/FethchHistory";
 import { Avatar, AvatarImage } from "../ui/avatar";
 import MessageRender from "./ChannelContent/MessageRender";
@@ -12,6 +12,7 @@ import { setStoreHasNewMessage } from "~/stores/HasNewMessage";
 export default function ChannelContents() {
   const [isFocused, setIsFocused] = createSignal(true);
   const param = useParams();
+  let channelIdBefore = "";
 
   /**
    * 現在のスクロール位置を確認してから該当する履歴取得をする
@@ -138,8 +139,8 @@ export default function ChannelContents() {
   }
 
   createEffect(() => {
-    if (param.channelId) {
-      //console.log("ChannelContents :: createEffect : param.channelId->", param.channelId);
+    if (param.channelId !== channelIdBefore) {
+      console.log("ChannelContents :: createEffect : param.channelId->", param.channelId, " channelIdBefore->", channelIdBefore);
       //もし履歴の長さが０なら既読時間から取得
       if (
         storeHistory[param.channelId]?.history.length === 0 ||
@@ -156,6 +157,21 @@ export default function ChannelContents() {
       } else {
         initScroll();
       }
+
+      //別チャンネルからの移動なら時差表示用既読時間を更新
+      if (channelIdBefore !== "") {
+        setStoreMessageReadTimeBefore((prev) => {
+          const currentReadTime = storeMessageReadTime.find((c) => c.channelId === param.channelId)?.readTime;
+          if (currentReadTime === undefined) return prev;
+          const newReadTime = { channelId: channelIdBefore, readTime: currentReadTime };
+          const newStore = prev.filter((c) => c.channelId !== channelIdBefore);
+          newStore.push(newReadTime);
+          return newStore;
+        });
+      }
+
+      //最後にいたチャンネルIdを書き換える
+      channelIdBefore = param.channelId;
     }
   });
 

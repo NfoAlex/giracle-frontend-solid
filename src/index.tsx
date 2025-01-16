@@ -61,7 +61,7 @@ const AuthGuard = (props: {children?: JSX.Element}) => {
   }));
 
   return (
-    <div class="w-screen h-screen">
+    <div class="w-full h-screen">
       {props.children}
     </div>
   );
