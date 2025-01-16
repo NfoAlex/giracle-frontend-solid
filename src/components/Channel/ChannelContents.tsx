@@ -1,7 +1,7 @@
 import { useParams } from "@solidjs/router";
 import { For, Show, createEffect, createSignal, onCleanup, onMount } from "solid-js";
 import { storeHistory } from "~/stores/History";
-import { storeMessageReadTime, updateReadTime } from "~/stores/Readtime";
+import { storeMessageReadTime, storeMessageReadTimeBefore, updateReadTime } from "~/stores/Readtime";
 import FetchHistory from "~/utils/FethchHistory";
 import { Avatar, AvatarImage } from "../ui/avatar";
 import MessageRender from "./ChannelContent/MessageRender";
@@ -10,7 +10,6 @@ import POST_MESSAGE_UPDATE_READTIME from "~/api/MESSAGE/MESSAGE_UPDATE_READTIME"
 import { setStoreHasNewMessage } from "~/stores/HasNewMessage";
 
 export default function ChannelContents() {
-  const [channelMoved, setChannelMoved] = createSignal(false);
   const [isFocused, setIsFocused] = createSignal(true);
   const param = useParams();
 
@@ -103,20 +102,7 @@ export default function ChannelContents() {
    * @param messageId
    */
   const scrollTo = (messageId: string) => {
-    console.log("ChannelContents :: scrollTo : messageId->", messageId, channelMoved(), document.getElementById("NEW_LINE") !== undefined);
-    
-    //ページ移動した後で新着線が有効ならそっちにスクロール
-    if (channelMoved()) {
-      const time = storeMessageReadTime.find((c) => {
-        c.channelId === param.channelId;
-      })?.readTime;
-      if (time !== undefined) {
-        initScroll();
-        return;
-      }
-      //document.getElementById("NEW_LINE")?.scrollIntoView();
-    }
-
+    console.log("ChannelContents :: scrollTo : messageId->", messageId, document.getElementById("NEW_LINE") !== undefined);
     const el = document.getElementById(`messageId::${messageId}`);
     if (el === null) return;
 
@@ -153,9 +139,6 @@ export default function ChannelContents() {
 
   createEffect(() => {
     if (param.channelId) {
-      //チャンネルを移動したと設定
-      setChannelMoved(true);
-
       //console.log("ChannelContents :: createEffect : param.channelId->", param.channelId);
       //もし履歴の長さが０なら既読時間から取得
       if (
@@ -171,10 +154,8 @@ export default function ChannelContents() {
           checkScrollPosAndFetchHistory(),
         );
       } else {
-        //initScroll();
+        initScroll();
       }
-      //チャンネルを移動したと設定を解除
-      setChannelMoved(false);
     }
   });
 
@@ -239,7 +220,7 @@ export default function ChannelContents() {
               </div>
 
               {/* 新着線の表示 */}
-              { (storeMessageReadTime.find((c) => c.channelId === param.channelId)?.readTime === h.createdAt && index() !== 0) && (<NewMessageLine />)}
+              { (storeMessageReadTimeBefore.find((c) => c.channelId === param.channelId)?.readTime === h.createdAt && index() !== 0) && (<NewMessageLine />)}
             </>
           )}
         </For>
