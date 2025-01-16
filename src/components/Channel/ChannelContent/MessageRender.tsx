@@ -1,5 +1,4 @@
 import { Show } from "solid-js";
-import { Card, CardContent } from "~/components/ui/card";
 import UserName from "~/components/unique/UserName";
 import type { IMessage } from "~/types/Message";
 import MessageTextRender from "./MessageRender/MessageTextRender";
