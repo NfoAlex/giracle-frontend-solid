@@ -4,7 +4,7 @@ import GET_USER_INFO from "~/api/USER/USER_INFO";
 import { storeAppStatus } from "~/stores/AppStatus";
 import { setStoreHasNewMessage } from "~/stores/HasNewMessage";
 import { setStoreMyUserinfo } from "~/stores/MyUserinfo";
-import { setStoreMessageReadTime } from "~/stores/Readtime";
+import { setStoreMessageReadTime, setStoreMessageReadTimeBefore } from "~/stores/Readtime";
 import { initWS } from "~/WS/WScontroller";
 
 export default function InitLoad(_userId: string) {
@@ -17,6 +17,7 @@ export default function InitLoad(_userId: string) {
   GET_MESSAGE_GET_READTIME().then((r) => {
     console.log("InitLoad :: GET_MESSAGE_GET_READTIME : 自分の既読時間r->", r);
     setStoreMessageReadTime(r.data);
+    setStoreMessageReadTimeBefore(r.data);
   });
   //新着メッセージの有無を取得、格納
   GET_MESSAGE_GET_NEW().then((r) => {

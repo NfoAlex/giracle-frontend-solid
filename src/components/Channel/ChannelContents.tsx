@@ -1,7 +1,7 @@
 import { useParams } from "@solidjs/router";
 import { For, Show, createEffect, createSignal, onCleanup, onMount } from "solid-js";
 import { storeHistory } from "~/stores/History";
-import { storeMessageReadTime, updateReadTime } from "~/stores/Readtime";
+import { setStoreMessageReadTimeBefore, storeMessageReadTime, storeMessageReadTimeBefore, updateReadTime } from "~/stores/Readtime";
 import FetchHistory from "~/utils/FethchHistory";
 import { Avatar, AvatarImage } from "../ui/avatar";
 import MessageRender from "./ChannelContent/MessageRender";
@@ -10,9 +10,9 @@ import POST_MESSAGE_UPDATE_READTIME from "~/api/MESSAGE/MESSAGE_UPDATE_READTIME"
 import { setStoreHasNewMessage } from "~/stores/HasNewMessage";
 
 export default function ChannelContents() {
-  const [channelMoved, setChannelMoved] = createSignal(false);
   const [isFocused, setIsFocused] = createSignal(true);
   const param = useParams();
+  let channelIdBefore = "";
 
   /**
    * 現在のスクロール位置を確認してから該当する履歴取得をする
@@ -91,18 +91,21 @@ export default function ChannelContents() {
   };
 
   /**
+   * チャンネル移動、あるいはマウントしてからの最初のスクロール用
+   */
+  const initScroll = () => {
+    const msg = storeHistory[param.channelId].history.find((m) => m.createdAt === storeMessageReadTime.find((c) => c.channelId === param.channelId)?.readTime);
+    if (msg !== undefined) scrollTo(msg.id);
+  }
+
+  /**
    * 指定のメッセージIdへスクロールする
    * @param messageId
    */
   const scrollTo = (messageId: string) => {
+    console.log("ChannelContents :: scrollTo : messageId->", messageId, document.getElementById("NEW_LINE") !== undefined);
     const el = document.getElementById(`messageId::${messageId}`);
     if (el === null) return;
-
-    //ページ移動した後で新着線が有効ならそっちにスクロール
-    if (channelMoved() && document.getElementById("NEW_LINE") !== null) {
-      document.getElementById("NEW_LINE")?.scrollIntoView();
-      return;
-    }
 
     el.scrollIntoView();
   };
@@ -126,21 +129,18 @@ export default function ChannelContents() {
     if (!isFocused()) flagWasFocused = true;
 
     setIsFocused(true);
-    console.log("ChannelContents :: toggleWindowFocus : isFocused->", isFocused());
+    //console.log("ChannelContents :: toggleWindowFocus : isFocused->", isFocused());
 
     if (flagWasFocused) checkScrollPosAndFetchHistory();
   }
   const unSetWindowFocused = () => {
     setIsFocused(false);
-    console.log("ChannelContents :: toggleWindowFocus : isFocused->", isFocused());
+    //console.log("ChannelContents :: toggleWindowFocus : isFocused->", isFocused());
   }
 
   createEffect(() => {
-    if (param.channelId) {
-      //チャンネルを移動したと設定
-      setChannelMoved(true);
-
-      //console.log("ChannelContents :: createEffect : param.channelId->", param.channelId);
+    if (param.channelId !== channelIdBefore) {
+      console.log("ChannelContents :: createEffect : param.channelId->", param.channelId, " channelIdBefore->", channelIdBefore);
       //もし履歴の長さが０なら既読時間から取得
       if (
         storeHistory[param.channelId]?.history.length === 0 ||
@@ -155,10 +155,23 @@ export default function ChannelContents() {
           checkScrollPosAndFetchHistory(),
         );
       } else {
-        document.getElementById("NEW_LINE")?.scrollIntoView();
+        initScroll();
       }
-      //チャンネルを移動したと設定を解除
-      setChannelMoved(false);
+
+      //別チャンネルからの移動なら時差表示用既読時間を更新
+      if (channelIdBefore !== "") {
+        setStoreMessageReadTimeBefore((prev) => {
+          const currentReadTime = storeMessageReadTime.find((c) => c.channelId === param.channelId)?.readTime;
+          if (currentReadTime === undefined) return prev;
+          const newReadTime = { channelId: channelIdBefore, readTime: currentReadTime };
+          const newStore = prev.filter((c) => c.channelId !== channelIdBefore);
+          newStore.push(newReadTime);
+          return newStore;
+        });
+      }
+
+      //最後にいたチャンネルIdを書き換える
+      channelIdBefore = param.channelId;
     }
   });
 
@@ -199,7 +212,7 @@ export default function ChannelContents() {
         atTop:{storeHistory[param.channelId]?.atTop.toString()} atEnd:
         {storeHistory[param.channelId]?.atEnd.toString()}
       </p>
-      <div class="grow flex flex-col-reverse gap-1">
+      <div class="grow w-full flex flex-col-reverse gap-1">
         <For each={storeHistory[param.channelId]?.history}>
           {(h, index) => (
             <>
@@ -214,7 +227,7 @@ export default function ChannelContents() {
                     </Avatar>
                   </Show>
                 </div>
-                <div class="shrink-0 hover:bg-slate-200 rounded-md px-2 ml-auto" style="width:calc(100% - 45px)">
+                <div class="shrink-0 grow-0 hover:bg-slate-200 rounded-md px-2 ml-auto" style="width:calc(100% - 45px)">
                   <MessageRender
                     message={h}
                     displayUserName={!sameSenderAsNext(index())}
@@ -223,7 +236,7 @@ export default function ChannelContents() {
               </div>
 
               {/* 新着線の表示 */}
-              { (storeMessageReadTime.find((c) => c.channelId === param.channelId)?.readTime === h.createdAt && index() !== 0) && (<NewMessageLine />)}
+              { (storeMessageReadTimeBefore.find((c) => c.channelId === param.channelId)?.readTime === h.createdAt && index() !== 0) && (<NewMessageLine />)}
             </>
           )}
         </For>
