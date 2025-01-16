@@ -1,6 +1,14 @@
 import { createStore } from "solid-js/store";
 
+//既読時間
 export const [storeMessageReadTime, setStoreMessageReadTime] = createStore<
+  {
+    channelId: string;
+    readTime: Date;
+  }[]
+>([]);
+//更新前のを表示するためのやつ
+export const [storeMessageReadTimeBefore, setStoreMessageReadTimeBefore] = createStore<
   {
     channelId: string;
     readTime: Date;
