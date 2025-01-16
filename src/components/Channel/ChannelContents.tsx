@@ -91,18 +91,34 @@ export default function ChannelContents() {
   };
 
   /**
+   * チャンネル移動、あるいはマウントしてからの最初のスクロール用
+   */
+  const initScroll = () => {
+    const msg = storeHistory[param.channelId].history.find((m) => m.createdAt === storeMessageReadTime.find((c) => c.channelId === param.channelId)?.readTime);
+    if (msg !== undefined) scrollTo(msg.id);
+  }
+
+  /**
    * 指定のメッセージIdへスクロールする
    * @param messageId
    */
   const scrollTo = (messageId: string) => {
+    console.log("ChannelContents :: scrollTo : messageId->", messageId, channelMoved(), document.getElementById("NEW_LINE") !== undefined);
+    
+    //ページ移動した後で新着線が有効ならそっちにスクロール
+    if (channelMoved()) {
+      const time = storeMessageReadTime.find((c) => {
+        c.channelId === param.channelId;
+      })?.readTime;
+      if (time !== undefined) {
+        initScroll();
+        return;
+      }
+      //document.getElementById("NEW_LINE")?.scrollIntoView();
+    }
+
     const el = document.getElementById(`messageId::${messageId}`);
     if (el === null) return;
-
-    //ページ移動した後で新着線が有効ならそっちにスクロール
-    if (channelMoved() || document.getElementById("NEW_LINE") !== null) {
-      document.getElementById("NEW_LINE")?.scrollIntoView();
-      return;
-    }
 
     el.scrollIntoView();
   };
@@ -126,13 +142,13 @@ export default function ChannelContents() {
     if (!isFocused()) flagWasFocused = true;
 
     setIsFocused(true);
-    console.log("ChannelContents :: toggleWindowFocus : isFocused->", isFocused());
+    //console.log("ChannelContents :: toggleWindowFocus : isFocused->", isFocused());
 
     if (flagWasFocused) checkScrollPosAndFetchHistory();
   }
   const unSetWindowFocused = () => {
     setIsFocused(false);
-    console.log("ChannelContents :: toggleWindowFocus : isFocused->", isFocused());
+    //console.log("ChannelContents :: toggleWindowFocus : isFocused->", isFocused());
   }
 
   createEffect(() => {
@@ -155,7 +171,7 @@ export default function ChannelContents() {
           checkScrollPosAndFetchHistory(),
         );
       } else {
-        document.getElementById("NEW_LINE")?.scrollIntoView();
+        //initScroll();
       }
       //チャンネルを移動したと設定を解除
       setChannelMoved(false);
