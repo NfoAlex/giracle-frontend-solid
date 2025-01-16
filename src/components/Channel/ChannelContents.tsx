@@ -99,7 +99,7 @@ export default function ChannelContents() {
     if (el === null) return;
 
     //ページ移動した後で新着線が有効ならそっちにスクロール
-    if (channelMoved() && document.getElementById("NEW_LINE") !== null) {
+    if (channelMoved() || document.getElementById("NEW_LINE") !== null) {
       document.getElementById("NEW_LINE")?.scrollIntoView();
       return;
     }
@@ -199,7 +199,7 @@ export default function ChannelContents() {
         atTop:{storeHistory[param.channelId]?.atTop.toString()} atEnd:
         {storeHistory[param.channelId]?.atEnd.toString()}
       </p>
-      <div class="grow flex flex-col-reverse gap-1">
+      <div class="grow w-full flex flex-col-reverse gap-1">
         <For each={storeHistory[param.channelId]?.history}>
           {(h, index) => (
             <>
@@ -214,7 +214,7 @@ export default function ChannelContents() {
                     </Avatar>
                   </Show>
                 </div>
-                <div class="shrink-0 hover:bg-slate-200 rounded-md px-2 ml-auto" style="width:calc(100% - 45px)">
+                <div class="shrink-0 grow-0 hover:bg-slate-200 rounded-md px-2 ml-auto" style="width:calc(100% - 45px)">
                   <MessageRender
                     message={h}
                     displayUserName={!sameSenderAsNext(index())}
