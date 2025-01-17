@@ -25,8 +25,8 @@ export default function ChannelContents() {
 
     const scrollPos = el.scrollTop;
 
-    if (!storeHistory[param.channelId].atTop && scrollPos <= 1) {
-      //console.log("上だね");
+    if (!storeHistory[param.channelId].atTop && Math.abs(scrollPos) + el.offsetHeight >= el.scrollHeight - 1) {
+      //console.log("checkScrollPosAndFetchHistory :: 上だね");
       //最後のメッセージIdを取得
       const messageIdLast = storeHistory[param.channelId].history.at(-1)?.id;
       if (messageIdLast === undefined) {
@@ -41,8 +41,10 @@ export default function ChannelContents() {
     }
     if (
       !storeHistory[param.channelId].atEnd &&
-      scrollPos >= el.scrollHeight - el.offsetHeight - 1
+      scrollPos <= 1
+      //scrollPos >= el.scrollHeight - el.offsetHeight - 1
     ) {
+      //console.log("checkScrollPosAndFetchHistory :: 下です");
       //最後のメッセージIdを取得
       const messageIdNewest = storeHistory[param.channelId].history[0]?.id;
       if (messageIdNewest === undefined)
@@ -207,8 +209,8 @@ export default function ChannelContents() {
   });
 
   return (
-    <div id="history" class="w-full overflow-y-auto p-2 grow">
-      <div class="h-full w-full overflow-y-auto flex flex-col-reverse gap-1">
+    <div class="w-full overflow-y-auto p-2 grow">
+      <div id="history" class="h-full w-full overflow-y-auto flex flex-col-reverse gap-1">
         <For each={storeHistory[param.channelId]?.history}>
           {(h, index) => (
             <>
@@ -236,6 +238,10 @@ export default function ChannelContents() {
             </>
           )}
         </For>
+
+        <Show when={storeHistory[param.channelId]?.atTop}>
+          <p>履歴の末端まで到達しました。</p>
+        </Show>
       </div>
     </div>
   );
