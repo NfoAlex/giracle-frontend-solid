@@ -35,6 +35,8 @@ export default function ChannelBrowser() {
           {(channel) => (
             <Card class="w-full py-3 px-5 flex items-center gap-2">
               <p>{channel.name}</p>
+              <p class="font-thin"> | </p>
+              <p>{channel.description}</p>
               <p class="ml-auto">{ storeMyUserinfo.ChannelJoin.some((cj) => cj.channelId === channel.id) ? "参加済み" : "未参加" }</p>
             </Card>
           )}
