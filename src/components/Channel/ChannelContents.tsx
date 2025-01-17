@@ -207,12 +207,8 @@ export default function ChannelContents() {
   });
 
   return (
-    <div id="history" class="w-full overflow-y-auto p-2 grow flex flex-col">
-      <p class="font-bold">
-        atTop:{storeHistory[param.channelId]?.atTop.toString()} atEnd:
-        {storeHistory[param.channelId]?.atEnd.toString()}
-      </p>
-      <div class="grow w-full flex flex-col-reverse gap-1">
+    <div id="history" class="w-full overflow-y-auto p-2 grow">
+      <div class="h-full w-full overflow-y-auto flex flex-col-reverse gap-1">
         <For each={storeHistory[param.channelId]?.history}>
           {(h, index) => (
             <>
