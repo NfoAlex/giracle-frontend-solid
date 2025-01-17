@@ -113,7 +113,7 @@ export default function ChannelContents() {
    * @param messageId
    */
   const scrollTo = (messageId: string) => {
-    console.log("ChannelContents :: scrollTo : messageId->", messageId, document.getElementById("NEW_LINE") !== undefined);
+    //console.log("ChannelContents :: scrollTo : messageId->", messageId, document.getElementById("NEW_LINE") !== undefined);
     const el = document.getElementById(`messageId::${messageId}`);
     if (el === null) return;
 
@@ -150,7 +150,7 @@ export default function ChannelContents() {
 
   createEffect(() => {
     if (param.channelId !== channelIdBefore) {
-      console.log("ChannelContents :: createEffect : param.channelId->", param.channelId, " channelIdBefore->", channelIdBefore);
+      //console.log("ChannelContents :: createEffect : param.channelId->", param.channelId, " channelIdBefore->", channelIdBefore);
       //もし履歴の長さが０なら既読時間から取得
       if (
         storeHistory[param.channelId]?.history.length === 0 ||
