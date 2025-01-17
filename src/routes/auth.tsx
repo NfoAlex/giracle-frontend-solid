@@ -1,5 +1,5 @@
 import { useLocation, useNavigate, useParams } from "@solidjs/router";
-import { Show, createSignal, onMount } from "solid-js";
+import { Show, onMount } from "solid-js";
 import GET_USER_VERIFY_TOKEN from "~/api/USER/USER_VERIFY_TOKEN";
 import Login from "~/components/Auth/Login";
 import Register from "~/components/Auth/Register";
@@ -11,7 +11,6 @@ import GetCookie from "~/utils/GetCookie";
 import InitLoad from "~/utils/InitLoad";
 
 export default function Auth() {
-  const [mode, setMode] = createSignal<"login" | "register">("login");
   const navi = useNavigate();
   const loc = useLocation();
 
@@ -23,7 +22,7 @@ export default function Auth() {
         InitLoad(r.data.userId);
         //もともと行こうとしていた場所を指定
         if (loc.search.split("?redirect=")[1]) {
-          navi(`/app/${loc.search.split("?redirect=")[1]}`);
+          navi(`${loc.search.split("?redirect=")[1]}`);
         } else {
           navi("/app");
         }
