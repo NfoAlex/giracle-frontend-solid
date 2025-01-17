@@ -42,7 +42,10 @@ export function AppSidebar() {
           </SidebarMenu>
         </SidebarGroup>
         <SidebarGroup>
-          <SidebarGroupLabel>チャンネル</SidebarGroupLabel>
+          <SidebarMenuButton as={A} href="/app/channel-browser" variant={loc.pathname === "/app/channel-browser" ? "outline" : "default"}>
+            チャンネル一覧
+          </SidebarMenuButton>
+          <SidebarGroupLabel>参加チャンネル</SidebarGroupLabel>
           <SidebarMenu>
             <For each={storeMyUserinfo.ChannelJoin}>
               {(c) => (

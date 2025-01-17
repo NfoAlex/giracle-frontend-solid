@@ -85,6 +85,7 @@ render(() =>
         <Route path="/:channelId" component={Channel} />
       </Route>
       <Route path="/profile" component={lazy(() => import("./routes/profile"))} />
+      <Route path="/channel-browser" component={lazy(() => import("./routes/channel-browser"))} />
     </Route>
   </Router>,
   root!
