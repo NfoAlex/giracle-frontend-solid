@@ -1,5 +1,8 @@
+import { IconPlus } from "@tabler/icons-solidjs";
 import { createSignal, For, onMount, Show } from "solid-js";
 import { GET_CHANNEL_LIST } from "~/api/CHANNEL/CHANNEL_LIST";
+import CreateChannel from "~/components/ChannelBrowser/CreateChannel";
+import { Button } from "~/components/ui/button";
 import { Card } from "~/components/ui/card";
 import { SidebarTrigger } from "~/components/ui/sidebar";
 import { storeMyUserinfo } from "~/stores/MyUserinfo";
@@ -27,7 +30,9 @@ export default function ChannelBrowser() {
         <p>チャンネルブラウザ</p>
       </Card>
 
-      <div class="flex flex-col gap-2 py-3 overflow-y-auto">
+      <hr class="my-3" />
+
+      <div class="flex flex-col gap-2 overflow-y-auto">
         <Show when={processing()}>
           <p class="mx-auto">ロード中...</p>
         </Show>
@@ -41,6 +46,8 @@ export default function ChannelBrowser() {
             </Card>
           )}
         </For>
+
+        <CreateChannel />
       </div>
     </div>
   )
