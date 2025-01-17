@@ -1,4 +1,4 @@
-import { A } from "@solidjs/router";
+import { A, useLocation } from "@solidjs/router";
 import { For } from "solid-js";
 import {
   Sidebar,
@@ -19,6 +19,8 @@ import { storeAppStatus } from "~/stores/AppStatus";
 import { storeHasNewMessage } from "~/stores/HasNewMessage";
 
 export function AppSidebar() {
+  const loc = useLocation();
+
   return (
     <Sidebar>
       <SidebarHeader>
@@ -45,12 +47,15 @@ export function AppSidebar() {
             <For each={storeMyUserinfo.ChannelJoin}>
               {(c) => (
                 <SidebarMenuItem>
-                  <A href={`/app/channel/${c.channelId}`}>
-                    <SidebarMenuButton class="truncate flex flex-row items-center">
-                      <ChannelName channelId={c.channelId} />
-                      { storeHasNewMessage[c.channelId] && <span class="text-xs text-red-500 ml-auto">●</span> }
-                    </SidebarMenuButton>
-                  </A>
+                  <SidebarMenuButton
+                    as={A}
+                    href={`/app/channel/${c.channelId}`}
+                    variant={loc.pathname === `/app/channel/${c.channelId}` ? "outline" : "default"}
+                    class="truncate flex flex-row items-center"
+                  >
+                    <ChannelName channelId={c.channelId} />
+                    { storeHasNewMessage[c.channelId] && <span class="text-xs ml-auto">●</span> }
+                  </SidebarMenuButton>
                 </SidebarMenuItem>
               )}
             </For>
