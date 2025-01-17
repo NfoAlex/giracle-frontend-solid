@@ -38,7 +38,7 @@ const AuthGuard = (props: {children?: JSX.Element}) => {
   const navi = useNavigate();
 
   const checkAuth = () => {
-    if (!storeAppStatus.loggedIn) navi("/auth");
+    if (!storeAppStatus.loggedIn) navi(`/auth?redirect=${location.pathname}`);
   }
 
   onMount(checkAuth);

@@ -25,8 +25,9 @@ export default function ChannelContents() {
 
     const scrollPos = el.scrollTop;
 
-    if (!storeHistory[param.channelId].atTop && scrollPos <= 1) {
-      //console.log("上だね");
+    //履歴の最古到達用
+    if (!storeHistory[param.channelId].atTop && Math.abs(scrollPos) + el.offsetHeight >= el.scrollHeight - 1) {
+      //console.log("checkScrollPosAndFetchHistory :: 上だね");
       //最後のメッセージIdを取得
       const messageIdLast = storeHistory[param.channelId].history.at(-1)?.id;
       if (messageIdLast === undefined) {
@@ -39,10 +40,13 @@ export default function ChannelContents() {
       await FetchHistory(param.channelId, { messageIdFrom: messageIdLast }, "older");
       scrollTo(messageIdLast);
     }
+    //履歴の最新到達用
     if (
       !storeHistory[param.channelId].atEnd &&
-      scrollPos >= el.scrollHeight - el.offsetHeight - 1
+      scrollPos <= 1
+      //scrollPos >= el.scrollHeight - el.offsetHeight - 1
     ) {
+      //console.log("checkScrollPosAndFetchHistory :: 下です");
       //最後のメッセージIdを取得
       const messageIdNewest = storeHistory[param.channelId].history[0]?.id;
       if (messageIdNewest === undefined)
@@ -52,9 +56,13 @@ export default function ChannelContents() {
       //履歴を取得、格納
       await FetchHistory(param.channelId, { messageIdFrom: messageIdNewest }, "newer");
       scrollTo(messageIdNewest);
-    } else if ( //履歴の末端に到達していたら既読時間を更新
+    }
+
+    //console.log("ChannelContent :: checkScrollPosAndFetchHistory : scrollPos->", scrollPos, " isFocused()->", isFocused());
+    //履歴の最新部分に到達していたら既読時間を更新
+    if (
       storeHistory[param.channelId].atEnd &&
-      scrollPos >= el.scrollHeight - el.offsetHeight - 1 &&
+      scrollPos <= 1 &&
       isFocused()
     ) {
       //すでに既読時間が一緒ならスルー
@@ -96,6 +104,8 @@ export default function ChannelContents() {
   const initScroll = () => {
     const msg = storeHistory[param.channelId].history.find((m) => m.createdAt === storeMessageReadTime.find((c) => c.channelId === param.channelId)?.readTime);
     if (msg !== undefined) scrollTo(msg.id);
+
+    checkScrollPosAndFetchHistory();
   }
 
   /**
@@ -103,7 +113,7 @@ export default function ChannelContents() {
    * @param messageId
    */
   const scrollTo = (messageId: string) => {
-    console.log("ChannelContents :: scrollTo : messageId->", messageId, document.getElementById("NEW_LINE") !== undefined);
+    //console.log("ChannelContents :: scrollTo : messageId->", messageId, document.getElementById("NEW_LINE") !== undefined);
     const el = document.getElementById(`messageId::${messageId}`);
     if (el === null) return;
 
@@ -140,7 +150,7 @@ export default function ChannelContents() {
 
   createEffect(() => {
     if (param.channelId !== channelIdBefore) {
-      console.log("ChannelContents :: createEffect : param.channelId->", param.channelId, " channelIdBefore->", channelIdBefore);
+      //console.log("ChannelContents :: createEffect : param.channelId->", param.channelId, " channelIdBefore->", channelIdBefore);
       //もし履歴の長さが０なら既読時間から取得
       if (
         storeHistory[param.channelId]?.history.length === 0 ||
@@ -207,12 +217,8 @@ export default function ChannelContents() {
   });
 
   return (
-    <div id="history" class="w-full overflow-y-auto p-2 grow flex flex-col">
-      <p class="font-bold">
-        atTop:{storeHistory[param.channelId]?.atTop.toString()} atEnd:
-        {storeHistory[param.channelId]?.atEnd.toString()}
-      </p>
-      <div class="grow w-full flex flex-col-reverse gap-1">
+    <div class="w-full overflow-y-auto p-2 grow">
+      <div id="history" class="h-full w-full overflow-y-auto flex flex-col-reverse gap-1">
         <For each={storeHistory[param.channelId]?.history}>
           {(h, index) => (
             <>
@@ -240,6 +246,10 @@ export default function ChannelContents() {
             </>
           )}
         </For>
+
+        <Show when={storeHistory[param.channelId]?.atTop}>
+          <p>履歴の末端まで到達しました。</p>
+        </Show>
       </div>
     </div>
   );
