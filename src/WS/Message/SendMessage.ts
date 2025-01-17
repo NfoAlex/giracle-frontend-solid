@@ -1,5 +1,5 @@
-import { setStoreHasNewMessage, storeHasNewMessage } from "~/stores/HasNewMessage";
-import { addMessage, storeHistory } from "~/stores/History";
+import { setStoreHasNewMessage } from "~/stores/HasNewMessage";
+import { addMessage } from "~/stores/History";
 import { storeMyUserinfo } from "~/stores/MyUserinfo";
 import { setStoreMessageReadTimeBefore } from "~/stores/Readtime";
 import type { IMessage } from "~/types/Message";
