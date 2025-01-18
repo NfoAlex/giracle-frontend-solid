@@ -99,7 +99,7 @@ export default function ChannelBrowser() {
         <For each={channels()}>
           {(channel) => (
             <Show when={!channel.isArchived || displayArchived()}>
-              <Card class="w-full py-3 px-5 flex items-center gap-2">
+              <Card class="w-full py-5 md:py-3 px-5 flex items-center gap-2">
                 <p>{channel.name}</p>
                 <p class="font-thin"> | </p>
                 <p>{channel.description}</p>
