@@ -85,7 +85,7 @@ export default function ChannelBrowser() {
           <SwitchLabel>アーカイブされたチャンネルも表示する</SwitchLabel>
         </Switch>
 
-        <Button onClick={fetchChannels} class="ml-auto" variant="outline">
+        <Button onClick={fetchChannels} disabled={processing()} class="ml-auto" variant="outline">
           <IconReload />
         </Button>
       </div>
