@@ -1,4 +1,4 @@
-import { useLocation, useNavigate, useParams } from "@solidjs/router";
+import { useLocation, useNavigate } from "@solidjs/router";
 import { Show, onMount } from "solid-js";
 import GET_USER_VERIFY_TOKEN from "~/api/USER/USER_VERIFY_TOKEN";
 import Login from "~/components/Auth/Login";

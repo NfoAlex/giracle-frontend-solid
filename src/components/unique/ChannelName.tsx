@@ -1,4 +1,4 @@
-import { createResource, createSignal } from "solid-js";
+import { createResource } from "solid-js";
 import { getterChannelInfo } from "~/stores/ChannelInfo";
 
 export default function ChannelName(props: { channelId: string }) {
