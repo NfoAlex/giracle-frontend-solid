@@ -1,4 +1,4 @@
-import { IconArchiveFilled } from "@tabler/icons-solidjs";
+import { IconArchiveFilled, IconReload } from "@tabler/icons-solidjs";
 import { createSignal, For, onMount, Show } from "solid-js";
 import POST_CHANNEL_JOIN from "~/api/CHANNEL/CHANNEL_JOIN";
 import POST_CHANNEL_LEAVE from "~/api/CHANNEL/CHANNEL_LEAVE";
@@ -73,7 +73,7 @@ export default function ChannelBrowser() {
         <p>チャンネルブラウザ</p>
       </Card>
 
-      <div class="flex items-center mt-3">
+      <div class="flex items-center gap-2 mt-3">
         <Switch
           class="flex items-center space-x-2"
           checked={displayArchived()}
@@ -85,7 +85,9 @@ export default function ChannelBrowser() {
           <SwitchLabel>アーカイブされたチャンネルも表示する</SwitchLabel>
         </Switch>
 
-        <Button onClick={fetchChannels} class="ml-auto" variant="outline">リロード</Button>
+        <Button onClick={fetchChannels} class="ml-auto" variant="outline">
+          <IconReload />
+        </Button>
       </div>
 
       <hr class="my-3" />
