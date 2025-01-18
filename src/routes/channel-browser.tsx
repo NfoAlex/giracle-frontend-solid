@@ -46,15 +46,24 @@ export default function ChannelBrowser() {
       .catch((err) => console.error("ChannelBrowser :: leaveChannel :: err ->", err));
   }
 
-  onMount(async () => {
+  /**
+   * チャンネル一覧を取得する
+   */
+  const fetchChannels = () => {
+    setProcessing(true); //ローディング中
+    setChannels([]); //初期化
     GET_CHANNEL_LIST()
       .then((r) => {
         setChannels(r.data);
         setProcessing(false);
       })
       .catch((err) => {
-        console.error("ChannelBrowser :: err ->", err);
+        console.error("ChannelBrowser :: fetchChannels : err ->", err);
       })
+  }
+
+  onMount(async () => {
+    fetchChannels();
   });
 
   return (
@@ -75,6 +84,8 @@ export default function ChannelBrowser() {
           </SwitchControl>
           <SwitchLabel>アーカイブされたチャンネルも表示する</SwitchLabel>
         </Switch>
+
+        <Button onClick={fetchChannels} class="ml-auto" variant="outline">リロード</Button>
       </div>
 
       <hr class="my-3" />
