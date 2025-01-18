@@ -1,4 +1,4 @@
-export default async function POST_CHANNEL_CREATE(
+export default async function PUT_CHANNEL_CREATE(
   _channelName: string,
   _description: string,
 ): Promise<{
