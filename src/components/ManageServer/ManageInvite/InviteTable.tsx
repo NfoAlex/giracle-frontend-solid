@@ -1,4 +1,4 @@
-import { createEffect, createSignal, For, Show } from "solid-js"
+import { createSignal, For, Show } from "solid-js"
 import { type ColumnDef, createSolidTable, flexRender, getCoreRowModel } from "@tanstack/solid-table"
  
 import {
