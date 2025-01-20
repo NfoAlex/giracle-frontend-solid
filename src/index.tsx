@@ -1,6 +1,6 @@
 /* @refresh reload */
 import { render } from 'solid-js/web';
-import { Route, Router, useNavigate } from "@solidjs/router";
+import { Route, Router, useLocation, useNavigate } from "@solidjs/router";
 
 import './index.css';
 import { createEffect, type JSX, lazy, on, onMount, Show, Suspense } from 'solid-js';
@@ -67,17 +67,27 @@ const AuthGuard = (props: {children?: JSX.Element}) => {
   );
 }
 
+const TopForMoving = () => {
+  const navi = useNavigate();
+  navi("/app");
+
+  return (
+    <p>移動します...</p>
+  )
+}
+
 render(() => 
   <Router root={(props) => (
     <>
       <SidebarProvider>
-        <Show when={location.pathname !== "/auth"}>
+        <Show when={useLocation().pathname !== "/auth"}>
           <AppSidebar />
         </Show>
         <Suspense>{props.children}</Suspense>
       </SidebarProvider>
     </>
   )}>
+    <Route path="/" component={TopForMoving} />
     <Route path="/auth" component={lazy(() => import("./routes/auth"))} />
     <Route path="/app" component={AuthGuard}>
       <Route path="/" component={lazy(() => import("./routes/index"))} />
