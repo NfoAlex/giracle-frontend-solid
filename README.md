@@ -22,3 +22,4 @@ Execute `bun i` then `bun dev` to launch dev-mode.
 - [ ] ユーザーに対するロールの付与、解除
 - [ ] ユーザー情報モーダル
 - [ ] ユーザーに対するBAN,BAN解除
+- [ ] オンラインユーザー表示
