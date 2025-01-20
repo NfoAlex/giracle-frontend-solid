@@ -84,19 +84,19 @@ export default function ManageRole() {
   });
 
   return (
-    <div class="flex flex-col md:flex-row h-full gap-2">
+    <div class="flex flex-col md:flex-row overflow-y-auto h-full gap-2">
       {/* PCUI用ロール選択 */}
-      <Card class="w-52 h-full hidden md:inline">
+      <Card class="w-52 hidden h-full flex-col md:flex">
         <CardHeader>
           <CardTitle class="flex items-center gap-1">
             <IconList />
             ロール一覧
           </CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent class="overflow-y-auto grow h-full pt-1 pb-3">
           <HoverCard>
             <HoverCardTrigger>
-              <SidebarMenuButton onclick={createRole} variant={"outline"} class="truncate">
+              <SidebarMenuButton ondblclick={createRole} variant={"outline"} class="truncate">
                 <IconPlus />
                 <p>ロールを作成</p>
               </SidebarMenuButton>
@@ -130,7 +130,7 @@ export default function ManageRole() {
         <p>ここでロール選択</p>
       </Card>
       
-      <Card class="grow">
+      <Card class="grow h-fit">
         <CardHeader>
           <CardTitle>ロール編集</CardTitle>
         </CardHeader>
