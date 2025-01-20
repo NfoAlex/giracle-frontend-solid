@@ -4,6 +4,9 @@ import GET_SERVER_GET_INVITE from "~/api/SERVER/SERVER_GET_INVITE";
 import type { IInvite } from "~/types/Server";
 import { InviteTable } from "./ManageInvite/InviteTable";
 import { Checkbox } from "../ui/checkbox";
+import CreateInvite from "./ManageInvite/CreateInvite";
+import { Button } from "../ui/button";
+import { IconRefresh } from "@tabler/icons-solidjs";
 
 export default function ManageInvite() {
   const [invites, setInvites] = createSignal<IInvite[]>([]);
@@ -61,10 +64,19 @@ export default function ManageInvite() {
   onMount(fetchInvites);
 
   return (
-    <div class="flex flex-col">
-      <p>招待管理</p>
-
+    <div class="flex flex-col overflow-y-auto">
       <InviteTable columns={col} data={invites()} />
+
+      {/* 再取得ボタン */}
+      <Button
+        onclick={fetchInvites}
+        class="fixed z-50 w-14 h-14 bottom-20 right-5 md:bottom-20 md:right-10"
+        variant={"outline"}
+      >
+        <IconRefresh />
+      </Button>
+      {/* 招待作成ボタン */}
+      <CreateInvite />
     </div>
   )
 }
