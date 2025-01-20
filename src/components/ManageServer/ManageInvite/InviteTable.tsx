@@ -11,6 +11,7 @@ import {
 } from "~/components/ui/table"
 import { Button } from "~/components/ui/button"
 import { Card } from "~/components/ui/card"
+import DELETE_SERVER_DELETE_INVITE from "~/api/SERVER/SERVER_DELETE_INVITE"
  
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -36,15 +37,29 @@ export function InviteTable<TData, TValue>(props: DataTableProps<TData, TValue>)
     },
   });
 
-  createEffect(() => {
-    console.log("rowSelection", rowSelection());
-  });
+  /**
+   * 招待を削除する
+   */
+  const deleteInvite = () => {
+    for (const row of table.getFilteredSelectedRowModel().rows) {
+      //id指定でエラーが出てますがきちんと割り当てられています。
+      DELETE_SERVER_DELETE_INVITE(Number.parseInt(row.original.id || undefined))
+        .then((r) => {
+          console.log("ManageInvite :: deleteInvite :: r->", r);
+          setRowSelection({}); // 選択を解除
+        })
+        .catch((e) => {
+          console.error("ManageInvite :: deleteInvite :: e->", e);
+        });
+    }
+  }
  
   return (
     <div class="flex flex-col gap-2">
       <Card class="px-4 py-2 flex items-center gap-1 sticky top-0 z-50">
         <p>{ Object.keys(rowSelection()).length }件を選択中</p>
         <Button
+          ondblclick={deleteInvite}
           variant={"destructive"}
           disabled={Object.keys(rowSelection()).length === 0}
           class="ml-auto"
