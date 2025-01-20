@@ -5,7 +5,7 @@ import { setStoreMessageReadTimeBefore } from "~/stores/Readtime";
 import type { IMessage } from "~/types/Message";
 
 export default function WSSendMessage(dat: IMessage) {
-  console.log("WSSendMessage :: triggered dat->", dat, location.pathname);
+  //console.log("WSSendMessage :: triggered dat->", dat);
 
   //履歴に追加
   addMessage(dat);
