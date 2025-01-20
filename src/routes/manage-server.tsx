@@ -60,12 +60,12 @@ export default function ManageServer() {
         </p>
       </Card>
       
-      <Card class="fixed py-3 px-5 bottom-3 left-1/2 transform -translate-x-1/2 flex items-center gap-2">
+      <Card class="fixed py-3 px-5 bottom-3 left-1/2 transform -translate-x-1/2 flex items-center gap-2 z-50">
         <Button onClick={changeServerConfig} disabled={!configChanged()}>変更を適用</Button>
         <Button onClick={()=>setServerConfig({...storeServerinfo})} disabled={!configChanged()} variant={"outline"}>復元</Button>
       </Card>
 
-      <div class="overflow-y-auto mx-auto grow w-full max-w-[950px] pt-3 pb-10 flex flex-col gap-2">
+      <div class="overflow-y-auto mx-auto grow w-full max-w-[950px] pt-3 pb-20 flex flex-col gap-4">
         <Card>
           <CardHeader>
             <CardTitle>コミュニティについて</CardTitle>
