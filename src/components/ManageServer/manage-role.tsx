@@ -8,6 +8,8 @@ import { TextField, TextFieldInput, TextFieldLabel } from "../ui/text-field";
 import { IconCircle, IconList, IconPlus } from "@tabler/icons-solidjs";
 import { Switch, SwitchControl, SwitchLabel, SwitchThumb } from "../ui/switch";
 import POST_ROLE_UPDATE from "~/api/ROLE/ROLE_UPDATE";
+import DELETE_ROLE_DELETE from "~/api/ROLE/ROLE_DELETE";
+import POST_ROLE_CREATE from "~/api/ROLE/ROLE_CREATE";
 
 export default function ManageRole() {
   const [roles, setRoles] = createSignal<IRole[]>([]);
@@ -39,6 +41,32 @@ export default function ManageRole() {
   }
 
   /**
+   * ロールを削除する
+   */
+  const deleteRole = () => {
+    DELETE_ROLE_DELETE(roleEditing().id)
+      .then((r) => {
+        console.log("ManageRole :: deleteRole :: r->", r);
+        setRoles(roles().filter((role) => role.id !== roleEditing().id));
+        setRoleEditing(roles()[1]);
+      })
+      .catch((err) => console.error("ManageRole :: deleteRole :: err->", err));
+  }
+
+  /**
+   * ロールを作成する
+   */
+  const createRole = () => {
+    POST_ROLE_CREATE(`ロール : ${new Date().toLocaleString()}`)
+      .then((r) => {
+        console.log("ManageRole :: createRole :: r->", r);
+        setRoles([...roles(), r.data]);
+        setRoleEditing(r.data);
+      })
+      .catch((err) => console.error("ManageRole :: createRole :: err->", err));
+  }
+
+  /**
    * ロール一覧を取得する
    */
   const fetchRole = () => {
@@ -64,7 +92,7 @@ export default function ManageRole() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <SidebarMenuButton variant={"outline"}>
+          <SidebarMenuButton onclick={createRole} variant={"outline"} class="truncate">
             <IconPlus />
             <p>ロールを作成</p>
           </SidebarMenuButton>
@@ -77,7 +105,7 @@ export default function ManageRole() {
                 onclick={()=>setRoleEditing(role)}
                 variant={roleEditing().id === role.id ? "outline" : "default"}
                 tabIndex={index()}
-                class="w-full"
+                class="w-full truncate"
                 disabled={role.id === "HOST"}
               >
                 <IconCircle style={`color: ${role.color}`} />
@@ -167,7 +195,7 @@ export default function ManageRole() {
             disabled={!roleChanged()}
           >復元</Button>
           <Button onClick={saveRole} disabled={!roleChanged()}>保存</Button>
-          <Button variant={"destructive"} class="mr-auto">削除</Button>
+          <Button ondblclick={deleteRole} variant={"destructive"} class="mr-auto">削除</Button>
         </CardFooter>
       </Card>
     </div>
