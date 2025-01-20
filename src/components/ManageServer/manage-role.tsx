@@ -129,7 +129,7 @@ export default function ManageRole() {
         <hr class="my-3" />
 
         <CardFooter class="flex flex-row-reverse items-center gap-2">
-          <Button variant={"outline"}>復元</Button>
+          <Button onclick={()=>setRoleEditing(roles().find((r)=>r.id === roleEditing().id) || roleEditing())} variant={"outline"}>復元</Button>
           <Button>保存</Button>
           <Button variant={"destructive"} class="mr-auto">削除</Button>
         </CardFooter>
