@@ -1,4 +1,6 @@
 import { createSignal, onMount } from "solid-js";
+import POST_SERVER_CHANGE_CONFIG from "~/api/SERVER/SERVER_CHANGE_CONFIG";
+import POST_SERVER_CHANGE_INFO from "~/api/SERVER/SERVER_CHANGE_INFO";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Label } from "~/components/ui/label";
@@ -6,7 +8,7 @@ import { NumberField, NumberFieldDecrementTrigger, NumberFieldErrorMessage, Numb
 import { SidebarTrigger } from "~/components/ui/sidebar";
 import { Switch, SwitchControl, SwitchLabel, SwitchThumb } from "~/components/ui/switch";
 import { TextFieldInput, TextField } from "~/components/ui/text-field";
-import { storeServerinfo } from "~/stores/Serverinfo";
+import { setStoreServerinfo, storeServerinfo } from "~/stores/Serverinfo";
 import type { IServer } from "~/types/Server";
 
 export default function ManageServer() {
@@ -24,6 +26,27 @@ export default function ManageServer() {
     return JSON.stringify(serverConfig()) !== JSON.stringify(storeServerinfo);
   };
 
+  /**
+   * サーバー設定を変更する
+   */
+  const changeServerConfig = () => {
+    //サーバー情報更新
+    POST_SERVER_CHANGE_INFO(serverConfig().name, serverConfig().introduction)
+      .then((r) => {
+        setStoreServerinfo(r.data);
+        setServerConfig({...storeServerinfo});
+      })
+      .catch((err) => console.error("ManageServer :: changeServerConfig :: err->", err));
+
+    //サーバー設定更新
+    POST_SERVER_CHANGE_CONFIG(serverConfig())
+      .then((r) => {
+        setStoreServerinfo(r.data);
+        setServerConfig({...storeServerinfo});
+      })
+      .catch((err) => console.error("ManageServer :: changeServerConfig :: err->", err));
+  }
+
   onMount(() => {
     storeServerinfo
     setServerConfig({...storeServerinfo});
@@ -38,7 +61,7 @@ export default function ManageServer() {
       </Card>
       
       <Card class="fixed py-3 px-5 bottom-3 left-1/2 transform -translate-x-1/2 flex items-center gap-2">
-        <Button disabled={!configChanged()}>変更を適用</Button>
+        <Button onClick={changeServerConfig} disabled={!configChanged()}>変更を適用</Button>
         <Button onClick={()=>setServerConfig({...storeServerinfo})} disabled={!configChanged()} variant={"outline"}>復元</Button>
       </Card>
 
