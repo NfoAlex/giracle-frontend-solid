@@ -6,6 +6,7 @@ import { Button } from "~/components/ui/button";
 import { Card } from "~/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~/components/ui/select";
 import { SidebarTrigger } from "~/components/ui/sidebar";
+import { getRolePower } from "~/stores/MyUserinfo";
 
 export default function ManageServer() {
   const [displayMode, setDisplayMode] = createSignal<"community" | "role" | "invite">("community");
@@ -56,9 +57,9 @@ export default function ManageServer() {
         </div>
       </Card>
       
-      { displayMode() === "community" && <ManageCommunity /> }
-      { displayMode() === "role" && <ManageRole /> }
-      { displayMode() === "invite" && <ManageInvite /> }
+      { displayMode() === "community" && (getRolePower("manageServer") ? <ManageCommunity /> : <p>サーバーの管理権限がありません</p>) }
+      { displayMode() === "role" && (getRolePower("manageRole") ? <ManageRole /> : <p>ロールの管理権限がありません</p>) }
+      { displayMode() === "invite" && (getRolePower("manageServer") ? <ManageInvite /> : <p>サーバーの管理権限がありません</p>) }
     </div>
   );
 }

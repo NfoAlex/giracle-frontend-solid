@@ -1,5 +1,5 @@
 import { A, useLocation } from "@solidjs/router";
-import { For } from "solid-js";
+import { For, Show } from "solid-js";
 import {
   Sidebar,
   SidebarContent,
@@ -11,7 +11,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "~/components/ui/sidebar";
-import { storeMyUserinfo } from "~/stores/MyUserinfo";
+import { getRolePower, storeMyUserinfo } from "~/stores/MyUserinfo";
 import { storeServerinfo } from "~/stores/Serverinfo";
 import { Avatar, AvatarImage } from "./ui/avatar";
 import ChannelName from "./unique/ChannelName";
@@ -70,16 +70,18 @@ export function AppSidebar() {
       </SidebarContent>
 
       <hr class="pb-2" />
-      <SidebarFooter class="py-2">
-        <SidebarMenuButton
-          as={A}
-          href="/app/manage-server"
-          variant={loc.pathname === "/app/manage-server" ? "outline" : "default"}
-        >
-          <IconDatabaseCog />
-          サーバー管理
-        </SidebarMenuButton>
-      </SidebarFooter>
+      <Show when={getRolePower("manageRole") || getRolePower("manageServer")}>
+        <SidebarFooter class="py-2">
+          <SidebarMenuButton
+            as={A}
+            href="/app/manage-server"
+            variant={loc.pathname === "/app/manage-server" ? "outline" : "default"}
+          >
+            <IconDatabaseCog />
+            サーバー管理
+          </SidebarMenuButton>
+        </SidebarFooter>
+      </Show>
       <A href="/app/profile">
         <SidebarFooter class="pb-5 pt-2">
           <div class="flex items-center gap-2">
