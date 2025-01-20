@@ -72,7 +72,10 @@ export default function ManageRole() {
             <TextFieldInput value={roleEditing().name} />
           </TextField>
           <TextField>
-            <TextFieldLabel>ロールカラー</TextFieldLabel>
+            <TextFieldLabel class="flex items-center gap-3">
+              <p>ロールカラー</p>
+              <p style={`color: ${roleEditing().color}`}>●</p>
+            </TextFieldLabel>
             <TextFieldInput value={roleEditing().color} />
           </TextField>
         </CardContent>
