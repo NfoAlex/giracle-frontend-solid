@@ -17,6 +17,7 @@ import { Avatar, AvatarImage } from "./ui/avatar";
 import ChannelName from "./unique/ChannelName";
 import { storeAppStatus } from "~/stores/AppStatus";
 import { storeHasNewMessage } from "~/stores/HasNewMessage";
+import { IconDatabaseCog } from "@tabler/icons-solidjs";
 
 export function AppSidebar() {
   const loc = useLocation();
@@ -68,8 +69,19 @@ export function AppSidebar() {
         <SidebarGroup />
       </SidebarContent>
 
+      <hr class="pb-2" />
+      <SidebarFooter class="py-2">
+        <SidebarMenuButton
+          as={A}
+          href="/app/manage-server"
+          variant={loc.pathname === "/app/manage-server" ? "outline" : "default"}
+        >
+          <IconDatabaseCog />
+          サーバー管理
+        </SidebarMenuButton>
+      </SidebarFooter>
       <A href="/app/profile">
-        <SidebarFooter class="py-5">
+        <SidebarFooter class="pb-5 pt-2">
           <div class="flex items-center gap-2">
             <Avatar class="w-auto h-8">
               <AvatarImage src={`/api/user/icon/${storeMyUserinfo.id}`} />
