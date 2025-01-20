@@ -5,6 +5,8 @@ import WSUpdateChannel from "./Channel/UpdateChannel";
 import WSRoleUpdated from "./Role/RoleUpdatede";
 import WSRoleLinked from "./Role/RoleLinked";
 import WSRoleUnlinked from "./Role/RoleUnlinked";
+import WSChannelDeleted from "./Channel/ChannelDeleted";
+import WSMessageDeleted from "./Message/MessageDelete";
 
 //WSインスタンス
 export let ws: WebSocket | undefined = undefined;
@@ -39,9 +41,19 @@ export const initWS = async () => {
           WSSendMessage(json.data);
           break;
 
+        //メッセージ削除の通知受け取り
+        case "message::MessageDeleted":
+          WSMessageDeleted(json.data);
+          break;
+
         //チャンネル情報の受け取り
         case "channel::UpdateChannel":
           WSUpdateChannel(json.data);
+          break;
+
+        //チャンネル削除通知の受け取り
+        case "channel::Deleted":
+          WSChannelDeleted(json.data);
           break;
 
         //ロール情報の受け取り
