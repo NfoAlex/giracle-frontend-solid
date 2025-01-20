@@ -24,11 +24,24 @@ export const updateRoleInfo = (value: IRole) => {
  * ロール情報を返す。無いなら取得してから返す
  * @param channelId
  */
-export const getterRoleInfo = async (
+export const getterRoleInfo = (
   roleId: string,
-): Promise<IRole> => {
+): IRole => {
   if (storeRoleInfo[roleId] === undefined) {
-    await GET_ROLE(roleId)
+    //プレースホルダーを格納してから取得
+    updateRoleInfo({
+      name: "ロード中...",
+      id: roleId,
+      createdAt: new Date(),
+      createdUserId: "",
+      color: "#00f",
+      manageServer: false,
+      manageChannel: false,
+      manageRole: false,
+      manageUser: false
+    });
+    //ロール情報を取得
+    GET_ROLE(roleId)
       .then((r) => {
         //Storeに設定
         updateRoleInfo(r.data);

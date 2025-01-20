@@ -14,12 +14,17 @@ export const [storeMyUserinfo, setStoreMyUserinfo] = createStore<IUser>({
  * 該当の権限を持っているか確認する
  * @param roleTerm 確認する権限名
  */
-export const getRolePower = async (
-  roleTerm: "manageRole" | "manageChannel" | "manageRole" | "manageUser"
-): Promise<boolean> => {
+export const getRolePower = (
+  roleTerm: "manageRole" | "manageChannel" | "manageUser" | "manageServer"
+): boolean => {
   for (const index in storeMyUserinfo.RoleLink) {
-    const role = await getterRoleInfo(storeMyUserinfo.RoleLink[index].roleId);
-
+    //HOST権限を持っている場合はtrueを返す
+    if (storeMyUserinfo.RoleLink[index].roleId === "HOST") {
+      return true;
+    }
+    //ロール情報を取得
+    const role = getterRoleInfo(storeMyUserinfo.RoleLink[index].roleId);
+    //該当の権限を持っている場合はtrueを返す
     if (role[roleTerm]) {
       return true;
     }
