@@ -10,6 +10,7 @@ import { Switch, SwitchControl, SwitchLabel, SwitchThumb } from "../ui/switch";
 import POST_ROLE_UPDATE from "~/api/ROLE/ROLE_UPDATE";
 import DELETE_ROLE_DELETE from "~/api/ROLE/ROLE_DELETE";
 import POST_ROLE_CREATE from "~/api/ROLE/ROLE_CREATE";
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "../ui/hover-card";
 
 export default function ManageRole() {
   const [roles, setRoles] = createSignal<IRole[]>([]);
@@ -92,10 +93,17 @@ export default function ManageRole() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <SidebarMenuButton onclick={createRole} variant={"outline"} class="truncate">
-            <IconPlus />
-            <p>ロールを作成</p>
-          </SidebarMenuButton>
+          <HoverCard>
+            <HoverCardTrigger>
+              <SidebarMenuButton onclick={createRole} variant={"outline"} class="truncate">
+                <IconPlus />
+                <p>ロールを作成</p>
+              </SidebarMenuButton>
+            </HoverCardTrigger>
+            <HoverCardContent>
+              <p>ダブルクリックでロールを作成</p>
+            </HoverCardContent>
+          </HoverCard>
           
           <hr class="my-2" />
 
