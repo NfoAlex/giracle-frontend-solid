@@ -101,12 +101,13 @@ export default function ManageServer() {
 
             <p class="font-bold mb-2">メッセージ</p>
             <span class="flex flex-col gap-2">
+              <p>メッセージの文字数制限</p>
               <NumberField
                 class="w-36"
                 value={serverConfig().MessageMaxLength}
                 defaultValue={3000}
                 onRawValueChange={(e) => setServerConfig({...serverConfig(), MessageMaxLength: e})}
-                validationState={serverConfig().MessageMaxLength === 0 ? "invalid" : "valid"}
+                validationState={serverConfig().MessageMaxLength <= 0 ? "invalid" : "valid"}
               >
                 <NumberFieldGroup>
                   <NumberFieldInput />
