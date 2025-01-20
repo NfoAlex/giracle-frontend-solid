@@ -84,8 +84,9 @@ export default function ManageRole() {
   });
 
   return (
-    <div class="flex h-full gap-2">
-      <Card class="w-52 h-full">
+    <div class="flex flex-col md:flex-row h-full gap-2">
+      {/* PCUI用ロール選択 */}
+      <Card class="w-52 h-full hidden md:inline">
         <CardHeader>
           <CardTitle class="flex items-center gap-1">
             <IconList />
@@ -122,6 +123,11 @@ export default function ManageRole() {
             )}
           </For>
         </CardContent>
+      </Card>
+
+      {/* スマホUI用ロール選択 */}
+      <Card class="md:hidden">
+        <p>ここでロール選択</p>
       </Card>
       
       <Card class="grow">
