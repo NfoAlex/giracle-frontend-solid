@@ -7,6 +7,7 @@ import { SidebarMenuButton } from "../ui/sidebar";
 import { TextField, TextFieldInput, TextFieldLabel } from "../ui/text-field";
 import { IconList } from "@tabler/icons-solidjs";
 import { Switch, SwitchControl, SwitchLabel, SwitchThumb } from "../ui/switch";
+import POST_ROLE_UPDATE from "~/api/ROLE/ROLE_UPDATE";
 
 export default function ManageRole() {
   const [roles, setRoles] = createSignal<IRole[]>([]);
@@ -21,6 +22,21 @@ export default function ManageRole() {
     manageRole: false,
     manageUser: false
   });
+  const roleChanged = () => {
+    return JSON.stringify(roleEditing()) !== JSON.stringify(roles().find((r)=>r.id === roleEditing().id))
+  };
+
+  /**
+   * ロールの更新を保存する
+   */
+  const saveRole = () => {
+    POST_ROLE_UPDATE(roleEditing().id, roleEditing())
+      .then((r) => {
+        console.log("ManageRole :: saveRole :: r->", r);
+        setRoles(roles().map((role) => role.id === roleEditing().id ? roleEditing() : role));
+      })
+      .catch((err) => console.error("ManageRole :: saveRole :: err->", err));
+  }
 
   /**
    * ロール一覧を取得する
@@ -29,6 +45,7 @@ export default function ManageRole() {
     GET_ROLE_LIST()
       .then((r) => {
         setRoles(r.data);
+        setRoleEditing(r.data[0]);
       })
       .catch((err) => console.error("ManageRole :: fetchRole :: err->", err));
   }
@@ -129,8 +146,12 @@ export default function ManageRole() {
         <hr class="my-3" />
 
         <CardFooter class="flex flex-row-reverse items-center gap-2">
-          <Button onclick={()=>setRoleEditing(roles().find((r)=>r.id === roleEditing().id) || roleEditing())} variant={"outline"}>復元</Button>
-          <Button>保存</Button>
+          <Button
+            onclick={()=>setRoleEditing(roles().find((r)=>r.id === roleEditing().id) || roleEditing())}
+            variant={"outline"}
+            disabled={!roleChanged()}
+          >復元</Button>
+          <Button onClick={saveRole} disabled={!roleChanged()}>保存</Button>
           <Button variant={"destructive"} class="mr-auto">削除</Button>
         </CardFooter>
       </Card>
