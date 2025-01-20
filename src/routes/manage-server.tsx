@@ -104,7 +104,7 @@ export default function ManageServer() {
               <NumberField
                 class="w-36"
                 value={serverConfig().MessageMaxLength}
-                defaultValue={serverConfig().MessageMaxLength}
+                defaultValue={3000}
                 onRawValueChange={(e) => setServerConfig({...serverConfig(), MessageMaxLength: e})}
                 validationState={serverConfig().MessageMaxLength === 0 ? "invalid" : "valid"}
               >
