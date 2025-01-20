@@ -8,7 +8,7 @@ import { Button } from "~/components/ui/button";
 import { Card } from "~/components/ui/card";
 import { SidebarTrigger } from "~/components/ui/sidebar";
 import { Switch, SwitchControl, SwitchLabel, SwitchThumb } from "~/components/ui/switch";
-import { setStoreMyUserinfo, storeMyUserinfo } from "~/stores/MyUserinfo";
+import { getRolePower, setStoreMyUserinfo, storeMyUserinfo } from "~/stores/MyUserinfo";
 import type { IChannel } from "~/types/Channel";
 
 export default function ChannelBrowser() {
@@ -119,7 +119,7 @@ export default function ChannelBrowser() {
           )}
         </For>
 
-        <CreateChannel />
+        { getRolePower("manageChannel") && <CreateChannel /> }
       </div>
     </div>
   )
