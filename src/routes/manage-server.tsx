@@ -1,6 +1,7 @@
 import { createSignal, onMount } from "solid-js";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
+import { Label } from "~/components/ui/label";
 import { NumberField, NumberFieldDecrementTrigger, NumberFieldErrorMessage, NumberFieldGroup, NumberFieldIncrementTrigger, NumberFieldInput } from "~/components/ui/number-field";
 import { SidebarTrigger } from "~/components/ui/sidebar";
 import { Switch, SwitchControl, SwitchLabel, SwitchThumb } from "~/components/ui/switch";
@@ -44,14 +45,24 @@ export default function ManageServer() {
       <div class="overflow-y-auto mx-auto grow w-full max-w-[950px] pt-3 pb-10 flex flex-col gap-2">
         <Card>
           <CardHeader>
-            <CardTitle>インスタンス名</CardTitle>
+            <CardTitle>コミュニティについて</CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent class="flex flex-col gap-4">
             <TextField>
+              <Label>名前</Label>
               <TextFieldInput
                 type="text"
                 value={serverConfig().name}
                 onChange={(e) => setServerConfig({...serverConfig(), name: e.currentTarget.value})}
+              />
+            </TextField>
+
+            <TextField>
+              <Label>概要</Label>
+              <TextFieldInput
+                type="text"
+                value={serverConfig().introduction}
+                onChange={(e) => setServerConfig({...serverConfig(), introduction: e.currentTarget.value})}
               />
             </TextField>
           </CardContent>
@@ -97,7 +108,7 @@ export default function ManageServer() {
               </Switch>
             </span>
 
-            <hr class="my-4" />
+            <hr class="my-6" />
 
             <p class="font-bold mb-2">メッセージ</p>
             <span class="flex flex-col gap-2">
@@ -117,6 +128,11 @@ export default function ManageServer() {
                 <NumberFieldErrorMessage>発言できません。</NumberFieldErrorMessage>
               </NumberField>
             </span>
+
+            <hr class="my-6" />
+
+            <p class="font-bold mb-2">デフォルトで参加するチャンネル</p>
+            <p class="italic">todo...</p>
           </CardContent>
         </Card>
       </div>
