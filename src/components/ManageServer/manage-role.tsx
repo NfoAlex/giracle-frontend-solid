@@ -11,6 +11,7 @@ import POST_ROLE_UPDATE from "~/api/ROLE/ROLE_UPDATE";
 import DELETE_ROLE_DELETE from "~/api/ROLE/ROLE_DELETE";
 import POST_ROLE_CREATE from "~/api/ROLE/ROLE_CREATE";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "../ui/hover-card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 
 export default function ManageRole() {
   const [roles, setRoles] = createSignal<IRole[]>([]);
@@ -127,7 +128,34 @@ export default function ManageRole() {
 
       {/* スマホUI用ロール選択 */}
       <Card class="md:hidden">
-        <p>ここでロール選択</p>
+        <Select
+          value={roleEditing()}
+          onChange={(role) => role ? setRoleEditing(role) : null}
+          options={roles()}
+          optionValue={(role) => role.name}
+          placeholder="ロールを選択..."
+          itemComponent={
+            (props) =>
+            <SelectItem item={props.item}>
+              <span class="flex items-center gap-1">
+                <IconCircle style={`color: ${props.item.rawValue.color}`} />
+                <p>{props.item.rawValue.name}</p>
+              </span>
+            </SelectItem>
+          }
+        >
+          <SelectTrigger aria-label="role-select">
+            <SelectValue<IRole>>
+              {
+                (state) => <span class="flex items-center">
+                  <IconCircle style={`color: ${state.selectedOption()?.color}`} />
+                  {state.selectedOption()?.name}
+                </span>
+              }
+            </SelectValue>
+          </SelectTrigger>
+          <SelectContent />
+        </Select>
       </Card>
       
       <Card class="grow h-fit">
