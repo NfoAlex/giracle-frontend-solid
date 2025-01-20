@@ -203,7 +203,16 @@ export default function ManageRole() {
             disabled={!roleChanged()}
           >復元</Button>
           <Button onClick={saveRole} disabled={!roleChanged() || roleEditing().name === ""}>保存</Button>
-          <Button ondblclick={deleteRole} variant={"destructive"} class="mr-auto">削除</Button>
+          <span class="mr-auto">
+            <HoverCard>
+              <HoverCardTrigger>
+                <Button ondblclick={deleteRole} variant={"destructive"}>削除</Button>
+              </HoverCardTrigger>
+              <HoverCardContent>
+                <p>ダブルクリックでロールを削除</p>
+              </HoverCardContent>
+            </HoverCard>
+          </span>
         </CardFooter>
       </Card>
     </div>
