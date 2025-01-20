@@ -5,7 +5,7 @@ import { GET_ROLE_LIST } from "~/api/ROLE/ROLE_LIST";
 import { Button } from "../ui/button";
 import { SidebarMenuButton } from "../ui/sidebar";
 import { TextField, TextFieldInput, TextFieldLabel } from "../ui/text-field";
-import { IconList } from "@tabler/icons-solidjs";
+import { IconCircle, IconList, IconPlus } from "@tabler/icons-solidjs";
 import { Switch, SwitchControl, SwitchLabel, SwitchThumb } from "../ui/switch";
 import POST_ROLE_UPDATE from "~/api/ROLE/ROLE_UPDATE";
 
@@ -45,7 +45,7 @@ export default function ManageRole() {
     GET_ROLE_LIST()
       .then((r) => {
         setRoles(r.data);
-        setRoleEditing(r.data[0]);
+        setRoleEditing(r.data[1]);
       })
       .catch((err) => console.error("ManageRole :: fetchRole :: err->", err));
   }
@@ -64,6 +64,13 @@ export default function ManageRole() {
           </CardTitle>
         </CardHeader>
         <CardContent>
+          <SidebarMenuButton variant={"outline"}>
+            <IconPlus />
+            <p>ロールを作成</p>
+          </SidebarMenuButton>
+          
+          <hr class="my-2" />
+
           <For each={roles()}>
             {(role, index) => (
               <SidebarMenuButton
@@ -71,7 +78,9 @@ export default function ManageRole() {
                 variant={roleEditing().id === role.id ? "outline" : "default"}
                 tabIndex={index()}
                 class="w-full"
+                disabled={role.id === "HOST"}
               >
+                <IconCircle style={`color: ${role.color}`} />
                 {role.name}
               </SidebarMenuButton>
             )}
@@ -86,14 +95,20 @@ export default function ManageRole() {
         <CardContent class="flex flex-col gap-4">
           <TextField>
             <TextFieldLabel>ロール名</TextFieldLabel>
-            <TextFieldInput value={roleEditing().name} />
+            <TextFieldInput
+              value={roleEditing().name}
+              onchange={e=>setRoleEditing({...roleEditing(), name: e.currentTarget.value})}
+            />
           </TextField>
           <TextField>
             <TextFieldLabel class="flex items-center gap-3">
               <p>ロールカラー</p>
               <p style={`color: ${roleEditing().color}`}>●</p>
             </TextFieldLabel>
-            <TextFieldInput value={roleEditing().color} />
+            <TextFieldInput
+              value={roleEditing().color}
+              onchange={e=>setRoleEditing({...roleEditing(), color: e.currentTarget.value})}
+            />
           </TextField>
         </CardContent>
 
