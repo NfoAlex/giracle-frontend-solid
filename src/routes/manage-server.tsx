@@ -1,7 +1,9 @@
 import { createSignal, onMount } from "solid-js";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
+import { NumberField, NumberFieldDecrementTrigger, NumberFieldErrorMessage, NumberFieldGroup, NumberFieldIncrementTrigger, NumberFieldInput } from "~/components/ui/number-field";
 import { SidebarTrigger } from "~/components/ui/sidebar";
+import { Switch, SwitchControl, SwitchLabel, SwitchThumb } from "~/components/ui/switch";
 import { TextFieldInput, TextField } from "~/components/ui/text-field";
 import { storeServerinfo } from "~/stores/Serverinfo";
 import type { IServer } from "~/types/Server";
@@ -71,7 +73,49 @@ export default function ManageServer() {
             <CardTitle>各種設定</CardTitle>
           </CardHeader>
           <CardContent>
-            <p>各種設定</p>
+            <p class="font-bold mb-2">アカウント登録</p>
+            <span class="flex flex-col gap-2">
+              <Switch
+                checked={serverConfig().RegisterAvailable}
+                onChange={(e) => setServerConfig({...serverConfig(), RegisterAvailable: e.valueOf()})}
+                class="flex items-center space-x-2"
+              >
+                <SwitchControl>
+                  <SwitchThumb />
+                </SwitchControl>
+                <SwitchLabel>新規登録を有効化</SwitchLabel>
+              </Switch>
+              <Switch
+                checked={serverConfig().RegisterInviteOnly}
+                onChange={(e) => setServerConfig({...serverConfig(), RegisterInviteOnly: e.valueOf()})}
+                class="flex items-center space-x-2"
+              >
+                <SwitchControl>
+                  <SwitchThumb />
+                </SwitchControl>
+                <SwitchLabel>招待制にする</SwitchLabel>
+              </Switch>
+            </span>
+
+            <hr class="my-4" />
+
+            <p class="font-bold mb-2">メッセージ</p>
+            <span class="flex flex-col gap-2">
+              <NumberField
+                class="w-36"
+                value={serverConfig().MessageMaxLength}
+                defaultValue={serverConfig().MessageMaxLength}
+                onRawValueChange={(e) => setServerConfig({...serverConfig(), MessageMaxLength: e})}
+                validationState={serverConfig().MessageMaxLength === 0 ? "invalid" : "valid"}
+              >
+                <NumberFieldGroup>
+                  <NumberFieldInput />
+                  <NumberFieldIncrementTrigger />
+                  <NumberFieldDecrementTrigger />
+                </NumberFieldGroup>
+                <NumberFieldErrorMessage>発言できません。</NumberFieldErrorMessage>
+              </NumberField>
+            </span>
           </CardContent>
         </Card>
       </div>
