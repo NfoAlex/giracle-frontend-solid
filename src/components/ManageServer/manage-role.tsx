@@ -194,7 +194,7 @@ export default function ManageRole() {
             variant={"outline"}
             disabled={!roleChanged()}
           >復元</Button>
-          <Button onClick={saveRole} disabled={!roleChanged()}>保存</Button>
+          <Button onClick={saveRole} disabled={!roleChanged() || roleEditing().name === ""}>保存</Button>
           <Button ondblclick={deleteRole} variant={"destructive"} class="mr-auto">削除</Button>
         </CardFooter>
       </Card>
