@@ -1,6 +1,6 @@
 /* @refresh reload */
 import { render } from 'solid-js/web';
-import { Route, Router, useNavigate } from "@solidjs/router";
+import { Route, Router, useLocation, useNavigate } from "@solidjs/router";
 
 import './index.css';
 import { createEffect, type JSX, lazy, on, onMount, Show, Suspense } from 'solid-js';
@@ -80,7 +80,7 @@ render(() =>
   <Router root={(props) => (
     <>
       <SidebarProvider>
-        <Show when={location.pathname !== "/auth"}>
+        <Show when={useLocation().pathname !== "/auth"}>
           <AppSidebar />
         </Show>
         <Suspense>{props.children}</Suspense>
