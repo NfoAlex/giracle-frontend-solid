@@ -67,6 +67,15 @@ const AuthGuard = (props: {children?: JSX.Element}) => {
   );
 }
 
+const TopForMoving = () => {
+  const navi = useNavigate();
+  navi("/app");
+
+  return (
+    <p>移動します...</p>
+  )
+}
+
 render(() => 
   <Router root={(props) => (
     <>
@@ -78,6 +87,7 @@ render(() =>
       </SidebarProvider>
     </>
   )}>
+    <Route path="/" component={TopForMoving} />
     <Route path="/auth" component={lazy(() => import("./routes/auth"))} />
     <Route path="/app" component={AuthGuard}>
       <Route path="/" component={lazy(() => import("./routes/index"))} />
