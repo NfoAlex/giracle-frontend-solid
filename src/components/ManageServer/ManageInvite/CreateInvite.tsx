@@ -8,6 +8,7 @@ import type { IInvite } from "~/types/Server";
 
 export default function CreateInvite(props: { inviteActionTaken: (dat: IInvite) => void }) {
   const [code, setCode] = createSignal<string>("");
+  const [open, setOpen] = createSignal(false); //ダイアログの開閉
 
   /**
    * 招待を作成する
@@ -18,6 +19,7 @@ export default function CreateInvite(props: { inviteActionTaken: (dat: IInvite) 
         console.log("CreateInvite :: createInvite :: r->", r);
         setCode("");
         props.inviteActionTaken(r.data); //親に伝える
+        setOpen(false); //ダイアログを閉じる
       })
       .catch((e) => {
         console.error("CreateInvite :: createInvite :: e->", e);
@@ -25,8 +27,8 @@ export default function CreateInvite(props: { inviteActionTaken: (dat: IInvite) 
   }
 
   return (
-    <Dialog>
-      <DialogContent>
+    <Dialog open={open()} onOpenChange={setOpen}>
+      <DialogContent id="dialogCreateInvite">
         <DialogTitle>
           招待を作成する
         </DialogTitle>
