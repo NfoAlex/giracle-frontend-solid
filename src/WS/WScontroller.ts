@@ -1,6 +1,7 @@
 import GET_USER_GET_ONLINE from "~/api/USER/USER_GET_ONLINE";
 import { storeAppStatus } from "~/stores/AppStatus";
 import WSSendMessage from "./Message/SendMessage";
+import WSUpdateChannel from "./Channel/UpdateChannel";
 
 //WSインスタンス
 export let ws: WebSocket | undefined = undefined;
@@ -33,6 +34,11 @@ export const initWS = async () => {
         //メッセージの受け取り
         case "message::SendMessage":
           WSSendMessage(json.data);
+          break;
+
+        //チャンネル情報の受け取り
+        case "channel::UpdateChannel":
+          WSUpdateChannel(json.data);
           break;
       }
     } catch(e) {
