@@ -61,11 +61,21 @@ export default function ManageInvite() {
       })
   }
 
+  /**
+   * 招待に対し操作されたあとにリストを再取得する
+   * @param dat 
+   */
+  const inviteActionTaken = (dat: IInvite) => {
+    console.log("ManageInvite :: sig : dat->", dat);
+
+    fetchInvites();
+  }
+
   onMount(fetchInvites);
 
   return (
     <div class="flex flex-col overflow-y-auto">
-      <InviteTable columns={col} data={invites()} />
+      <InviteTable columns={col} data={invites()} inviteActionTaken={inviteActionTaken} />
 
       {/* 再取得ボタン */}
       <Button
@@ -76,7 +86,7 @@ export default function ManageInvite() {
         <IconRefresh />
       </Button>
       {/* 招待作成ボタン */}
-      <CreateInvite />
+      <CreateInvite inviteActionTaken={inviteActionTaken} />
     </div>
   )
 }

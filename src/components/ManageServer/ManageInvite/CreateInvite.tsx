@@ -4,8 +4,9 @@ import { createSignal } from "solid-js";
 import { TextField, TextFieldInput, TextFieldLabel } from "../../ui/text-field";
 import { Button } from "~/components/ui/button";
 import PUT_SERVER_CREATE_INVITE from "~/api/SERVER/SERVER_CREATE_INVITE";
+import type { IInvite } from "~/types/Server";
 
-export default function CreateInvite() {
+export default function CreateInvite(props: { inviteActionTaken: (dat: IInvite) => void }) {
   const [code, setCode] = createSignal<string>("");
 
   /**
@@ -16,6 +17,7 @@ export default function CreateInvite() {
       .then((r) => {
         console.log("CreateInvite :: createInvite :: r->", r);
         setCode("");
+        props.inviteActionTaken(r.data); //親に伝える
       })
       .catch((e) => {
         console.error("CreateInvite :: createInvite :: e->", e);

@@ -1,6 +1,5 @@
 import { createSignal, For, Show } from "solid-js"
 import { type ColumnDef, createSolidTable, flexRender, getCoreRowModel } from "@tanstack/solid-table"
- 
 import {
   Table,
   TableBody,
@@ -12,10 +11,12 @@ import {
 import { Button } from "~/components/ui/button"
 import { Card } from "~/components/ui/card"
 import DELETE_SERVER_DELETE_INVITE from "~/api/SERVER/SERVER_DELETE_INVITE"
+import type { IInvite } from "~/types/Server"
  
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
-  data: TData[]
+  data: TData[],
+  inviteActionTaken: (data: IInvite) => void
 }
  
 export function InviteTable<TData, TValue>(props: DataTableProps<TData, TValue>) {
@@ -42,11 +43,14 @@ export function InviteTable<TData, TValue>(props: DataTableProps<TData, TValue>)
    */
   const deleteInvite = () => {
     for (const row of table.getFilteredSelectedRowModel().rows) {
+      const inviteData = row.original as IInvite;
+
       //id指定でエラーが出てますがきちんと割り当てられています。
-      DELETE_SERVER_DELETE_INVITE(Number.parseInt(row.original.id || undefined))
+      DELETE_SERVER_DELETE_INVITE(inviteData.id)
         .then((r) => {
           console.log("ManageInvite :: deleteInvite :: r->", r);
           setRowSelection({}); // 選択を解除
+          props.inviteActionTaken(row.getValue("id")); //親に伝える
         })
         .catch((e) => {
           console.error("ManageInvite :: deleteInvite :: e->", e);
