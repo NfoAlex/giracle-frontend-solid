@@ -8,6 +8,7 @@ import PUT_CHANNEL_CREATE from "~/api/CHANNEL/CHANNEL_CREATE";
 export default function CreateChannel() {
   const [channelName, setChannelName] = createSignal<string>("");
   const [description, setDescription] = createSignal<string>("");
+  const [open, setOpen] = createSignal(false); //ダイアログの開閉
 
   /**
    * チャンネル作成
@@ -16,6 +17,7 @@ export default function CreateChannel() {
     PUT_CHANNEL_CREATE(channelName(), description())
       .then((r) => {
         console.log("CreateChannel :: createChannel :: r ->", r);
+        setOpen(false); //ダイアログを閉じる
       })
       .catch((err) => {
         console.error("CreateChannel :: createChannel :: err ->", err);
@@ -23,7 +25,7 @@ export default function CreateChannel() {
   }
 
   return (
-    <Dialog>
+    <Dialog open={open()} onOpenChange={setOpen}>
       <DialogContent>
         <DialogTitle>
           チャンネル作成
