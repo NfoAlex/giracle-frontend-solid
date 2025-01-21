@@ -4,8 +4,6 @@ import { setStoreUserinfo } from "~/stores/Userinfo";
 export default function WSRoleUnlinked(dat: { roleId: string, userId: string }) {
   console.log("WSRoleUnlinked :: triggered dat->", dat);
 
-  const myRole = storeMyUserinfo.RoleLink;
-
   //リンクされていて自分のユーザーId宛てなら解除
   if (storeMyUserinfo.id === dat.userId) {
     setStoreMyUserinfo((prev) => {
@@ -27,7 +25,7 @@ export default function WSRoleUnlinked(dat: { roleId: string, userId: string }) 
     //Store更新
     prev[dat.userId] = _user;
 
-    console.log("WSRoleUnlinked :: setStoreUserinfo :: prev[dat.userId] ->", prev[dat.userId]);
+    //console.log("WSRoleUnlinked :: setStoreUserinfo :: prev[dat.userId] ->", prev[dat.userId]);
     return prev;
   });
 }
