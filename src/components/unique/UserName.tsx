@@ -13,6 +13,7 @@ import { Badge } from "../ui/badge";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import type { IRole } from "~/types/Role";
 import { GET_ROLE_LIST } from "~/api/ROLE/ROLE_LIST";
+import POST_ROLE_LINK from "~/api/ROLE/ROLE_LINK";
 
 export default function UserName(props: { userId: string }) {
   const [user] = createResource(props.userId, getterUserinfo);
@@ -20,6 +21,18 @@ export default function UserName(props: { userId: string }) {
 
   const [openRoleList, setOpenRoleList] = createSignal(false);
   const [roleList, setRoleList] = createSignal<IRole[]>([]);
+
+  /**
+   * ロールを付与
+   * @param roleId 付与するロールのId
+   */
+  const linkRole = (roleId: string) => {
+    POST_ROLE_LINK(props.userId, roleId)
+      .then((r) => {
+        console.log("UserName :: linkRole :: r ->", r);
+      })
+      .catch((e) => console.error("UserName :: linkRole :: err ->", e));
+  }
 
   createEffect(() => {
     if (openRoleList() && roleList().length === 0) {
@@ -92,9 +105,13 @@ export default function UserName(props: { userId: string }) {
                     </Badge>
                   </PopoverTrigger>
                   <PopoverContent >
-                    <div class="max-h-[25vh] overflow-y-auto flex flex-col gap-1">
+                    <div class="max-h-[25vh] max-w-[75vw] w-fit overflow-y-auto flex flex-col gap-1">
                       <For each={roleList()}>
-                        {(role) => <RoleChip deltable={false} roleId={role.id} />}
+                        {(role) => 
+                          <span onclick={()=>linkRole(role.id)} class="cursor-pointer">
+                            <RoleChip deltable={false} roleId={role.id} />
+                          </span>
+                        }
                       </For>
                     </div>
                   </PopoverContent>
