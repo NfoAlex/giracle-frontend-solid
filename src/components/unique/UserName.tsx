@@ -125,8 +125,6 @@ export default function UserName(props: { userId: string }) {
               <Card class="px-4 py-2">ここでBANとかする</Card>
             </div>
           </div>
-
-          <Button onclick={()=>console.log("UserName :: () : user->", user())}>log</Button>
         </Show>
       </DialogContent>
 
