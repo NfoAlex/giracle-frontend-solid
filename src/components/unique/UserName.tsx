@@ -38,12 +38,12 @@ export default function UserName(props: { userId: string }) {
     if (openRoleList() && roleList().length === 0) {
       //ロールリストを取得
       GET_ROLE_LIST()
-       .then((r) => {
-         setRoleList(r.data);
-       })
-       .catch((e) => {
-         console.error("UserName :: createEffect :: openRoleList :: err ->", e);
-       });
+        .then((r) => {
+          setRoleList(r.data);
+        })
+        .catch((e) => {
+          console.error("UserName :: createEffect :: openRoleList :: err ->", e);
+        });
     }
   })
 
@@ -107,7 +107,9 @@ export default function UserName(props: { userId: string }) {
                   <PopoverContent class="w-fit">
                     <div class="max-h-[25vh] max-w-[75vw] overflow-y-auto flex flex-col gap-1">
                       <For each={roleList()}>
-                        {(role) => 
+                        {(role) => //ロールリンクされていないものだけ表示
+                          !storeUserinfo[user().id].RoleLink.some((rl) => rl.roleId === role.id)
+                          &&
                           <span onclick={()=>linkRole(role.id)} class="cursor-pointer pr-2">
                             <RoleChip deletable={false} roleId={role.id} />
                           </span>
