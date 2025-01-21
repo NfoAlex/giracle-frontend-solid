@@ -1,5 +1,5 @@
-import { createEffect, createResource, createSignal, For, Show } from "solid-js";
-import { getterUserinfo } from "~/stores/Userinfo";
+import { createEffect, createSignal, For, Show } from "solid-js";
+import { getterUserinfo, storeUserinfo } from "~/stores/Userinfo";
 import { Dialog, DialogContent, DialogTrigger } from "../ui/dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Card } from "../ui/card";
@@ -16,7 +16,7 @@ import { GET_ROLE_LIST } from "~/api/ROLE/ROLE_LIST";
 import POST_ROLE_LINK from "~/api/ROLE/ROLE_LINK";
 
 export default function UserName(props: { userId: string }) {
-  const [user] = createResource(props.userId, getterUserinfo);
+  const [user] = createSignal(getterUserinfo(props.userId));
   const [open, setOpen] = createSignal(false);
 
   const [openRoleList, setOpenRoleList] = createSignal(false);
@@ -50,28 +50,28 @@ export default function UserName(props: { userId: string }) {
   return (
     <Dialog open={open()} onOpenChange={setOpen}>
       <DialogContent class="p-0 max-h-[90vh] flex flex-col overflow-y-auto">
-        <Show when={open() && !user.loading}>
+        <Show when={open() && user()}>
           <div class="h-[35%] w-full">
             <img
               alt="user banner"
-              src={`/api/user/banner/${user()?.id}`}
+              src={`/api/user/banner/${storeUserinfo[props.userId].id}`}
               class="h-full w-full object-cover"
             />
           </div>
           <div class="w-full -mt-12">
             <Avatar class="w-16 h-16 ml-4">
-              <AvatarImage src={`/api/user/icon/${user()?.id}`} />
-              <AvatarFallback class="w-full h-full">{user()?.name}</AvatarFallback>
+              <AvatarImage src={`/api/user/icon/${user().id}`} />
+              <AvatarFallback class="w-full h-full">{user().name}</AvatarFallback>
             </Avatar>
           </div>
 
           <div class="pb-2 px-4 flex flex-col gap-2">
             {/* 名前 */}
             <span class="flex items-center">
-              <p class="font-bold text-2xl w-min">{user()?.name}</p>
+              <p class="font-bold text-2xl w-min">{user().name}</p>
 
               {
-                storeMyUserinfo.id === user()?.id
+                storeMyUserinfo.id === user().id
                 &&
                 <Button as={A} href="/app/profile" class="ml-auto">
                   <IconPencil />
@@ -82,15 +82,16 @@ export default function UserName(props: { userId: string }) {
             {/* 自己紹介 */}
             <div>
               <Label>自己紹介</Label>
-              <Card class="px-4 py-2">{user()?.selfIntroduction}</Card>
+              <Card class="px-4 py-2">{user().selfIntroduction}</Card>
             </div>
             
             {/* ロール */}
             <div>
               <Label>ロール</Label>
+              ロール長 : { storeUserinfo[user().id]?.RoleLink.length }
               <div class="flex flex-wrap gap-1">
-                <For each={user()?.RoleLink}>
-                  {(role) =><RoleChip deletable={true} roleId={role.roleId} userId={props.userId} />}
+                <For each={storeUserinfo[user().id].RoleLink}>
+                  {(role, index) =><RoleChip deletable={true} roleId={role.roleId} userId={props.userId} />}
                 </For>
 
                 {/* ロール追加ボタン */}
@@ -104,11 +105,11 @@ export default function UserName(props: { userId: string }) {
                       <IconPlus size={12} />
                     </Badge>
                   </PopoverTrigger>
-                  <PopoverContent >
-                    <div class="max-h-[25vh] max-w-[75vw] w-fit overflow-y-auto flex flex-col gap-1">
+                  <PopoverContent class="w-fit">
+                    <div class="max-h-[25vh] max-w-[75vw] overflow-y-auto flex flex-col gap-1">
                       <For each={roleList()}>
                         {(role) => 
-                          <span onclick={()=>linkRole(role.id)} class="cursor-pointer">
+                          <span onclick={()=>linkRole(role.id)} class="cursor-pointer pr-2">
                             <RoleChip deletable={false} roleId={role.id} />
                           </span>
                         }
@@ -125,11 +126,13 @@ export default function UserName(props: { userId: string }) {
               <Card class="px-4 py-2">ここでBANとかする</Card>
             </div>
           </div>
+
+          <Button onclick={()=>console.log("UserName :: () : user->", user())}>log</Button>
         </Show>
       </DialogContent>
 
       <DialogTrigger>
-        <p class="font-bold">{user.loading ? props.userId : user()?.name}</p>
+        <p class="font-bold">{!user() ? props.userId : user().name}</p>
       </DialogTrigger>
     </Dialog>
   );

@@ -21,12 +21,20 @@ export const updateUserinfo = (value: IUser) => {
 };
 
 /**
- * チャンネル情報を返す。無いなら取得してから返す
- * @param channelId
+ * ユーザー情報を返す。無いなら取得してから返す
+ * @param userId
  */
-export const getterUserinfo = async (userId: string): Promise<IUser> => {
+export const getterUserinfo = (userId: string): IUser => {
   if (storeUserinfo[userId] === undefined) {
-    await GET_USER_INFO(userId)
+    updateUserinfo({
+      id: userId,
+      name: "ロード中...",
+      selfIntroduction: "ロード中のユーザー情報です。しばらく経っても同じ表示の場合、リロードしてください。",
+      ChannelJoin: [],
+      RoleLink: []
+    });
+
+    GET_USER_INFO(userId)
       .then((r) => {
         //Storeに設定
         updateUserinfo(r.data);
