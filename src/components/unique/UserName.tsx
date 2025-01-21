@@ -19,6 +19,7 @@ export default function UserName(props: { userId: string }) {
   const [user] = createSignal(getterUserinfo(props.userId));
   const [open, setOpen] = createSignal(false);
 
+  // ロールリスト用
   const [openRoleList, setOpenRoleList] = createSignal(false);
   const [roleList, setRoleList] = createSignal<IRole[]>([]);
 
