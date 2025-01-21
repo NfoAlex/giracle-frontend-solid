@@ -1,3 +1,4 @@
+import { produce } from "solid-js/store";
 import { setStoreMyUserinfo, storeMyUserinfo } from "~/stores/MyUserinfo";
 import { setStoreUserinfo } from "~/stores/Userinfo";
 
@@ -13,7 +14,7 @@ export default function WSRoleLinked(dat: { roleId: string, userId: string }) {
   }
 
   //ユーザー情報Storeを更新
-  setStoreUserinfo((prev) => {
+  setStoreUserinfo(produce((prev) => {
     //もしユーザー情報Storeにこの人が無いなら停止
     if (prev[dat.userId] === undefined) return prev;
     //ユーザー情報をコピー
@@ -27,5 +28,5 @@ export default function WSRoleLinked(dat: { roleId: string, userId: string }) {
 
     //console.log("WSRoleLinked :: setStoreUserinfo :: prev[dat.userId] ->", prev[dat.userId]);
     return prev;
-  });
+  }));
 }
