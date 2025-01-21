@@ -7,6 +7,7 @@ import { Label } from "../ui/label";
 import { Button } from "../ui/button";
 import { IconPencil } from "@tabler/icons-solidjs";
 import { A } from "@solidjs/router";
+import { storeMyUserinfo } from "~/stores/MyUserinfo";
 
 export default function UserName(props: { userId: string }) {
   const [user] = createResource(props.userId, getterUserinfo);
@@ -34,9 +35,13 @@ export default function UserName(props: { userId: string }) {
             <span class="flex items-center">
               <p class="font-bold text-2xl w-min">{user()?.name}</p>
 
-              <Button as={A} href="/app/profile" class="ml-auto">
-                <IconPencil />
-              </Button>
+              {
+                storeMyUserinfo.id === user()?.id
+                &&
+                <Button as={A} href="/app/profile" class="ml-auto">
+                  <IconPencil />
+                </Button>
+              }
             </span>
 
             <div>
