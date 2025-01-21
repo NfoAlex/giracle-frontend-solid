@@ -8,6 +8,7 @@ import { Button } from "../ui/button";
 import { IconPencil } from "@tabler/icons-solidjs";
 import { A } from "@solidjs/router";
 import { storeMyUserinfo } from "~/stores/MyUserinfo";
+import RoleChip from "./RoleChip";
 
 export default function UserName(props: { userId: string }) {
   const [user] = createResource(props.userId, getterUserinfo);
@@ -51,11 +52,11 @@ export default function UserName(props: { userId: string }) {
 
             <div>
               <Label>ロール</Label>
-              <Card class="px-4 py-2">
+              <div class="flex flex-wrap">
                 <For each={user()?.RoleLink}>
-                  {(role) => <p>{role.roleId}</p>}
+                  {(role) =><RoleChip deltable={false} roleId={role.roleId} />}
                 </For>
-              </Card>
+              </div>
             </div>
 
             <div>
