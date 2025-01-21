@@ -90,7 +90,7 @@ export default function UserName(props: { userId: string }) {
               <Label>ロール</Label>
               <div class="flex flex-wrap gap-1">
                 <For each={user()?.RoleLink}>
-                  {(role) =><RoleChip deltable={false} roleId={role.roleId} />}
+                  {(role) =><RoleChip deletable={true} roleId={role.roleId} userId={props.userId} />}
                 </For>
 
                 {/* ロール追加ボタン */}
@@ -109,7 +109,7 @@ export default function UserName(props: { userId: string }) {
                       <For each={roleList()}>
                         {(role) => 
                           <span onclick={()=>linkRole(role.id)} class="cursor-pointer">
-                            <RoleChip deltable={false} roleId={role.id} userId={props.userId} />
+                            <RoleChip deletable={false} roleId={role.id} />
                           </span>
                         }
                       </For>
