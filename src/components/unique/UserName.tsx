@@ -109,7 +109,7 @@ export default function UserName(props: { userId: string }) {
                       <For each={roleList()}>
                         {(role) => 
                           <span onclick={()=>linkRole(role.id)} class="cursor-pointer">
-                            <RoleChip deltable={false} roleId={role.id} />
+                            <RoleChip deltable={false} roleId={role.id} userId={props.userId} />
                           </span>
                         }
                       </For>
