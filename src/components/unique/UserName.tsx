@@ -4,6 +4,9 @@ import { Dialog, DialogContent, DialogTrigger } from "../ui/dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Card } from "../ui/card";
 import { Label } from "../ui/label";
+import { Button } from "../ui/button";
+import { IconPencil } from "@tabler/icons-solidjs";
+import { A } from "@solidjs/router";
 
 export default function UserName(props: { userId: string }) {
   const [user] = createResource(props.userId, getterUserinfo);
@@ -27,21 +30,33 @@ export default function UserName(props: { userId: string }) {
             </Avatar>
           </div>
 
-          <div class="pb-2 px-4 flex flex-col gap-4">
-            <p class="font-bold text-2xl w-min">{user()?.name}</p>
+          <div class="pb-2 px-4 flex flex-col gap-2">
+            <span class="flex items-center">
+              <p class="font-bold text-2xl w-min">{user()?.name}</p>
 
-            <Label>自己紹介</Label>
-            <Card class="px-4 py-2">{user()?.selfIntroduction}</Card>
+              <Button as={A} href="/app/profile" class="ml-auto">
+                <IconPencil />
+              </Button>
+            </span>
 
-            <Label>ロール</Label>
-            <Card class="px-4 py-2">
-              <For each={user()?.RoleLink}>
-                {(role) => <p>{role.roleId}</p>}
-              </For>
-            </Card>
+            <div>
+              <Label>自己紹介</Label>
+              <Card class="px-4 py-2">{user()?.selfIntroduction}</Card>
+            </div>
 
-            <Label>管理</Label>
-            <Card class="px-4 py-2">ここでBANとかする</Card>
+            <div>
+              <Label>ロール</Label>
+              <Card class="px-4 py-2">
+                <For each={user()?.RoleLink}>
+                  {(role) => <p>{role.roleId}</p>}
+                </For>
+              </Card>
+            </div>
+
+            <div>
+              <Label>管理</Label>
+              <Card class="px-4 py-2">ここでBANとかする</Card>
+            </div>
           </div>
         </Show>
       </DialogContent>
