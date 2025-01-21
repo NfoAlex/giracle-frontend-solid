@@ -11,9 +11,9 @@ export default function UserName(props: { userId: string }) {
 
   return (
     <Dialog open={open()} onOpenChange={setOpen}>
-      <DialogContent class="p-0 max-h-[50vh] flex flex-col overflow-y-auto">
+      <DialogContent class="p-0 max-h-[90vh] flex flex-col overflow-y-auto">
         <Show when={open() && !user.loading}>
-          <div class="h-[45%] w-full">
+          <div class="h-[35%] w-full">
             <img
               alt="user banner"
               src={`/api/user/banner/${user()?.id}`}
@@ -39,6 +39,9 @@ export default function UserName(props: { userId: string }) {
                 {(role) => <p>{role.roleId}</p>}
               </For>
             </Card>
+
+            <Label>管理</Label>
+            <Card class="px-4 py-2">ここでBANとかする</Card>
           </div>
         </Show>
       </DialogContent>
