@@ -68,7 +68,7 @@ export default function UserName(props: { userId: string }) {
           <div class="pb-2 px-4 flex flex-col gap-2">
             {/* 名前 */}
             <span class="flex items-center">
-              <p class="font-bold text-2xl w-min">{user().name}</p>
+              <p class="font-bold text-2xl w-min">{storeUserinfo[user().id].name}</p>
 
               {
                 storeMyUserinfo.id === user().id
@@ -82,16 +82,15 @@ export default function UserName(props: { userId: string }) {
             {/* 自己紹介 */}
             <div>
               <Label>自己紹介</Label>
-              <Card class="px-4 py-2">{user().selfIntroduction}</Card>
+              <Card class="px-4 py-2">{storeUserinfo[user().id].selfIntroduction}</Card>
             </div>
             
             {/* ロール */}
             <div>
               <Label>ロール</Label>
-              ロール長 : { storeUserinfo[user().id]?.RoleLink.length }
               <div class="flex flex-wrap gap-1">
                 <For each={storeUserinfo[user().id].RoleLink}>
-                  {(role, index) =><RoleChip deletable={true} roleId={role.roleId} userId={props.userId} />}
+                  {(role) =><RoleChip deletable={true} roleId={role.roleId} userId={props.userId} />}
                 </For>
 
                 {/* ロール追加ボタン */}
