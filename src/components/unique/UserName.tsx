@@ -99,7 +99,7 @@ export default function UserName(props: { userId: string }) {
                     <Badge
                       onclick={()=>console.log("asdf")}
                       variant={"outline"}
-                      class="cursor-pointer"
+                      class="cursor-pointer h-full"
                     >
                       <IconPlus size={12} />
                     </Badge>
