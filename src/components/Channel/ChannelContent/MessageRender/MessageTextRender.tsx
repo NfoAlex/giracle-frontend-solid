@@ -1,6 +1,6 @@
-import { createEffect, createSignal, For, onMount, type JSX } from "solid-js";
+import { createSignal, For, onMount, type JSX } from "solid-js";
 import { Dynamic } from "solid-js/web";
-import { directGetterChannelInfo, getterChannelInfo } from "~/stores/ChannelInfo";
+import { directGetterChannelInfo } from "~/stores/ChannelInfo";
 import { getterUserinfo } from "~/stores/Userinfo";
 
 export default function MessageTextRender(props: { content: string }) {
