@@ -101,7 +101,6 @@ export default function MessageTextRender(props: { content: string }) {
   })
 
   return <p class="whitespace-pre-wrap break-all">
-    { text() }
     <For each={text()}>
       {(el) => <Dynamic component={() => <>{el}</>} Fallback={<span>{el}</span>} />}
     </For>
