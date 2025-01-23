@@ -73,7 +73,7 @@ export default function MessageTextRender(props: { content: string }) {
             MessageRenderingFinal.push(<a href={obj.context} target="_blank" rel="noreferrer" class="underline">{ obj.context }</a>);
             break;
           case "userId":
-            MessageRenderingFinal.push(<span>@{ getterUserinfo(obj.context.replace(/[<>]/g, "")).name } : { obj.context.replace(/[<>]/g, "") }</span>);
+            MessageRenderingFinal.push(<span>@{ getterUserinfo(obj.context.slice(2, -1)).name }</span>);
             break;
           case "breakLine":
             MessageRenderingFinal.push(<br />);
