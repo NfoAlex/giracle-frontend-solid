@@ -47,3 +47,38 @@ export const getterChannelInfo = async (
 
   return storeChannelInfo[channelId];
 };
+
+/**
+ * チャンネル情報を同期で返す。無いなら取得してから返す
+ * @param channelId
+ */
+export const directGetterChannelInfo = (
+  channelId: string,
+): IChannel => {
+  if (storeChannelInfo[channelId] === undefined) {
+    updateChannelInfo({
+      name: "ロード中...",
+      id: channelId,
+      description: "このチャンネルはロード中です",
+      createdUserId: "",
+      isArchived: false,
+    });
+    GET_CHANNEL_GET_INFO(channelId)
+      .then((r) => {
+        //Storeに設定
+        updateChannelInfo(r.data);
+      })
+      .catch((e) => {
+        console.error("ChannelInfo :: getterChannelInfo : エラー -> ", e);
+        updateChannelInfo({
+          name: "存在しないチャンネル",
+          id: channelId,
+          description: "存在しないチャンネル",
+          createdUserId: "",
+          isArchived: false,
+        });
+      });
+  }
+
+  return storeChannelInfo[channelId];
+};
