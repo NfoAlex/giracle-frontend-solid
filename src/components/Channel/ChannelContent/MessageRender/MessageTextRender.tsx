@@ -21,14 +21,14 @@ export default function MessageTextRender(props: { content: string }) {
     //レンダーする要素用データ
     const ObjectIndex: {
       context: string;
-      type: "link" | "userId" | "breakLine" | "channel";
+      type: "link" | "userId" | "breakLine" | "channel" | "inlineCode";
       index: number;
     }[] = [];
 
     //メッセージ本文からRegexを使い要素データとテキストデータを分けて順番に追加する関数
     const addMatches = (
       regex: RegExp,
-      type: "link" | "userId" | "breakLine" | "channel",
+      type: "link" | "userId" | "breakLine" | "channel" | "inlineCode",
     ) => {
       let match = regex.exec(props.content);
       let lastIndex = 0;
@@ -50,6 +50,7 @@ export default function MessageTextRender(props: { content: string }) {
     addMatches(mentionPattern, "userId");
     addMatches(newlinePattern, "breakLine");
     addMatches(channelPattern, "channel");
+    addMatches(inlineCodePattern, "inlineCode");
 
     ObjectIndex.sort((a, b) => a.index - b.index);
 
@@ -84,6 +85,9 @@ export default function MessageTextRender(props: { content: string }) {
               <span>{ directGetterChannelInfo(obj.context).name }</span>
             );
             break;
+            case "inlineCode":
+              MessageRenderingFinal.push(<code>{ obj.context.slice(1, -1) }</code>);
+              break;
         }
       }
     }
