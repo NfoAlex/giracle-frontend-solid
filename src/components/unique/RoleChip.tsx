@@ -1,4 +1,4 @@
-import { IconCircleFilled, IconCircleXFilled, IconX } from "@tabler/icons-solidjs";
+import { IconCircleFilled, IconX } from "@tabler/icons-solidjs";
 import { Badge } from "../ui/badge";
 import { getterRoleInfo } from "~/stores/RoleInfo";
 import { createSignal, Show } from "solid-js";
