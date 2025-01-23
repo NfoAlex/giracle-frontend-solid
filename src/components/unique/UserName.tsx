@@ -1,4 +1,4 @@
-import { createEffect, createSignal, For, Show } from "solid-js";
+import { createSignal, For, Show } from "solid-js";
 import { getterUserinfo, storeUserinfo } from "~/stores/Userinfo";
 import { Dialog, DialogContent, DialogTrigger } from "../ui/dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
@@ -11,9 +11,9 @@ import { storeMyUserinfo } from "~/stores/MyUserinfo";
 import RoleChip from "./RoleChip";
 import { Badge } from "../ui/badge";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
-import type { IRole } from "~/types/Role";
-import { GET_ROLE_LIST } from "~/api/ROLE/ROLE_LIST";
 import POST_ROLE_LINK from "~/api/ROLE/ROLE_LINK";
+import { storeRoleInfo } from "~/stores/RoleInfo";
+import type { IRole } from "~/types/Role";
 
 export default function UserName(props: { userId: string }) {
   const [user] = createSignal(getterUserinfo(props.userId));
@@ -21,7 +21,7 @@ export default function UserName(props: { userId: string }) {
 
   // ロールリスト用
   const [openRoleList, setOpenRoleList] = createSignal(false);
-  const [roleList, setRoleList] = createSignal<IRole[]>([]);
+  const roles: IRole[] = Object.values(storeRoleInfo);;
 
   /**
    * ロールを付与
@@ -34,19 +34,6 @@ export default function UserName(props: { userId: string }) {
       })
       .catch((e) => console.error("UserName :: linkRole :: err ->", e));
   }
-
-  createEffect(() => {
-    if (openRoleList() && roleList().length === 0) {
-      //ロールリストを取得
-      GET_ROLE_LIST()
-        .then((r) => {
-          setRoleList(r.data);
-        })
-        .catch((e) => {
-          console.error("UserName :: createEffect :: openRoleList :: err ->", e);
-        });
-    }
-  })
 
   return (
     <Dialog open={open()} onOpenChange={setOpen}>
@@ -107,7 +94,7 @@ export default function UserName(props: { userId: string }) {
                   </PopoverTrigger>
                   <PopoverContent class="w-fit">
                     <div class="max-h-[25vh] max-w-[75vw] overflow-y-auto flex flex-col gap-1">
-                      <For each={roleList()}>
+                      <For each={roles}>
                         {(role) => //ロールリンクされていないものだけ表示
                           !storeUserinfo[user().id].RoleLink.some((rl) => rl.roleId === role.id)
                           &&
@@ -132,7 +119,7 @@ export default function UserName(props: { userId: string }) {
       </DialogContent>
 
       <DialogTrigger>
-        <p class="font-bold">{!user() ? props.userId : user().name}</p>
+        <p class="font-bold">{!user() ? props.userId : getterUserinfo(props.userId).name}</p>
       </DialogTrigger>
     </Dialog>
   );
