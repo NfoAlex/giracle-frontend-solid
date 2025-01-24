@@ -2,7 +2,7 @@ import {Card} from "~/components/ui/card";
 import {createSignal, onMount} from "solid-js";
 import {useParams} from "@solidjs/router";
 
-export default function FilePreview(
+export default function FileUploadPreview(
   props: {
     file: File,
     dataSetter: (files: string) => void
@@ -16,7 +16,7 @@ export default function FilePreview(
    * ファイルをアップロードする
    */
   const uploadFile = async () => {
-    console.log("FilePreview :: uploadFile : props.file->", props.file, " : params.channelId->", params.channelId);
+    console.log("FileUploadPreview :: uploadFile : props.file->", props.file, " : params.channelId->", params.channelId);
 
     //アップロードするデータフォームオブジェクト生成
     const formData = new FormData();
@@ -42,7 +42,7 @@ export default function FilePreview(
     //アップロードの結果用
     xhr.addEventListener("load", () => {
       if (xhr.status === 200) {
-        console.log("FilePreview :: uploadFile : 成功!->", xhr.responseText);
+        console.log("FileUploadPreview :: uploadFile : 成功!->", xhr.responseText);
         const result: { result: string; data: { fileId: string } } = JSON.parse(
           xhr.responseText,
         );
@@ -52,11 +52,11 @@ export default function FilePreview(
           setResult("SUCCESS");
         } else {
           //エラーとして設定
-          console.error("FilePreview :: uploadFile : 結果が取れていない->", result);
+          console.error("FileUploadPreview :: uploadFile : 結果が取れていない->", result);
           setResult("内部エラー");
         }
       } else {
-        console.error("FilePreview :: uploadFile : 失敗...->", xhr.statusText);
+        console.error("FileUploadPreview :: uploadFile : 失敗...->", xhr.statusText);
         setResult(`error::${xhr.statusText}`);
       }
     });

@@ -21,7 +21,7 @@ export const updateUserinfo = (value: IUser) => {
 };
 
 /**
- * ユーザー情報を返す。無いなら取得してから返す
+ * ユーザー情報を返す。無いなら取得しつつ返す
  * @param userId
  */
 export const getterUserinfo = (userId: string): IUser => {

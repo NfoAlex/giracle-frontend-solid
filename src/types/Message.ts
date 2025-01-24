@@ -44,3 +44,8 @@ export interface IRequestChannelHistoryBody {
   fetchLength?: number;
   fetchDirection?: "older" | "newer";
 }
+
+export interface ISystemMessage {
+  targetUserId: string,
+  messageTerm: "WELCOME" | "CHANNEL_JOIN" | "CHANNEL_LEFT",
+}

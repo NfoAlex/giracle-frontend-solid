@@ -4,7 +4,7 @@ import { Button } from "../ui/button";
 import { useParams } from "@solidjs/router";
 import POST_MESSAGE_SEND from "~/api/MESSAGE/MESSAGE_SEND";
 import {IconUpload} from "@tabler/icons-solidjs";
-import FilePreview from "~/components/Channel/ChannelTextInput/FilePreview";
+import FileUploadPreview from "~/components/Channel/ChannelTextInput/FileUploadPreview";
 
 export default function ChannelTextInput() {
   const params = useParams();
@@ -74,7 +74,7 @@ export default function ChannelTextInput() {
             {(file) => {
               return (
                 <div class={"w-fit flex items-center"}>
-                  <FilePreview
+                  <FileUploadPreview
                     file={file}
                     dataSetter={pushFileIds}
                   />
