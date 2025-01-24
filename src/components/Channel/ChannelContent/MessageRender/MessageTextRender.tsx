@@ -62,8 +62,9 @@ export default function MessageTextRender(props: { content: string }) {
     }
     content.push(props.content.slice(lastIndex));
 
+    //最終的なレンダリング用配列
     const MessageRenderingFinal: JSX.Element[] = [];
-    //レンダーする要素配列をループしてVNodeへパース
+    //レンダーする要素配列をループしてJSXへパース
     for (let i = 0; i < content.length; i++) {
       //まず最初のデータをパースする
       MessageRenderingFinal.push(<span>{ content[i] }</span>);
