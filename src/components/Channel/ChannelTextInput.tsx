@@ -1,9 +1,10 @@
-import { createSignal } from "solid-js";
+import {createSignal, For, Show} from "solid-js";
 import { TextField, TextFieldInput } from "../ui/text-field";
 import { Button } from "../ui/button";
 import { useParams } from "@solidjs/router";
 import POST_MESSAGE_SEND from "~/api/MESSAGE/MESSAGE_SEND";
 import {IconUpload} from "@tabler/icons-solidjs";
+import FilePreview from "~/components/Channel/ChannelTextInput/FilePreview";
 
 export default function ChannelTextInput() {
   const params = useParams();
@@ -38,6 +39,10 @@ export default function ChannelTextInput() {
     }
   }
 
+  /**
+   * ペーストイベントからのファイルを受け取る
+   * @param event
+   */
   const receiveFiles = (event: ClipboardEvent) => {
     const items = event.clipboardData?.items;
     if (items) {
@@ -56,20 +61,38 @@ export default function ChannelTextInput() {
   }
 
   return (
-    <div class="flex items-center gap-1">
-      <input type={"file"} id={"fileInput"} class={"hidden"} />
+    <div class={"flex flex-col gap-2"}>
+      <Show when={fileInput().length > 0}>
+        <div>
+          <For each={fileInput()}>
+            {(file) => {
+              return (
+                <div class={"w-full overflow-x-auto flex items-center"}>
+                  <FilePreview
+                    file={file}
+                  />
+                </div>
+              );
+            }}
+          </For>
+        </div>
+        <hr />
+      </Show>
+      <div class="flex items-center gap-1">
+        <input type={"file"} id={"fileInput"} class={"hidden"} />
 
-      <Button onClick={bindFiles} variant={"secondary"}><IconUpload /></Button>
-      <TextField class="grow">
-        <TextFieldInput
-          type="text"
-          value={text()}
-          onInput={(e) => setText(e.currentTarget.value)}
-          onKeyDown={(e) => {e.key === "Enter" && sendMsg()}}
-          onPaste={(e) => receiveFiles(e)}
-        />
-      </TextField>
-      <Button onClick={sendMsg}>送信</Button>
+        <Button onClick={bindFiles} variant={"secondary"}><IconUpload /></Button>
+        <TextField class="grow">
+          <TextFieldInput
+            type="text"
+            value={text()}
+            onInput={(e) => setText(e.currentTarget.value)}
+            onKeyDown={(e) => {e.key === "Enter" && sendMsg()}}
+            onPaste={(e) => receiveFiles(e)}
+          />
+        </TextField>
+        <Button onClick={sendMsg}>送信</Button>
+      </div>
     </div>
   );
 }
