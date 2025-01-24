@@ -8,12 +8,12 @@ export default function URLPreview(props: { MessageUrlPreview: IMessageUrlPrevie
       <For each={props.MessageUrlPreview}>
         {(urlPreview: IMessageUrlPreview) => (
           <Card class={"md:w-1/3 sm:w-1/2"}>
-            <img src={urlPreview.imageLink} alt={""} class={"rounded-t"} />
+            <img src={urlPreview.imageLink} alt={""} class={"rounded-t mx-auto"} />
             <CardHeader class={"flex flex-row items-center gap-1"}>
               <img class={"w-4 h-fit"} src={urlPreview.faviconLink} alt="favicon" />
               <CardTitle>{ urlPreview.title }</CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent class={"whitespace-pre-wrap break-all"}>
               { urlPreview.description }
             </CardContent>
           </Card>
