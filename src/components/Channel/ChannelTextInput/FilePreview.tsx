@@ -76,7 +76,7 @@ export default function FilePreview(
         {result() === "SUCCESS" && "✅" }
         {result() === "内部エラー" && "!" }
         {result().startsWith("error::") && result() }
-        <p> __ { props.file.name }</p>
+        <p> : { props.file.name }</p>
       </Card>
     </div>
   );
