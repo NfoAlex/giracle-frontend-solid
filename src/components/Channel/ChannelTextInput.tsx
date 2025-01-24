@@ -9,6 +9,10 @@ import FilePreview from "~/components/Channel/ChannelTextInput/FilePreview";
 export default function ChannelTextInput() {
   const params = useParams();
   const [text, setText] = createSignal("");
+  const [fileIds, setFileIds] = createSignal<string[]>([]);
+  const pushFileIds = (fileId: string) => {
+    setFileIds([...fileIds(), fileId]);
+  }
   const [fileInput, setFileInput] = createSignal<File[]>([]);
 
   const sendMsg = () => {
@@ -70,6 +74,7 @@ export default function ChannelTextInput() {
                 <div class={"w-full overflow-x-auto flex items-center"}>
                   <FilePreview
                     file={file}
+                    dataSetter={pushFileIds}
                   />
                 </div>
               );
