@@ -82,7 +82,6 @@ export default function MessageTextRender(props: { content: string }) {
             break;
           case "channel":
             MessageRenderingFinal.push(
-              //h(ChannelChip, { channelId: obj.context }),
               <span>{ directGetterChannelInfo(obj.context).name }</span>
             );
             break;

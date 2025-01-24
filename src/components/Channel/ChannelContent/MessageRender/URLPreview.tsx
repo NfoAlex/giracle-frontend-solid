@@ -11,7 +11,11 @@ export default function URLPreview(props: { MessageUrlPreview: IMessageUrlPrevie
             <img src={urlPreview.imageLink} alt={""} class={"rounded-t mx-auto"} />
             <CardHeader class={"flex flex-row items-center gap-1"}>
               <img class={"w-4 h-fit"} src={urlPreview.faviconLink} alt="favicon" />
-              <CardTitle>{ urlPreview.title }</CardTitle>
+              <CardTitle>
+                <a href={urlPreview.url} target="_blank" rel="noreferrer" class="underline">
+                  {urlPreview.title}
+                </a>
+              </CardTitle>
             </CardHeader>
             <CardContent class={"whitespace-pre-wrap break-all"}>
               { urlPreview.description }
