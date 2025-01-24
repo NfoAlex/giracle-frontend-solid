@@ -85,9 +85,9 @@ export default function MessageTextRender(props: { content: string }) {
               <span>{ directGetterChannelInfo(obj.context).name }</span>
             );
             break;
-            case "inlineCode":
-              MessageRenderingFinal.push(<code>{ obj.context.slice(1, -1) }</code>);
-              break;
+          case "inlineCode":
+            MessageRenderingFinal.push(<code>{ obj.context.slice(1, -1) }</code>);
+            break;
         }
       }
     }
