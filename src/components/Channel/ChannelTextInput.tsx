@@ -22,6 +22,8 @@ export default function ChannelTextInput() {
       .then((r) => {
         console.log("POST_MESSAGE_SEND :: r->", r);
         setText("");
+        setFileIds([]);
+        setFileInput([]);
       })
       .catch((e) => {
         console.error("POST_MESSAGE_SEND :: e->", e);
