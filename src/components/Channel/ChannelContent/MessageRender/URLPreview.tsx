@@ -10,7 +10,7 @@ export default function URLPreview(props: { MessageUrlPreview: IMessageUrlPrevie
           <Card class={"md:w-1/3 sm:w-1/2"}>
             <img src={urlPreview.imageLink} alt={""} class={"rounded-t mx-auto"} />
             <CardHeader class={"flex flex-row items-center gap-1"}>
-              <img class={"w-4 h-fit"} src={urlPreview.faviconLink} alt="favicon" />
+              {urlPreview.faviconLink && <img class={"w-4 h-fit shrink"} src={urlPreview.faviconLink} alt="favicon" />}
               <CardTitle>
                 <a href={urlPreview.url} target="_blank" rel="noreferrer">
                   {urlPreview.title}
