@@ -1,15 +1,19 @@
 import type {IMessageUrlPreview} from "~/types/Message";
-import {Card, CardContent} from "~/components/ui/card";
+import {Card, CardContent, CardHeader, CardTitle} from "~/components/ui/card";
 import {For} from "solid-js";
 
 export default function URLPreview(props: { MessageUrlPreview: IMessageUrlPreview[] }) {
   return (
-    <div>
+    <div class={"py-1"}>
       <For each={props.MessageUrlPreview}>
         {(urlPreview: IMessageUrlPreview) => (
-          <Card>
+          <Card class={"md:w-1/3 sm:w-1/2"}>
+            <img src={urlPreview.imageLink} alt={""} />
+            <CardHeader class={"flex flex-row items-center gap-1"}>
+              <img class={"w-4 h-fit"} src={urlPreview.faviconLink} alt="favicon" />
+              <CardTitle>{ urlPreview.title }</CardTitle>
+            </CardHeader>
             <CardContent>
-              { urlPreview.title }
               { urlPreview.description }
             </CardContent>
           </Card>
