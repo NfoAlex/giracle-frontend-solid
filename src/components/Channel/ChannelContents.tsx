@@ -89,13 +89,8 @@ export default function ChannelContents() {
     if (storeHistory[param.channelId].history === undefined) return false;
     if (storeHistory[param.channelId].history.length === index + 1) return false;
 
-    if (
-      storeHistory[param.channelId].history[index].userId ===
-      storeHistory[param.channelId].history[index + 1].userId
-    )
-      return true;
-
-    return false;
+    return storeHistory[param.channelId].history[index].userId ===
+      storeHistory[param.channelId].history[index + 1].userId;
   };
 
   /**
