@@ -151,9 +151,9 @@ export default function ChannelContents() {
         storeHistory[param.channelId]?.history.length === 0 ||
         storeHistory[param.channelId] === undefined
       ) {
-        const time = storeMessageReadTime.find((c) => {
-          c.channelId === param.channelId;
-        })?.readTime;
+        const time = storeMessageReadTime.find((c) =>
+          c.channelId === param.channelId
+        )?.readTime;
 
         //履歴を取得、格納した時点でもう一度履歴取得を試す
         FetchHistory(param.channelId, { messageTimeFrom: time }, "older").then(() =>
@@ -194,9 +194,9 @@ export default function ChannelContents() {
       storeHistory[param.channelId]?.history.length === 0 ||
       storeHistory[param.channelId] === undefined
     ) {
-      const time = storeMessageReadTime.find((c) => {
-        c.channelId === param.channelId;
-      })?.readTime;
+      const time = storeMessageReadTime.find((c) =>
+        c.channelId === param.channelId
+      )?.readTime;
 
       //履歴を取得、格納した時点でもう一度履歴取得を試す
       FetchHistory(param.channelId, { messageTimeFrom: time }, "older").then(() =>
