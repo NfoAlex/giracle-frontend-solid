@@ -10,7 +10,7 @@ export default function FilePreview(
 ) {
   const params = useParams();
   const [progress, setProgress] = createSignal(0);
-  const [isUploaded, setIsUploaded] = createSignal(false);
+  const [result, setResult] = createSignal<"" | "SUCCESS" | "内部エラー" | `error::${string}`>("");
 
   /**
    * ファイルをアップロードする
@@ -46,18 +46,18 @@ export default function FilePreview(
         const result: { result: string; data: { fileId: string } } = JSON.parse(
           xhr.responseText,
         );
-        //結果を格納
-        setIsUploaded(true);
         //結果がちゃんと取れているなら親コンポにファイルIdを渡す
         if (result.data !== undefined) {
           props.dataSetter(result.data.fileId);
-          setIsUploaded(true);
+          setResult("SUCCESS");
         } else {
           //エラーとして設定
           console.error("FilePreview :: uploadFile : 結果が取れていない->", result);
+          setResult("内部エラー");
         }
       } else {
         console.error("FilePreview :: uploadFile : 失敗...->", xhr.statusText);
+        setResult(`error::${xhr.statusText}`);
       }
     });
 
@@ -72,7 +72,10 @@ export default function FilePreview(
   return (
     <div>
       <Card class={"p-2 w-fit flex items-center"}>
-        {progress()}
+        {result() === "" && progress() }
+        {result() === "SUCCESS" && "✅" }
+        {result() === "内部エラー" && "!" }
+        {result().startsWith("error::") && result() }
         <p> __ { props.file.name }</p>
       </Card>
     </div>
