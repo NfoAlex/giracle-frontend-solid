@@ -67,11 +67,11 @@ export default function ChannelTextInput() {
   return (
     <div class={"flex flex-col gap-2"}>
       <Show when={fileInput().length > 0}>
-        <div>
+        <div class={"flex items-center overflow-x-auto gap-1"}>
           <For each={fileInput()}>
             {(file) => {
               return (
-                <div class={"w-full overflow-x-auto flex items-center"}>
+                <div class={"w-fit flex items-center"}>
                   <FilePreview
                     file={file}
                     dataSetter={pushFileIds}
