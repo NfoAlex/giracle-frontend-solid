@@ -3,7 +3,7 @@ import { TextField, TextFieldInput } from "../ui/text-field";
 import { Button } from "../ui/button";
 import { useParams } from "@solidjs/router";
 import POST_MESSAGE_SEND from "~/api/MESSAGE/MESSAGE_SEND";
-import {IconFile, IconUpload} from "@tabler/icons-solidjs";
+import {IconUpload} from "@tabler/icons-solidjs";
 
 export default function ChannelTextInput() {
   const params = useParams();
