@@ -37,7 +37,7 @@ export default function ChannelTextInput() {
     fileInputEl.onchange = (e) => {
       const files = (e.target as HTMLInputElement).files;
       if (files) {
-        setFileInput([...files]);
+        setFileInput([...fileInput(), ...files]);
         console.log("ChannelTextInput :: bindFiles : fileInput->", fileInput());
       }
     }
