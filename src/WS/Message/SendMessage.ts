@@ -8,7 +8,7 @@ export default function WSSendMessage(dat: IMessage) {
   //console.log("WSSendMessage :: triggered dat->", dat);
 
   //履歴に追加
-  addMessage(dat);
+  addMessage({...dat, MessageUrlPreview: []});
 
   //自分のメッセージなら時差表示用既読時間を更新
   if (storeMyUserinfo.id === dat.userId) {
@@ -18,7 +18,7 @@ export default function WSSendMessage(dat: IMessage) {
       newStore.push(newReadTime);
       return newStore;
     });
-  };
+  }
 
   //もし受け取ったメッセージのチャンネルにいない、あるいはフォーカスしていないなら新着設定
   if (!location.pathname.includes(dat.channelId) || !document.hasFocus()) {
