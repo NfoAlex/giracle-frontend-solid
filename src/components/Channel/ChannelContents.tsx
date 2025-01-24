@@ -226,19 +226,30 @@ export default function ChannelContents() {
                 id={`messageId::${h.id}`}
                 class="flex flex-row items-start"
               >
-                <div class="w-[40px] shrink-0">
-                  <Show when={!sameSenderAsNext(index())}>
-                    <Avatar class="mx-auto">
-                      <AvatarImage src={`/api/user/icon/${h.userId}`} />
-                    </Avatar>
-                  </Show>
-                </div>
-                <div class="shrink-0 grow-0 hover:bg-slate-200 rounded-md px-2 ml-auto" style="width:calc(100% - 45px)">
-                  <MessageRender
-                    message={h}
-                    displayUserName={!sameSenderAsNext(index())}
-                  />
-                </div>
+                {
+                  !h.isSystemMessage //システムメッセージかどうか
+                  ?
+                    <>
+                      <div class="w-[40px] shrink-0">
+                        <Show when={!sameSenderAsNext(index())}>
+                          <Avatar class="mx-auto">
+                            <AvatarImage src={`/api/user/icon/${h.userId}`} />
+                          </Avatar>
+                        </Show>
+                      </div>
+                      <div class="shrink-0 grow-0 hover:bg-slate-200 rounded-md px-2 ml-auto" style="width:calc(100% - 45px)">
+                        <MessageRender
+                          message={h}
+                          displayUserName={!sameSenderAsNext(index())}
+                        />
+                      </div>
+                    </>
+                  :
+                    <MessageRender
+                      message={h}
+                      displayUserName={false}
+                    />
+                }
               </div>
 
               {/* 新着線の表示 */}
