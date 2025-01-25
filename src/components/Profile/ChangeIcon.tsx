@@ -12,6 +12,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "../ui/dialog";
+import {TextField, TextFieldInput} from "~/components/ui/text-field";
 
 export default function ChangeIcon() {
   const [file, setFile] = createSignal<File | null>(null);
@@ -53,19 +54,20 @@ export default function ChangeIcon() {
           <DialogTitle>アイコンを変更する</DialogTitle>
           <DialogDescription>
             <div class="flex flex-col gap-2">
-              <p>ここで画像</p>
-              <input
-                type="file"
-                class="mx-auto"
-                onInput={(e) =>
-                  setFile(
-                    e.currentTarget.files !== null
-                      ? e.currentTarget.files[0]
-                      : null,
-                  )
-                }
-                accept=".jpeg,.jpg,.gif,.png"
-              />
+              <TextField>
+                <TextFieldInput
+                  type={"file"}
+                  class="mx-auto mt-2"
+                  onInput={(e) =>
+                    setFile(
+                      e.currentTarget.files !== null
+                        ? e.currentTarget.files[0]
+                        : null,
+                    )
+                  }
+                  accept=".jpeg,.jpg,.gif,.png"
+                />
+              </TextField>
             </div>
           </DialogDescription>
         </DialogHeader>
