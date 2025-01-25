@@ -1,6 +1,5 @@
 import { IconCheck, IconUserCircle } from "@tabler/icons-solidjs";
 import { Show, createSignal } from "solid-js";
-import POST_USER_CHANGE_ICON from "~/api/USER/USER_CHANGE_ICON";
 import { Button } from "../ui/button";
 import { Callout, CalloutContent, CalloutTitle } from "../ui/callout";
 import {
@@ -12,27 +11,27 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "../ui/dialog";
+import POST_USER_CHANGE_BANNER from "~/api/USER/USER_CHANGE_BANNER";
 import {TextField, TextFieldInput} from "~/components/ui/text-field";
 
-export default function ChangeIcon() {
+export default function ChangeBanner() {
   const [file, setFile] = createSignal<File | null>(null);
   const [result, setResult] = createSignal<"success" | "error" | "">("");
 
   /**
-   * アイコンの変更
+   * プロフィールバナーの変更
    */
-  const changeIcon = () => {
+  const changeBanner = () => {
     //ファイル入力がないなら停止
     const _file = file();
     if (_file === null) return;
-    //アイコンの変更
-    POST_USER_CHANGE_ICON(_file)
+    //バナーの変更
+    POST_USER_CHANGE_BANNER(_file)
       .then(() => {
-        console.log("アイコンを変更しました。");
         setResult("success");
       })
       .catch((e) => {
-        console.log("ChangeIcon :: changeIcon : e->", e);
+        console.log("ChangeBanner :: changeBanner : e->", e);
         setResult("error");
       });
   };
@@ -42,16 +41,16 @@ export default function ChangeIcon() {
       <DialogTrigger class="mx-auto">
         <Button
           class="mx-auto flex flex-row items-center gap-2"
-          variant={"outline"}
+          variant={"default"}
         >
           <IconUserCircle />
-          <p>アイコン画像を変更する</p>
+          <p>バナー画像を変更する</p>
         </Button>
       </DialogTrigger>
 
       <DialogContent id="dialogChangeIcon">
         <DialogHeader>
-          <DialogTitle>アイコンを変更する</DialogTitle>
+          <DialogTitle>ユーザーバナーを変更する</DialogTitle>
           <DialogDescription>
             <div class="flex flex-col gap-2">
               <TextField>
@@ -74,7 +73,7 @@ export default function ChangeIcon() {
 
         <DialogFooter>
           <Show when={result() !== "success"} fallback={<IconCheck />}>
-            <Button onClick={changeIcon} disabled={file() === null}>
+            <Button onClick={changeBanner} disabled={file() === null}>
               変更する
             </Button>
           </Show>
@@ -84,7 +83,7 @@ export default function ChangeIcon() {
           <Callout class="float-end" variant={"error"}>
             <CalloutTitle>エラー！</CalloutTitle>
             <CalloutContent>
-              アイコンを変更できませんでした。しばらくしてからもう一度お試しください。
+              バナーを変更できませんでした。しばらくしてからもう一度お試しください。
             </CalloutContent>
           </Callout>
         </Show>
