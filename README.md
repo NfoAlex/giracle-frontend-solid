@@ -3,7 +3,7 @@
 Execute `bun i` then `bun dev` to launch dev-mode.
 
 ## ToDo
-- [ ] 会話
+- [x] 会話
   - [x] メッセージの内容に合わせたレンダー処理
   - [x] 履歴の取得
   - [x] メッセージの削除
