@@ -20,7 +20,8 @@ export default function HoverMenu(props: { message: IMessage }) {
       });
   }
   return (
-    <Card class={"p-2 flex items-center"}>
+    <Card class={"p-2 flex items-center gap-1"}>
+      <p class={"text-sm font-extralight"}>{ new Date(props.message.createdAt).toLocaleString() }</p>
       {
         (getRolePower("manageUser") || storeMyUserinfo.id === props.message.userId)
         &&
