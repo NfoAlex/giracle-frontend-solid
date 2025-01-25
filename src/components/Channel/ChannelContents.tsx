@@ -8,9 +8,11 @@ import MessageRender from "./ChannelContent/MessageRender";
 import NewMessageLine from "./ChannelContent/NewMessageLine";
 import POST_MESSAGE_UPDATE_READTIME from "~/api/MESSAGE/MESSAGE_UPDATE_READTIME";
 import { setStoreHasNewMessage } from "~/stores/HasNewMessage";
+import HoverMenu from "~/components/Channel/ChannelContent/HoverMenu";
 
 export default function ChannelContents() {
   const [isFocused, setIsFocused] = createSignal(true);
+  const [hoveredMsgId, setHoveredMsgId] = createSignal("");
   const param = useParams();
   let channelIdBefore = "";
 
@@ -232,11 +234,23 @@ export default function ChannelContents() {
                           </Avatar>
                         </Show>
                       </div>
-                      <div class="shrink-0 grow-0 hover:bg-slate-200 rounded-md px-2 ml-auto" style="width:calc(100% - 45px)">
+                      <div
+                        class="relative shrink-0 grow-0 hover:bg-slate-200 rounded-md px-2 ml-auto"
+                        style="width:calc(100% - 45px)"
+                        onmouseenter={() => setHoveredMsgId(h.id)}
+                        onmouseleave={() => setHoveredMsgId("")}
+                      >
                         <MessageRender
                           message={h}
                           displayUserName={!sameSenderAsNext(index())}
                         />
+                        { //ホバーメニュー
+                          hoveredMsgId() === h.id
+                          &&
+                          <div class={"absolute right-0 z-50"} style={"bottom:95%;"}>
+                            <HoverMenu messageId={h.id} />
+                          </div>
+                        }
                       </div>
                     </>
                   :
