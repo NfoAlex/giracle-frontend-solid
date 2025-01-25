@@ -1,10 +1,7 @@
 export default async function DELETE_CHANNEL_DELETE(
   _channelId: string,
 ): Promise<{
-  message: `Channel created`;
-  data: {
-    channelId: string
-  };
+  message: `Channel deleted`;
 }> {
   const res = await fetch("/api/channel/delete", {
     method: "DELETE",
