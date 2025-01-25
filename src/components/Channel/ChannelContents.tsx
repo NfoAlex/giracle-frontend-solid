@@ -248,8 +248,8 @@ export default function ChannelContents() {
                         { //ホバーメニュー
                           hoveredMsgId() === h.id
                           &&
-                          <div class={"absolute right-1 z-50"} style={"bottom:95%;"}>
-                            <HoverMenu messageId={h.id} />
+                          <div class={"absolute right-1 z-50"} style={"bottom:calc(100% - 15px);"}>
+                            <HoverMenu message={h} />
                           </div>
                         }
                       </div>
