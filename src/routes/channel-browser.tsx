@@ -10,6 +10,7 @@ import { SidebarTrigger } from "~/components/ui/sidebar";
 import { Switch, SwitchControl, SwitchLabel, SwitchThumb } from "~/components/ui/switch";
 import { getRolePower, setStoreMyUserinfo, storeMyUserinfo } from "~/stores/MyUserinfo";
 import type { IChannel } from "~/types/Channel";
+import DeleteChannel from "~/components/ChannelBrowser/DeleteChannel";
 
 export default function ChannelBrowser() {
   const [processing, setProcessing] = createSignal(true);
@@ -113,6 +114,8 @@ export default function ChannelBrowser() {
                     :
                       <Button onclick={()=>joinChannel(channel.id)}>参加</Button>
                   }
+
+                  { getRolePower("manageChannel") && <DeleteChannel channel={channel} /> }
                 </div>
               </Card>
             </Show>
