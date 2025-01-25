@@ -239,6 +239,7 @@ export default function ChannelContents() {
                         style="width:calc(100% - 45px)"
                         onmouseenter={() => setHoveredMsgId(h.id)}
                         onmouseleave={() => setHoveredMsgId("")}
+                        on:touchend={() => setHoveredMsgId(h.id) /* スマホ用 */}
                       >
                         <MessageRender
                           message={h}
