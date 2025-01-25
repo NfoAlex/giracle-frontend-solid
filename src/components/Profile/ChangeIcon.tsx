@@ -26,7 +26,7 @@ export default function ChangeIcon() {
     if (_file === null) return;
     //アイコンの変更
     POST_USER_CHANGE_ICON(_file)
-      .then((r) => {
+      .then(() => {
         console.log("アイコンを変更しました。");
         setResult("success");
       })

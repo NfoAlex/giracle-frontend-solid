@@ -27,7 +27,7 @@ export default function ChangeBanner() {
     if (_file === null) return;
     //バナーの変更
     POST_USER_CHANGE_BANNER(_file)
-      .then((r) => {
+      .then(() => {
         setResult("success");
       })
       .catch((e) => {
