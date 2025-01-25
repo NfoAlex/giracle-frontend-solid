@@ -235,7 +235,7 @@ export default function ChannelContents() {
                         </Show>
                       </div>
                       <div
-                        class="relative shrink-0 grow-0 hover:bg-slate-200 rounded-md px-2 ml-auto"
+                        class={`relative shrink-0 grow-0 rounded-md px-2 ml-auto ${hoveredMsgId()===h.id ? "bg-slate-200" : ""}`}
                         style="width:calc(100% - 45px)"
                         onmouseenter={() => setHoveredMsgId(h.id)}
                         onmouseleave={() => setHoveredMsgId("")}
