@@ -9,6 +9,7 @@ import { Label } from "~/components/ui/label";
 import { SidebarTrigger } from "~/components/ui/sidebar";
 import { TextField, TextFieldInput } from "~/components/ui/text-field";
 import { setStoreMyUserinfo, storeMyUserinfo } from "~/stores/MyUserinfo";
+import ChangeBanner from "~/components/Profile/ChangeBanner";
 
 export default function Profile() {
   const [nameEditMode, setNameEditMode] = createSignal(false);
@@ -66,13 +67,23 @@ export default function Profile() {
       </span>
       <Card class="w-full">
         <CardHeader>
-          <Avatar class="mx-auto h-[75px] w-auto">
-            <AvatarImage src={`/api/user/icon/${storeMyUserinfo.id}`} />
-          </Avatar>
-        </CardHeader>
+          <div class={"relative mb-[37.5px]"}>
+            <img alt={"バナー画像"} src={"/api/user/banner/" + storeMyUserinfo.id} class="w-full rounded" />
+            <span class={"absolute top-2 right-2 z-50"}>
+              <ChangeBanner />
+            </span>
 
+            <Avatar
+              class="mx-auto h-[75px] w-[75px] absolute z-50"
+              style={"left:calc(50% - 37.5px); right:left:calc(50% - 37.5px); bottom:-37.5px;"}
+            >
+              <AvatarImage src={`/api/user/icon/${storeMyUserinfo.id}`}/>
+            </Avatar>
+          </div>
+        </CardHeader>
+        
         <div class="mx-auto w-fit">
-          <ChangeIcon />
+          <ChangeIcon/>
         </div>
 
         <CardContent class="mt-10">
@@ -85,7 +96,7 @@ export default function Profile() {
                 <div class="flex flex-row items-center gap-2">
                   <p class="grow truncate">{storeMyUserinfo.name}</p>
                   <Button onClick={() => setNameEditMode(!nameEditMode())}>
-                    <IconPencil stroke="2" />
+                    <IconPencil stroke="2"/>
                   </Button>
                 </div>
               }
@@ -101,20 +112,20 @@ export default function Profile() {
                 </TextField>
                 <div class="flex flex-row items-center gap-1">
                   <Button class="w-1/2" onClick={changeName} variant={"ghost"}>
-                    <IconCheck stroke="2" />
+                    <IconCheck stroke="2"/>
                   </Button>
                   <Button
                     class="w-1/2"
                     onClick={() => setNameEditMode(!nameEditMode())}
                     variant={"ghost"}
                   >
-                    <IconCircleX stroke="2" />
+                    <IconCircleX stroke="2"/>
                   </Button>
                 </div>
               </div>
             </Show>
 
-            <hr class="my-3" />
+            <hr class="my-3"/>
 
             {/* 自己紹介部分 */}
             <Label>自己紹介</Label>
@@ -128,7 +139,7 @@ export default function Profile() {
                   <Button
                     onClick={() => setSelfIntroEditMode(!selfIntroEditMode())}
                   >
-                    <IconPencil stroke="2" />
+                    <IconPencil stroke="2"/>
                   </Button>
                 </div>
               }
@@ -148,20 +159,20 @@ export default function Profile() {
                     onClick={changeSelfIntro}
                     variant={"ghost"}
                   >
-                    <IconCheck stroke="2" />
+                    <IconCheck stroke="2"/>
                   </Button>
                   <Button
                     class="w-1/2"
                     onClick={() => setSelfIntroEditMode(!selfIntroEditMode())}
                     variant={"ghost"}
                   >
-                    <IconCircleX stroke="2" />
+                    <IconCircleX stroke="2"/>
                   </Button>
                 </div>
               </div>
             </Show>
 
-            <hr class="my-3" />
+            <hr class="my-3"/>
 
             {/* ロール一覧 */}
             <Label>ロール</Label>
