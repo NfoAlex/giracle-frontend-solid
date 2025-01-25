@@ -6,10 +6,13 @@ export default function WSChannelDeleted(dat: { channelId: string }) {
   const myJoinedChannel = storeMyUserinfo.ChannelJoin;
   
   //チャンネル参加しているなら削除
-  if (Object.keys(myJoinedChannel).includes(dat.channelId)) {
+  if (myJoinedChannel.map(cj => cj.channelId).includes(dat.channelId)) {
     setStoreMyUserinfo((prev) => {
-      prev.ChannelJoin.filter((cj) => cj.channelId !== dat.channelId);
-      return prev;
+      const ChannelJoinFiltered = prev.ChannelJoin.filter((cj) => cj.channelId !== dat.channelId);
+      return {
+        ...prev,
+        ChannelJoin: ChannelJoinFiltered,
+      };
     });
   }
 }
