@@ -11,7 +11,7 @@ export default function HoverMenu(props: { messageId: string }) {
   const deleteMessage = () => {
     DELETE_MESSAGE_DELETE(props.messageId)
       .then((r) => {
-        console.log("DELETE_MESSAGE_DELETE :: r->", r);
+        //console.log("DELETE_MESSAGE_DELETE :: r->", r);
       })
       .catch((e) => {
         console.error("DELETE_MESSAGE_DELETE :: e->", e);
