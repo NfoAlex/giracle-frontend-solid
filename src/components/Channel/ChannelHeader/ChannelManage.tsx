@@ -6,12 +6,25 @@ import {IconCheck, IconPencil, IconX} from "@tabler/icons-solidjs";
 import {createSignal} from "solid-js";
 import {TextField, TextFieldInput, TextFieldTextArea} from "~/components/ui/text-field";
 import {Button} from "~/components/ui/button";
+import POST_CHANNEL_UPDATE from "~/api/CHANNEL/CHANNEL_UPDATE";
 
 export default function ChannelManage(props: {channelId: string}) {
   const [editName, setEditName] = createSignal(false);
   const [editDescription, setEditDescription] = createSignal(false);
-  const [, setNewName] = createSignal("");
-  const [, setNewDescription] = createSignal("");
+  const [newName, setNewName] = createSignal(directGetterChannelInfo(props.channelId).name);
+  const [newDescription, setNewDescription] = createSignal(directGetterChannelInfo(props.channelId).description);
+
+  const updateChannel = () => {
+    POST_CHANNEL_UPDATE({name: newName(), description: newDescription(), channelId: props.channelId})
+      .then((r) => {
+        console.log(r);
+        setEditDescription(false);
+        setEditName(false);
+      })
+      .catch((e) => {
+        console.error("ChannelManage :: updateChannel : e", e);
+      })
+  }
 
   return (
     <Dialog>
@@ -31,7 +44,7 @@ export default function ChannelManage(props: {channelId: string}) {
                     onInput={(e)=>setNewName(e.currentTarget.value)}
                   />
                 </TextField>
-                <Button class={"ml-auto h-10 w-10"}><IconCheck /></Button>
+                <Button onClick={updateChannel} class={"ml-auto h-10 w-10"}><IconCheck /></Button>
                 <Button onClick={()=>setEditName(false)} class={"ml-auto h-10 w-10"} variant={"outline"}><IconX /></Button>
               </div>
             :
@@ -58,7 +71,7 @@ export default function ChannelManage(props: {channelId: string}) {
                   />
                 </TextField>
                 <div class={"w-fit ml-auto p-2 flex items-center gap-1"}>
-                  <Button onClick={()=>setEditDescription(false)} class={"border rounded-md h-10 w-10"} ><IconCheck /></Button>
+                  <Button onClick={updateChannel} class={"border rounded-md h-10 w-10"} ><IconCheck /></Button>
                   <Button onClick={()=>setEditDescription(false)} class={"border rounded-md h-10 w-10"} variant={"outline"} ><IconX /></Button>
                 </div>
               </div>
