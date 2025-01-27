@@ -1,8 +1,9 @@
 import { useParams } from "@solidjs/router";
 import { createEffect, createResource, createSignal } from "solid-js";
-import { getterChannelInfo } from "~/stores/ChannelInfo";
+import {directGetterChannelInfo, getterChannelInfo} from "~/stores/ChannelInfo";
 import { Card } from "../ui/card";
 import { SidebarTrigger } from "../ui/sidebar";
+import ChannelManage from "~/components/Channel/ChannelHeader/ChannelManage";
 
 export default function ChannelHeader() {
   const params = useParams();
@@ -19,6 +20,14 @@ export default function ChannelHeader() {
       <p>{!channel.loading ? channel()?.name : "loading..."}</p>
       <p class="text-gray-400 mx-1"> | </p>
       <p>{!channel.loading ? channel()?.description : ""}</p>
+
+      {
+        directGetterChannelInfo("manageChannel")
+        &&
+        <span class={"ml-auto"}>
+          <ChannelManage channelId={currentChannelId()} />
+        </span>
+      }
     </Card>
   );
 }

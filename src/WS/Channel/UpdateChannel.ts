@@ -6,7 +6,8 @@ export default function WSUpdateChannel(dat: IChannel) {
 
   //チャンネル情報を更新
   setStoreChannelInfo((prev) => {
-    prev[dat.id] = dat;
-    return prev;
+    const newState = { ...prev };
+    newState[dat.id] = dat;
+    return newState;
   });
 }
