@@ -11,11 +11,15 @@ import POST_CHANNEL_UPDATE from "~/api/CHANNEL/CHANNEL_UPDATE";
 export default function ChannelManage(props: {channelId: string}) {
   const [editName, setEditName] = createSignal(false);
   const [editDescription, setEditDescription] = createSignal(false);
-  const [newName, setNewName] = createSignal(directGetterChannelInfo(props.channelId).name);
-  const [newDescription, setNewDescription] = createSignal(directGetterChannelInfo(props.channelId).description);
+  const [newName, setNewName] = createSignal("");
+  const [newDescription, setNewDescription] = createSignal("");
 
   const updateChannel = () => {
-    POST_CHANNEL_UPDATE({name: newName(), description: newDescription(), channelId: props.channelId})
+    POST_CHANNEL_UPDATE({
+      name: newName()!=="" ? newName() : undefined,
+      description: newDescription()!=="" ? newDescription() : undefined,
+      channelId: props.channelId
+    })
       .then((r) => {
         console.log(r);
         setEditDescription(false);
