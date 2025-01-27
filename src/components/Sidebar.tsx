@@ -14,10 +14,10 @@ import {
 import { getRolePower, storeMyUserinfo } from "~/stores/MyUserinfo";
 import { storeServerinfo } from "~/stores/Serverinfo";
 import { Avatar, AvatarImage } from "./ui/avatar";
-import ChannelName from "./unique/ChannelName";
 import { storeAppStatus } from "~/stores/AppStatus";
 import { storeHasNewMessage } from "~/stores/HasNewMessage";
 import { IconDatabaseCog } from "@tabler/icons-solidjs";
+import {directGetterChannelInfo} from "~/stores/ChannelInfo";
 
 export function AppSidebar() {
   const loc = useLocation();
@@ -57,7 +57,7 @@ export function AppSidebar() {
                     variant={loc.pathname === `/app/channel/${c.channelId}` ? "outline" : "default"}
                     class="truncate flex flex-row items-center"
                   >
-                    <ChannelName channelId={c.channelId} />
+                    <p>{ directGetterChannelInfo(c.channelId).name }</p>
                     { storeHasNewMessage[c.channelId] && <span class="text-xs ml-auto">●</span> }
                   </SidebarMenuButton>
                 </SidebarMenuItem>
