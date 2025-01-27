@@ -49,7 +49,7 @@ export const getterChannelInfo = async (
 };
 
 /**
- * チャンネル情報を同期で返す。無いなら取得してから返す
+ * チャンネル情報を同期で返す。無いなら取得しつつ返す
  * @param channelId
  */
 export const directGetterChannelInfo = (
