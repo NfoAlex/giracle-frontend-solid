@@ -32,7 +32,6 @@ const trimHistory = (channelId: string, direction: "older" | "newer") => {
       }
     }));
   } else if (direction === "newer") {
-    const historyTrimmed = _history.slice(30);
     setStoreHistory(produce((historyData) => {
       const historySliced = historyData[channelId].history.slice(30);
       return {
