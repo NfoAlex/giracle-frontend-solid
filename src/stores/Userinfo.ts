@@ -5,6 +5,7 @@ import type { IUser } from "~/types/User";
 export const [storeUserinfo, setStoreUserinfo] = createStore<{
   [key: string]: IUser;
 }>({});
+export const [storeUserOnline, setStoreUserOnline] = createStore<string[]>([]);
 
 /**
  * ユーザー情報Storeの値を更新/挿入する

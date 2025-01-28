@@ -18,6 +18,7 @@ import { storeAppStatus } from "~/stores/AppStatus";
 import { storeHasNewMessage } from "~/stores/HasNewMessage";
 import { IconDatabaseCog } from "@tabler/icons-solidjs";
 import {directGetterChannelInfo} from "~/stores/ChannelInfo";
+import {storeUserOnline} from "~/stores/Userinfo";
 
 export function AppSidebar() {
   const loc = useLocation();
@@ -34,7 +35,7 @@ export function AppSidebar() {
             <SidebarMenuItem>
               {storeAppStatus.wsConnected ? 
                 <p>
-                  オンラインユーザー : todo...
+                  オンラインユーザー : { storeUserOnline.length }
                 </p>
                 :
                 <p class="italic">再接続中...</p>
@@ -82,7 +83,7 @@ export function AppSidebar() {
           </SidebarMenuButton>
         </SidebarFooter>
       </Show>
-      <A href="/app/profile">
+      <A href={"/app/profile"}>
         <SidebarFooter class="pb-5 pt-2">
           <div class="flex items-center gap-2">
             <Avatar class="w-auto h-8">

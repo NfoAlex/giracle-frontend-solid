@@ -8,6 +8,9 @@ import WSRoleUnlinked from "./Role/RoleUnlinked";
 import WSChannelDeleted from "./Channel/ChannelDeleted";
 import WSMessageDeleted from "./Message/MessageDelete";
 import WSUpdateMessage from "~/WS/Message/UpdateMessage";
+import {setStoreUserOnline} from "~/stores/Userinfo";
+import WSUserConnected from "~/WS/User/UserConnected";
+import WSUserDisconnected from "~/WS/User/UserDisconnected";
 
 //WSインスタンス
 export let ws: WebSocket | undefined = undefined;
@@ -81,6 +84,14 @@ export const initWS = async () => {
         case "role::Deleted":
           WSRoleUnlinked(json.data);
           break;
+
+        //オンラインユーザーの登録、削除
+        case "user::Connected":
+          WSUserConnected(json.data);
+          break;
+        case "user::Disconnected":
+          WSUserDisconnected(json.data);
+          break;
       }
     } catch(e) {
       console.error("WScontroller :: initWS(.onmessage) : error->", e, " \ndata->", event.data);
@@ -94,16 +105,14 @@ export const initWS = async () => {
     //接続状態を更新
     storeAppStatus.wsConnected = true;
 
-    //オンラインユーザー情報を同期する
-    // TODO
-
-    //オンラインユーザーを取得
+    //オンラインユーザーを取得、格納
     GET_USER_GET_ONLINE()
       .then((r) => {
-        console.log("r->", r);
+        console.log("WScontroller :: initWS(.onopen) : オンラインユーザー r->", r);
+        setStoreUserOnline(r.data);
       })
       .catch((e) => {
-        console.error("WScontroller :: initWS(.onopen) : error->", e);
+        console.error("WScontroller :: initWS(.onopen) : オンラインユーザー error->", e);
       });
   };
 

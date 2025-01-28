@@ -39,6 +39,8 @@ export default function InitLoad(_userId: string) {
     setStoreHasNewMessage(r.data);
   });
 
+  // オンラインユーザーの同期は👇のinitWS関数で行う
+
   //WS接続の初期化
   initWS();
 
