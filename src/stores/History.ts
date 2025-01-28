@@ -10,6 +10,45 @@ export const [storeHistory, setStoreHistory] = createStore<{
 }>({});
 
 /**
+ * 履歴の長さを90まで削る
+ * @param channelId 削る履歴のチャンネルID
+ * @param direction 削る方向(指定方向から削る)
+ */
+const trimHistory = (channelId: string, direction: "older" | "newer") => {
+  const _history = storeHistory[channelId].history;
+
+  //すでに90個以下の場合は何もしない
+  if (_history.length <= 90) return;
+
+  if (direction === "older") {
+    setStoreHistory(produce((historyData) => {
+      return {
+        ...historyData,
+        [channelId]: {
+          ...historyData[channelId],
+          history: _history.slice(0, 90),
+          atTop: false,
+        },
+      }
+    }));
+  } else if (direction === "newer") {
+    const historyTrimmed = _history.slice(30);
+    setStoreHistory(produce((historyData) => {
+      const historySliced = historyData[channelId].history.slice(30);
+      return {
+        ...historyData,
+        [channelId]: {
+          ...historyData[channelId],
+          history: historySliced,
+          atEnd: false,
+        },
+      }
+    }));
+    console.log("History :: trimHistory(新しい方向) : storeHistory ->", storeHistory[channelId].history.length);
+  }
+}
+
+/**
  * 履歴Storeに挿入する
  * @param history
  */
@@ -37,6 +76,9 @@ export const insertHistory = (history: IMessage[]) => {
         ...currentHistory[history[0].channelId],
         history: [...trimmedHistory, ...currentHistory[history[0].channelId].history],
       };
+
+      //古い履歴を削る
+      trimHistory(history[0].channelId, "older");
     } else {
       //先頭だけ切る
       const trimmedHistory = history.slice(1);
@@ -44,6 +86,9 @@ export const insertHistory = (history: IMessage[]) => {
         ...currentHistory[history[0].channelId],
         history: [...currentHistory[history[0].channelId].history, ...trimmedHistory],
       };
+
+      //新しい方の履歴を削る
+      trimHistory(history[0].channelId, "newer");
     }
   }
 
