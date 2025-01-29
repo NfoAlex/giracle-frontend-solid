@@ -26,6 +26,7 @@ export default function ChannelContents() {
     if (storeHistory[param.channelId] === undefined) return;
 
     const scrollPos = el.scrollTop;
+    //console.log("ChannelContent :: checkScrollPosAndFetchHistory : scrollPos->", scrollPos);
 
     //履歴の最古到達用
     if (!storeHistory[param.channelId].atTop && Math.abs(scrollPos) + el.offsetHeight >= el.scrollHeight - 1) {
@@ -45,7 +46,7 @@ export default function ChannelContents() {
     //履歴の最新到達用
     if (
       !storeHistory[param.channelId].atEnd &&
-      scrollPos <= 1
+      Math.abs(scrollPos) <= 2
       //scrollPos >= el.scrollHeight - el.offsetHeight - 1
     ) {
       //console.log("checkScrollPosAndFetchHistory :: 下です");
@@ -114,7 +115,10 @@ export default function ChannelContents() {
   const scrollTo = (messageId: string) => {
     //console.log("ChannelContents :: scrollTo : messageId->", messageId, document.getElementById("NEW_LINE") !== undefined);
     const el = document.getElementById(`messageId::${messageId}`);
-    if (el === null) return;
+    if (el === null) {
+      console.error("ChannelContents :: scrollTo : メッセージIdが見つかりませんでした el->", el);
+      return;
+    }
 
     el.scrollIntoView();
   };
