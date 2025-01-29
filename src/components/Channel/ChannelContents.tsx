@@ -51,10 +51,12 @@ export default function ChannelContents() {
       //console.log("checkScrollPosAndFetchHistory :: 下です");
       //最後のメッセージIdを取得
       const messageIdNewest = storeHistory[param.channelId].history[0]?.id;
-      if (messageIdNewest === undefined)
+      if (messageIdNewest === undefined) {
         console.error(
           "ChannelContent :: checkScrollPosAndFetchHistory : 最新のメッセIdを取得できなかった",
         );
+        return;
+      }
       //履歴を取得、格納
       await FetchHistory(param.channelId, { messageIdFrom: messageIdNewest }, "newer");
       scrollTo(messageIdNewest);
