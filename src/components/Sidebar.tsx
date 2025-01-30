@@ -34,9 +34,9 @@ export function AppSidebar() {
           <SidebarMenu>
             <SidebarMenuItem>
               {storeAppStatus.wsConnected ? 
-                <p>
-                  オンラインユーザー : { storeUserOnline.length }
-                </p>
+                <span class={"flex items-center pr-3"}>
+                  <p>オンラインユーザー : </p> <p class={"ml-auto"}>{ storeUserOnline.length }</p>
+                </span>
                 :
                 <p class="italic">再接続中...</p>
               }
