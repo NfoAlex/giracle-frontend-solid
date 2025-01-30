@@ -31,19 +31,19 @@ export default function Auth() {
   });
 
   return (
-    <div class="pt-5 px-2 max-w-[450px] mx-auto ">
+    <div class="py-5 px-2 max-w-[500px] w-full h-screen mx-auto flex flex-col gap-4 md:justify-center">
       <p class="text-2xl">{storeServerinfo.name || "Giracle"}</p>
       <Card class="w-full mx-auto py-4">
         <CardContent class="grid- gap-3">
           <Tabs defaultValue="login">
             <TabsList class="grid w-full grid-cols-2">
               <TabsTrigger value="login">ログイン</TabsTrigger>
-              <TabsTrigger value="register">新規登録</TabsTrigger>
+              <TabsTrigger value="register" disabled={!storeServerinfo.RegisterAvailable}>新規登録</TabsTrigger>
             </TabsList>
 
             <Show
               when={storeAppStatus.hasServerinfo}
-              fallback={<p>loading...</p>}
+              fallback={<p class={"text-center"}>loading...</p>}
             >
               <TabsContent value="login">
                 <Login />
@@ -54,6 +54,16 @@ export default function Auth() {
             </Show>
           </Tabs>
         </CardContent>
+      </Card>
+
+      <Card class={"justify-self-end md:mt-auto p-4 px-4 flex items-center"}>
+        <p class={"font-bold"}>Giracle</p>
+        <p class={"ml-auto"}>
+          {
+            //@ts-ignore: __VERSION__はvite.config.tsで定義されている
+            __VERSION__
+          }
+        </p>
       </Card>
     </div>
   );

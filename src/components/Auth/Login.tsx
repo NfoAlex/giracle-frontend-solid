@@ -46,7 +46,7 @@ export default function Login() {
         <TextFieldLabel for="email">パスワード</TextFieldLabel>
         <TextFieldInput
           type="password"
-          placeholder="Member"
+          placeholder=")a{|s}f`@d"
           value={password()}
           onInput={(e) => setPassword(e.currentTarget.value)}
         />
