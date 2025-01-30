@@ -101,6 +101,7 @@ render(() =>
         <Route path="/:channelId" component={Channel} />
       </Route>
       <Route path="/profile" component={lazy(() => import("./routes/profile"))} />
+      <Route path="/inbox" component={lazy(() => import("./routes/Inbox"))} />
       <Route path="/channel-browser" component={lazy(() => import("./routes/channel-browser"))} />
       <Route path="/manage-server" component={lazy(() => import("./routes/manage-server"))} />
       <Route path="*paramName" component={lazy(() => import("./routes/[...404]"))} />
