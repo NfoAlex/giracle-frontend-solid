@@ -16,9 +16,10 @@ import { storeServerinfo } from "~/stores/Serverinfo";
 import { Avatar, AvatarImage } from "./ui/avatar";
 import { storeAppStatus } from "~/stores/AppStatus";
 import { storeHasNewMessage } from "~/stores/HasNewMessage";
-import { IconDatabaseCog } from "@tabler/icons-solidjs";
+import {IconBell, IconDatabaseCog, IconList} from "@tabler/icons-solidjs";
 import {directGetterChannelInfo} from "~/stores/ChannelInfo";
 import {storeUserOnline} from "~/stores/Userinfo";
+import {storeInbox} from "~/stores/Inbox";
 
 export function AppSidebar() {
   const loc = useLocation();
@@ -44,7 +45,13 @@ export function AppSidebar() {
           </SidebarMenu>
         </SidebarGroup>
         <SidebarGroup>
+          <SidebarMenuButton as={A} href="/app/inbox" variant={loc.pathname === "/app/inbox" ? "outline" : "default"}>
+            <IconBell />
+            <p>通知</p>
+            <p class={"ml-auto"}>{ storeInbox.length!==0?storeInbox.length:"" }</p>
+          </SidebarMenuButton>
           <SidebarMenuButton as={A} href="/app/channel-browser" variant={loc.pathname === "/app/channel-browser" ? "outline" : "default"}>
+            <IconList />
             チャンネル一覧
           </SidebarMenuButton>
           <SidebarGroupLabel>参加チャンネル</SidebarGroupLabel>

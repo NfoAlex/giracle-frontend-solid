@@ -9,6 +9,8 @@ import { setStoreMessageReadTime, setStoreMessageReadTimeBefore } from "~/stores
 import { setStoreRoleInfo } from "~/stores/RoleInfo";
 import type { IRole } from "~/types/Role";
 import { initWS } from "~/WS/WScontroller";
+import GET_MESSAGE_INBOX from "~/api/MESSAGE/MESSAGE_INBOX";
+import {setStoreInbox} from "~/stores/Inbox";
 
 export default function InitLoad(_userId: string) {
   //自分のユーザー情報を取得してStoreに格納
@@ -38,6 +40,11 @@ export default function InitLoad(_userId: string) {
     console.log("InitLoad :: GET_MESSAGE_GET_NEW : 新着メッセージr->", r);
     setStoreHasNewMessage(r.data);
   });
+  //インボックス取得
+  GET_MESSAGE_INBOX().then((r) => {
+    console.log("InitLoad :: GET_MESSAGE_INBOX : インボックスr->", r);
+    setStoreInbox(r.data);
+  }).catch((e) => console.error("InitLoad :: GET_MESSAGE_INBOX : インボックス取得エラー", e));
 
   // オンラインユーザーの同期は👇のinitWS関数で行う
 

@@ -24,9 +24,9 @@ export default function MessageRender(props: {
             <MessageTextRender content={props.message.content} />
         }
 
-        { (props.message.MessageUrlPreview.length > 0) && <URLPreview MessageUrlPreview={props.message.MessageUrlPreview} />}
+        { (props.message.MessageUrlPreview?.length > 0) && <URLPreview MessageUrlPreview={props.message.MessageUrlPreview} />}
         {
-          props.message.MessageFileAttached.length > 0
+          props.message.MessageFileAttached?.length > 0
           &&
           (
             <For each={props.message.MessageFileAttached}>
