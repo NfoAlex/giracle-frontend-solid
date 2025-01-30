@@ -2,6 +2,8 @@ import { createSignal, For, onMount, type JSX } from "solid-js";
 import { Dynamic } from "solid-js/web";
 import { directGetterChannelInfo } from "~/stores/ChannelInfo";
 import { getterUserinfo } from "~/stores/Userinfo";
+import {Badge} from "~/components/ui/badge";
+import {storeMyUserinfo} from "~/stores/MyUserinfo";
 
 export default function MessageTextRender(props: { content: string }) {
   // biome-ignore lint/correctness/useJsxKeyInIterable: ??? need research
@@ -75,7 +77,9 @@ export default function MessageTextRender(props: { content: string }) {
             MessageRenderingFinal.push(<a href={obj.context} target="_blank" rel="noreferrer" class="underline">{ obj.context }</a>);
             break;
           case "userId":
-            MessageRenderingFinal.push(<span>@{ getterUserinfo(obj.context.slice(2, -1)).name }</span>);
+            MessageRenderingFinal.push(
+              <Badge variant={storeMyUserinfo.id===obj.context.slice(2, -1)?"default":"secondary"}>@  { getterUserinfo(obj.context.slice(2, -1)).name }</Badge>
+            );
             break;
           case "breakLine":
             MessageRenderingFinal.push(<br />);
