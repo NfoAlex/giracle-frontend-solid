@@ -31,7 +31,7 @@ export default function Auth() {
   });
 
   return (
-    <div class="pt-5 px-2 max-w-[500px] w-full mx-auto flex flex-col gap-4 md:justify-center">
+    <div class="py-5 px-2 max-w-[500px] w-full h-screen mx-auto flex flex-col gap-4 md:justify-center">
       <p class="text-2xl">{storeServerinfo.name || "Giracle"}</p>
       <Card class="w-full mx-auto py-4">
         <CardContent class="grid- gap-3">
@@ -56,7 +56,7 @@ export default function Auth() {
         </CardContent>
       </Card>
 
-      <Card class={"justify-self-end p-4 px-4 flex items-center"}>
+      <Card class={"justify-self-end md:mt-auto p-4 px-4 flex items-center"}>
         <p class={"font-bold"}>Giracle</p>
         <p class={"ml-auto"}>
           {
