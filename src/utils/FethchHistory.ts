@@ -5,7 +5,9 @@ let fetching = false;
 
 /**
  * 履歴の取得を行う
- * @param _channelId
+ * @param _channelId チャンネルId
+ * @param _dat メッセージIdとメッセージ時間指定
+ * @param _direction 取得方向
  */
 export default async function FetchHistory(
   _channelId: string,

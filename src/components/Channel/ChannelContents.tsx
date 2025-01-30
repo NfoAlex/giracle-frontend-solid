@@ -30,9 +30,9 @@ export default function ChannelContents() {
 
     //履歴の最古到達用
     if (!storeHistory[param.channelId].atTop && Math.abs(scrollPos) + el.offsetHeight >= el.scrollHeight - 1) {
-      //console.log("checkScrollPosAndFetchHistory :: 上だね");
       //最後のメッセージIdを取得
       const messageIdLast = storeHistory[param.channelId].history.at(-1)?.id;
+      //console.log("checkScrollPosAndFetchHistory :: 上だね", messageIdLast);
       if (messageIdLast === undefined) {
         console.error(
           "ChannelContent :: checkScrollPosAndFetchHistory : 最古のメッセIdを取得できなかった",
@@ -41,17 +41,17 @@ export default function ChannelContents() {
       }
       //履歴を取得、格納
       await FetchHistory(param.channelId, { messageIdFrom: messageIdLast }, "older");
-      scrollTo(messageIdLast);
+      setTimeout(() => scrollTo(messageIdLast));
     }
     //履歴の最新到達用
     if (
       !storeHistory[param.channelId].atEnd &&
-      Math.abs(scrollPos) <= 2
+      Math.abs(scrollPos) <= 0
       //scrollPos >= el.scrollHeight - el.offsetHeight - 1
     ) {
-      //console.log("checkScrollPosAndFetchHistory :: 下です");
       //最後のメッセージIdを取得
       const messageIdNewest = storeHistory[param.channelId].history[0]?.id;
+      console.log("checkScrollPosAndFetchHistory :: 下です", Math.abs(scrollPos), messageIdNewest);
       if (messageIdNewest === undefined) {
         console.error(
           "ChannelContent :: checkScrollPosAndFetchHistory : 最新のメッセIdを取得できなかった",
@@ -60,7 +60,7 @@ export default function ChannelContents() {
       }
       //履歴を取得、格納
       await FetchHistory(param.channelId, { messageIdFrom: messageIdNewest }, "newer");
-      scrollTo(messageIdNewest);
+      setTimeout(() => scrollTo(messageIdNewest, "start"));
     }
 
     //console.log("ChannelContent :: checkScrollPosAndFetchHistory : scrollPos->", scrollPos, " isFocused()->", isFocused());
@@ -110,9 +110,10 @@ export default function ChannelContents() {
 
   /**
    * 指定のメッセージIdへスクロールする
-   * @param messageId
+   * @param messageId メッセージId
+   * @param block スクロール位置オプション
    */
-  const scrollTo = (messageId: string) => {
+  const scrollTo = (messageId: string, block: "nearest"|"start" = "nearest") => {
     //console.log("ChannelContents :: scrollTo : messageId->", messageId, document.getElementById("NEW_LINE") !== undefined);
     const el = document.getElementById(`messageId::${messageId}`);
     if (el === null) {
@@ -120,7 +121,7 @@ export default function ChannelContents() {
       return;
     }
 
-    el.scrollIntoView();
+    el.scrollIntoView({ block });
   };
 
   /**
