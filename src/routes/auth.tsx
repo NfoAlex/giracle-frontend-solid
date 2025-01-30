@@ -15,7 +15,6 @@ export default function Auth() {
   const loc = useLocation();
 
   onMount(async () => {
-    console.log("Auth.tsx onMount :: import.meta.env", import.meta);
     //クッキーにTokenがあれば初期処理をして移動
     const token = GetCookie("token");
     if (token !== undefined) {
