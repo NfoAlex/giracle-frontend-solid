@@ -6,9 +6,7 @@ import MessageRender from "~/components/Channel/ChannelContent/MessageRender";
 import {Badge} from "~/components/ui/badge";
 import {directGetterChannelInfo} from "~/stores/ChannelInfo";
 import {Avatar, AvatarFallback, AvatarImage} from "~/components/ui/avatar";
-import UserName from "~/components/unique/UserName";
 import {getterUserinfo} from "~/stores/Userinfo";
-import {IconHash} from "@tabler/icons-solidjs";
 
 export default function Inbox() {
   return (
