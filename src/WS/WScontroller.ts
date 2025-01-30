@@ -11,6 +11,8 @@ import WSUpdateMessage from "~/WS/Message/UpdateMessage";
 import {setStoreUserOnline} from "~/stores/Userinfo";
 import WSUserConnected from "~/WS/User/UserConnected";
 import WSUserDisconnected from "~/WS/User/UserDisconnected";
+import WSInboxDelete from "~/WS/inbox/inboxDeleted";
+import WSInboxAdded from "~/WS/inbox/inboxAdded";
 
 //WSインスタンス
 export let ws: WebSocket | undefined = undefined;
@@ -53,6 +55,16 @@ export const initWS = async () => {
         //メッセージ更新の通知受け取り
         case "message::UpdateMessage":
           WSUpdateMessage(json.data);
+          break;
+
+        //インボックス項目の削除（既読）受け取り
+        case "inbox::Deleted":
+          WSInboxDelete(json.data);
+          break;
+
+        //新規インボックス項目の受け取り
+        case "inbox::Added":
+          WSInboxAdded(json.data);
           break;
 
         //チャンネル情報の受け取り
