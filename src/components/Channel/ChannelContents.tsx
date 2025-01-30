@@ -51,7 +51,7 @@ export default function ChannelContents() {
     ) {
       //最後のメッセージIdを取得
       const messageIdNewest = storeHistory[param.channelId].history[0]?.id;
-      console.log("checkScrollPosAndFetchHistory :: 下です", Math.abs(scrollPos), messageIdNewest);
+      //console.log("checkScrollPosAndFetchHistory :: 下です", Math.abs(scrollPos), messageIdNewest);
       if (messageIdNewest === undefined) {
         console.error(
           "ChannelContent :: checkScrollPosAndFetchHistory : 最新のメッセIdを取得できなかった",
