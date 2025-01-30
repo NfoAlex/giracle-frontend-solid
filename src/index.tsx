@@ -80,7 +80,7 @@ render(() =>
   <Router root={(props) => (
     <>
       <SidebarProvider>
-        <Show when={useLocation().pathname !== "/auth"}>
+        <Show when={useLocation().pathname.startsWith("/app")}>
           <AppSidebar />
         </Show>
         <Suspense>{props.children}</Suspense>
@@ -89,6 +89,7 @@ render(() =>
   )}>
     <Route path="/" component={TopForMoving} />
     <Route path="/auth" component={lazy(() => import("./routes/auth"))} />
+    <Route path="*paramName" component={lazy(() => import("./routes/[...404]"))} />
     <Route path="/app" component={AuthGuard}>
       <Route path="/" component={lazy(() => import("./routes/index"))} />
       <Route path="/channel">
