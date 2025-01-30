@@ -97,6 +97,7 @@ render(() =>
       <Route path="/profile" component={lazy(() => import("./routes/profile"))} />
       <Route path="/channel-browser" component={lazy(() => import("./routes/channel-browser"))} />
       <Route path="/manage-server" component={lazy(() => import("./routes/manage-server"))} />
+      <Route path="*paramName" component={lazy(() => import("./routes/[...404]"))} />
     </Route>
   </Router>,
   root!

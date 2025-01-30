@@ -2,10 +2,8 @@ import { A } from "@solidjs/router";
 
 export default function NotFound() {
   return (
-    <main class="text-center mx-auto text-gray-700 p-4">
-      <h1 class="max-6-xs text-6xl text-sky-700 font-thin uppercase my-16">
-        ここにはなにもありません。
-      </h1>
-    </main>
+    <p class="text-2xl text-center mt-10">
+      ここにはなにもありません。
+    </p>
   );
 }
