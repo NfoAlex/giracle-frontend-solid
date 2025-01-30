@@ -38,12 +38,12 @@ export default function Auth() {
           <Tabs defaultValue="login">
             <TabsList class="grid w-full grid-cols-2">
               <TabsTrigger value="login">ログイン</TabsTrigger>
-              <TabsTrigger value="register">新規登録</TabsTrigger>
+              <TabsTrigger value="register" disabled={!storeServerinfo.RegisterAvailable}>新規登録</TabsTrigger>
             </TabsList>
 
             <Show
               when={storeAppStatus.hasServerinfo}
-              fallback={<p>loading...</p>}
+              fallback={<p class={"text-center"}>loading...</p>}
             >
               <TabsContent value="login">
                 <Login />
