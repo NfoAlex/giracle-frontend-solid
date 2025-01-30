@@ -17,6 +17,14 @@ export const insertHistory = (history: IMessage[]) => {
   if (history.length === 0) return;
 
   const currentHistory = { ...storeHistory };
+
+  //挿入方向(挿入する履歴が現在保持するものより新しいかどうかで順序を選ぶ
+  let insertDirection = (
+    history[0].createdAt.valueOf() //受け取った履歴の最初の時間
+    >
+    (currentHistory[history[0].channelId]?.history.at(-1)?.createdAt.valueOf() || 0) //現在の履歴最古の時間
+  ) ? "newer" : "older";
+
   if (currentHistory[history[0].channelId] === undefined) {
     currentHistory[history[0].channelId] = {
       atEnd: true,
@@ -24,13 +32,8 @@ export const insertHistory = (history: IMessage[]) => {
       history: history,
     };
   } else {
-    //挿入する履歴が現在保持するものより新しいかどうかで順序を選ぶ
-    if (
-      history[0].createdAt.valueOf() >
-      (currentHistory[history[0].channelId].history
-        .at(-1)
-        ?.createdAt.valueOf() || 0)
-    ) {
+    if (insertDirection === "newer") {
+      //console.log("History :: insertHistory : 新しい方向に挿入");
       //最後だけ切る
       const trimmedHistory = history.slice(0,-1);
       currentHistory[history[0].channelId] = {
@@ -38,6 +41,7 @@ export const insertHistory = (history: IMessage[]) => {
         history: [...trimmedHistory, ...currentHistory[history[0].channelId].history],
       };
     } else {
+      //console.log("History :: insertHistory : 古い方向に挿入");
       //先頭だけ切る
       const trimmedHistory = history.slice(1);
       currentHistory[history[0].channelId] = {
@@ -47,7 +51,25 @@ export const insertHistory = (history: IMessage[]) => {
     }
   }
 
-  setStoreHistory(currentHistory);
+  //setStoreHistory(currentHistory);
+
+  if (insertDirection === "newer") {
+    //古い履歴を削る
+    //console.log("History :: insertHistory : 古い方向に削る", currentHistory[history[0].channelId].history.length);
+    if (currentHistory[history[0].channelId].history.length >= 120) {
+      currentHistory[history[0].channelId].history = currentHistory[history[0].channelId].history.slice(0, 90);
+      currentHistory[history[0].channelId].atTop = false;
+    }
+  } else {
+    //新しい方の履歴を削る
+    //console.log("History :: insertHistory : 新しい方向に削る", currentHistory[history[0].channelId].history.length);
+    if (currentHistory[history[0].channelId].history.length >= 120) {
+      currentHistory[history[0].channelId].history = currentHistory[history[0].channelId].history.slice(30);
+      currentHistory[history[0].channelId].atEnd = false;
+    }
+  }
+
+  setTimeout(() => setStoreHistory(currentHistory), 0);
 
   //console.log("History :: insertHistory : current store->", storeHistory);
 };
