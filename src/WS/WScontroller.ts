@@ -29,11 +29,10 @@ export const initWS = async () => {
   console.log("WScontroller :: initWS : triggered");
 
   ws.onmessage = async (event) => {
-    console.log("WScontroller :: initWS(.onmessage) : triggered", await JSON.parse(event.data));
+    //console.log("WScontroller :: initWS(.onmessage) : triggered", await JSON.parse(event.data));
     try {
       // biome-ignore lint/suspicious/noExplicitAny: バックエンド次第
       const json: { signal: string, data: any } = JSON.parse(event.data);
-      console.log("WScontroller :: initWS : event->", )
 
       //トークンが無効な場合のフラグ設定
       if (json.signal === "ERROR" && json.data === "token not valid") {
