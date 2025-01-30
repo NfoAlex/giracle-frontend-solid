@@ -9,6 +9,7 @@ import NewMessageLine from "./ChannelContent/NewMessageLine";
 import POST_MESSAGE_UPDATE_READTIME from "~/api/MESSAGE/MESSAGE_UPDATE_READTIME";
 import { setStoreHasNewMessage } from "~/stores/HasNewMessage";
 import HoverMenu from "~/components/Channel/ChannelContent/HoverMenu";
+import MentionReadWrapper from "~/components/Channel/ChannelContent/MentionReadWrapper";
 
 export default function ChannelContents() {
   const [isFocused, setIsFocused] = createSignal(true);
@@ -248,10 +249,12 @@ export default function ChannelContents() {
                         onmouseleave={() => setHoveredMsgId("")}
                         on:touchend={() => setHoveredMsgId(h.id) /* スマホ用 */}
                       >
-                        <MessageRender
-                          message={h}
-                          displayUserName={!sameSenderAsNext(index())}
-                        />
+                        <MentionReadWrapper>
+                          <MessageRender
+                            message={h}
+                            displayUserName={!sameSenderAsNext(index())}
+                          />
+                        </MentionReadWrapper>
                         { //ホバーメニュー
                           hoveredMsgId() === h.id
                           &&
