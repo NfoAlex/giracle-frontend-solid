@@ -11,6 +11,7 @@ import Channel from './routes/channel/[id]';
 import GET_SERVER_CONFIG from './api/SERVER/SERVER_CONFIG';
 import { setStoreServerinfo, storeServerinfo } from './stores/Serverinfo';
 import { HasAnythingNew } from './stores/HasNewMessage';
+import {ColorModeProvider, ColorModeScript, createLocalStorageManager} from "@kobalte/core";
 
 const root = document.getElementById('root');
 
@@ -76,15 +77,19 @@ const TopForMoving = () => {
   )
 }
 
+const storageManager = createLocalStorageManager("vite-ui-theme")
 render(() => 
   <Router root={(props) => (
     <>
-      <SidebarProvider>
-        <Show when={useLocation().pathname.startsWith("/app")}>
-          <AppSidebar />
-        </Show>
-        <Suspense>{props.children}</Suspense>
-      </SidebarProvider>
+      <ColorModeScript storageType={storageManager.type} />
+      <ColorModeProvider storageManager={storageManager}>
+        <SidebarProvider>
+          <Show when={useLocation().pathname.startsWith("/app")}>
+            <AppSidebar />
+          </Show>
+          <Suspense>{props.children}</Suspense>
+        </SidebarProvider>
+      </ColorModeProvider>
     </>
   )}>
     <Route path="/" component={TopForMoving} />

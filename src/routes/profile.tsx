@@ -1,4 +1,4 @@
-import { IconCheck, IconCircleX, IconPencil } from "@tabler/icons-solidjs";
+import {IconCheck, IconCircleX, IconMoonFilled, IconPencil, IconSunFilled} from "@tabler/icons-solidjs";
 import { Show, createSignal } from "solid-js";
 import POST_USER_PROFILE_UPDATE from "~/api/USER/USER_PROFILE_UPDATE";
 import ChangeIcon from "~/components/Profile/ChangeIcon";
@@ -10,6 +10,7 @@ import { SidebarTrigger } from "~/components/ui/sidebar";
 import { TextField, TextFieldInput } from "~/components/ui/text-field";
 import { setStoreMyUserinfo, storeMyUserinfo } from "~/stores/MyUserinfo";
 import ChangeBanner from "~/components/Profile/ChangeBanner";
+import {useColorMode} from "@kobalte/core";
 
 export default function Profile() {
   const [nameEditMode, setNameEditMode] = createSignal(false);
@@ -18,6 +19,7 @@ export default function Profile() {
   const [newSelfIntro, setNewSelfIntro] = createSignal(
     storeMyUserinfo.selfIntroduction,
   );
+  const { setColorMode, colorMode } = useColorMode()
 
   /**
    * 名前の変更
@@ -177,6 +179,16 @@ export default function Profile() {
             {/* ロール一覧 */}
             <Label>ロール</Label>
             <p>Coming soon...</p>
+
+            <hr class="my-3"/>
+
+            <div class={"flex flex-col gap-2"}>
+              <Label>テーマ</Label>
+              <div class={"mx-auto"}>
+                {colorMode() === "dark" && <IconMoonFilled onClick={()=>setColorMode("light")} />}
+                {colorMode() === "light" && <IconSunFilled onClick={()=>setColorMode("dark")} />}
+              </div>
+            </div>
           </div>
         </CardContent>
       </Card>
