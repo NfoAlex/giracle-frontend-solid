@@ -9,7 +9,7 @@ export default function MentionReadWrapper(props: {children: JSX.Element, messag
     if (msg) {
       POST_MESSAGE_INBOX_READ(props.messageId).then(() => {
         console.log("MentionReadWrapper :: onMounted : message read");
-      });
+      }).catch((e) => console.error("MentionReadWrapper :: onMounted : 既読error->", e));
     }
   });
 
