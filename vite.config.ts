@@ -1,8 +1,12 @@
 import { defineConfig } from 'vite';
 import solidPlugin from 'vite-plugin-solid';
+import pkg from './package.json' with { type: "json" };
 
 export default defineConfig({
   plugins: [solidPlugin()],
+  define: {
+    __VERSION__: `"${pkg.version}"`,
+  },
   server: {
     port: 3333,
     proxy: {

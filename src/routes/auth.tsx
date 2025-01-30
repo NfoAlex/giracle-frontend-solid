@@ -15,6 +15,7 @@ export default function Auth() {
   const loc = useLocation();
 
   onMount(async () => {
+    console.log("Auth.tsx onMount :: import.meta.env", import.meta);
     //クッキーにTokenがあれば初期処理をして移動
     const token = GetCookie("token");
     if (token !== undefined) {
@@ -31,7 +32,7 @@ export default function Auth() {
   });
 
   return (
-    <div class="pt-5 px-2 max-w-[450px] mx-auto ">
+    <div class="pt-5 px-2 max-w-[500px] w-full mx-auto flex flex-col gap-4 md:justify-center">
       <p class="text-2xl">{storeServerinfo.name || "Giracle"}</p>
       <Card class="w-full mx-auto py-4">
         <CardContent class="grid- gap-3">
@@ -54,6 +55,16 @@ export default function Auth() {
             </Show>
           </Tabs>
         </CardContent>
+      </Card>
+
+      <Card class={"justify-self-end p-4 px-4 flex items-center"}>
+        <p class={"font-bold"}>Giracle</p>
+        <p class={"ml-auto"}>
+          {
+            //@ts-ignore: __VERSION__はvite.config.tsで定義されている
+            __VERSION__
+          }
+        </p>
       </Card>
     </div>
   );
