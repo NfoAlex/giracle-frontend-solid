@@ -249,7 +249,7 @@ export default function ChannelContents() {
                         onmouseleave={() => setHoveredMsgId("")}
                         on:touchend={() => setHoveredMsgId(h.id) /* スマホ用 */}
                       >
-                        <MentionReadWrapper>
+                        <MentionReadWrapper messageId={h.id}>
                           <MessageRender
                             message={h}
                             displayUserName={!sameSenderAsNext(index())}
