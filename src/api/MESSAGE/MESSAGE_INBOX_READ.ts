@@ -1,5 +1,3 @@
-import type { IMessage } from "~/types/Message";
-
 export default async function POST_MESSAGE_INBOX_READ(
   _messageId: string,
 ): Promise<{
