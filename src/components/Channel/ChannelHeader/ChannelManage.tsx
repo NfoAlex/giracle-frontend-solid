@@ -33,7 +33,7 @@ export default function ChannelManage(props: {channelId: string}) {
   return (
     <Dialog>
       <DialogTrigger>
-        <Button>管理</Button>
+        <Button variant={"secondary"} class={"w-9 h-9"}><IconPencil /></Button>
       </DialogTrigger>
       <DialogContent class={"pt-10"}>
         <DialogHeader>
