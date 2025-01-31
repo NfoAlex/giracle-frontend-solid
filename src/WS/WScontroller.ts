@@ -13,12 +13,16 @@ import WSUserConnected from "~/WS/User/UserConnected";
 import WSUserDisconnected from "~/WS/User/UserDisconnected";
 import WSInboxDelete from "~/WS/inbox/inboxDeleted";
 import WSInboxAdded from "~/WS/inbox/inboxAdded";
+import InitLoad from "~/utils/InitLoad";
+import {storeMyUserinfo} from "~/stores/MyUserinfo";
 
 //WSインスタンス
 export let ws: WebSocket | undefined = undefined;
 
 //WS接続がエラーで閉じられた場合のフラグ
 let FLAGwsError = false;
+//再接続フラグ
+let FLAGwsReconnect = false;
 
 export const initWS = async () => {
   //既に接続済みの場合は再接続しない
@@ -116,6 +120,11 @@ export const initWS = async () => {
     //接続状態を更新
     storeAppStatus.wsConnected = true;
 
+    //再接続フラグが立っていた場合は初期処理を再実行
+    if (FLAGwsReconnect) {
+      InitLoad(storeMyUserinfo.id);
+    }
+
     //オンラインユーザーを取得、格納
     GET_USER_GET_ONLINE()
       .then((r) => {
@@ -142,6 +151,7 @@ export const initWS = async () => {
     //再接続
     setTimeout(
       () => {
+        FLAGwsReconnect = true;
         initWS();
       },
       Math.random() * 500 + 1000,
