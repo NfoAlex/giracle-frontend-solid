@@ -78,7 +78,7 @@ export default function UserName(props: { userId: string }) {
               <Label>ロール</Label>
               <div class="flex flex-wrap gap-1">
                 <For each={storeUserinfo[user().id].RoleLink}>
-                  {(role) =><RoleChip deletable={true} roleId={role.roleId} userId={props.userId} />}
+                  {(role) =><RoleChip deletable={getRolePower("manageRole")} roleId={role.roleId} userId={props.userId} />}
                 </For>
               </div>
               <Show when={getRolePower("manageRole")}>
