@@ -39,11 +39,11 @@ export default function UserName(props: { userId: string }) {
     <Dialog open={open()} onOpenChange={setOpen}>
       <DialogContent class="p-0 max-h-[90vh] flex flex-col overflow-y-auto">
         <Show when={open() && user()}>
-          <div class="h-[35%] w-full">
+          <div class="h-[250px] shrink-0 grow w-full">
             <img
-              alt="user banner"
+              alt="ユーザーバナー"
               src={`/api/user/banner/${storeUserinfo[props.userId].id}`}
-              class="h-full w-full object-cover"
+              class="h-full w-full text-center object-cover"
             />
           </div>
           <div class="w-full -mt-12">
