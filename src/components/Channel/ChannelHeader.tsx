@@ -4,6 +4,7 @@ import {directGetterChannelInfo} from "~/stores/ChannelInfo";
 import { Card } from "../ui/card";
 import { SidebarTrigger } from "../ui/sidebar";
 import ChannelManage from "~/components/Channel/ChannelHeader/ChannelManage";
+import {getRolePower} from "~/stores/MyUserinfo";
 
 export default function ChannelHeader() {
   const params = useParams();
@@ -21,7 +22,7 @@ export default function ChannelHeader() {
       <p>{ directGetterChannelInfo(params.channelId).description }</p>
 
       {
-        directGetterChannelInfo("manageChannel")
+        getRolePower("manageChannel")
         &&
         <span class={"ml-auto"}>
           <ChannelManage channelId={currentChannelId()} />

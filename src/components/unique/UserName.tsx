@@ -7,7 +7,7 @@ import { Label } from "../ui/label";
 import { Button } from "../ui/button";
 import { IconPencil, IconPlus } from "@tabler/icons-solidjs";
 import { A } from "@solidjs/router";
-import { storeMyUserinfo } from "~/stores/MyUserinfo";
+import {getRolePower, storeMyUserinfo} from "~/stores/MyUserinfo";
 import RoleChip from "./RoleChip";
 import { Badge } from "../ui/badge";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
@@ -20,7 +20,7 @@ export default function UserName(props: { userId: string }) {
   const [open, setOpen] = createSignal(false);
 
   // ロールリスト用
-  const [openRoleList, setOpenRoleList] = createSignal(false);
+  const [, setOpenRoleList] = createSignal(false);
   const roles: IRole[] = Object.values(storeRoleInfo);
 
   /**
@@ -78,18 +78,19 @@ export default function UserName(props: { userId: string }) {
               <Label>ロール</Label>
               <div class="flex flex-wrap gap-1">
                 <For each={storeUserinfo[user().id].RoleLink}>
-                  {(role) =><RoleChip deletable={true} roleId={role.roleId} userId={props.userId} />}
+                  {(role) =><RoleChip deletable={getRolePower("manageRole")} roleId={role.roleId} userId={props.userId} />}
                 </For>
-
+              </div>
+              <Show when={getRolePower("manageRole")}>
                 {/* ロール追加ボタン */}
                 <Popover onOpenChange={setOpenRoleList}>
                   <PopoverTrigger>
                     <Badge
                       onclick={()=>console.log("asdf")}
                       variant={"outline"}
-                      class="cursor-pointer h-full"
+                      class="cursor-pointer h-full mt-1"
                     >
-                      <IconPlus size={12} />
+                      <IconPlus size={16} />
                     </Badge>
                   </PopoverTrigger>
                   <PopoverContent class="w-fit">
@@ -98,15 +99,15 @@ export default function UserName(props: { userId: string }) {
                         {(role) => //ロールリンクされていないものだけ表示
                           !storeUserinfo[user().id].RoleLink.some((rl) => rl.roleId === role.id)
                           &&
-                          <span onclick={()=>linkRole(role.id)} class="cursor-pointer pr-2">
-                            <RoleChip deletable={false} roleId={role.id} />
-                          </span>
+                            <span onclick={()=>linkRole(role.id)} class="cursor-pointer pr-2">
+                              <RoleChip deletable={false} roleId={role.id} />
+                            </span>
                         }
                       </For>
                     </div>
                   </PopoverContent>
                 </Popover>
-              </div>
+              </Show>
             </div>
 
             {/* 管理 */}
