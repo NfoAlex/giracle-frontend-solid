@@ -26,7 +26,7 @@ let FLAGwsReconnect = false;
 
 export const initWS = async () => {
   //既に接続済みの場合は再接続しない
-  if (ws === undefined) {
+  if (ws === undefined || ws.readyState === WebSocket.CLOSED) {
     ws = new WebSocket("/ws");
   }
 
