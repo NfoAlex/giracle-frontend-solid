@@ -164,9 +164,9 @@ export default function ChannelContents() {
         })?.readTime;
 
         //履歴を取得、格納した時点でもう一度履歴取得を試す
-        FetchHistory(param.channelId, { messageTimeFrom: time }, "older").then(() =>
-          checkScrollPosAndFetchHistory(),
-        );
+        FetchHistory(param.channelId, { messageTimeFrom: time }, "older").then(() => {
+          setTimeout(checkScrollPosAndFetchHistory, 0);
+        });
       } else {
         initScroll();
       }
