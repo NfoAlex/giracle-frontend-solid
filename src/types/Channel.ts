@@ -4,4 +4,5 @@ export interface IChannel {
   description: string;
   createdUserId: string;
   isArchived: boolean;
+  channelViewableRoles: { roleId: string;}[];
 }
