@@ -23,6 +23,9 @@ export default function ChannelManage(props: {channelId: string}) {
     return oldRoles !== newRoles().join(",");
   }
 
+  /**
+   * チャンネル情報を更新する
+   */
   const updateChannel = () => {
     POST_CHANNEL_UPDATE({
       name: newName()!=="" ? newName() : undefined,
