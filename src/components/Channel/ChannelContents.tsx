@@ -29,8 +29,12 @@ export default function ChannelContents() {
     const scrollPos = el.scrollTop;
     //console.log("ChannelContent :: checkScrollPosAndFetchHistory : scrollPos->", scrollPos);
 
+    //スクロール位置の計算
+    const scrollAtTop = Math.abs(scrollPos) + el.offsetHeight >= el.scrollHeight - 1;
+    const scrollAtBottom = Math.abs(scrollPos) <= 0;
+
     //履歴の最古到達用
-    if (!storeHistory[param.channelId].atTop && Math.abs(scrollPos) + el.offsetHeight >= el.scrollHeight - 1) {
+    if (!storeHistory[param.channelId].atTop && scrollAtTop) {
       //最後のメッセージIdを取得
       const messageIdLast = storeHistory[param.channelId].history.at(-1)?.id;
       //console.log("checkScrollPosAndFetchHistory :: 上だね", messageIdLast);
@@ -46,9 +50,7 @@ export default function ChannelContents() {
     }
     //履歴の最新到達用
     if (
-      !storeHistory[param.channelId].atEnd &&
-      Math.abs(scrollPos) <= 0
-      //scrollPos >= el.scrollHeight - el.offsetHeight - 1
+      !storeHistory[param.channelId].atEnd && scrollAtBottom
     ) {
       //最後のメッセージIdを取得
       const messageIdNewest = storeHistory[param.channelId].history[0]?.id;
@@ -64,11 +66,15 @@ export default function ChannelContents() {
       setTimeout(() => scrollTo(messageIdNewest, "start"));
     }
 
-    //console.log("ChannelContent :: checkScrollPosAndFetchHistory : scrollPos->", scrollPos, " isFocused()->", isFocused());
+    // console.log("ChannelContent :: checkScrollPosAndFetchHistory : scrollAtBottom->(",
+    //   scrollPos, el.offsetHeight, el.scrollHeight - 1,
+    //   ") storeHistory[param.channelId].atEnd->", storeHistory[param.channelId].atEnd,
+    //   " isFocused()->", isFocused(),
+    // );
     //履歴の最新部分に到達していたら既読時間を更新
     if (
       storeHistory[param.channelId].atEnd &&
-      scrollPos <= 1 &&
+      scrollAtBottom &&
       isFocused()
     ) {
       //すでに既読時間が一緒ならスルー
