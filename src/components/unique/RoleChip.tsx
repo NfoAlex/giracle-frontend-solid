@@ -2,23 +2,23 @@ import { IconCircleFilled, IconX } from "@tabler/icons-solidjs";
 import { Badge } from "../ui/badge";
 import { getterRoleInfo } from "~/stores/RoleInfo";
 import { createSignal, Show } from "solid-js";
-import POST_ROLE_UNLINK from "~/api/ROLE/ROLE_UNLINK";
 
-export default function RoleChip(props: { deletable: boolean, roleId: string, userId?: string }) {
+export default function RoleChip(props: {
+  deletable: boolean,
+  roleId: string,
+  onDelete?: (roleId: string) => void,
+  userId?: string
+}) {
   const [hovered, setHovered] = createSignal(false);
 
   /**
-   * ロールを解除
+   * ロールの削除ボタンアクション
    */
-  const unlinkRole = () => {
-    console.log("RoleChip :: unlinkRole :: props ->", props);
-    if (props.userId === undefined) return;
+  const deleteIt = () => {
+    //console.log("RoleChip :: deleteIt :: onDelete", props.onDelete);
+    if (props.onDelete === undefined) return;
 
-    POST_ROLE_UNLINK(props.userId, props.roleId)
-      .then((r) => {
-        console.log("RoleChip :: unlinkRole :: r ->", r);
-      })
-      .catch((e) => console.error("RoleChip :: unlinkRole :: err ->", e));
+    props.onDelete(props.roleId);
   }
 
   return (
@@ -36,7 +36,7 @@ export default function RoleChip(props: { deletable: boolean, roleId: string, us
             size={12}
             color={ getterRoleInfo(props.roleId).color }
             onMouseLeave={()=>setHovered(false)}
-            onclick={unlinkRole}
+            onclick={deleteIt}
           />
         </Show>
         <p>{ getterRoleInfo(props.roleId).name }</p>

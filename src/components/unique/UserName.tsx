@@ -14,6 +14,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import POST_ROLE_LINK from "~/api/ROLE/ROLE_LINK";
 import { storeRoleInfo } from "~/stores/RoleInfo";
 import type { IRole } from "~/types/Role";
+import POST_ROLE_UNLINK from "~/api/ROLE/ROLE_UNLINK";
 
 export default function UserName(props: { userId: string }) {
   const [user] = createSignal(getterUserinfo(props.userId));
@@ -30,9 +31,22 @@ export default function UserName(props: { userId: string }) {
   const linkRole = (roleId: string) => {
     POST_ROLE_LINK(props.userId, roleId)
       .then((r) => {
-        console.log("UserName :: linkRole :: r ->", r);
+        //console.log("UserName :: linkRole :: r ->", r);
       })
       .catch((e) => console.error("UserName :: linkRole :: err ->", e));
+  }
+
+  /**
+   * ロールを解除
+   */
+  const unlinkRole = (roleId: string) => {
+    if (props.userId === undefined) return;
+
+    POST_ROLE_UNLINK(props.userId, roleId)
+      .then((r) => {
+        //console.log("RoleChip :: unlinkRole :: r ->", r);
+      })
+      .catch((e) => console.error("UserName :: unlinkRole :: err ->", e));
   }
 
   return (
@@ -78,7 +92,14 @@ export default function UserName(props: { userId: string }) {
               <Label>ロール</Label>
               <div class="flex flex-wrap gap-1">
                 <For each={storeUserinfo[user().id].RoleLink}>
-                  {(role) =><RoleChip deletable={getRolePower("manageRole")} roleId={role.roleId} userId={props.userId} />}
+                  {(role) =>
+                    <RoleChip
+                      deletable={getRolePower("manageRole")}
+                        roleId={role.roleId}
+                        userId={props.userId}
+                        onDelete={(roleId)=>unlinkRole(roleId)}
+                      />
+                  }
                 </For>
               </div>
               <Show when={getRolePower("manageRole")}>
@@ -97,7 +118,7 @@ export default function UserName(props: { userId: string }) {
                     <div class="max-h-[25vh] max-w-[75vw] overflow-y-auto flex flex-col gap-1">
                       <For each={roles}>
                         {(role) => //ロールリンクされていないものだけ表示
-                          !storeUserinfo[user().id].RoleLink.some((rl) => rl.roleId === role.id)
+                            !storeUserinfo[user().id].RoleLink.some((rl) => rl.roleId === role.id)
                           &&
                             <span onclick={()=>linkRole(role.id)} class="cursor-pointer pr-2">
                               <RoleChip deletable={false} roleId={role.id} />
