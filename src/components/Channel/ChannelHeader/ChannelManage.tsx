@@ -34,6 +34,9 @@ export default function ChannelManage(props: {channelId: string}) {
         console.log(r);
         setEditDescription(false);
         setEditName(false);
+        //更新後の閲覧可能ロールを格納
+        const roleIdArr = [...directGetterChannelInfo(props.channelId).ChannelViewableRole];
+        setNewRoles(roleIdArr.map((r)=>r.roleId));
       })
       .catch((e) => {
         console.error("ChannelManage :: updateChannel : e", e);
