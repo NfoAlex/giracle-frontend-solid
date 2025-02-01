@@ -21,7 +21,6 @@ export default function ChannelContents() {
    * 現在のスクロール位置を確認してから該当する履歴取得をする
    */
   const checkScrollPosAndFetchHistory = async () => {
-    //console.log("checkScrollPosAndFetchHistory triggered");
     const el = document.getElementById("history");
     if (el === null) return;
     if (storeHistory[param.channelId] === undefined) return;
@@ -37,7 +36,6 @@ export default function ChannelContents() {
     if (!storeHistory[param.channelId].atTop && scrollAtTop) {
       //最後のメッセージIdを取得
       const messageIdLast = storeHistory[param.channelId].history.at(-1)?.id;
-      //console.log("checkScrollPosAndFetchHistory :: 上だね", messageIdLast);
       if (messageIdLast === undefined) {
         console.error(
           "ChannelContent :: checkScrollPosAndFetchHistory : 最古のメッセIdを取得できなかった",
@@ -54,7 +52,6 @@ export default function ChannelContents() {
     ) {
       //最後のメッセージIdを取得
       const messageIdNewest = storeHistory[param.channelId].history[0]?.id;
-      //console.log("checkScrollPosAndFetchHistory :: 下です", Math.abs(scrollPos), messageIdNewest);
       if (messageIdNewest === undefined) {
         console.error(
           "ChannelContent :: checkScrollPosAndFetchHistory : 最新のメッセIdを取得できなかった",
@@ -66,11 +63,6 @@ export default function ChannelContents() {
       setTimeout(() => scrollTo(messageIdNewest, "start"));
     }
 
-    // console.log("ChannelContent :: checkScrollPosAndFetchHistory : scrollAtBottom->(",
-    //   scrollPos, el.offsetHeight, el.scrollHeight - 1,
-    //   ") storeHistory[param.channelId].atEnd->", storeHistory[param.channelId].atEnd,
-    //   " isFocused()->", isFocused(),
-    // );
     //履歴の最新部分に到達していたら既読時間を更新
     if (
       storeHistory[param.channelId].atEnd &&
