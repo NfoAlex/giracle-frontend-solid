@@ -3,7 +3,7 @@ import {directGetterChannelInfo} from "~/stores/ChannelInfo";
 import {Card} from "~/components/ui/card";
 import {getRolePower} from "~/stores/MyUserinfo";
 import {IconCheck, IconPencil, IconX} from "@tabler/icons-solidjs";
-import {createEffect, createSignal, on, onMount} from "solid-js";
+import {createEffect, createSignal, on} from "solid-js";
 import {TextField, TextFieldInput, TextFieldTextArea} from "~/components/ui/text-field";
 import {Button} from "~/components/ui/button";
 import POST_CHANNEL_UPDATE from "~/api/CHANNEL/CHANNEL_UPDATE";
