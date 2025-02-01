@@ -56,53 +56,59 @@ export default function ChannelManage(props: {channelId: string}) {
       </DialogTrigger>
       <DialogContent class={"pt-10"}>
         <DialogHeader>
-
+          <p>チャンネル情報の編集</p>
         </DialogHeader>
         <DialogDescription class={"flex flex-col gap-2"}>
-          <div class={"flex px-3 text-card-foreground items-center"}>
+          <Card class={"p-2 px-4"}>
+            <Label class={"text-muted-foreground"}>チャンネル名</Label>
+            <div class={"flex text-card-foreground items-center"}>
+              {
+                editName()
+                  ?
+                  <div class={"flex items-center gap-1 w-full"}>
+                    <TextField class={"grow"}>
+                      <TextFieldInput
+                        placeholder={"チャンネル名"}
+                        value={directGetterChannelInfo(props.channelId).name}
+                        onInput={(e)=>setNewName(e.currentTarget.value)}
+                      />
+                    </TextField>
+                    <Button onClick={updateChannel} class={"ml-auto h-10 w-10"}><IconCheck /></Button>
+                    <Button onClick={()=>setEditName(false)} class={"ml-auto h-10 w-10"} variant={"outline"}><IconX /></Button>
+                  </div>
+                  :
+                  <p class={"text-2xl truncate"}>{ directGetterChannelInfo(props.channelId).name ?? "ロード中..." }</p>
+              }
+              { (getRolePower("manageChannel") && !editName()) && <Button onClick={()=>setEditName(true)} variant={"outline"} class={"ml-auto border rounded-md h-10 w-10"}><IconPencil /></Button> }
+            </div>
+
+            <hr class={"my-4"} />
+
+            <Label class={"text-muted-foreground"}>概要</Label>
             {
-              editName()
-                ?
-                <div class={"flex items-center gap-1 w-full"}>
-                  <TextField class={"grow"}>
-                    <TextFieldInput
-                      placeholder={"チャンネル名"}
-                      value={directGetterChannelInfo(props.channelId).name}
-                      onInput={(e)=>setNewName(e.currentTarget.value)}
+              !editDescription()
+              ?
+                <div class={"pt-3 pb-12 relative max-h-64 overflow-y-auto"}>
+                    <p>{ directGetterChannelInfo(props.channelId).description }</p>
+                    { directGetterChannelInfo(props.channelId).description==="" && <p class={"text-muted-foreground"}>概要が空です。</p> }
+
+                    <Button onClick={()=>setEditDescription(true)} class={"absolute bottom-2 right-0 border rounded-md h-10 w-10"} variant={"outline"} ><IconPencil /></Button>
+                </div>
+              :
+                <div class={"flex flex-col gap-1"}>
+                  <TextField class={"max-h-64 overflow-y-auto"}>
+                    <TextFieldTextArea
+                      value={directGetterChannelInfo(props.channelId).description}
+                      onInput={(e)=>setNewDescription(e.currentTarget.value)}
                     />
                   </TextField>
-                  <Button onClick={updateChannel} class={"ml-auto h-10 w-10"}><IconCheck /></Button>
-                  <Button onClick={()=>setEditName(false)} class={"ml-auto h-10 w-10"} variant={"outline"}><IconX /></Button>
+                  <div class={"w-fit ml-auto p-2 flex items-center gap-1"}>
+                    <Button onClick={updateChannel} class={"border rounded-md h-10 w-10"} ><IconCheck /></Button>
+                    <Button onClick={()=>setEditDescription(false)} class={"border rounded-md h-10 w-10"} variant={"outline"} ><IconX /></Button>
+                  </div>
                 </div>
-                :
-                <p class={"text-2xl truncate"}>{ directGetterChannelInfo(props.channelId).name ?? "ロード中..." }</p>
             }
-            { (getRolePower("manageChannel") && !editName()) && <Button onClick={()=>setEditName(true)} variant={"outline"} class={"ml-auto border rounded-md h-10 w-10"}><IconPencil /></Button> }
-          </div>
-
-          {
-            !editDescription()
-            ?
-              <Card class={"px-3 pt-3 pb-12 relative max-h-64 overflow-y-auto"}>
-                  <p>{ directGetterChannelInfo(props.channelId).description }</p>
-                  { directGetterChannelInfo(props.channelId).description==="" && <p class={"text-muted-foreground"}>概要が空です。</p> }
-
-                  <Button onClick={()=>setEditDescription(true)} class={"absolute bottom-2 right-2 border rounded-md h-10 w-10"} variant={"outline"} ><IconPencil /></Button>
-              </Card>
-            :
-              <div class={"flex flex-col gap-1"}>
-                <TextField class={"max-h-64 overflow-y-auto"}>
-                  <TextFieldTextArea
-                    value={directGetterChannelInfo(props.channelId).description}
-                    onInput={(e)=>setNewDescription(e.currentTarget.value)}
-                  />
-                </TextField>
-                <div class={"w-fit ml-auto p-2 flex items-center gap-1"}>
-                  <Button onClick={updateChannel} class={"border rounded-md h-10 w-10"} ><IconCheck /></Button>
-                  <Button onClick={()=>setEditDescription(false)} class={"border rounded-md h-10 w-10"} variant={"outline"} ><IconX /></Button>
-                </div>
-              </div>
-          }
+          </Card>
 
           <hr class={"my-4"} />
 
