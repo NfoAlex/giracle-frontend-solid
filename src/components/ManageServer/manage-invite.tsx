@@ -77,16 +77,18 @@ export default function ManageInvite() {
     <div class="flex flex-col overflow-y-auto">
       <InviteTable columns={col} data={invites()} inviteActionTaken={inviteActionTaken} />
 
-      {/* 再取得ボタン */}
-      <Button
-        onclick={fetchInvites}
-        class="fixed z-50 w-14 h-14 bottom-20 right-5 md:bottom-20 md:right-10"
-        variant={"outline"}
-      >
-        <IconRefresh />
-      </Button>
-      {/* 招待作成ボタン */}
-      <CreateInvite inviteActionTaken={inviteActionTaken} />
+      <div class={"fixed z-50 bottom-10 right-5 md:right-10 flex flex-col gap-4 md:gap-2"}>
+        {/* 再取得ボタン */}
+        <Button
+          onclick={fetchInvites}
+          class="w-14 h-14"
+          variant={"secondary"}
+        >
+          <IconRefresh />
+        </Button>
+        {/* 招待作成ボタン */}
+        <CreateInvite inviteActionTaken={inviteActionTaken} />
+      </div>
     </div>
   )
 }
