@@ -16,6 +16,13 @@ export default function RoleLinker(props: { roles: string[], onUpdate?: (roles: 
     props.onUpdate(newRoles());
   }
 
+  const removeRole = (roleIdRemoving: string) => {
+    if (props.onUpdate === undefined) return;
+
+    setNewRoles(newRoles().filter((r) => r !== roleIdRemoving));
+    props.onUpdate(newRoles());
+  }
+
   return (
     <Card class={"p-2 flex flex-col gap-2"}>
       {/* ロール一覧表示 */}
@@ -23,7 +30,11 @@ export default function RoleLinker(props: { roles: string[], onUpdate?: (roles: 
         <For each={props.roles}>
           {
             (roleId) =>
-              <RoleChip deletable={false} roleId={roleId} />
+              <RoleChip
+                deletable={true}
+                roleId={roleId}
+                onDelete={(roleId)=>removeRole(roleId)}
+              />
           }
         </For>
         <Show when={props.roles.length === 0}>
