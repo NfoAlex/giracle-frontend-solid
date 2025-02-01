@@ -33,6 +33,7 @@ export const directGetterChannelInfo = (
       id: channelId,
       description: "このチャンネルはロード中です",
       createdUserId: "",
+      ChannelViewableRole: [],
       isArchived: false,
     });
     GET_CHANNEL_GET_INFO(channelId)
@@ -47,6 +48,7 @@ export const directGetterChannelInfo = (
           id: channelId,
           description: "存在しないチャンネル",
           createdUserId: "",
+          ChannelViewableRole: [],
           isArchived: false,
         });
       });
