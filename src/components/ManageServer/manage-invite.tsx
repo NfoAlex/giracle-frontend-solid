@@ -18,14 +18,14 @@ export default function ManageInvite() {
         <Checkbox
           checked={props.table.getIsAllPageRowsSelected()}
           indeterminate={props.table.getIsSomePageRowsSelected()}
-          onChange={(value) => props.table.toggleAllPageRowsSelected(!!value)}
+          onChange={(value) => props.table.toggleAllPageRowsSelected(value)}
           aria-label="Select all"
         />
       ),
       cell: (props) => (
         <Checkbox
           checked={props.row.getIsSelected()}
-          onChange={(value) => props.row.toggleSelected(!!value)}
+          onChange={(value) => props.row.toggleSelected(value)}
           aria-label="Select row"
         />
       ),
