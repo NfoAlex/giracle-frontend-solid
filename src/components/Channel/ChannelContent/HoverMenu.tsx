@@ -1,9 +1,9 @@
 import {Card} from "~/components/ui/card";
 import {IconTrash} from "@tabler/icons-solidjs";
-import {Button} from "@kobalte/core/button";
 import DELETE_MESSAGE_DELETE from "~/api/MESSAGE/MESSAGE_DELETE";
 import {getRolePower, storeMyUserinfo} from "~/stores/MyUserinfo";
 import type {IMessage} from "~/types/Message";
+import {Button} from "~/components/ui/button";
 
 export default function HoverMenu(props: { message: IMessage }) {
 
@@ -25,7 +25,7 @@ export default function HoverMenu(props: { message: IMessage }) {
       {
         (getRolePower("manageUser") || storeMyUserinfo.id === props.message.userId)
         &&
-        <Button ondblclick={deleteMessage}><IconTrash color={"red"} /></Button>
+        <Button ondblclick={deleteMessage} variant={"ghost"} class={"w-8 h-8"}><IconTrash color={"hsl(var(--destructive))"} /></Button>
       }
     </Card>
   )

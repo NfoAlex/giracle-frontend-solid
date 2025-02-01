@@ -52,7 +52,7 @@ export default function CreateInvite(props: { inviteActionTaken: (dat: IInvite) 
         </DialogFooter>
       </DialogContent>
       <DialogTrigger>
-        <Button class="fixed z-50 w-14 h-14 bottom-5 right-5 md:bottom-10 md:right-10">
+        <Button class="w-14 h-14">
           <IconPlus />
         </Button>
       </DialogTrigger>

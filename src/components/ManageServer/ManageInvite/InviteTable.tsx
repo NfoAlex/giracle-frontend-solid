@@ -60,14 +60,14 @@ export function InviteTable<TData, TValue>(props: DataTableProps<TData, TValue>)
  
   return (
     <div class="flex flex-col gap-2">
-      <Card class="px-4 py-2 flex items-center gap-1 sticky top-0 z-50">
+      <Card class="px-4 py-2 flex items-center gap-2 sticky top-0 z-50">
         <p>{ Object.keys(rowSelection()).length }件を選択中</p>
         <Button
           ondblclick={deleteInvite}
           variant={"destructive"}
           disabled={Object.keys(rowSelection()).length === 0}
-          class="ml-auto"
-        >招待を削除</Button>
+          class={"ml-auto"}
+        >ダブルクリックで招待を削除</Button>
       </Card>
 
       <div class="rounded-md border h-full">
