@@ -3,16 +3,19 @@ import {directGetterChannelInfo} from "~/stores/ChannelInfo";
 import {Card} from "~/components/ui/card";
 import {getRolePower} from "~/stores/MyUserinfo";
 import {IconCheck, IconPencil, IconX} from "@tabler/icons-solidjs";
-import {createSignal} from "solid-js";
+import {createSignal, onMount} from "solid-js";
 import {TextField, TextFieldInput, TextFieldTextArea} from "~/components/ui/text-field";
 import {Button} from "~/components/ui/button";
 import POST_CHANNEL_UPDATE from "~/api/CHANNEL/CHANNEL_UPDATE";
+import RoleLinker from "~/components/unique/RoleLinker";
+import {Label} from "~/components/ui/label";
 
 export default function ChannelManage(props: {channelId: string}) {
   const [editName, setEditName] = createSignal(false);
   const [editDescription, setEditDescription] = createSignal(false);
   const [newName, setNewName] = createSignal("");
   const [newDescription, setNewDescription] = createSignal("");
+  const [newRoles, setNewRoles] = createSignal<string[]>([]);
 
   const updateChannel = () => {
     POST_CHANNEL_UPDATE({
@@ -29,6 +32,12 @@ export default function ChannelManage(props: {channelId: string}) {
         console.error("ChannelManage :: updateChannel : e", e);
       })
   }
+
+  onMount(() => {
+    console.log("ChannelManage :: onMount : ", directGetterChannelInfo(props.channelId));
+    const roleIdArr = [...directGetterChannelInfo(props.channelId).ChannelViewableRole];
+    setNewRoles(roleIdArr.map((r)=>r.roleId));
+  })
 
   return (
     <Dialog>
@@ -84,6 +93,14 @@ export default function ChannelManage(props: {channelId: string}) {
                 </div>
               </div>
           }
+
+          <hr class={"my-4"} />
+
+          <Label>閲覧できるロール</Label>
+          <RoleLinker
+            roles={newRoles()}
+            onUpdate={(roles)=>setNewRoles(roles)}
+          />
         </DialogDescription>
       </DialogContent>
     </Dialog>
