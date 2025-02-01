@@ -1,16 +1,12 @@
 import {createSignal, For, Show} from "solid-js";
-import { TextField, TextFieldInput } from "../ui/text-field";
-import {Button} from "~/components/ui/button";
-import {IconCheck, IconPencil, IconPlus, IconX} from "@tabler/icons-solidjs";
+import {IconPlus} from "@tabler/icons-solidjs";
 import {Popover, PopoverContent, PopoverTrigger} from "~/components/ui/popover";
 import {Badge} from "~/components/ui/badge";
-import {storeUserinfo} from "~/stores/Userinfo";
 import RoleChip from "~/components/unique/RoleChip";
 import {storeRoleInfo} from "~/stores/RoleInfo";
 import {Card} from "~/components/ui/card";
 
 export default function RoleLinker(props: { roles: string[], onUpdate?: (roles: string[])=>void }) {
-  const [edit, setEdit] = createSignal(false);
   const [newRoles, setNewRoles] = createSignal(props.roles);
 
   const updateRoles = (roleIdAdding: string) => {
@@ -18,7 +14,6 @@ export default function RoleLinker(props: { roles: string[], onUpdate?: (roles: 
 
     setNewRoles([...newRoles(), roleIdAdding]);
     props.onUpdate(newRoles());
-    setEdit(false);
   }
 
   return (
