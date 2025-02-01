@@ -3,7 +3,7 @@ import {directGetterChannelInfo} from "~/stores/ChannelInfo";
 import {Card} from "~/components/ui/card";
 import {getRolePower} from "~/stores/MyUserinfo";
 import {IconCheck, IconPencil, IconX} from "@tabler/icons-solidjs";
-import {createSignal, onMount} from "solid-js";
+import {createEffect, createSignal, on, onMount} from "solid-js";
 import {TextField, TextFieldInput, TextFieldTextArea} from "~/components/ui/text-field";
 import {Button} from "~/components/ui/button";
 import POST_CHANNEL_UPDATE from "~/api/CHANNEL/CHANNEL_UPDATE";
@@ -17,10 +17,17 @@ export default function ChannelManage(props: {channelId: string}) {
   const [newDescription, setNewDescription] = createSignal("");
   const [newRoles, setNewRoles] = createSignal<string[]>([]);
 
+  //閲覧可能ロールが変更されたかどうか
+  const roleIsDiff = () => {
+    const oldRoles = directGetterChannelInfo(props.channelId).ChannelViewableRole.map((r)=>r.roleId).join(",");
+    return oldRoles !== newRoles().join(",");
+  }
+
   const updateChannel = () => {
     POST_CHANNEL_UPDATE({
       name: newName()!=="" ? newName() : undefined,
       description: newDescription()!=="" ? newDescription() : undefined,
+      viewableRole: roleIsDiff() ? newRoles() : undefined,
       channelId: props.channelId
     })
       .then((r) => {
@@ -33,11 +40,11 @@ export default function ChannelManage(props: {channelId: string}) {
       })
   }
 
-  onMount(() => {
-    console.log("ChannelManage :: onMount : ", directGetterChannelInfo(props.channelId));
+  //チャンネルを移動するごとに閲覧可能ロールを更新
+  createEffect(on(() => props.channelId, () => {
     const roleIdArr = [...directGetterChannelInfo(props.channelId).ChannelViewableRole];
     setNewRoles(roleIdArr.map((r)=>r.roleId));
-  })
+  }));
 
   return (
     <Dialog>
@@ -101,6 +108,13 @@ export default function ChannelManage(props: {channelId: string}) {
             roles={newRoles()}
             onUpdate={(roles)=>setNewRoles(roles)}
           />
+          <Button
+            onClick={updateChannel}
+            size={"sm"}
+            class={"w-fit"}
+            variant={"secondary"}
+            disabled={!roleIsDiff()}
+          >ロールを更新</Button>
         </DialogDescription>
       </DialogContent>
     </Dialog>

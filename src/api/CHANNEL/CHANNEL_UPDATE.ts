@@ -1,5 +1,9 @@
 export default async function POST_CHANNEL_UPDATE(data: {
-  name?: string, description?: string, isArchived?: boolean, channelId: string
+  name?: string,
+  description?: string,
+  isArchived?: boolean,
+  viewableRole?: string[],
+  channelId: string
 }) {
   const res = await fetch("/api/channel/update", {
     method: "POST",
