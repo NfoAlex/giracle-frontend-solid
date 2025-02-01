@@ -30,7 +30,7 @@ export default function UserName(props: { userId: string }) {
    */
   const linkRole = (roleId: string) => {
     POST_ROLE_LINK(props.userId, roleId)
-      .then((r) => {
+      .then(() => {
         //console.log("UserName :: linkRole :: r ->", r);
       })
       .catch((e) => console.error("UserName :: linkRole :: err ->", e));
@@ -43,7 +43,7 @@ export default function UserName(props: { userId: string }) {
     if (props.userId === undefined) return;
 
     POST_ROLE_UNLINK(props.userId, roleId)
-      .then((r) => {
+      .then(() => {
         //console.log("RoleChip :: unlinkRole :: r ->", r);
       })
       .catch((e) => console.error("UserName :: unlinkRole :: err ->", e));
