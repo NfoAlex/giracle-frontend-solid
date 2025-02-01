@@ -106,7 +106,7 @@ export default function ChannelManage(props: {channelId: string}) {
 
           <hr class={"my-4"} />
 
-          <Label>閲覧できるロール</Label>
+          <Label>閲覧できるロール  {roleIsDiff() && "*"}</Label>
           <RoleLinker
             roles={newRoles()}
             onUpdate={(roles)=>setNewRoles(roles)}
