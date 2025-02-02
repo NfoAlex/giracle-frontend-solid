@@ -6,7 +6,6 @@ import { GET_CHANNEL_LIST } from "~/api/CHANNEL/CHANNEL_LIST";
 import CreateChannel from "~/components/ChannelBrowser/CreateChannel";
 import { Button } from "~/components/ui/button";
 import { Card } from "~/components/ui/card";
-import { SidebarTrigger } from "~/components/ui/sidebar";
 import { Switch, SwitchControl, SwitchLabel, SwitchThumb } from "~/components/ui/switch";
 import { getRolePower, setStoreMyUserinfo, storeMyUserinfo } from "~/stores/MyUserinfo";
 import type { IChannel } from "~/types/Channel";

@@ -1,5 +1,4 @@
 import {Card} from "~/components/ui/card";
-import {SidebarTrigger} from "~/components/ui/sidebar";
 import {storeInbox} from "~/stores/Inbox";
 import {For, Show} from "solid-js";
 import MessageRender from "~/components/Channel/ChannelContent/MessageRender";

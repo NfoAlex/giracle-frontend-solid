@@ -6,7 +6,6 @@ import { Avatar, AvatarImage } from "~/components/ui/avatar";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader } from "~/components/ui/card";
 import { Label } from "~/components/ui/label";
-import { SidebarTrigger } from "~/components/ui/sidebar";
 import { TextField, TextFieldInput } from "~/components/ui/text-field";
 import { setStoreMyUserinfo, storeMyUserinfo } from "~/stores/MyUserinfo";
 import ChangeBanner from "~/components/Profile/ChangeBanner";

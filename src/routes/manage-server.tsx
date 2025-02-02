@@ -5,7 +5,6 @@ import ManageRole from "~/components/ManageServer/manage-role";
 import { Button } from "~/components/ui/button";
 import { Card } from "~/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~/components/ui/select";
-import { SidebarTrigger } from "~/components/ui/sidebar";
 import { getRolePower } from "~/stores/MyUserinfo";
 import SidebarTriggerWithDot from "~/components/unique/SidebarTriggerWithDot";
 
