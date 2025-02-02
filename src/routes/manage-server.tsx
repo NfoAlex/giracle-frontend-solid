@@ -5,8 +5,8 @@ import ManageRole from "~/components/ManageServer/manage-role";
 import { Button } from "~/components/ui/button";
 import { Card } from "~/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~/components/ui/select";
-import { SidebarTrigger } from "~/components/ui/sidebar";
 import { getRolePower } from "~/stores/MyUserinfo";
+import SidebarTriggerWithDot from "~/components/unique/SidebarTriggerWithDot";
 
 export default function ManageServer() {
   const [displayMode, setDisplayMode] = createSignal<"community" | "role" | "invite">("community");
@@ -15,7 +15,7 @@ export default function ManageServer() {
     <div class="p-2 flex flex-col h-full">
       <Card class="w-full py-3 px-5 mb-2 flex md:flex-col flex-row gap-2">
         <div class="flex items-center gap-2">
-          <SidebarTrigger />
+          <SidebarTriggerWithDot />
           <p>サーバー管理</p>
         </div>
         <hr class="hidden md:inline" />

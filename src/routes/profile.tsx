@@ -6,11 +6,11 @@ import { Avatar, AvatarImage } from "~/components/ui/avatar";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader } from "~/components/ui/card";
 import { Label } from "~/components/ui/label";
-import { SidebarTrigger } from "~/components/ui/sidebar";
 import { TextField, TextFieldInput } from "~/components/ui/text-field";
 import { setStoreMyUserinfo, storeMyUserinfo } from "~/stores/MyUserinfo";
 import ChangeBanner from "~/components/Profile/ChangeBanner";
 import {useColorMode} from "@kobalte/core";
+import SidebarTriggerWithDot from "~/components/unique/SidebarTriggerWithDot";
 
 export default function Profile() {
   const [nameEditMode, setNameEditMode] = createSignal(false);
@@ -64,7 +64,7 @@ export default function Profile() {
   return (
     <div class="md:max-w-[450px] w-11/12 mx-auto">
       <span class="flex items-center gap-2">
-        <SidebarTrigger />
+        <SidebarTriggerWithDot />
         <p class="font-bold text-2xl my-2">プロフィール</p>
       </span>
       <Card class="w-full">

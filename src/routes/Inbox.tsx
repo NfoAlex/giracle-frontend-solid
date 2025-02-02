@@ -1,5 +1,4 @@
 import {Card} from "~/components/ui/card";
-import {SidebarTrigger} from "~/components/ui/sidebar";
 import {storeInbox} from "~/stores/Inbox";
 import {For, Show} from "solid-js";
 import MessageRender from "~/components/Channel/ChannelContent/MessageRender";
@@ -10,6 +9,7 @@ import {getterUserinfo} from "~/stores/Userinfo";
 import {IconBed, IconCheck} from "@tabler/icons-solidjs";
 import {Button} from "~/components/ui/button";
 import POST_MESSAGE_INBOX_READ from "~/api/MESSAGE/MESSAGE_INBOX_READ";
+import SidebarTriggerWithDot from "~/components/unique/SidebarTriggerWithDot";
 
 export default function Inbox() {
 
@@ -26,7 +26,7 @@ export default function Inbox() {
   return (
     <div class={"p-2 flex flex-col gap-2"}>
       <Card class="w-full py-3 px-5 flex items-center gap-2">
-        <SidebarTrigger />
+        <SidebarTriggerWithDot />
         <p>通知</p>
       </Card>
 
