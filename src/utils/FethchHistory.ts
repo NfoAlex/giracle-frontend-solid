@@ -33,7 +33,10 @@ export default async function FetchHistory(
         atEnd: r.data.atEnd,
         atTop: r.data.atTop,
       });
-      insertHistory(r.data.history);
+      new Promise((resolve) => {
+        insertHistory(r.data.history);
+        resolve(null);
+      })
     })
     .catch((e) =>
       console.error("ChannelContent :: fetchHistory : エラー->", e),
