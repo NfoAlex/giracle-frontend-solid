@@ -97,7 +97,7 @@ export default function Profile() {
               fallback={
                 <div class="flex flex-row items-center gap-2">
                   <p class="grow truncate">{storeMyUserinfo.name}</p>
-                  <Button onClick={() => setNameEditMode(!nameEditMode())}>
+                  <Button onClick={() => setNameEditMode(!nameEditMode())} size={"icon"}>
                     <IconPencil stroke="2"/>
                   </Button>
                 </div>
@@ -113,13 +113,13 @@ export default function Profile() {
                   />
                 </TextField>
                 <div class="flex flex-row items-center gap-1">
-                  <Button class="w-1/2" onClick={changeName} variant={"ghost"}>
+                  <Button onClick={changeName} variant={"ghost"} size={"icon"}>
                     <IconCheck stroke="2"/>
                   </Button>
                   <Button
-                    class="w-1/2"
                     onClick={() => setNameEditMode(!nameEditMode())}
                     variant={"ghost"}
+                    size={"icon"}
                   >
                     <IconCircleX stroke="2"/>
                   </Button>
@@ -140,6 +140,7 @@ export default function Profile() {
                   </p>
                   <Button
                     onClick={() => setSelfIntroEditMode(!selfIntroEditMode())}
+                    size={"icon"}
                   >
                     <IconPencil stroke="2"/>
                   </Button>
@@ -157,16 +158,16 @@ export default function Profile() {
                 </TextField>
                 <div class="flex flex-row items-center gap-1">
                   <Button
-                    class="w-1/2"
                     onClick={changeSelfIntro}
                     variant={"ghost"}
+                    size={"icon"}
                   >
                     <IconCheck stroke="2"/>
                   </Button>
                   <Button
-                    class="w-1/2"
                     onClick={() => setSelfIntroEditMode(!selfIntroEditMode())}
                     variant={"ghost"}
+                    size={"icon"}
                   >
                     <IconCircleX stroke="2"/>
                   </Button>
