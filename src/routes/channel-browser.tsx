@@ -11,6 +11,7 @@ import { Switch, SwitchControl, SwitchLabel, SwitchThumb } from "~/components/ui
 import { getRolePower, setStoreMyUserinfo, storeMyUserinfo } from "~/stores/MyUserinfo";
 import type { IChannel } from "~/types/Channel";
 import DeleteChannel from "~/components/ChannelBrowser/DeleteChannel";
+import SidebarTriggerWithDot from "~/components/unique/SidebarTriggerWithDot";
 
 export default function ChannelBrowser() {
   const [processing, setProcessing] = createSignal(true);
@@ -70,7 +71,7 @@ export default function ChannelBrowser() {
   return (
     <div class="p-2">
       <Card class="w-full py-3 px-5 flex items-center gap-2">
-        <SidebarTrigger />
+        <SidebarTriggerWithDot />
         <p>チャンネルブラウザ</p>
       </Card>
 
