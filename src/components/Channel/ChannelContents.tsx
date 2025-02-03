@@ -1,5 +1,5 @@
 import { useParams } from "@solidjs/router";
-import { For, Show, createEffect, createSignal, onCleanup, onMount } from "solid-js";
+import {For, Show, createEffect, createSignal, onCleanup, onMount, on} from "solid-js";
 import { storeHistory } from "~/stores/History";
 import { setStoreMessageReadTimeBefore, storeMessageReadTime, storeMessageReadTimeBefore, updateReadTime } from "~/stores/Readtime";
 import FetchHistory from "~/utils/FethchHistory";
@@ -151,6 +151,14 @@ export default function ChannelContents() {
     //console.log("ChannelContents :: toggleWindowFocus : isFocused->", isFocused());
   }
 
+  //履歴の更新監視
+  createEffect(
+    on(() => storeHistory[param.channelId]?.history[0]?.id + ":" + storeHistory[param.channelId]?.history.at(-1)?.id, () => {
+      console.log("ChannelContents :: createEffect : 履歴更新された");
+      checkScrollPosAndFetchHistory();
+    })
+  );
+
   createEffect(() => {
     if (param.channelId !== channelIdBefore) {
       //console.log("ChannelContents :: createEffect : param.channelId->", param.channelId, " channelIdBefore->", channelIdBefore);
@@ -164,9 +172,7 @@ export default function ChannelContents() {
         })?.readTime;
 
         //履歴を取得、格納した時点でもう一度履歴取得を試す
-        FetchHistory(param.channelId, { messageTimeFrom: time }, "older").then(() => {
-          setTimeout(checkScrollPosAndFetchHistory, 0);
-        });
+        FetchHistory(param.channelId, { messageTimeFrom: time }, "older");
       } else {
         initScroll();
       }
