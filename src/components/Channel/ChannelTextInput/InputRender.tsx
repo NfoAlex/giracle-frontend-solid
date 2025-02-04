@@ -1,7 +1,5 @@
 import {createSignal, For, Match, Switch as SolidSwitch} from "solid-js";
-import {TextField, TextFieldInput, TextFieldTextArea} from "~/components/ui/text-field";
 import {Card} from "~/components/ui/card";
-import {TextArea} from "@kobalte/core/text-field";
 
 interface IMessageInput {
   type: "text"|"mention"|"channel",
