@@ -7,13 +7,14 @@ import {IconUpload} from "@tabler/icons-solidjs";
 import FileUploadPreview from "~/components/Channel/ChannelTextInput/FileUploadPreview";
 
 export default function ChannelTextInput() {
-  const params = useParams();
-  const [text, setText] = createSignal("");
-  const [fileIds, setFileIds] = createSignal<string[]>([]);
-  const pushFileIds = (fileId: string) => {
+  const params = useParams(); //URLパラメータを取得するやつ
+  const [text, setText] = createSignal(""); //メッセージテキスト
+  const [fileIds, setFileIds] = createSignal<string[]>([]); //送信に使うファイルIDの配列
+  const pushFileIds = (fileId: string) => { //ファイルIDを追加するようの関数
     setFileIds([...fileIds(), fileId]);
   }
-  const [fileInput, setFileInput] = createSignal<File[]>([]);
+  const [fileInput, setFileInput] = createSignal<File[]>([]); //ファイル選択ダイアログからのファイル入力受け取り用配列
+  let cursorPosition = 0; //フォーム上のカーソル位置
 
   const sendMsg = () => {
     console.log("ChannelTextInput :: sendMsg : params.id->", {...params});
@@ -93,7 +94,10 @@ export default function ChannelTextInput() {
           <TextFieldInput
             type="text"
             value={text()}
-            onInput={(e) => setText(e.currentTarget.value)}
+            onInput={(e) => {
+              setText(e.currentTarget.value);
+              cursorPosition = e.currentTarget?.selectionStart || 0;
+            }}
             onKeyDown={(e) => {e.key === "Enter" && sendMsg()}}
             onPaste={(e) => receiveFiles(e)}
           />
