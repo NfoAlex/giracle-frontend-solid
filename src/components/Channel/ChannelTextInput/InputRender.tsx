@@ -55,7 +55,10 @@ export default function InputRender() {
   }
 
   return (
-    <div class={"border rounded flex flex-wrap w-full p-2"}>
+    <div
+      class={"border rounded flex flex-wrap w-full p-2 cursor-text"}
+      onClick={() => { document.getElementById("MsgInput:" + (inputs().length-1))?.focus() }}
+    >
       <For each={inputs()}>
         {
           (inp, index) => (
@@ -64,6 +67,7 @@ export default function InputRender() {
                 <Match when={inp.type === "text"}>
                   <div
                     id={"MsgInput:" + index()}
+                    onClick={(e) => e.stopPropagation()}
                     contentEditable
                     onInput={(e) => bindInput(e.currentTarget.textContent || "", index())}
                     class={"border-red-700 border-2 shrink min-w-[3ch] max-w-full text-wrap whitespace-pre-wrap break-all focus:outline-none"}
@@ -92,6 +96,7 @@ export default function InputRender() {
                     <p>@</p>
                     <div
                       id={"MsgInput:" + index()}
+                      onClick={(e) => e.stopPropagation()}
                       contentEditable
                       onInput={(e) => bindInput(e.currentTarget.textContent || "", index())}
                       class={"border-orange-700 border-2 shrink min-w-[3ch] max-w-full text-wrap whitespace-pre-wrap break-all focus:outline-none"}
