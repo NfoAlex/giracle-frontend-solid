@@ -15,9 +15,6 @@ export default function InputRender() {
    * テキスト入力をバインドする
    */
   const bindInput = (value: string, index: number) => {
-    //console.log("bindInput : value->", value.at(-1));
-    //if (value.at(-1) === "@") return;
-
     setInputs((prev) => {
       const newInputs = [...prev];
       newInputs[index].data = value;
@@ -27,16 +24,8 @@ export default function InputRender() {
 
   const AtSignTrigger = (index: number) => {
     console.log("@");
-
-    // setInputs((prev) => {
-    //   const newInputs = [...prev];
-    //   newInputs.splice(index + 1, 0, {type: "mention", data: ""});
-    //   return newInputs;
-    // });
     insertBlock("mention", index);
     console.log("inputs->", inputs());
-
-    //document.getElementById("MsgInput:" + (inputs().length - 1))?.focus();
   }
 
   const insertBlock = (type: IMessageInput["type"], index: number) => {
@@ -48,6 +37,21 @@ export default function InputRender() {
 
     //フォーカスを移す
     document.getElementById("MsgInput:" + (inputs().length - 1))?.focus();
+  }
+
+  const removeBlock = (index: number) => {
+    //console.log("removeBlock : index->", index);
+    if (inputs().length > 1) {
+      setInputs((prev) => {
+        let newInputs = [...prev];
+        //newInputs.splice(index, 1);
+        newInputs = newInputs.filter((_obj, _index) => _index!==index)
+        return newInputs;
+      });
+
+      //フォーカスを移す
+      document.getElementById("MsgInput:" + (index - 1))?.focus();
+    }
   }
 
   return (
@@ -69,6 +73,13 @@ export default function InputRender() {
                           case "@": {
                             e.preventDefault();
                             AtSignTrigger(index());
+                            break;
+                          }
+                          case "Backspace": {
+                            if (e.currentTarget.textContent === "") {
+                              e.preventDefault();
+                              removeBlock(index());
+                            }
                             break;
                           }
                         }
@@ -94,6 +105,13 @@ export default function InputRender() {
                             case " ": {
                               e.preventDefault();
                               insertBlock("text", index());
+                              break;
+                            }
+                            case "Backspace": {
+                              if (e.currentTarget.textContent === "") {
+                                e.preventDefault();
+                                removeBlock(index());
+                              }
                               break;
                             }
                             default: {
