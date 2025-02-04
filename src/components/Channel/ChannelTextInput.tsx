@@ -5,7 +5,6 @@ import { useParams } from "@solidjs/router";
 import POST_MESSAGE_SEND from "~/api/MESSAGE/MESSAGE_SEND";
 import {IconUpload} from "@tabler/icons-solidjs";
 import FileUploadPreview from "~/components/Channel/ChannelTextInput/FileUploadPreview";
-import InputRender from "~/components/Channel/ChannelTextInput/InputRender";
 
 export default function ChannelTextInput() {
   const params = useParams();
@@ -102,8 +101,6 @@ export default function ChannelTextInput() {
 
         <Button onClick={sendMsg}>送信</Button>
       </div>
-
-      <InputRender />
     </div>
   );
 }
