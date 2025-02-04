@@ -1,15 +1,17 @@
-import {createSignal, For, Match, Switch as SolidSwitch} from "solid-js";
+import {createSignal, For, Match, Show, Switch as SolidSwitch} from "solid-js";
 import {Card} from "~/components/ui/card";
 
 interface IMessageInput {
   type: "text"|"mention"|"channel",
-  data: string
+  data: string,
+  isReady?: boolean,
 }
 
 export default function InputRender() {
   const [inputs, setInputs] = createSignal<IMessageInput[]>([
     {type: "text", data: ""},
   ]);
+  let currentFocusIndex = 0;
 
   /**
    * テキスト入力をバインドする
@@ -31,7 +33,8 @@ export default function InputRender() {
   const insertBlock = (type: IMessageInput["type"], index: number) => {
     setInputs((prev) => {
       const newInputs = [...prev];
-      newInputs.splice(index + 1, 0, {type, data: ""});
+      const isReadyOption = type === "mention" ? false : undefined;
+      newInputs.splice(index + 1, 0, {type, data: "", isReady: isReadyOption});
       return newInputs;
     });
 
@@ -56,7 +59,7 @@ export default function InputRender() {
 
   return (
     <div
-      class={"border rounded flex flex-wrap w-full p-2 cursor-text"}
+      class={"relative border rounded flex flex-wrap w-full p-2 cursor-text"}
       onClick={() => { document.getElementById("MsgInput:" + (inputs().length-1))?.focus() }}
     >
       <For each={inputs()}>
@@ -67,9 +70,10 @@ export default function InputRender() {
                 <Match when={inp.type === "text"}>
                   <div
                     id={"MsgInput:" + index()}
-                    onClick={(e) => e.stopPropagation()}
                     contentEditable
+                    onClick={(e) => e.stopPropagation()}
                     onInput={(e) => bindInput(e.currentTarget.textContent || "", index())}
+                    onFocus={() => currentFocusIndex = index()}
                     class={"border-red-700 border-2 shrink min-w-[3ch] max-w-full text-wrap whitespace-pre-wrap break-all focus:outline-none"}
                     onKeyDown={
                       (e) => {
@@ -96,9 +100,10 @@ export default function InputRender() {
                     <p>@</p>
                     <div
                       id={"MsgInput:" + index()}
-                      onClick={(e) => e.stopPropagation()}
                       contentEditable
+                      onClick={(e) => e.stopPropagation()}
                       onInput={(e) => bindInput(e.currentTarget.textContent || "", index())}
+                      onFocus={() => currentFocusIndex = index()}
                       class={"border-orange-700 border-2 shrink min-w-[3ch] max-w-full text-wrap whitespace-pre-wrap break-all focus:outline-none"}
                       onKeyDown={
                         (e) => {
@@ -134,6 +139,13 @@ export default function InputRender() {
           )
         }
       </For>
+
+      {/* メンション用ユーザー検索バー */}
+      <Show when={inputs()[currentFocusIndex]?.type === "mention"}>
+        <Card class={"absolute w-full rounded-b-none bottom-full left-0 m-0 p-2"}>
+          <p>tesuto</p>
+        </Card>
+      </Show>
     </div>
   )
 }
