@@ -1,6 +1,7 @@
 import {createSignal, For, Match, Switch as SolidSwitch} from "solid-js";
 import {TextField, TextFieldInput, TextFieldTextArea} from "~/components/ui/text-field";
 import {Card} from "~/components/ui/card";
+import {TextArea} from "@kobalte/core/text-field";
 
 interface IMessageInput {
   type: "text"|"mention"|"channel",
@@ -52,65 +53,63 @@ export default function InputRender() {
   }
 
   return (
-    <div class={"border rounded flex flex-wrap"}>
+    <div class={"border rounded flex flex-wrap w-full p-2"}>
       <For each={inputs()}>
         {
           (inp, index) => (
-            <div>
-              {index()} :  { inp.type } - { inp.data }
+            <>
               <SolidSwitch>
                 <Match when={inp.type === "text"}>
-                  <TextField class={"w-full p-0"}>
-                    <TextFieldTextArea
-                      autoResize
-                      rows={1}
+                  <div
+                    id={"MsgInput:" + index()}
+                    contentEditable
+                    onInput={(e) => bindInput(e.currentTarget.textContent || "", index())}
+                    class={"border-red-700 border-2 shrink min-w-[3ch] max-w-full text-wrap whitespace-pre-wrap break-all focus:outline-none"}
+                    onKeyDown={
+                      (e) => {
+                        switch(e.key) {
+                          case "@": {
+                            e.preventDefault();
+                            AtSignTrigger(index());
+                            break;
+                          }
+                        }
+                      }
+                    }
+                  />
+                </Match>
+                <Match when={inp.type === "mention"}>
+                  <Card class={"flex items-center bg-border"}>
+                    <p>@</p>
+                    <div
                       id={"MsgInput:" + index()}
-                      value={inp.data}
-                      class={"border-red-700 min-w-[3ch] h-min max-w-full shrink p-0"}
-                      style={`width: ${inputs()[index()].data.length}ch`}
-                      onInput={(e) => bindInput(e.currentTarget.value, index())}
+                      contentEditable
+                      onInput={(e) => bindInput(e.currentTarget.textContent || "", index())}
+                      class={"border-orange-700 border-2 shrink min-w-[3ch] max-w-full text-wrap whitespace-pre-wrap break-all focus:outline-none"}
                       onKeyDown={
                         (e) => {
-                          switch(e.key) {
+                          switch (e.key) {
                             case "@": {
-                              AtSignTrigger(index());
+                              e.preventDefault();
                               break;
+                            }
+                            case " ": {
+                              e.preventDefault();
+                              insertBlock("text", index());
+                              break;
+                            }
+                            default: {
+                              console.log("mention : key->", e.key);
                             }
                           }
                         }
                       }
                     />
-                  </TextField>
-                </Match>
-                <Match when={inp.type === "mention"}>
-                  <Card>
-                    <TextField>
-                      <TextFieldInput
-                        type="text"
-                        id={"MsgInput:" + index()}
-                        class={"border-0"}
-                        value={inp.data}
-                        onInput={(e) => bindInput(e.currentTarget.value, index())}
-                        onKeyDown={
-                          (e) => {
-                            switch(e.key) {
-                              case " ": {
-                                e.preventDefault();
-                                insertBlock("text", index());
-                                break;
-                              }
-                              default: {
-                                console.log("mention : key->", e.key);
-                              }
-                            }
-                          }
-                        }
-                      />
-                    </TextField>
+
                   </Card>
                 </Match>
               </SolidSwitch>
-            </div>
+            </>
           )
         }
       </For>
