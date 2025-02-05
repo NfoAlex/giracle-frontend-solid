@@ -53,7 +53,7 @@ export default function ChannelTextInput() {
 
     //カーソル位置がメンション条件の範囲中にあるかどうか
     for (const arr of matchesFilter) {
-      console.log("ChannelTextInput :: checkMode : arr->", arr.index, (arr.index + arr[0].length));
+      //console.log("ChannelTextInput :: checkMode : arr->", arr.index, (arr.index + arr[0].length));
       if (arr.index <= cursorPosition && cursorPosition <= (arr.index + arr[0].length + 1)) {
         setSearchOptions({
           type: "user",
@@ -85,7 +85,7 @@ export default function ChannelTextInput() {
     GET_USER_SEARCH(query, params.channelId)
       .then((r) => {
         setUserSearchResult(r.data);
-        console.log("GET_USER_SEARCH :: r->", r);
+        //console.log("GET_USER_SEARCH :: r->", r);
       })
       .catch((e) => console.error("GET_USER_SEARCH :: e->", e));
   }
