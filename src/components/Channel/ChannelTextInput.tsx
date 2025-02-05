@@ -169,7 +169,10 @@ export default function ChannelTextInput() {
 
         {/* メンション用ユーザー検索 */}
         <Show when={searchOptions().isEnabled && searchOptions().type === "user"}>
-          <Card class={"absolute left-0 bottom-full border-b-0 w-full p-2 overflow-y-auto max-h-40"}>
+          <Card class={"absolute left-0 bottom-full border-b-0 w-full p-2 overflow-y-auto max-h-40 cursor-pointer"}>
+            <Show when={userSearchResult().length === 0}>
+              <p class={"text-center"}>...</p>
+            </Show>
             <For each={userSearchResult()}>
               {(user) => {
                 return (
