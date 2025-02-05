@@ -1,10 +1,19 @@
-import {createSignal, For, Show} from "solid-js";
+import {createEffect, createSignal, For, on, Show} from "solid-js";
 import { TextField, TextFieldInput } from "../ui/text-field";
 import { Button } from "../ui/button";
 import { useParams } from "@solidjs/router";
 import POST_MESSAGE_SEND from "~/api/MESSAGE/MESSAGE_SEND";
 import {IconUpload} from "@tabler/icons-solidjs";
 import FileUploadPreview from "~/components/Channel/ChannelTextInput/FileUploadPreview";
+import type {IUser} from "~/types/User";
+import GET_USER_SEARCH from "~/api/USER/USER_SEARCH.";
+import { Card } from "../ui/card";
+
+interface ISearchValObj {
+  type: "user" | "channel",
+  startPos: number,
+  endPos: number
+}
 
 export default function ChannelTextInput() {
   const params = useParams(); //URLパラメータを取得するやつ
@@ -14,7 +23,14 @@ export default function ChannelTextInput() {
     setFileIds([...fileIds(), fileId]);
   }
   const [fileInput, setFileInput] = createSignal<File[]>([]); //ファイル選択ダイアログからのファイル入力受け取り用配列
+  const searchValObj: ISearchValObj[] = []
+  const [userSearchResult, setUserSearchResult] = createSignal<IUser[]>([]); //ユーザー検索結果
   let cursorPosition = 0; //フォーム上のカーソル位置
+  let [searchOptions, setSearchOptions] = createSignal<{ type:"user"|"channel", isEnabled:boolean }>({
+    type: "user",
+    isEnabled: false,
+  });
+  const el = document.getElementById("messageInput") as HTMLInputElement;
 
   const sendMsg = () => {
     console.log("ChannelTextInput :: sendMsg : params.id->", {...params});
@@ -29,6 +45,46 @@ export default function ChannelTextInput() {
       .catch((e) => {
         console.error("POST_MESSAGE_SEND :: e->", e);
       });
+  }
+
+  const checkMode = () => {
+    //メンションを検索する
+    const matches = [...text().matchAll(/@\S+/g)];
+    //カーソル位置までのメンションを取得
+    const matchesFilter = matches.filter((obj) => cursorPosition >= obj.index);
+
+    //カーソル位置がメンション条件の範囲中にあるかどうか
+    for (const arr of matchesFilter) {
+      console.log("ChannelTextInput :: checkMode : arr->", arr.index, (arr.index + arr[0].length));
+      if (arr.index <= cursorPosition && cursorPosition <= (arr.index + arr[0].length + 1)) {
+        setSearchOptions({
+          type: "user",
+          isEnabled: true,
+        })
+        return;
+      }
+    }
+    //console.log("ChannelTextInput :: checkMode : cursorPosition->", cursorPosition, " matches->", matches, matchesFilter);
+
+    //メンション検索が無効の場合
+    setSearchOptions(
+      {
+        type: "user",
+        isEnabled: false,
+      }
+    );
+  }
+
+  /**
+   * メンション用のユーザー検索
+   * @param query
+   */
+  const searchUser = (query: string) => {
+    GET_USER_SEARCH(query, params.channelId)
+      .then((r) => {
+        setUserSearchResult(r.data);
+      })
+      .catch((e) => console.error("GET_USER_SEARCH :: e->", e));
   }
 
   /**
@@ -86,24 +142,44 @@ export default function ChannelTextInput() {
         </div>
         <hr />
       </Show>
-      <div class="flex items-center gap-1">
+      <div class="relative flex items-center gap-1">
         <input type={"file"} id={"fileInput"} class={"hidden"} />
 
         <Button onClick={bindFiles} variant={"secondary"}><IconUpload /></Button>
         <TextField class="grow">
           <TextFieldInput
             type="text"
+            id={"messageInput"}
             value={text()}
             onInput={(e) => {
-              setText(e.currentTarget.value);
               cursorPosition = e.currentTarget?.selectionStart || 0;
+              checkMode();
+              setText(e.currentTarget.value);
             }}
-            onKeyDown={(e) => {e.key === "Enter" && sendMsg()}}
+            onKeyDown={(e) => {
+              switch(e.key) {
+                case "@": {
+                  console.log("@");
+                  break;
+                }
+                case "Enter": {
+                  sendMsg();
+                  break;
+                }
+              }
+            }}
             onPaste={(e) => receiveFiles(e)}
           />
         </TextField>
 
         <Button onClick={sendMsg}>送信</Button>
+
+        {/* メンション用ユーザー検索 */}
+        <Show when={searchOptions().isEnabled && searchOptions().type === "user"}>
+          <Card class={"absolute left-0 bottom-full w-full p-2"}>
+            ここでユーザー表示
+          </Card>
+        </Show>
       </div>
     </div>
   );
