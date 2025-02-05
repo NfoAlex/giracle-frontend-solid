@@ -59,6 +59,10 @@ export default function ChannelTextInput() {
           type: "user",
           isEnabled: true,
         })
+        //ユーザーを検索する
+        if (arr[0].length >= 2)
+          searchUser(arr[0].slice(1));
+
         return;
       }
     }
@@ -81,6 +85,7 @@ export default function ChannelTextInput() {
     GET_USER_SEARCH(query, params.channelId)
       .then((r) => {
         setUserSearchResult(r.data);
+        console.log("GET_USER_SEARCH :: r->", r);
       })
       .catch((e) => console.error("GET_USER_SEARCH :: e->", e));
   }
@@ -156,10 +161,6 @@ export default function ChannelTextInput() {
             }}
             onKeyDown={(e) => {
               switch(e.key) {
-                case "@": {
-                  console.log("@");
-                  break;
-                }
                 case "Enter": {
                   sendMsg();
                   break;
@@ -174,8 +175,20 @@ export default function ChannelTextInput() {
 
         {/* メンション用ユーザー検索 */}
         <Show when={searchOptions().isEnabled && searchOptions().type === "user"}>
-          <Card class={"absolute left-0 bottom-full w-full p-2"}>
-            ここでユーザー表示
+          <Card class={"absolute left-0 bottom-full border-b-0 w-full p-2 overflow-y-auto max-h-40"}>
+            <For each={userSearchResult()}>
+              {(user) => {
+                return (
+                  <div class={"flex items-center gap-2 p-2 rounded hover:bg-border"}>
+                    <img alt={user.name} src={`/api/user/icon/${user.id}`} class={"w-8 h-8 rounded-full"} />
+                    <div class={"flex-grow"}>
+                      <p>{user.name}</p>
+                    </div>
+                  </div>
+                );
+              }
+            }
+            </For>
           </Card>
         </Show>
       </div>
