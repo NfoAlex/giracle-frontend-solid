@@ -1,4 +1,4 @@
-import {createEffect, createSignal, For, on, Show} from "solid-js";
+import {createSignal, For, Show} from "solid-js";
 import { TextField, TextFieldInput } from "../ui/text-field";
 import { Button } from "../ui/button";
 import { useParams } from "@solidjs/router";
@@ -23,14 +23,12 @@ export default function ChannelTextInput() {
     setFileIds([...fileIds(), fileId]);
   }
   const [fileInput, setFileInput] = createSignal<File[]>([]); //ファイル選択ダイアログからのファイル入力受け取り用配列
-  const searchValObj: ISearchValObj[] = []
   const [userSearchResult, setUserSearchResult] = createSignal<IUser[]>([]); //ユーザー検索結果
   let cursorPosition = 0; //フォーム上のカーソル位置
   let [searchOptions, setSearchOptions] = createSignal<{ type:"user"|"channel", isEnabled:boolean }>({
     type: "user",
     isEnabled: false,
   });
-  const el = document.getElementById("messageInput") as HTMLInputElement;
 
   const sendMsg = () => {
     console.log("ChannelTextInput :: sendMsg : params.id->", {...params});
