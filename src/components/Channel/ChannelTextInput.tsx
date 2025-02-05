@@ -9,12 +9,6 @@ import type {IUser} from "~/types/User";
 import GET_USER_SEARCH from "~/api/USER/USER_SEARCH.";
 import { Card } from "../ui/card";
 
-interface ISearchValObj {
-  type: "user" | "channel",
-  startPos: number,
-  endPos: number
-}
-
 export default function ChannelTextInput() {
   const params = useParams(); //URLパラメータを取得するやつ
   const [text, setText] = createSignal(""); //メッセージテキスト
@@ -156,8 +150,8 @@ export default function ChannelTextInput() {
             value={text()}
             onInput={(e) => {
               cursorPosition = e.currentTarget?.selectionStart || 0;
-              checkMode();
               setText(e.currentTarget.value);
+              checkMode();
             }}
             onKeyDown={(e) => {
               switch(e.key) {
