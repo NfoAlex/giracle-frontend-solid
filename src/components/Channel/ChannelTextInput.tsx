@@ -20,10 +20,11 @@ export default function ChannelTextInput() {
   const [fileInput, setFileInput] = createSignal<File[]>([]); //ファイル選択ダイアログからのファイル入力受け取り用配列
   const [userSearchResult, setUserSearchResult] = createSignal<IUser[]>([]); //ユーザー検索結果
   let cursorPosition = 0; //フォーム上のカーソル位置
-  let [searchOptions, setSearchOptions] = createSignal<{ type:"user"|"channel", isEnabled:boolean, query: string }>({
+  let [searchOptions, setSearchOptions] = createSignal<{ type:"user"|"channel", isEnabled:boolean, query: string, selectIndex: number }>({
     type: "user",
     isEnabled: false,
-    query: ""
+    query: "",
+    selectIndex: 0
   });
 
   const sendMsg = () => {
@@ -35,6 +36,13 @@ export default function ChannelTextInput() {
         setText("");
         setFileIds([]);
         setFileInput([]);
+        //検索モードを初期化
+        setSearchOptions({
+          type: "user",
+          isEnabled: false,
+          query: "",
+          selectIndex: 0,
+        });
       })
       .catch((e) => {
         console.error("POST_MESSAGE_SEND :: e->", e);
@@ -58,6 +66,7 @@ export default function ChannelTextInput() {
           type: "user",
           isEnabled: true,
           query: arr[0].slice(1),
+          selectIndex: 0,
         })
         //ユーザーを検索する
         if (arr[0].length >= 2)
@@ -73,7 +82,8 @@ export default function ChannelTextInput() {
       {
         type: "user",
         isEnabled: false,
-        query: ""
+        query: "",
+        selectIndex: 0,
       }
     );
   }
@@ -84,7 +94,6 @@ export default function ChannelTextInput() {
    * @param type バインドする情報の種類
    */
   const bindSearchedItem = (item: IChannel | IUser, type: "user" | "channel") => {
-    console.log("ChannelTextInput :: bindSearchedItem : searchOption->", searchOptions());
     //メッセージ文にバインド
     setText(text().replace(searchOptions().query, `<${item.id}> `));
     //フォーカスを戻す
@@ -93,7 +102,8 @@ export default function ChannelTextInput() {
     setSearchOptions({
       type: "user",
       isEnabled: false,
-      query: ""
+      query: "",
+      selectIndex: 0,
     });
   }
 
@@ -182,7 +192,28 @@ export default function ChannelTextInput() {
             onKeyDown={(e) => {
               switch(e.key) {
                 case "Enter": {
+                  //検索モードが有効なら選択した情報をメッセージ文にバインド
+                  if (searchOptions().isEnabled) {
+                    bindSearchedItem(userSearchResult()[searchOptions().selectIndex], "user");
+                    break;
+                  }
                   sendMsg();
+                  break;
+                }
+                case "ArrowUp": { //検索モード用の選択移動
+                  if (searchOptions().isEnabled) {
+                    e.preventDefault();
+                    if (0 < searchOptions().selectIndex)
+                      setSearchOptions({...searchOptions(), selectIndex: searchOptions().selectIndex - 1});
+                  }
+                  break;
+                }
+                case "ArrowDown": { //検索モード用の選択移動
+                  if (searchOptions().isEnabled) {
+                    e.preventDefault();
+                    if (userSearchResult().length > searchOptions().selectIndex + 1)
+                      setSearchOptions({...searchOptions(), selectIndex: searchOptions().selectIndex + 1});
+                  }
                   break;
                 }
               }
@@ -200,9 +231,12 @@ export default function ChannelTextInput() {
               <p class={"text-center"}>...</p>
             </Show>
             <For each={userSearchResult()}>
-              {(user) => {
+              {(user, index) => {
                 return (
-                  <div onClick={()=>bindSearchedItem(user, "user")} class={"flex items-center gap-2 p-2 rounded hover:bg-border"}>
+                  <div
+                    onClick={()=>bindSearchedItem(user, "user")}
+                    class={`flex items-center gap-2 p-2 rounded hover:bg-border ${searchOptions().selectIndex === index()&&"bg-border"}`}
+                  >
                     <img alt={user.name} src={`/api/user/icon/${user.id}`} class={"w-8 h-8 rounded-full"} />
                     <div class={"flex-grow"}>
                       <p>{user.name}</p>
