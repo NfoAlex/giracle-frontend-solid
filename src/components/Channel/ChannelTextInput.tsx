@@ -94,17 +94,22 @@ export default function ChannelTextInput() {
    * @param type バインドする情報の種類
    */
   const bindSearchedItem = (item: IChannel | IUser, type: "user" | "channel") => {
-    //メッセージ文にバインド
-    setText(text().replace(searchOptions().query, `<${item.id}> `));
-    //フォーカスを戻す
-    document.getElementById("messageInput")?.focus();
-    //検索モードを初期化
-    setSearchOptions({
-      type: "user",
-      isEnabled: false,
-      query: "",
-      selectIndex: 0,
-    });
+    if (type === "user") {
+      //メッセージ文にバインド
+      setText(text().replace(searchOptions().query, `<${item.id}> `));
+      //フォーカスを戻す
+      document.getElementById("messageInput")?.focus();
+      //検索モードを初期化
+      setSearchOptions({
+        type: "user",
+        isEnabled: false,
+        query: "",
+        selectIndex: 0,
+      });
+    }
+    if (type === "channel") {
+      //todo
+    }
   }
 
   /**
