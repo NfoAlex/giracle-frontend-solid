@@ -108,7 +108,7 @@ export default function ChannelTextInput() {
       });
     }
     if (type === "channel") {
-      //todo
+      // これから
     }
   }
 
