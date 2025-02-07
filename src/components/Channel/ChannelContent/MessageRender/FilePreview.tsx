@@ -1,9 +1,10 @@
 import {IMessageFileAttached} from "~/types/Message";
 import {Card} from "~/components/ui/card";
-import {Button} from "@kobalte/core/button";
+
 import {IconDownload} from "@tabler/icons-solidjs";
 import {Badge} from "~/components/ui/badge";
 import ConvertSizeToHumanSize from "~/utils/ConvertSizeToHumanSize";
+import {Button} from "~/components/ui/button";
 
 export default function FilePreview(props: { file: IMessageFileAttached }) {
 
@@ -33,7 +34,7 @@ export default function FilePreview(props: { file: IMessageFileAttached }) {
               <p class={"truncate"}>{props.file.actualFileName}</p>
 
               <Badge class={"shrink-0 ml-auto"}>{ ConvertSizeToHumanSize(props.file.size) }</Badge>
-              <Button onClick={downloadFile}>
+              <Button onClick={downloadFile} size={"icon"} class={"shrink-0"} variant={"secondary"}>
                 <IconDownload />
               </Button>
             </div>
