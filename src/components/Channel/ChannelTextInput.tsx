@@ -8,6 +8,7 @@ import FileUploadPreview from "~/components/Channel/ChannelTextInput/FileUploadP
 import type {IUser} from "~/types/User";
 import GET_USER_SEARCH from "~/api/USER/USER_SEARCH.";
 import { Card } from "../ui/card";
+import { IChannel } from "~/types/Channel";
 
 export default function ChannelTextInput() {
   const params = useParams(); //URLパラメータを取得するやつ
@@ -19,9 +20,10 @@ export default function ChannelTextInput() {
   const [fileInput, setFileInput] = createSignal<File[]>([]); //ファイル選択ダイアログからのファイル入力受け取り用配列
   const [userSearchResult, setUserSearchResult] = createSignal<IUser[]>([]); //ユーザー検索結果
   let cursorPosition = 0; //フォーム上のカーソル位置
-  let [searchOptions, setSearchOptions] = createSignal<{ type:"user"|"channel", isEnabled:boolean }>({
+  let [searchOptions, setSearchOptions] = createSignal<{ type:"user"|"channel", isEnabled:boolean, query: string }>({
     type: "user",
     isEnabled: false,
+    query: ""
   });
 
   const sendMsg = () => {
@@ -39,6 +41,9 @@ export default function ChannelTextInput() {
       });
   }
 
+  /**
+   * 検索モードの条件判別、設定をする
+   */
   const checkMode = () => {
     //メンションを検索する
     const matches = [...text().matchAll(/@\S+/g)];
@@ -52,10 +57,11 @@ export default function ChannelTextInput() {
         setSearchOptions({
           type: "user",
           isEnabled: true,
+          query: arr[0].slice(1),
         })
         //ユーザーを検索する
         if (arr[0].length >= 2)
-          searchUser(arr[0].slice(1));
+          searchUser(searchOptions().query);
 
         return;
       }
@@ -67,8 +73,28 @@ export default function ChannelTextInput() {
       {
         type: "user",
         isEnabled: false,
+        query: ""
       }
     );
+  }
+
+  /**
+   * 検索結果から選択した情報メッセージ文へバインドする
+   * @param item バインドする情報
+   * @param type バインドする情報の種類
+   */
+  const bindSearchedItem = (item: IChannel | IUser, type: "user" | "channel") => {
+    console.log("ChannelTextInput :: bindSearchedItem : searchOption->", searchOptions());
+    //メッセージ文にバインド
+    setText(text().replace(searchOptions().query, `<${item.id}> `));
+    //フォーカスを戻す
+    document.getElementById("messageInput")?.focus();
+    //検索モードを初期化
+    setSearchOptions({
+      type: "user",
+      isEnabled: false,
+      query: ""
+    });
   }
 
   /**
@@ -176,7 +202,7 @@ export default function ChannelTextInput() {
             <For each={userSearchResult()}>
               {(user) => {
                 return (
-                  <div class={"flex items-center gap-2 p-2 rounded hover:bg-border"}>
+                  <div onClick={()=>bindSearchedItem(user, "user")} class={"flex items-center gap-2 p-2 rounded hover:bg-border"}>
                     <img alt={user.name} src={`/api/user/icon/${user.id}`} class={"w-8 h-8 rounded-full"} />
                     <div class={"flex-grow"}>
                       <p>{user.name}</p>
