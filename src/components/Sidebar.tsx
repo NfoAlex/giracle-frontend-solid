@@ -20,6 +20,7 @@ import {IconBell, IconDatabaseCog, IconList} from "@tabler/icons-solidjs";
 import {directGetterChannelInfo} from "~/stores/ChannelInfo";
 import {storeUserOnline} from "~/stores/Userinfo";
 import {storeInbox} from "~/stores/Inbox";
+import {Badge} from "~/components/ui/badge";
 
 export function AppSidebar() {
   const loc = useLocation();
@@ -36,10 +37,11 @@ export function AppSidebar() {
             <SidebarMenuItem>
               {storeAppStatus.wsConnected ? 
                 <span class={"flex items-center pr-3"}>
-                  <p>オンラインユーザー : </p> <p class={"ml-auto"}>{ storeUserOnline.length }</p>
+                  <p>オンラインユーザー : </p>
+                  <Badge class={"ml-auto"}>{ storeUserOnline.length }</Badge>
                 </span>
                 :
-                <p class="italic">再接続中...</p>
+                <Badge variant={"secondary"}>再接続中...</Badge>
               }
             </SidebarMenuItem>
           </SidebarMenu>
