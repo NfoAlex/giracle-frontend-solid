@@ -60,7 +60,7 @@ export default function ChannelContents() {
       }
       //履歴を取得、格納
       await FetchHistory(param.channelId, { messageIdFrom: messageIdNewest }, "newer");
-      setTimeout(() => scrollTo(messageIdNewest, "start"));
+      setTimeout(() => scrollTo(messageIdNewest, "start", true));
     }
 
     //履歴の最新部分に到達していたら既読時間を更新
@@ -111,8 +111,9 @@ export default function ChannelContents() {
    * 指定のメッセージIdへスクロールする
    * @param messageId メッセージId
    * @param block スクロール位置オプション
+   * @param scrollingToFuture 未来方向へのスクロールかどうか
    */
-  const scrollTo = (messageId: string, block: "nearest"|"start" = "nearest") => {
+  const scrollTo = (messageId: string, block: "nearest"|"start" = "nearest", scrollingToFuture = false) => {
     //console.log("ChannelContents :: scrollTo : messageId->", messageId, document.getElementById("NEW_LINE") !== undefined);
     const el = document.getElementById(`messageId::${messageId}`);
     if (el === null) {
@@ -120,7 +121,12 @@ export default function ChannelContents() {
       return;
     }
 
-    el.scrollIntoView({ block });
+    //スクロールするとき時間方向に合わせてやり方を改善して精度を高める
+    if (scrollingToFuture) { //新しい方向
+      el.scrollIntoView(false);
+    } else {                 //古い方向
+      el.scrollIntoView({block});
+    }
   };
 
   /**
