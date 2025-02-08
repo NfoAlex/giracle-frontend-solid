@@ -32,8 +32,8 @@ export default function InitLoad(_userId: string) {
   //メッセージ既読時間を取得、格納
   GET_MESSAGE_GET_READTIME().then((r) => {
     console.log("InitLoad :: GET_MESSAGE_GET_READTIME : 自分の既読時間r->", r);
-    setStoreMessageReadTime(r.data);
-    setStoreMessageReadTimeBefore(r.data);
+    setStoreMessageReadTime([...r.data]);
+    setStoreMessageReadTimeBefore([...r.data]);
   });
   //新着メッセージの有無を取得、格納
   GET_MESSAGE_GET_NEW().then((r) => {
