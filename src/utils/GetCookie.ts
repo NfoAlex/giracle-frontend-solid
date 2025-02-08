@@ -1,7 +1,7 @@
 export default function GetCookie(name: string): string | undefined {
-  const cookirArr = document.cookie.split(";");
+  const cookieArr = document.cookie.split(";");
   let cookieValue: undefined | string;
-  for (const c of cookirArr) {
+  for (const c of cookieArr) {
     if (c.startsWith(`${name}=`) || c.startsWith(` ${name}=`)) {
       cookieValue = c.split(`${name}=`)[1];
     }
