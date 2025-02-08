@@ -31,7 +31,7 @@ export default function WSSendMessage(dat: IMessage) {
     });
 
     //自分宛てメンションあるなら通知
-    if (dat.content) {
+    if (dat.content.includes(`@<${storeMyUserinfo.id}>`)) {
       notifyIt(dat.userId, dat.content);
     }
   }
