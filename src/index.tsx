@@ -3,15 +3,15 @@ import { render } from 'solid-js/web';
 import { Route, Router, useLocation, useNavigate } from "@solidjs/router";
 
 import './index.css';
-import { createEffect, type JSX, lazy, on, onMount, Show, Suspense } from 'solid-js';
+import { lazy, Show, Suspense } from 'solid-js';
 import { storeAppStatus } from './stores/AppStatus';
 import { SidebarProvider } from './components/ui/sidebar';
 import { AppSidebar } from './components/Sidebar';
 import Channel from './routes/channel/[id]';
 import GET_SERVER_CONFIG from './api/SERVER/SERVER_CONFIG';
 import { setStoreServerinfo, storeServerinfo } from './stores/Serverinfo';
-import { HasAnythingNew } from './stores/HasNewMessage';
 import {ColorModeProvider, ColorModeScript, createLocalStorageManager} from "@kobalte/core";
+import AuthGuard from "~/components/AuthGuard";
 
 const root = document.getElementById('root');
 
@@ -34,39 +34,6 @@ GET_SERVER_CONFIG()
   .catch((e) => {
     console.error("AuthGuard :: GET_SERVER_CONFIG e->", e);
   });
-
-const AuthGuard = (props: {children?: JSX.Element}) => {
-  const navi = useNavigate();
-
-  const checkAuth = () => {
-    if (!storeAppStatus.loggedIn) navi(`/auth?redirect=${location.pathname}`);
-  }
-
-  onMount(checkAuth);
-
-  //ページの移動監視用
-  createEffect(() => {
-    //console.log("index :: wrapper : createEffect");
-    checkAuth();
-  });
-
-  //新着状態監視用
-  createEffect(
-    on(() => HasAnythingNew(),
-    () => {
-    if (HasAnythingNew()) {
-      document.title = "(*) Giracle"
-    } else {
-      document.title = "Giracle"
-    }
-  }));
-
-  return (
-    <div class="w-full h-screen">
-      {props.children}
-    </div>
-  );
-}
 
 const TopForMoving = () => {
   const navi = useNavigate();

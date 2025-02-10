@@ -3,6 +3,7 @@ import { addMessage } from "~/stores/History";
 import { storeMyUserinfo } from "~/stores/MyUserinfo";
 import { setStoreMessageReadTimeBefore } from "~/stores/Readtime";
 import type { IMessage } from "~/types/Message";
+import {notifyIt} from "~/utils/Notify";
 
 export default function WSSendMessage(dat: IMessage) {
   //console.log("WSSendMessage :: triggered dat->", dat);
@@ -28,5 +29,10 @@ export default function WSSendMessage(dat: IMessage) {
         [dat.channelId]: true,
       };
     });
+
+    //自分宛てメンションあるなら通知
+    if (dat.content.includes(`@<${storeMyUserinfo.id}>`)) {
+      notifyIt(dat.userId, dat.content);
+    }
   }
 }
