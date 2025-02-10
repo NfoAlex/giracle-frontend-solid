@@ -22,6 +22,32 @@ export const updateUserinfo = (value: IUser) => {
 };
 
 /**
+ * 非同期でユーザー情報を取得し返す
+ * @param userId
+ */
+export const asyncGetterUserinfo = async (userId: string) => {
+  if (storeUserinfo[userId] === undefined) {
+    await GET_USER_INFO(userId)
+      .then((r) => {
+        //Storeに設定
+        updateUserinfo(r.data);
+      })
+      .catch((e) => {
+        console.error("Userinfo :: getterUserinfo : エラー -> ", e);
+        updateUserinfo({
+          id: userId,
+          name: "存在しないユーザー",
+          selfIntroduction: "このユーザーは存在しません。",
+          ChannelJoin: [],
+          RoleLink: [],
+        });
+      });
+  }
+
+  return storeUserinfo[userId];
+}
+
+/**
  * ユーザー情報を返す。無いなら取得しつつ返す
  * @param userId
  */
