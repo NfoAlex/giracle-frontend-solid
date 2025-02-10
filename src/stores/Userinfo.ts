@@ -27,23 +27,21 @@ export const updateUserinfo = (value: IUser) => {
  */
 export const asyncGetterUserinfo = async (userId: string) => {
   if (storeUserinfo[userId] === undefined) {
-    await GET_USER_INFO(userId)
-      .then((r) => {
-        //Storeに設定
-        updateUserinfo(r.data);
-      })
+    const userFetched = await GET_USER_INFO(userId)
       .catch((e) => {
-        console.error("Userinfo :: getterUserinfo : エラー -> ", e);
-        updateUserinfo({
+        console.error("Userinfo :: asyncGetterUserinfo : エラー -> ", e);
+        return {
           id: userId,
           name: "存在しないユーザー",
           selfIntroduction: "このユーザーは存在しません。",
           ChannelJoin: [],
           RoleLink: [],
-        });
+        };
       });
+    if (userFetched?.message === "User info") {
+      updateUserinfo(userFetched.data);
+    }
   }
-
   return storeUserinfo[userId];
 }
 
