@@ -51,13 +51,13 @@ export default async function FormatMessageContent(content: string) {
   const result = [];
   for (let i = 0; i < contentText.length; i++) {
     //まず最初のデータをパースする
-    result.push(content[i]);
+    result.push(contentText[i]);
     if (i < ObjectIndex.length) {
       const obj = ObjectIndex[i];
       switch (obj.type) {
         case "userId":
           const user = await asyncGetterUserinfo(obj.context.slice(2, -1));
-          result.push(`${user.name}`);
+          result.push(`@${user.name}`);
           break;
         case "breakLine":
           result.push("\n");
