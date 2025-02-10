@@ -1,6 +1,4 @@
-import {Badge} from "~/components/ui/badge";
-import {storeMyUserinfo} from "~/stores/MyUserinfo";
-import {asyncGetterUserinfo, getterUserinfo} from "~/stores/Userinfo";
+import {asyncGetterUserinfo} from "~/stores/Userinfo";
 import {directGetterChannelInfo} from "~/stores/ChannelInfo";
 
 export default async function FormatMessageContent(content: string) {
