@@ -141,7 +141,7 @@ export default function UserName(props: { userId: string }) {
       </DialogContent>
 
       <DialogTrigger>
-        <p class="font-bold">{!user() ? props.userId : getterUserinfo(props.userId).name}</p>
+        <p class="font-bold hover:underline">{!user() ? props.userId : getterUserinfo(props.userId).name}</p>
       </DialogTrigger>
     </Dialog>
   );
