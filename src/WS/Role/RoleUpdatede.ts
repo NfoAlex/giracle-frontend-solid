@@ -1,4 +1,3 @@
-import { storeMyUserinfo } from "~/stores/MyUserinfo";
 import type { IRole } from "~/types/Role";
 import {setStoreRoleInfo} from "~/stores/RoleInfo";
 
