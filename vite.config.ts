@@ -1,6 +1,9 @@
 import { defineConfig } from 'vite';
 import solidPlugin from 'vite-plugin-solid';
 import pkg from './package.json' with { type: "json" };
+import 'dotenv/config';
+
+const apiURI = process.env.VITE_CORS_ORIGIN || "http://localhost:3000";
 
 export default defineConfig({
   plugins: [solidPlugin()],
@@ -11,11 +14,11 @@ export default defineConfig({
     port: 3333,
     proxy: {
       "/api": {
-        target: "http://localhost:3000",
+        target: apiURI,
         rewrite: (path) => path.replace(/^\/api/, ""),
       },
       "/ws": {
-        target: "http://localhost:3000",
+        target: apiURI,
         ws: true,
       },
     },
