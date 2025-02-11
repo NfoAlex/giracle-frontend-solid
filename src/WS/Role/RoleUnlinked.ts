@@ -1,9 +1,9 @@
 import { produce } from "solid-js/store";
 import { setStoreMyUserinfo, storeMyUserinfo } from "~/stores/MyUserinfo";
-import { setStoreUserinfo, storeUserinfo } from "~/stores/Userinfo";
+import { setStoreUserinfo } from "~/stores/Userinfo";
 
 export default function WSRoleUnlinked(dat: { roleId: string, userId: string }) {
-  console.log("WSRoleUnlinked :: triggered dat->", dat);
+  //console.log("WSRoleUnlinked :: triggered dat->", dat);
 
   //リンクされていて自分のユーザーId宛てなら解除
   if (storeMyUserinfo.id === dat.userId) {

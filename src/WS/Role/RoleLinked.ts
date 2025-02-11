@@ -3,7 +3,7 @@ import { setStoreMyUserinfo, storeMyUserinfo } from "~/stores/MyUserinfo";
 import { setStoreUserinfo } from "~/stores/Userinfo";
 
 export default function WSRoleLinked(dat: { roleId: string, userId: string }) {
-  console.log("WSRoleLinked :: triggered dat->", dat);
+  //console.log("WSRoleLinked :: triggered dat->", dat);
 
   //自分に対する付与なら自分のStoreを更新
   if (storeMyUserinfo.id === dat.userId) {

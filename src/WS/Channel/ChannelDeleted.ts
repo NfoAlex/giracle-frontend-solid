@@ -1,7 +1,7 @@
 import { setStoreMyUserinfo, storeMyUserinfo } from "~/stores/MyUserinfo";
 
 export default function WSChannelDeleted(dat: { channelId: string }) {
-  console.log("WSChannelDeleted :: triggered dat->", dat);
+  //console.log("WSChannelDeleted :: triggered dat->", dat);
 
   const myJoinedChannel = storeMyUserinfo.ChannelJoin;
   

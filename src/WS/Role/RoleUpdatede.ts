@@ -1,8 +1,12 @@
-import { storeMyUserinfo } from "~/stores/MyUserinfo";
 import type { IRole } from "~/types/Role";
+import {setStoreRoleInfo} from "~/stores/RoleInfo";
 
 export default function WSRoleUpdated(dat: IRole) {
-  console.log("WSRoleUpdated :: triggered dat->", dat);
+  //console.log("WSRoleUpdated :: triggered dat->", dat);
 
-  //todo :: 使える権限の計算処理
+  setStoreRoleInfo((prev) => {
+    const _role = {...prev};
+    _role[dat.id] = dat;
+    return _role;
+  });
 }
