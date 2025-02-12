@@ -22,21 +22,20 @@ export default function SwipeToOpenSidebarWrapper(props: { children: JSX.Element
     let yDiff = yDown - yUp;
 
     if ( Math.abs( xDiff ) > Math.abs( yDiff ) ) {/*most significant*/
+      const triggerEl = document.getElementById("sidebarTriggerButton"); //サイドバートリガー要素
+      const sidebarEl = document.getElementById("sidebar-content"); //サイドバー要素
       if ( xDiff > 0 ) {
         /* right swipe */
-        //console.log("SwipeToOpenSidebarWrapper :: handleTouchMove : 右向きスワイプされたはず");
+        //console.log("SwipeToOpenSidebarWrapper :: handleTouchMove : 右からスワイプされたはず");
         //サイドバーを開く
-        const triggerEl = document.getElementById("sidebarTriggerButton"); //サイドバートリガー要素
-        const sidebarEl = document.getElementById("sidebar-content"); //サイドバー要素
         if (triggerEl && sidebarEl) { //サイドバーが開いていない場合のみ開く
           triggerEl.click();
         }
       } else {
         /* left swipe */
-        //console.log("SwipeToOpenSidebarWrapper :: handleTouchMove : 左向きスワイプされたはず");
+        //console.log("SwipeToOpenSidebarWrapper :: handleTouchMove : 左からスワイプされたはず");
         //サイドバーを開く
-        const triggerEl = document.getElementById("sidebarTriggerButton"); //サイドバートリガー要素
-        if (triggerEl) {
+        if (triggerEl && sidebarEl === null) {
           triggerEl.click();
         }
       }

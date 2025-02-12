@@ -31,7 +31,7 @@ export function AppSidebar() {
         <p class=" text-xl">{storeServerinfo.name}</p>
       </SidebarHeader>
 
-      <SidebarContent>
+      <SidebarContent id={"sidebar-content"}>
         <SidebarGroup>
           <SidebarMenu>
             <SidebarMenuItem>
