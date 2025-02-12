@@ -28,7 +28,7 @@ export default function SwipeToOpenSidebarWrapper(props: { children: JSX.Element
         //サイドバーを開く
         const triggerEl = document.getElementById("sidebarTriggerButton"); //サイドバートリガー要素
         const sidebarEl = document.getElementById("sidebar-content"); //サイドバー要素
-        if (triggerEl && sidebarEl) {
+        if (triggerEl && sidebarEl) { //サイドバーが開いていない場合のみ開く
           triggerEl.click();
         }
       } else {
