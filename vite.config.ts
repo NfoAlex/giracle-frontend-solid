@@ -13,7 +13,30 @@ export default defineConfig({
       registerType: 'autoUpdate',
       devOptions: {enabled: true},
       manifest: {
-        lang: "ja"
+        lang: "ja",
+        "icons": [
+          {
+            "src": "./src/assets/pwa-64x64.png",
+            "sizes": "64x64",
+            "type": "image/png"
+          },
+          {
+            "src": "./src/assets/pwa-192x192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+          },
+          {
+            "src": "./src/assets/pwa-512x512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+          },
+          {
+            "src": "./src/assets/maskable-icon-512x512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "maskable"
+          }
+        ]
       }
     })
   ],
