@@ -68,7 +68,7 @@ export default function ChannelBrowser() {
   });
 
   return (
-    <div class="p-2">
+    <div class="pt-2 px-2 flex flex-col h-full">
       <Card class="w-full py-3 px-5 flex items-center gap-2">
         <SidebarTriggerWithDot />
         <p>チャンネルブラウザ</p>
@@ -97,9 +97,9 @@ export default function ChannelBrowser() {
         </Button>
       </div>
 
-      <hr class="my-3" />
+      <hr class="mt-3" />
 
-      <div class="flex flex-col gap-2 overflow-y-auto">
+      <div class="flex flex-col gap-2 pt-2 pb-28 overflow-y-auto">
         <Show when={processing()}>
           <p class="mx-auto">ロード中...</p>
         </Show>
@@ -128,8 +128,10 @@ export default function ChannelBrowser() {
           )}
         </For>
 
-        { getRolePower("manageChannel") && <CreateChannel /> }
       </div>
+
+      {/* チャンネル作成FAB */}
+      { getRolePower("manageChannel") && <CreateChannel /> }
     </div>
   )
 }
