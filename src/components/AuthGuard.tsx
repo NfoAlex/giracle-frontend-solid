@@ -22,10 +22,17 @@ export default function AuthGuard(props: {children?: JSX.Element}) {
   createEffect(
     on(() => HasAnythingNew(),
       () => {
+        //タブのテキストとfaviconを変更
         if (HasAnythingNew()) {
           document.title = "(*) Giracle"
+          const link = document.getElementById("favicon") as HTMLLinkElement;
+          if (link)
+            link.href = "/src/assets/favicon_dot.svg";
         } else {
-          document.title = "Giracle"
+          document.title = "Giracle";
+          const link = document.getElementById("favicon") as HTMLLinkElement;
+          if (link)
+            link.href = "/src/assets/favicon.svg";
         }
       }
     )
