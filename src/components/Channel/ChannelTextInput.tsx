@@ -3,7 +3,7 @@ import { TextField, TextFieldInput } from "../ui/text-field";
 import { Button } from "../ui/button";
 import { useParams } from "@solidjs/router";
 import POST_MESSAGE_SEND from "~/api/MESSAGE/MESSAGE_SEND";
-import {IconUpload} from "@tabler/icons-solidjs";
+import {IconSend, IconUpload} from "@tabler/icons-solidjs";
 import FileUploadPreview from "~/components/Channel/ChannelTextInput/FileUploadPreview";
 import type {IUser} from "~/types/User";
 import GET_USER_SEARCH from "~/api/USER/USER_SEARCH.";
@@ -183,7 +183,7 @@ export default function ChannelTextInput() {
       <div class="relative flex items-center gap-1">
         <input type={"file"} id={"fileInput"} class={"hidden"} />
 
-        <Button onClick={bindFiles} variant={"secondary"}><IconUpload /></Button>
+        <Button onClick={bindFiles} variant={"secondary"} size={"icon"}><IconUpload /></Button>
         <TextField class="grow">
           <TextFieldInput
             type="text"
@@ -227,7 +227,7 @@ export default function ChannelTextInput() {
           />
         </TextField>
 
-        <Button onClick={sendMsg}>送信</Button>
+        <Button onClick={sendMsg} size={"icon"}><IconSend /></Button>
 
         {/* メンション用ユーザー検索 */}
         <Show when={searchOptions().isEnabled && searchOptions().type === "user"}>
