@@ -12,6 +12,7 @@ import GET_SERVER_CONFIG from './api/SERVER/SERVER_CONFIG';
 import { setStoreServerinfo, storeServerinfo } from './stores/Serverinfo';
 import {ColorModeProvider, ColorModeScript, createLocalStorageManager} from "@kobalte/core";
 import AuthGuard from "~/components/AuthGuard";
+import SwipeToOpenSidebarWrapper from "~/components/unique/SwipeToOpenSidebarWrapper";
 
 const root = document.getElementById('root');
 
@@ -63,15 +64,17 @@ render(() =>
     <Route path="/auth" component={lazy(() => import("./routes/auth"))} />
     <Route path="*paramName" component={lazy(() => import("./routes/[...404]"))} />
     <Route path="/app" component={AuthGuard}>
-      <Route path="/" component={lazy(() => import("./routes/index"))} />
-      <Route path="/channel">
-        <Route path="/:channelId" component={Channel} />
-      </Route>
-      <Route path="/profile" component={lazy(() => import("./routes/profile"))} />
-      <Route path="/inbox" component={lazy(() => import("./routes/Inbox"))} />
-      <Route path="/channel-browser" component={lazy(() => import("./routes/channel-browser"))} />
-      <Route path="/manage-server" component={lazy(() => import("./routes/manage-server"))} />
-      <Route path="*paramName" component={lazy(() => import("./routes/[...404]"))} />
+      <SwipeToOpenSidebarWrapper>
+        <Route path="/" component={lazy(() => import("./routes/index"))} />
+        <Route path="/channel">
+          <Route path="/:channelId" component={Channel} />
+        </Route>
+        <Route path="/profile" component={lazy(() => import("./routes/profile"))} />
+        <Route path="/inbox" component={lazy(() => import("./routes/Inbox"))} />
+        <Route path="/channel-browser" component={lazy(() => import("./routes/channel-browser"))} />
+        <Route path="/manage-server" component={lazy(() => import("./routes/manage-server"))} />
+        <Route path="*paramName" component={lazy(() => import("./routes/[...404]"))} />
+      </SwipeToOpenSidebarWrapper>
     </Route>
   </Router>,
   root!

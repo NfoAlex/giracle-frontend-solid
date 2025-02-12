@@ -6,11 +6,9 @@ import SwipeToOpenSidebarWrapper from "~/components/unique/SwipeToOpenSidebarWra
 export default function Channel() {
   return (
     <div class="w-full h-screen mx-auto px-1 py-2 flex flex-col">
-      <SwipeToOpenSidebarWrapper>
-        <ChannelHeader />
-        <ChannelContents />
-        <ChannelTextInput />
-      </SwipeToOpenSidebarWrapper>
+      <ChannelHeader />
+      <ChannelContents />
+      <ChannelTextInput />
     </div>
   );
 }
