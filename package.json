@@ -29,6 +29,7 @@
     "dotenv": "^16.4.7",
     "solid-js": "^1.9.4",
     "tailwind-merge": "^2.6.0",
-    "tailwindcss-animate": "^1.0.7"
+    "tailwindcss-animate": "^1.0.7",
+    "vite-plugin-pwa": "^0.21.1"
   }
 }
