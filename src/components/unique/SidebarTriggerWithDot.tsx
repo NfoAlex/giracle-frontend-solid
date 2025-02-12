@@ -6,7 +6,7 @@ import {Button} from "~/components/ui/button";
 export default function SidebarTriggerWithDot() {
   return (
     <div class={"p-0 m-0 relative"}>
-      {/*<SidebarTrigger />*/}
+      {/* ↓エラーが出ているが動作確認済み */}
       <Button
         id="sidebarTriggerButton"
         as={SidebarTrigger}
