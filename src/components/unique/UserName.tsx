@@ -15,6 +15,8 @@ import POST_ROLE_LINK from "~/api/ROLE/ROLE_LINK";
 import { storeRoleInfo } from "~/stores/RoleInfo";
 import type { IRole } from "~/types/Role";
 import POST_ROLE_UNLINK from "~/api/ROLE/ROLE_UNLINK";
+import POST_USER_BAN from "~/api/USER/USER_BAN";
+import POST_USER_UNBAN from "~/api/USER/USER_UNBAN";
 
 export default function UserName(props: { userId: string }) {
   const [user] = createSignal(getterUserinfo(props.userId));
@@ -49,6 +51,25 @@ export default function UserName(props: { userId: string }) {
       .catch((e) => console.error("UserName :: unlinkRole :: err ->", e));
   }
 
+  /**
+   * ユーザーのBAN状態制御
+   */
+  const controlBanState = async (banState: boolean) => {
+    if (banState) {
+      await POST_USER_BAN(props.userId)
+        .then((r) => {
+          console.log("UserName :: controlBanState(BAN) :: r ->", r);
+        })
+        .catch((e) => console.error("UserName :: controlBanState :: err ->", e));
+    } else {
+      await POST_USER_UNBAN(props.userId)
+        .then((r) => {
+          console.log("UserName :: controlBanState(UNBAN) :: r ->", r);
+        })
+        .catch((e) => console.error("UserName :: controlBanState :: err ->", e));
+    }
+  }
+
   return (
     <Dialog open={open()} onOpenChange={setOpen}>
       <DialogContent class="p-0 max-h-[90vh] flex flex-col overflow-y-auto">
@@ -67,13 +88,18 @@ export default function UserName(props: { userId: string }) {
             </Avatar>
           </div>
 
-          <div class="pb-2 px-4 flex flex-col gap-2">
+          <div class="pb-4 px-4 flex flex-col gap-2">
             {/* 名前 */}
             <span class="flex items-center">
               <p class="font-bold text-2xl w-min">{storeUserinfo[user().id].name}</p>
 
               {
-                storeMyUserinfo.id === user().id
+                storeUserinfo[user().id].isBanned
+                &&
+                <Badge class="ml-auto" variant={"error"}>BANされたユーザー</Badge>
+              }
+              {
+                storeMyUserinfo.id === user().id && !storeUserinfo[user().id].isBanned
                 &&
                 <Button as={A} href="/app/profile" class="ml-auto">
                   <IconPencil />
@@ -132,10 +158,20 @@ export default function UserName(props: { userId: string }) {
             </div>
 
             {/* 管理 */}
-            <div>
-              <Label>管理</Label>
-              <Card class="px-4 py-2">ここでBANとかする</Card>
-            </div>
+            <Show when={getRolePower("manageUser")}>
+              <div>
+                <Label>管理</Label>
+                <Card class="p-2 flex flex-col gap-1">
+                  {
+                    !storeUserinfo[user().id].isBanned ?
+                      <Button ondblclick={()=>controlBanState(true)} class={"w-full"} variant={"destructive"}>BANする</Button>
+                      :
+                      <Button ondblclick={()=>controlBanState(false)} class={"w-full"} variant={"default"}>BANを解除する</Button>
+                  }
+                  <Label class={"text-border"}>ダブルクリックで操作</Label>
+                </Card>
+              </div>
+            </Show>
           </div>
         </Show>
       </DialogContent>

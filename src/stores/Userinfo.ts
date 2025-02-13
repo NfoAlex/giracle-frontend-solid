@@ -44,6 +44,7 @@ export const getterUserinfo = (userId: string): IUser => {
     updateUserinfo({
       id: userId,
       name: "ロード中...",
+      isBanned: false,
       selfIntroduction: "ロード中のユーザー情報です。しばらく経っても同じ表示の場合、リロードしてください。",
       ChannelJoin: [],
       RoleLink: []
@@ -59,6 +60,7 @@ export const getterUserinfo = (userId: string): IUser => {
         updateUserinfo({
           id: userId,
           name: "存在しないユーザー",
+          isBanned: false,
           selfIntroduction: "このユーザーは存在しません。",
           ChannelJoin: [],
           RoleLink: [],
