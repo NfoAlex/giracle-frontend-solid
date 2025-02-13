@@ -73,7 +73,12 @@ export default function UserName(props: { userId: string }) {
               <p class="font-bold text-2xl w-min">{storeUserinfo[user().id].name}</p>
 
               {
-                storeMyUserinfo.id === user().id
+                !user().isBanned
+                &&
+                <Badge class="ml-auto" variant={"error"}>BANされたユーザー</Badge>
+              }
+              {
+                storeMyUserinfo.id === user().id && !user().isBanned
                 &&
                 <Button as={A} href="/app/profile" class="ml-auto">
                   <IconPencil />
@@ -134,7 +139,15 @@ export default function UserName(props: { userId: string }) {
             {/* 管理 */}
             <div>
               <Label>管理</Label>
-              <Card class="px-4 py-2">ここでBANとかする</Card>
+              <Card class="px-4 py-2 flex flex-col gap-2">
+                {
+                  !user().isBanned ?
+                    <Button class={"w-full"} variant={"destructive"}>BANする</Button>
+                    :
+                    <Button class={"w-full"} variant={"default"}>BANを解除する</Button>
+                }
+                <Label>ダブルクリックで操作</Label>
+              </Card>
             </div>
           </div>
         </Show>
