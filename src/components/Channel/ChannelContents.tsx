@@ -128,9 +128,9 @@ export default function ChannelContents() {
 
     //スクロールするとき時間方向に合わせてやり方を改善して精度を高める
     if (scrollingToFuture) { //新しい方向
-      el.scrollIntoView({block});
-    } else {                 //古い方向
       el.scrollIntoView(false);
+    } else {                 //古い方向
+      el.scrollIntoView({block});
     }
   };
 
