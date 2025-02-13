@@ -24,7 +24,7 @@ export const updateReadTime = (channelId: string, readTime: Date) => {
   setStoreMessageReadTime((prev) => {
     const newReadTime = { channelId, readTime };
     const newStore = prev.filter((c) => c.channelId !== channelId);
-    newStore.push(newReadTime);
+    newStore.push({...newReadTime});
     return newStore;
   });
 }
