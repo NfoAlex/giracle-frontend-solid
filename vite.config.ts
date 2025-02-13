@@ -11,7 +11,7 @@ export default defineConfig({
     solidPlugin(),
     VitePWA({
       registerType: 'autoUpdate',
-      devOptions: {enabled: true},
+      devOptions: {enabled: false},
       manifest: {
         lang: "ja",
         "icons": [
