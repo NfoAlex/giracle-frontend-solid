@@ -101,7 +101,12 @@ export default function ChannelContents() {
    * チャンネル移動、あるいはマウントしてからの最初のスクロール用
    */
   const initScroll = () => {
-    const msg = storeHistory[param.channelId].history.find((m) => m.createdAt === storeMessageReadTime.find((c) => c.channelId === param.channelId)?.readTime);
+    const readTimeBefore = storeMessageReadTimeBefore.find((c) => c.channelId === param.channelId)?.readTime;
+    const msgIndex = storeHistory[param.channelId].history.findIndex(
+      (m) => m.createdAt === readTimeBefore
+    );
+    //既読位置の次に設定することで(index - 1)、新着線が画面内に表示される
+    const msg = storeHistory[param.channelId].history[msgIndex - 1];
     if (msg !== undefined) scrollTo(msg.id);
 
     checkScrollPosAndFetchHistory();
