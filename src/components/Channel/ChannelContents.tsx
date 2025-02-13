@@ -238,7 +238,7 @@ export default function ChannelContents() {
           {(h, index) => (
             <>
               {/* 新着線の表示 */}
-              { (storeMessageReadTimeBefore.find((c) => c.channelId === param.channelId)?.readTime === h.createdAt && index() !== 0) && (<NewMessageLine />)}
+              { (storeMessageReadTimeBefore.find((c) => c.channelId === useParams().channelId)?.readTime === h.createdAt && index() !== 0) && (<NewMessageLine />)}
               <div
                 id={`messageId::${h.id}`}
                 class="flex flex-row items-start"
