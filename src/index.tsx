@@ -25,7 +25,7 @@ if (import.meta.env.DEV && !(root instanceof HTMLElement)) {
 //サーバー情報を取得
 GET_SERVER_CONFIG()
   .then((r) => {
-    console.log("AuthGuard : GET_SERVER_CONFIG r->", r);
+    //console.log("AuthGuard : GET_SERVER_CONFIG r->", r);
     setStoreServerinfo ({
       ...storeServerinfo,
       ...r.data,

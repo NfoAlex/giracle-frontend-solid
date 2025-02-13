@@ -31,18 +31,18 @@ export default function InitLoad(_userId: string) {
   });
   //メッセージ既読時間を取得、格納
   GET_MESSAGE_GET_READTIME().then((r) => {
-    console.log("InitLoad :: GET_MESSAGE_GET_READTIME : 自分の既読時間r->", r);
+    //console.log("InitLoad :: GET_MESSAGE_GET_READTIME : 自分の既読時間r->", r);
     setStoreMessageReadTime([...r.data]);
     setStoreMessageReadTimeBefore([...r.data]);
   });
   //新着メッセージの有無を取得、格納
   GET_MESSAGE_GET_NEW().then((r) => {
-    console.log("InitLoad :: GET_MESSAGE_GET_NEW : 新着メッセージr->", r);
+    //console.log("InitLoad :: GET_MESSAGE_GET_NEW : 新着メッセージr->", r);
     setStoreHasNewMessage(r.data);
   });
   //インボックス取得
   GET_MESSAGE_INBOX().then((r) => {
-    console.log("InitLoad :: GET_MESSAGE_INBOX : インボックスr->", r);
+    //console.log("InitLoad :: GET_MESSAGE_INBOX : インボックスr->", r);
     setStoreInbox(r.data);
   }).catch((e) => console.error("InitLoad :: GET_MESSAGE_INBOX : インボックス取得エラー", e));
 

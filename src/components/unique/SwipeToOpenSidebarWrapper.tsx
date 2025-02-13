@@ -48,7 +48,6 @@ export default function SwipeToOpenSidebarWrapper(props: { children: JSX.Element
   onMount(() => {
     document.addEventListener('touchstart', handleTouchStart, false);
     document.addEventListener('touchmove', handleTouchMove, false);
-    console.log("SwipeToOpenSidebarWrapper :: onMount : スワイプ用のイベントリスナーを登録しました");
   });
 
   onCleanup(() => {
