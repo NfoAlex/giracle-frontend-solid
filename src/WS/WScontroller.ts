@@ -15,6 +15,7 @@ import WSInboxDelete from "~/WS/inbox/inboxDeleted";
 import WSInboxAdded from "~/WS/inbox/inboxAdded";
 import InitLoad from "~/utils/InitLoad";
 import {storeMyUserinfo} from "~/stores/MyUserinfo";
+import WSUserProfileUpdate from "~/WS/User/UserProfileUpdate";
 
 //WSインスタンス
 export let ws: WebSocket | undefined = undefined;
@@ -98,6 +99,11 @@ export const initWS = async () => {
         //ロールの解削除、やること一緒なので同じ関数を使う
         case "role::Deleted":
           WSRoleUnlinked(json.data);
+          break;
+
+        //ユーザーのプロフィール更新受け取り
+        case "user::ProfileUpdate":
+          WSUserProfileUpdate(json.data);
           break;
 
         //オンラインユーザーの登録、削除
