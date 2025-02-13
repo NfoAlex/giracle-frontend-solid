@@ -18,6 +18,7 @@ export interface IResponseUserList {
 export interface IUser {
   id: string;
   name: string;
+  isBanned: boolean;
   selfIntroduction: string;
   ChannelJoin: {
     channelId: string;
