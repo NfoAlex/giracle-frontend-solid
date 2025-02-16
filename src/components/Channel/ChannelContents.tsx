@@ -15,8 +15,9 @@ export default function ChannelContents() {
   const [isFocused, setIsFocused] = createSignal(true);
   const [hoveredMsgId, setHoveredMsgId] = createSignal("");
   const param = useParams();
-  let channelIdBefore = "";
-  let stateFetchingHistory = false;
+  let channelIdBefore = ""; //チャンネル移動前のチャンネルId格納用
+  let firstChannelMove = false; //チャンネル移動して最初の履歴アクションかどうかフラグ
+  let stateFetchingHistory = false; //履歴取得中かどうか
 
   /**
    * 現在のスクロール位置を確認してから該当する履歴取得をする
@@ -46,11 +47,7 @@ export default function ChannelContents() {
       //履歴を取得、格納
       stateFetchingHistory = true;
       await FetchHistory(param.channelId, { messageIdFrom: messageIdLast }, "older");
-      setTimeout(() => {
-        scrollTo(messageIdLast);
-        //履歴取得中状態を解除
-        stateFetchingHistory = false;
-      });
+      setTimeout(() => firstChannelMove ? scrollToReadTime() : scrollTo(messageIdLast));
     }
     //履歴の最新到達用
     if (
@@ -67,12 +64,10 @@ export default function ChannelContents() {
       //履歴を取得、格納
       stateFetchingHistory = true;
       await FetchHistory(param.channelId, { messageIdFrom: messageIdNewest }, "newer");
-      setTimeout(() => {
-        scrollTo(messageIdNewest, "start", true);
-        //履歴取得中状態を解除
-        stateFetchingHistory = false;
-      });
+      setTimeout(() => firstChannelMove ? scrollToReadTime() : scrollTo(messageIdNewest, "start", true));
     }
+
+    stateFetchingHistory = false;
 
     //履歴の最新部分に到達していたら既読時間を更新
     if (
@@ -94,6 +89,9 @@ export default function ChannelContents() {
       //新着メッセージがないことと設定
       setStoreHasNewMessage(param.channelId, false);
     }
+
+    //チャンネル移動時の最初のアクションフラグを解除
+    firstChannelMove = false;
   };
 
   /**
@@ -111,7 +109,7 @@ export default function ChannelContents() {
   /**
    * チャンネル移動、あるいはマウントしてからの最初のスクロール用
    */
-  const initScroll = () => {
+  const scrollToReadTime = () => {
     const readTimeBefore = storeMessageReadTimeBefore.find((c) => c.channelId === param.channelId)?.readTime;
     const msgIndex = storeHistory[param.channelId].history.findIndex(
       (m) => m.createdAt === readTimeBefore
@@ -119,11 +117,11 @@ export default function ChannelContents() {
     //既読位置の次に設定することで(index - 1)、新着線が画面内に表示される
     const msg = storeHistory[param.channelId].history[msgIndex - 1];
     if (msg !== undefined) {
-      scrollTo(msg.id);
+      setTimeout(() => scrollTo(msg.id));
     } else {
       const msgBefore = storeHistory[param.channelId].history[msgIndex];
       if (msgBefore !== undefined)
-        scrollTo(msgBefore.id);
+        setTimeout(() => scrollTo(msgBefore.id));
     }
 
     checkScrollPosAndFetchHistory();
@@ -190,6 +188,8 @@ export default function ChannelContents() {
   createEffect(() => {
     if (param.channelId !== channelIdBefore) {
       //console.log("ChannelContents :: createEffect : param.channelId->", param.channelId, " channelIdBefore->", channelIdBefore);
+      //チャンネル移動してすぐフラグを設定
+      firstChannelMove = true;
       //もし履歴の長さが０なら既読時間から取得
       if (
         storeHistory[param.channelId]?.history.length === 0 ||
@@ -202,7 +202,7 @@ export default function ChannelContents() {
         //履歴を取得、格納した時点でもう一度履歴取得を試す
         FetchHistory(param.channelId, { messageTimeFrom: time }, "older");
       } else {
-        initScroll();
+        scrollToReadTime();
       }
 
       //別チャンネルからの移動なら時差表示用既読時間を更新
