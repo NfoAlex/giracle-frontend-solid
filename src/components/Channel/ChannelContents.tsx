@@ -16,13 +16,14 @@ export default function ChannelContents() {
   const [hoveredMsgId, setHoveredMsgId] = createSignal("");
   const param = useParams();
   let channelIdBefore = "";
+  let stateFetchingHistory = false;
 
   /**
    * 現在のスクロール位置を確認してから該当する履歴取得をする
    */
   const checkScrollPosAndFetchHistory = async () => {
     const el = document.getElementById("history");
-    if (el === null) return;
+    if (el === null || stateFetchingHistory) return;
     if (storeHistory[param.channelId] === undefined) return;
 
     const scrollPos = el.scrollTop;
@@ -43,6 +44,7 @@ export default function ChannelContents() {
         return;
       }
       //履歴を取得、格納
+      stateFetchingHistory = true;
       await FetchHistory(param.channelId, { messageIdFrom: messageIdLast }, "older");
       setTimeout(() => scrollTo(messageIdLast));
     }
@@ -59,9 +61,13 @@ export default function ChannelContents() {
         return;
       }
       //履歴を取得、格納
+      stateFetchingHistory = true;
       await FetchHistory(param.channelId, { messageIdFrom: messageIdNewest }, "newer");
       setTimeout(() => scrollTo(messageIdNewest, "start", true));
     }
+
+    //履歴取得中状態を解除
+    stateFetchingHistory = false;
 
     //履歴の最新部分に到達していたら既読時間を更新
     if (
@@ -107,7 +113,13 @@ export default function ChannelContents() {
     );
     //既読位置の次に設定することで(index - 1)、新着線が画面内に表示される
     const msg = storeHistory[param.channelId].history[msgIndex - 1];
-    if (msg !== undefined) scrollTo(msg.id);
+    if (msg !== undefined) {
+      scrollTo(msg.id);
+    } else {
+      const msgBefore = storeHistory[param.channelId].history[msgIndex];
+      if (msgBefore !== undefined)
+        scrollTo(msgBefore.id);
+    }
 
     checkScrollPosAndFetchHistory();
   }
