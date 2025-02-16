@@ -185,6 +185,7 @@ export default function ChannelContents() {
     })
   );
 
+  //チャンネルの移動監視
   createEffect(() => {
     if (param.channelId !== channelIdBefore) {
       //console.log("ChannelContents :: createEffect : param.channelId->", param.channelId, " channelIdBefore->", channelIdBefore);
