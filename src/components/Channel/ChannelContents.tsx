@@ -230,25 +230,6 @@ export default function ChannelContents() {
 
     window.addEventListener("focus", setWindowFocused);
     window.addEventListener("blur", unSetWindowFocused);
-
-    //もし履歴の長さが０なら既読時間から取得
-    /*
-    if (
-      storeHistory[param.channelId]?.history.length === 0 ||
-      storeHistory[param.channelId] === undefined
-    ) {
-      const time = storeMessageReadTime.find((c) =>
-        c.channelId === param.channelId
-      )?.readTime;
-
-      console.log("ChannelContents :: onMount : time->", time);
-
-      //履歴を取得、格納した時点でもう一度履歴取得を試す
-      FetchHistory(param.channelId, { messageTimeFrom: time }, "older").then(() =>
-        checkScrollPosAndFetchHistory(),
-      );
-    }
-   */
   });
 
   onCleanup(() => {
