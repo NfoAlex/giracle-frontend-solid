@@ -1,7 +1,7 @@
 export interface IMessage {
   channelId: string;
   content: string;
-  createdAt: Date;
+  createdAt: string;
   id: string;
   isSystemMessage: false;
   userId: string;
