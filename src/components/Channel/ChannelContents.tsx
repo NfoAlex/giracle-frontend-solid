@@ -253,7 +253,7 @@ export default function ChannelContents() {
       <div id="history" class="h-full w-full overflow-y-auto flex flex-col-reverse gap-1">
         <For each={storeHistory[param.channelId]?.history}>
           {(h, index) => (
-            <>
+            <div id={`messageId::${h.id}`}>
               {/* 新着線の表示 */}
               { (
                     storeMessageReadTimeBefore.find(
@@ -266,7 +266,6 @@ export default function ChannelContents() {
                 ) && (<NewMessageLine />)
               }
               <div
-                id={`messageId::${h.id}`}
                 class="flex flex-row items-start"
               >
                 {
@@ -309,7 +308,7 @@ export default function ChannelContents() {
                     />
                 }
               </div>
-            </>
+            </div>
           )}
         </For>
 
