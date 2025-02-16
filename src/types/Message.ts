@@ -1,7 +1,7 @@
 export interface IMessage {
   channelId: string;
   content: string;
-  createdAt: Date;
+  createdAt: string;
   id: string;
   isSystemMessage: false;
   userId: string;
@@ -14,7 +14,7 @@ export interface IInbox {
   userId: string;
   messageId: string;
   Message: IMessage;
-  happendAt: Date;
+  happendAt: string;
 }
 
 export interface IMessageUrlPreview {
@@ -36,13 +36,6 @@ export interface IMessageFileAttached {
   savedFileName: string;
   size: number;
   type: File["type"];
-}
-
-export interface IRequestChannelHistoryBody {
-  messageIdFrom?: string;
-  messageTimeFrom?: Date;
-  fetchLength?: number;
-  fetchDirection?: "older" | "newer";
 }
 
 export interface ISystemMessage {
