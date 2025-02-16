@@ -46,7 +46,11 @@ export default function ChannelContents() {
       //履歴を取得、格納
       stateFetchingHistory = true;
       await FetchHistory(param.channelId, { messageIdFrom: messageIdLast }, "older");
-      setTimeout(() => scrollTo(messageIdLast));
+      setTimeout(() => {
+        scrollTo(messageIdLast);
+        //履歴取得中状態を解除
+        stateFetchingHistory = false;
+      });
     }
     //履歴の最新到達用
     if (
@@ -63,11 +67,12 @@ export default function ChannelContents() {
       //履歴を取得、格納
       stateFetchingHistory = true;
       await FetchHistory(param.channelId, { messageIdFrom: messageIdNewest }, "newer");
-      setTimeout(() => scrollTo(messageIdNewest, "start", true));
+      setTimeout(() => {
+        scrollTo(messageIdNewest, "start", true);
+        //履歴取得中状態を解除
+        stateFetchingHistory = false;
+      });
     }
-
-    //履歴取得中状態を解除
-    stateFetchingHistory = false;
 
     //履歴の最新部分に到達していたら既読時間を更新
     if (
@@ -231,9 +236,10 @@ export default function ChannelContents() {
       storeHistory[param.channelId]?.history.length === 0 ||
       storeHistory[param.channelId] === undefined
     ) {
-      const time = storeMessageReadTime.find((c) => {
+      const time = storeMessageReadTime.find((c) =>
         c.channelId === param.channelId
       })?.readTime;
+      )?.readTime;
 
       //履歴を取得、格納した時点でもう一度履歴取得を試す
       FetchHistory(param.channelId, { messageTimeFrom: time }, "older").then(() =>
