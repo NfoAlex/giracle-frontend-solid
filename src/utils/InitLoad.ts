@@ -2,7 +2,6 @@ import GET_MESSAGE_GET_NEW from "~/api/MESSAGE/MESSAGE_GET_NEW";
 import GET_MESSAGE_GET_READTIME from "~/api/MESSAGE/MESSAGE_GET_READTIME";
 import { GET_ROLE_LIST } from "~/api/ROLE/ROLE_LIST";
 import GET_USER_INFO from "~/api/USER/USER_INFO";
-import { storeAppStatus } from "~/stores/AppStatus";
 import { setStoreHasNewMessage } from "~/stores/HasNewMessage";
 import { setStoreMyUserinfo } from "~/stores/MyUserinfo";
 import { setStoreMessageReadTime, setStoreMessageReadTimeBefore } from "~/stores/Readtime";
