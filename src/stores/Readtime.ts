@@ -4,14 +4,14 @@ import { createStore } from "solid-js/store";
 export const [storeMessageReadTime, setStoreMessageReadTime] = createStore<
   {
     channelId: string;
-    readTime: Date;
+    readTime: string;
   }[]
 >([]);
 //更新前のを表示するためのやつ
 export const [storeMessageReadTimeBefore, setStoreMessageReadTimeBefore] = createStore<
   {
     channelId: string;
-    readTime: Date;
+    readTime: string;
   }[]
 >([]);
 
@@ -20,7 +20,7 @@ export const [storeMessageReadTimeBefore, setStoreMessageReadTimeBefore] = creat
  * @param channelId 
  * @param readTime 
  */
-export const updateReadTime = (channelId: string, readTime: Date) => {
+export const updateReadTime = (channelId: string, readTime: string) => {
   setStoreMessageReadTime((prev) => {
     const newReadTime = { channelId, readTime };
     const newStore = prev.filter((c) => c.channelId !== channelId);

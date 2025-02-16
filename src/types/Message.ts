@@ -1,7 +1,7 @@
 export interface IMessage {
   channelId: string;
   content: string;
-  createdAt: Date;
+  createdAt: string;
   id: string;
   isSystemMessage: false;
   userId: string;
@@ -14,7 +14,7 @@ export interface IInbox {
   userId: string;
   messageId: string;
   Message: IMessage;
-  happendAt: Date;
+  happendAt: string;
 }
 
 export interface IMessageUrlPreview {

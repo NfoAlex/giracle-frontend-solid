@@ -3,7 +3,7 @@ export default async function GET_MESSAGE_GET_READTIME(): Promise<{
   data: {
     userId: string;
     channelId: string;
-    readTime: Date;
+    readTime: string;
   }[];
 }> {
   const res = await fetch("/api/message/read-time/get", {

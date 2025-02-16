@@ -2,7 +2,7 @@ import type { IMessage } from "~/types/Message";
 
 export default async function POST_MESSAGE_UPDATE_READTIME(
   _channelId: string,
-  _readTime: Date
+  _readTime: string
 ): Promise<{
   message: `Message sent`;
   data: IMessage;

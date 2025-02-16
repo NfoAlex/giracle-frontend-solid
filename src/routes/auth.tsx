@@ -18,15 +18,15 @@ export default function Auth() {
     //クッキーにTokenがあれば初期処理をして移動
     const token = GetCookie("token");
     if (token !== undefined) {
-      await GET_USER_VERIFY_TOKEN().then((r) => {
-        InitLoad(r.data.userId);
-        //もともと行こうとしていた場所を指定
-        if (loc.search.split("?redirect=")[1]) {
-          navi(`${loc.search.split("?redirect=")[1]}`);
-        } else {
-          navi("/app");
-        }
-      });
+      const r = await GET_USER_VERIFY_TOKEN();
+      await InitLoad(r.data.userId);
+      storeAppStatus.loggedIn = true;
+      //もともと行こうとしていた場所を指定
+      if (loc.search.split("?redirect=")[1]) {
+        navi(`${loc.search.split("?redirect=")[1]}`);
+      } else {
+        navi("/app");
+      }
     }
   });
 

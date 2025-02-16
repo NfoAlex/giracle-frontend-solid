@@ -13,16 +13,17 @@ export default async function FetchHistory(
   _channelId: string,
   _dat: {
     messageIdFrom?: string | undefined;
-    messageTimeFrom?: Date | undefined;
+    messageTimeFrom?: string | undefined;
   },
   _direction: "older" | "newer" = "older",
 ) {
   if (fetching) return;
   fetching = true;
+  console.log("FetchHistory :: _dat->", _dat);
   await POST_CHANNEL_GET_HISTORY(
     _channelId,
     _dat.messageIdFrom,
-    _dat.messageTimeFrom?.toDateString(),
+    _dat.messageTimeFrom,
     undefined,
     _direction,
   )
