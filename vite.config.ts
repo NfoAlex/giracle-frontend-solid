@@ -56,6 +56,10 @@ export default defineConfig({
       },
     },
   },
+  preview: {
+    port: 6173,
+    allowedHosts: []
+  },
   resolve: {
     alias: {
       "~/": "/src/",
