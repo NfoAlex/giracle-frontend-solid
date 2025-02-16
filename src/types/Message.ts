@@ -14,7 +14,7 @@ export interface IInbox {
   userId: string;
   messageId: string;
   Message: IMessage;
-  happendAt: Date;
+  happendAt: string;
 }
 
 export interface IMessageUrlPreview {
