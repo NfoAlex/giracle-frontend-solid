@@ -179,7 +179,7 @@ export default function ChannelContents() {
 
   //履歴の更新監視
   createEffect(
-    on(() => storeHistory[param.channelId]?.history[0]?.id + ":" + storeHistory[param.channelId]?.history.at(-1)?.id, () => {
+    on(() => `${storeHistory[param.channelId]?.history[0]?.id}:${storeHistory[param.channelId]?.history.at(-1)?.id}`, () => {
       //console.log("ChannelContents :: createEffect : 履歴更新された");
       checkScrollPosAndFetchHistory();
     })
