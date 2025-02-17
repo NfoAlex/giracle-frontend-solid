@@ -228,21 +228,6 @@ export default function ChannelContents() {
 
     window.addEventListener("focus", setWindowFocused);
     window.addEventListener("blur", unSetWindowFocused);
-
-    //もし履歴の長さが０なら既読時間から取得
-    if (
-      storeHistory[param.channelId]?.history.length === 0 ||
-      storeHistory[param.channelId] === undefined
-    ) {
-      const time = storeMessageReadTime.find((c) =>
-        c.channelId === param.channelId
-      )?.readTime;
-
-      //履歴を取得、格納した時点でもう一度履歴取得を試す
-      FetchHistory(param.channelId, { messageTimeFrom: time }, "older").then(() =>
-        checkScrollPosAndFetchHistory(),
-      );
-    }
   });
 
   onCleanup(() => {
@@ -257,21 +242,6 @@ export default function ChannelContents() {
         <For each={storeHistory[param.channelId]?.history}>
           {(h, index) => (
             <div id={`messageId::${h.id}`}>
-              {/* 新着線の表示 */}
-              { (
-                  (
-                    storeMessageReadTimeBefore.find(
-                      (c) => c.channelId === useParams().channelId
-                    )?.readTime.valueOf() //一つ古い既読時間
-                      ===
-                    h.createdAt.valueOf() //メッセージの時間
-                  )
-                    &&
-                  index() !== 0 //最新メッセージ以外条件
-                )
-                  &&
-                (<NewMessageLine />)
-              }
               <div
                 class="flex flex-row items-start"
               >
@@ -315,6 +285,21 @@ export default function ChannelContents() {
                     />
                 }
               </div>
+              {/* 新着線の表示 */}
+              { (
+                  (
+                    storeMessageReadTimeBefore.find(
+                      (c) => c.channelId === useParams().channelId
+                    )?.readTime.valueOf() //一つ古い既読時間
+                      ===
+                    h.createdAt.valueOf() //メッセージの時間
+                  )
+                    &&
+                  index() !== 0 //最新メッセージ以外条件
+                )
+                  &&
+                (<NewMessageLine />)
+              }
             </div>
           )}
         </For>
