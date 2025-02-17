@@ -62,7 +62,7 @@ export default function Profile() {
   };
 
   return (
-    <div class="md:max-w-[450px] w-11/12 mx-auto">
+    <div class="md:max-w-[450px] w-11/12 h-full pb-2 mx-auto flex flex-col gap-2">
       <span class="flex items-center gap-2">
         <SidebarTriggerWithDot />
         <p class="font-bold text-2xl my-2">プロフィール</p>
@@ -192,6 +192,16 @@ export default function Profile() {
             </div>
           </div>
         </CardContent>
+      </Card>
+
+      <Card class="p-2 flex items-center mt-auto">
+        <p>バージョン : </p>
+        <p class="ml-auto">
+          {
+            //@ts-ignore: __VERSION__はvite.config.tsで定義されている
+            __VERSION__
+          }
+        </p>
       </Card>
     </div>
   );

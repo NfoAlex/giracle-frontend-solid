@@ -23,7 +23,9 @@ export default function ChannelContents() {
    */
   const checkScrollPosAndFetchHistory = async () => {
     const el = document.getElementById("history");
-    if (el === null || stateFetchingHistory) return;
+    //履歴要素が見つからない、履歴取得中、チャンネルが変わった直後ならスルー
+    if (el === null || stateFetchingHistory || param.channelId !== channelIdBefore) return;
+    //履歴配列が存在しないならスルー
     if (storeHistory[param.channelId] === undefined) return;
 
     const scrollPos = el.scrollTop;
@@ -114,11 +116,11 @@ export default function ChannelContents() {
     //既読位置の次に設定することで(index - 1)、新着線が画面内に表示される
     const msg = storeHistory[param.channelId].history[msgIndex - 1];
     if (msg !== undefined) {
-      scrollTo(msg.id);
+      scrollTo(msg.id, "start", true);
     } else {
       const msgBefore = storeHistory[param.channelId].history[msgIndex];
       if (msgBefore !== undefined)
-        scrollTo(msgBefore.id);
+        scrollTo(msgBefore.id, "start", true);
     }
 
     checkScrollPosAndFetchHistory();
@@ -139,9 +141,12 @@ export default function ChannelContents() {
     }
 
     //スクロールするとき時間方向に合わせてやり方を改善して精度を高める
+      //仕組みとしては一旦スクロールしたい方向から真逆へスクロールしきってからscrollIntoView、これで綺麗に見える
     if (scrollingToFuture) { //新しい方向
+      el.scrollTo(0, 0);
       el.scrollIntoView(false);
     } else {                 //古い方向
+      el.scrollTo(0, el.scrollHeight);
       el.scrollIntoView({block});
     }
   };
@@ -176,7 +181,7 @@ export default function ChannelContents() {
 
   //履歴の更新監視
   createEffect(
-    on(() => storeHistory[param.channelId]?.history[0]?.id + ":" + storeHistory[param.channelId]?.history.at(-1)?.id, () => {
+    on(() => `${storeHistory[param.channelId]?.history[0]?.id}:${storeHistory[param.channelId]?.history.at(-1)?.id}`, () => {
       //console.log("ChannelContents :: createEffect : 履歴更新された");
       checkScrollPosAndFetchHistory();
     })
@@ -190,12 +195,12 @@ export default function ChannelContents() {
         storeHistory[param.channelId]?.history.length === 0 ||
         storeHistory[param.channelId] === undefined
       ) {
-        const time = storeMessageReadTime.find((c) => {
+        const time = storeMessageReadTime.find((c) =>
           c.channelId === param.channelId
-        })?.readTime;
+        )?.readTime;
 
         //履歴を取得、格納した時点でもう一度履歴取得を試す
-        FetchHistory(param.channelId, { messageTimeFrom: time }, "older");
+        FetchHistory(param.channelId, { messageTimeFrom: time, fetchLength: 1 }, "newer");
       } else {
         initScroll();
       }
@@ -225,21 +230,6 @@ export default function ChannelContents() {
 
     window.addEventListener("focus", setWindowFocused);
     window.addEventListener("blur", unSetWindowFocused);
-
-    //もし履歴の長さが０なら既読時間から取得
-    if (
-      storeHistory[param.channelId]?.history.length === 0 ||
-      storeHistory[param.channelId] === undefined
-    ) {
-      const time = storeMessageReadTime.find((c) => {
-        c.channelId === param.channelId
-      })?.readTime;
-
-      //履歴を取得、格納した時点でもう一度履歴取得を試す
-      FetchHistory(param.channelId, { messageTimeFrom: time }, "older").then(() =>
-        checkScrollPosAndFetchHistory(),
-      );
-    }
   });
 
   onCleanup(() => {
@@ -254,17 +244,6 @@ export default function ChannelContents() {
         <For each={storeHistory[param.channelId]?.history}>
           {(h, index) => (
             <div id={`messageId::${h.id}`}>
-              {/* 新着線の表示 */}
-              { (
-                    storeMessageReadTimeBefore.find(
-                      (c) => c.channelId === useParams().channelId
-                    )?.readTime.valueOf() //一つ古い既読時間
-                    ===
-                    h.createdAt.valueOf() //メッセージの時間
-                  &&
-                    index() !== 0 //最新メッセージ以外条件
-                ) && (<NewMessageLine />)
-              }
               <div
                 class="flex flex-row items-start"
               >
@@ -308,6 +287,21 @@ export default function ChannelContents() {
                     />
                 }
               </div>
+              {/* 新着線の表示 */}
+              { (
+                  (
+                    storeMessageReadTimeBefore.find(
+                      (c) => c.channelId === useParams().channelId
+                    )?.readTime.valueOf() //一つ古い既読時間
+                      ===
+                    h.createdAt.valueOf() //メッセージの時間
+                  )
+                    &&
+                  index() !== 0 //最新メッセージ以外条件
+                )
+                  &&
+                (<NewMessageLine />)
+              }
             </div>
           )}
         </For>
