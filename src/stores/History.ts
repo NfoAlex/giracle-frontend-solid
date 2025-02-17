@@ -31,6 +31,12 @@ export const insertHistory = (history: IMessage[]) => {
       atTop: true,
       history: history,
     };
+
+  } else if (currentHistory[history[0].channelId].history.length === 0) {
+    currentHistory[history[0].channelId] = {
+      ...currentHistory[history[0].channelId],
+      history: history,
+    };
   } else {
     if (insertDirection === "newer") {
       //console.log("History :: insertHistory : 新しい方向に挿入");
