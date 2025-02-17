@@ -114,11 +114,11 @@ export default function ChannelContents() {
     //既読位置の次に設定することで(index - 1)、新着線が画面内に表示される
     const msg = storeHistory[param.channelId].history[msgIndex - 1];
     if (msg !== undefined) {
-      scrollTo(msg.id);
+      scrollTo(msg.id, "start", true);
     } else {
       const msgBefore = storeHistory[param.channelId].history[msgIndex];
       if (msgBefore !== undefined)
-        scrollTo(msgBefore.id);
+        scrollTo(msgBefore.id, "start", true);
     }
 
     checkScrollPosAndFetchHistory();
