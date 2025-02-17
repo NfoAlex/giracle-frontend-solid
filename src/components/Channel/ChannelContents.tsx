@@ -259,14 +259,18 @@ export default function ChannelContents() {
             <div id={`messageId::${h.id}`}>
               {/* 新着線の表示 */}
               { (
+                  (
                     storeMessageReadTimeBefore.find(
                       (c) => c.channelId === useParams().channelId
                     )?.readTime.valueOf() //一つ古い既読時間
-                    ===
+                      ===
                     h.createdAt.valueOf() //メッセージの時間
+                  )
+                    &&
+                  index() !== 0 //最新メッセージ以外条件
+                )
                   &&
-                    index() !== 0 //最新メッセージ以外条件
-                ) && (<NewMessageLine />)
+                (<NewMessageLine />)
               }
               <div
                 class="flex flex-row items-start"
