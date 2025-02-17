@@ -23,7 +23,9 @@ export default function ChannelContents() {
    */
   const checkScrollPosAndFetchHistory = async () => {
     const el = document.getElementById("history");
-    if (el === null || stateFetchingHistory) return;
+    //履歴要素が見つからない、履歴取得中、チャンネルが変わった直後ならスルー
+    if (el === null || stateFetchingHistory || param.channelId !== channelIdBefore) return;
+    //履歴配列が存在しないならスルー
     if (storeHistory[param.channelId] === undefined) return;
 
     const scrollPos = el.scrollTop;
@@ -198,7 +200,7 @@ export default function ChannelContents() {
         )?.readTime;
 
         //履歴を取得、格納した時点でもう一度履歴取得を試す
-        FetchHistory(param.channelId, { messageTimeFrom: time }, "older");
+        FetchHistory(param.channelId, { messageTimeFrom: time, fetchLength: 1 }, "newer");
       } else {
         initScroll();
       }
