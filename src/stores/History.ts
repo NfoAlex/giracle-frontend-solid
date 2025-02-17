@@ -19,7 +19,7 @@ export const insertHistory = (history: IMessage[]) => {
   const currentHistory = { ...storeHistory };
 
   //挿入方向(挿入する履歴が現在保持するものより新しいかどうかで順序を選ぶ
-  let insertDirection = (
+  const insertDirection = (
     history[0].createdAt.valueOf() //受け取った履歴の最初の時間
     >
     (currentHistory[history[0].channelId]?.history.at(-1)?.createdAt.valueOf() || 0) //現在の履歴最古の時間
