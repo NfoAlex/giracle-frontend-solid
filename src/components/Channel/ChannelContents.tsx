@@ -139,9 +139,12 @@ export default function ChannelContents() {
     }
 
     //スクロールするとき時間方向に合わせてやり方を改善して精度を高める
+      //仕組みとしては一旦スクロールしたい方向から真逆へスクロールしきってからscrollIntoView、これで綺麗に見える
     if (scrollingToFuture) { //新しい方向
+      el.scrollTo(0, 0);
       el.scrollIntoView(false);
     } else {                 //古い方向
+      el.scrollTo(0, el.scrollHeight);
       el.scrollIntoView({block});
     }
   };
