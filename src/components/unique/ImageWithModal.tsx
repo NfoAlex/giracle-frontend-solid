@@ -10,14 +10,14 @@ export default function ImageWithModal(props: { class: string, src: string }) {
 
   return (
     <>
-      <img onClick={() => setIsOpen(true)} src={props.src} class={`${props.class} cursor-pointer`}  alt={props.src}/>
+      <img onClick={() => setIsOpen(true)} src={props.src} class={`${props.class} cursor-pointer`} alt={props.src.length > 30 ? props.src.slice(0,15) + "..." : props.src}/>
       <KDialog open={isOpen()} onOpenChange={setIsOpen}>
         <KDialog.Portal>
           <div onClick={()=>setIsOpen(false)} class={"inset-0 z-50 p-2 fixed flex justify-center items-center w-full h-full bg-black bg-opacity-50"}>
-            <KDialog.Content class={"h-3/4 w-10/12 flex justify-center items-center break-all truncate"}>
+            <KDialog.Content class={"h-4/5 w-10/12 flex justify-center items-center"}>
               <img
                 src={props.src}
-                class={`w-fit h-fit cursor-pointer`}
+                class={`max-w-full max-h-full shrink cursor-pointer`}
                 alt={props.src.length > 30 ? props.src.slice(0,15) + "..." : props.src}
               />
             </KDialog.Content>
