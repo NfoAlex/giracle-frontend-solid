@@ -36,10 +36,10 @@ export function AppSidebar() {
           <SidebarMenu>
             <SidebarMenuItem>
               {storeAppStatus.wsConnected ? 
-                <span class={"flex items-center pr-3"}>
+                <Badge class={"flex items-center pr-3"}>
                   <p>オンラインユーザー : </p>
-                  <Badge class={"ml-auto"}>{ storeUserOnline.length }</Badge>
-                </span>
+                  <p class={"ml-auto"}>{ storeUserOnline.length }</p>
+                </Badge>
                 :
                 <Badge variant={"secondary"}>再接続中...</Badge>
               }
