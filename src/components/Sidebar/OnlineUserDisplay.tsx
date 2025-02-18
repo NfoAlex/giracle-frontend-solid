@@ -2,6 +2,9 @@ import {Dialog, DialogContent, DialogHeader, DialogTrigger} from "~/components/u
 import {storeUserOnline} from "~/stores/Userinfo";
 import {Badge} from "~/components/ui/badge";
 import {IconCircleFilled} from "@tabler/icons-solidjs";
+import {For} from "solid-js";
+import {Avatar, AvatarImage} from "~/components/ui/avatar";
+import UserName from "~/components/unique/UserName";
 
 export default function OnlineUserDisplay() {
   return (
@@ -17,9 +20,28 @@ export default function OnlineUserDisplay() {
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <p class="font-bold text-xl">オンラインユーザー</p>
+
         </DialogHeader>
-        <p>オンラインユーザー : { storeUserOnline.toString() }</p>
+
+        <span class="font-bold text-xl flex">
+          <p>オンラインユーザー</p>
+          <Badge class={"ml-auto"}>{storeUserOnline.length}</Badge>
+        </span>
+
+        <hr/>
+
+        <div class={"max-h-96 overflow-y-auto"}>
+          <For each={storeUserOnline}>
+            {(userId) => (
+              <div class={"p-2 rounded-md flex items-center gap-2 hover:bg-accent"}>
+                <Avatar class={"w-8 h-auto"}>
+                  <AvatarImage src={`/api/user/icon/${userId}`}/>
+                </Avatar>
+                <p class={"truncate"}><UserName userId={userId}/></p>
+              </div>
+            )}
+          </For>
+        </div>
       </DialogContent>
     </Dialog>
   )
