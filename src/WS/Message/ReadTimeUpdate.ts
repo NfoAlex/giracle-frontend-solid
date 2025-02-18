@@ -1,8 +1,9 @@
 import {setStoreMessageReadTime} from "~/stores/Readtime";
 import {produce} from "solid-js/store";
+import {setStoreHasNewMessage} from "~/stores/HasNewMessage";
 
 /**
- * 既読時間を更新する
+ * 既読時間と新着を更新する
  * @param dat
  * @constructor
  */
@@ -28,4 +29,10 @@ export default function WSReadTimeUpdate(dat: {
 
     return prev;
   }));
+
+  //新着Storeを更新
+  setStoreHasNewMessage(produce((prev) => {
+    prev[dat.channelId] = false;
+    return prev;
+  }))
 }
