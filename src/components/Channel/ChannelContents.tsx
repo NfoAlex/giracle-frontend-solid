@@ -10,6 +10,7 @@ import POST_MESSAGE_UPDATE_READTIME from "~/api/MESSAGE/MESSAGE_UPDATE_READTIME"
 import { setStoreHasNewMessage } from "~/stores/HasNewMessage";
 import HoverMenu from "~/components/Channel/ChannelContent/HoverMenu";
 import MentionReadWrapper from "~/components/Channel/ChannelContent/MentionReadWrapper";
+import {Badge} from "~/components/ui/badge";
 
 export default function ChannelContents() {
   const [isFocused, setIsFocused] = createSignal(true);
@@ -244,6 +245,16 @@ export default function ChannelContents() {
         <For each={storeHistory[param.channelId]?.history}>
           {(h, index) => (
             <div id={`messageId::${h.id}`}>
+
+              {/* 日付線 */}
+              <Show when={new Date(h.createdAt).getDay().valueOf() !== new Date(storeHistory[param.channelId]?.history[index() + 1]?.createdAt).getDay().valueOf()}>
+                <div class="flex justify-center items-center gap-3 py-1">
+                  <hr class={"grow"} />
+                  <Badge class={"shrink-0"} variant={"secondary"}>{ new Date(h.createdAt).toLocaleDateString() }</Badge>
+                  <hr class={"grow"} />
+                </div>
+              </Show>
+
               <div
                 class="flex flex-row items-start"
               >
@@ -287,6 +298,7 @@ export default function ChannelContents() {
                     />
                 }
               </div>
+
               {/* 新着線の表示 */}
               { (
                   (
