@@ -35,11 +35,11 @@ export function AppSidebar() {
         <SidebarGroup>
           <SidebarMenu>
             {storeAppStatus.wsConnected ?
-              <span class={"w-full"}>
+                <span class={"w-full"}>
                   <OnlineUserDisplay />
                 </span>
               :
-              <Badge variant={"secondary"}>再接続中...</Badge>
+              <Badge variant={"secondary"} class={"px-3 py-2"}>再接続中...</Badge>
             }
           </SidebarMenu>
         </SidebarGroup>
