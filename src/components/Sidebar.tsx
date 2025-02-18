@@ -18,7 +18,6 @@ import { storeAppStatus } from "~/stores/AppStatus";
 import { storeHasNewMessage } from "~/stores/HasNewMessage";
 import {IconBell, IconDatabaseCog, IconHash, IconList} from "@tabler/icons-solidjs";
 import {directGetterChannelInfo} from "~/stores/ChannelInfo";
-import {storeUserOnline} from "~/stores/Userinfo";
 import {storeInbox} from "~/stores/Inbox";
 import {Badge} from "~/components/ui/badge";
 import OnlineUserDisplay from "~/components/Sidebar/OnlineUserDisplay";
