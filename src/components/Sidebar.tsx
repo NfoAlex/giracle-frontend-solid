@@ -21,6 +21,7 @@ import {directGetterChannelInfo} from "~/stores/ChannelInfo";
 import {storeUserOnline} from "~/stores/Userinfo";
 import {storeInbox} from "~/stores/Inbox";
 import {Badge} from "~/components/ui/badge";
+import OnlineUserDisplay from "~/components/Sidebar/OnlineUserDisplay";
 
 export function AppSidebar() {
   const loc = useLocation();
@@ -34,16 +35,13 @@ export function AppSidebar() {
       <SidebarContent id={"sidebar-content"}>
         <SidebarGroup>
           <SidebarMenu>
-            <SidebarMenuItem>
-              {storeAppStatus.wsConnected ? 
-                <Badge class={"flex items-center pr-3"}>
-                  <p>オンラインユーザー : </p>
-                  <p class={"ml-auto"}>{ storeUserOnline.length }</p>
-                </Badge>
-                :
-                <Badge variant={"secondary"}>再接続中...</Badge>
-              }
-            </SidebarMenuItem>
+            {storeAppStatus.wsConnected ?
+              <span class={"w-full"}>
+                  <OnlineUserDisplay />
+                </span>
+              :
+              <Badge variant={"secondary"}>再接続中...</Badge>
+            }
           </SidebarMenu>
         </SidebarGroup>
         <SidebarGroup>
