@@ -13,9 +13,9 @@ export default function ImageWithModal(props: { class: string, src: string }) {
       <img onClick={() => setIsOpen(true)} src={props.src} class={`${props.class} cursor-pointer`}  alt={props.src}/>
       <KDialog open={isOpen()} onOpenChange={setIsOpen}>
         <KDialog.Portal>
-          <div class={"inset-0 z-50 p-2 fixed flex justify-center items-center w-full h-full bg-black bg-opacity-50"}>
+          <div onClick={()=>setIsOpen(false)} class={"inset-0 z-50 p-2 fixed flex justify-center items-center w-full h-full bg-black bg-opacity-50"}>
             <KDialog.Content class={"h-3/4 w-10/12 flex justify-center items-center"}>
-              <img onClick={()=>setIsOpen(false)} src={props.src} class={`w-fit h-fit cursor-pointer`} alt={props.src}/>
+              <img src={props.src} class={`w-fit h-fit cursor-pointer`} alt={props.src}/>
             </KDialog.Content>
           </div>
         </KDialog.Portal>
