@@ -1,11 +1,11 @@
 import { createSignal, For, Show } from "solid-js";
-import { getterUserinfo, storeUserinfo } from "~/stores/Userinfo";
+import {getterUserinfo, storeUserinfo, storeUserOnline} from "~/stores/Userinfo";
 import { Dialog, DialogContent, DialogTrigger } from "../ui/dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Card } from "../ui/card";
 import { Label } from "../ui/label";
 import { Button } from "../ui/button";
-import { IconPencil, IconPlus } from "@tabler/icons-solidjs";
+import {IconCircleFilled, IconPencil, IconPlus} from "@tabler/icons-solidjs";
 import { A } from "@solidjs/router";
 import {getRolePower, storeMyUserinfo} from "~/stores/MyUserinfo";
 import RoleChip from "./RoleChip";
@@ -81,11 +81,20 @@ export default function UserName(props: { userId: string }) {
               class="h-full w-full text-center object-cover"
             />
           </div>
-          <div class="w-full -mt-12">
+
+          {/* ユーザーアイコンとオンライン表示 */}
+          <div class="w-full -mt-12 flex items-center gap-4">
             <Avatar class="w-16 h-16 ml-4">
               <AvatarImage src={`/api/user/icon/${user().id}`} />
               <AvatarFallback class="w-full h-full">{user().name}</AvatarFallback>
             </Avatar>
+
+            <Show when={storeUserOnline.includes(props.userId)}>
+              <Badge variant={"secondary"} class={"flex ml-auto mr-4 items-center gap-2"}>
+                <IconCircleFilled size={16} color={"green"} />
+                <p>オンライン</p>
+              </Badge>
+            </Show>
           </div>
 
           <div class="pb-4 px-4 flex flex-col gap-2">
