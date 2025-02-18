@@ -194,7 +194,7 @@ export default function Profile() {
         </CardContent>
       </Card>
 
-      <Card class="p-2 flex items-center mt-auto">
+      <Card class="px-4 py-2 flex items-center mt-auto">
         <p>バージョン : </p>
         <p class="ml-auto">
           {
