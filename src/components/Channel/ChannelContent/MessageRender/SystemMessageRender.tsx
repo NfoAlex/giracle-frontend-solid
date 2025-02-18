@@ -6,7 +6,7 @@ export default function SystemMessageRender(props: { content: string }) {
   const systemMsg: ISystemMessage = JSON.parse(props.content);
 
   return (
-    <Card class={"px-4 py-2"}>
+    <Card class={"px-4 py-2 my-1"}>
       {systemMsg.messageTerm === "WELCOME" && (
         <p>{getterUserinfo(systemMsg.targetUserId).name}さんがGiracleに参加しました!ようこそ</p>
       )}
