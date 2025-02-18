@@ -251,7 +251,7 @@ export default function ChannelContents() {
 
   return (
     <div class="w-full overflow-y-auto p-2 grow">
-      <div id="history" class="h-full w-full overflow-y-auto flex flex-col-reverse gap-1">
+      <div id="history" class="h-full w-full overflow-y-auto flex flex-col-reverse gap-1.5">
         <For each={storeHistory[param.channelId]?.history}>
           {(h, index) => (
             <div id={`messageId::${h.id}`}>
