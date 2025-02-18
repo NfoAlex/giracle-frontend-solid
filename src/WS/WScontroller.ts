@@ -16,6 +16,7 @@ import WSInboxAdded from "~/WS/inbox/inboxAdded";
 import InitLoad from "~/utils/InitLoad";
 import {storeMyUserinfo} from "~/stores/MyUserinfo";
 import WSUserProfileUpdate from "~/WS/User/UserProfileUpdate";
+import WSReadTimeUpdate from "~/WS/Message/ReadTimeUpdate";
 
 //WSインスタンス
 export let ws: WebSocket | undefined = undefined;
@@ -59,6 +60,11 @@ export const initWS = async () => {
         //メッセージ更新の通知受け取り
         case "message::UpdateMessage":
           WSUpdateMessage(json.data);
+          break;
+
+        //既読時間更新の受け取り
+        case "message::ReadTimeUpdated":
+          WSReadTimeUpdate(json.data);
           break;
 
         //インボックス項目の削除（既読）受け取り
