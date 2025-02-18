@@ -59,7 +59,7 @@
 
   .dark,
   [data-kb-theme="dark"] {
-    --background: 240 10% 3.9%;
+    --background: 240 10% 5.9%;
     --foreground: 0 0% 98%;
 
     --muted: 240 3.7% 15.9%;
