@@ -11,6 +11,7 @@ import { setStoreHasNewMessage } from "~/stores/HasNewMessage";
 import HoverMenu from "~/components/Channel/ChannelContent/HoverMenu";
 import MentionReadWrapper from "~/components/Channel/ChannelContent/MentionReadWrapper";
 import {Badge} from "~/components/ui/badge";
+import {IMessage} from "~/types/Message";
 
 export default function ChannelContents() {
   const [isFocused, setIsFocused] = createSignal(true);
@@ -99,9 +100,18 @@ export default function ChannelContents() {
    * @param index
    */
   const sameSenderAsNext = (index: number): boolean => {
-    if (storeHistory[param.channelId].history === undefined) return false;
-    if (storeHistory[param.channelId].history.length === index + 1) return false;
+    //メッセオブジェクト取得
+    const msgHere = storeHistory[param.channelId].history[index];
+    const msgBehind: IMessage | undefined = storeHistory[param.channelId].history[index + 1];
+    //5分を比較するための変数(ミリ秒)
+    const miliSecFiveMin = 1000 * 60 * 5;
 
+    if (msgBehind === undefined) return false; //次のメッセージがない場合
+    if (new Date(msgHere.createdAt).valueOf() - new Date(msgBehind.createdAt).valueOf() > miliSecFiveMin) return false; //5分以上の差がある場合
+    if (storeHistory[param.channelId].history === undefined) return false; //履歴がない場合(一応のエラーcatch)
+    if (storeHistory[param.channelId].history.length === index + 1) return false; //最後のメッセージの場合
+
+    //最後に送信者が同じかどうか
     return storeHistory[param.channelId].history[index].userId ===
       storeHistory[param.channelId].history[index + 1].userId;
   };
