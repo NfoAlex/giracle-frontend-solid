@@ -6,6 +6,7 @@ export const [storeMyUserinfo, setStoreMyUserinfo] = createStore<IUser>({
   id: "",
   name: "ユーザー",
   selfIntroduction: "",
+  isBanned: false,
   ChannelJoin: [],
   RoleLink: [],
 });
