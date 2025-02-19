@@ -35,7 +35,7 @@ export default function ChannelContents() {
 
     //スクロール位置の計算
     const scrollAtTop = Math.abs(scrollPos) + el.offsetHeight >= el.scrollHeight - 1;
-    const scrollAtBottom = Math.abs(scrollPos) <= 0;
+    const scrollAtBottom = Math.abs(scrollPos) <= 1; //paddingに合わせて1pxの誤差を許容
 
     //履歴の最古到達用
     if (!storeHistory[param.channelId].atTop && scrollAtTop) {
@@ -73,6 +73,7 @@ export default function ChannelContents() {
     //履歴取得中状態を解除
     stateFetchingHistory = false;
 
+    //console.log("ChannelContent :: checkScrollPosAndFetchHistory : 既読ちぇっく scrollAtBottom->", scrollAtBottom, " isFocused()->", isFocused());
     //履歴の最新部分に到達していたら既読時間を更新
     if (
       storeHistory[param.channelId].atEnd &&
