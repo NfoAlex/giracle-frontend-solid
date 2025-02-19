@@ -33,20 +33,22 @@ export default function ChannelTextInput() {
     POST_MESSAGE_SEND(params.channelId, text(), fileIds())
       .then((r) => {
         console.log("POST_MESSAGE_SEND :: r->", r);
-        setText("");
-        setFileIds([]);
-        setFileInput([]);
-        //検索モードを初期化
-        setSearchOptions({
-          type: "user",
-          isEnabled: false,
-          query: "",
-          selectIndex: 0,
-        });
       })
       .catch((e) => {
         console.error("POST_MESSAGE_SEND :: e->", e);
       });
+
+    //初期化処理
+    setText("");
+    setFileIds([]);
+    setFileInput([]);
+    //検索モードを初期化
+    setSearchOptions({
+      type: "user",
+      isEnabled: false,
+      query: "",
+      selectIndex: 0,
+    });
   }
 
   /**
