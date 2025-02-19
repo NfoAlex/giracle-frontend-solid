@@ -4,7 +4,6 @@ import {Badge} from "~/components/ui/badge";
 import {IconCircleFilled} from "@tabler/icons-solidjs";
 import {For} from "solid-js";
 import {Avatar, AvatarImage} from "~/components/ui/avatar";
-import UserName from "~/components/unique/UserName";
 import UserinfoModalWrapper from "~/components/unique/UserinfoModalWrapper";
 
 export default function OnlineUserDisplay() {
