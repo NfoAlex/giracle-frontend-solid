@@ -186,9 +186,9 @@ export default function UserinfoModalWrapper(props: {children: JSX.Element, user
       </DialogContent>
 
       <DialogTrigger>
-        <span class={props.class}>
+        <div class={props.class}>
           {props.children}
-        </span>
+        </div>
       </DialogTrigger>
     </Dialog>
   )
