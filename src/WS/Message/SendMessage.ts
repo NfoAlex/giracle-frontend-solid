@@ -11,16 +11,6 @@ export default function WSSendMessage(dat: IMessage) {
   //履歴に追加
   addMessage({...dat, MessageUrlPreview: []});
 
-  //自分のメッセージなら時差表示用既読時間を更新
-  if (storeMyUserinfo.id === dat.userId) {
-    setStoreMessageReadTimeBefore((prev) => {
-      const newReadTime = { channelId: dat.channelId, readTime: dat.createdAt };
-      const newStore = prev.filter((c) => c.channelId !== dat.channelId);
-      newStore.push(newReadTime);
-      return newStore;
-    });
-  }
-
   //もし受け取ったメッセージのチャンネルにいない、あるいはフォーカスしていないなら新着設定
   if (!location.pathname.includes(dat.channelId) || !document.hasFocus()) {
     setStoreHasNewMessage((hnm) => {
@@ -34,5 +24,12 @@ export default function WSSendMessage(dat: IMessage) {
     if (dat.content.includes(`@<${storeMyUserinfo.id}>`)) {
       notifyIt(dat.userId, dat.content);
     }
+  } else { //普通にアクティブなら時差表示用既読時間を更新
+    setStoreMessageReadTimeBefore((prev) => {
+      const newReadTime = { channelId: dat.channelId, readTime: dat.createdAt };
+      const newStore = prev.filter((c) => c.channelId !== dat.channelId);
+      newStore.push(newReadTime);
+      return newStore;
+    });
   }
 }
