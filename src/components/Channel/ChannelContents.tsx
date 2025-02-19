@@ -14,6 +14,7 @@ import {Badge} from "~/components/ui/badge";
 import {IMessage} from "~/types/Message";
 import UserinfoModalWrapper from "~/components/unique/UserinfoModalWrapper";
 import EditMessage from "~/components/Channel/ChannelContent/EditMessage";
+import {storeMyUserinfo} from "~/stores/MyUserinfo";
 
 export default function ChannelContents() {
   const [isFocused, setIsFocused] = createSignal(true);
@@ -193,6 +194,25 @@ export default function ChannelContents() {
     setIsFocused(false);
     //console.log("ChannelContents :: toggleWindowFocus : isFocused->", isFocused());
   }
+  //上矢印キーハンドラ(編集モードに入るための処理)
+  const handleKeyUp = (event: KeyboardEvent) => {
+    if (event.key === "ArrowUp" && editingMsgId() === "") {
+      //履歴要素が取得できないなら停止
+      const el = document.getElementById("history");
+      if (el === null) return;
+      //もしテキストが入力された状態なら停止
+      const inputEl = document.getElementById("messageInput") as HTMLInputElement;
+      if (inputEl.value !== "") return;
+
+      //一番近い自分のメッセージを探して編集モードにする
+      for (let i = 0; i < storeHistory[param.channelId]?.history.length; i++) {
+        if (storeHistory[param.channelId]?.history[i].userId === storeMyUserinfo.id) {
+          setEditingMsgId(storeHistory[param.channelId]?.history[i].id);
+          return;
+        }
+      }
+    }
+  };
 
   //履歴の更新監視
   createEffect(
@@ -245,12 +265,15 @@ export default function ChannelContents() {
 
     window.addEventListener("focus", setWindowFocused);
     window.addEventListener("blur", unSetWindowFocused);
+    window.addEventListener("keyup", handleKeyUp);
   });
 
   onCleanup(() => {
     document.removeEventListener("scroll", handleScroll);
+
     window.removeEventListener("focus", setWindowFocused);
     window.removeEventListener("blur", unSetWindowFocused);
+    window.removeEventListener("keyup", handleKeyUp);
   });
 
   return (
