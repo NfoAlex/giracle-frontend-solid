@@ -1,6 +1,7 @@
 export interface IMessage {
   channelId: string;
   content: string;
+  isEdited: boolean;
   createdAt: string;
   id: string;
   isSystemMessage: false;
