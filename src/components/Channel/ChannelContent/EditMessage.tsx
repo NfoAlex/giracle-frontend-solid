@@ -69,10 +69,14 @@ export default function EditMessage(props: { messageId: string, content: string,
         <Button
           onClick={updateMessage}
           disabled={processing()}
+          size={"sm"}
         ><IconCheck />更新する</Button>
         <Button
           onClick={props.onCancelEdit}
-          disabled={processing()} variant={"secondary"}><IconCancel />キャンセル</Button>
+          disabled={processing()}
+          variant={"secondary"}
+          size={"sm"}
+        ><IconCancel />キャンセル</Button>
       </span>
     </Card>
   )
