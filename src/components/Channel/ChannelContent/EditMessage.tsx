@@ -19,10 +19,14 @@ export default function EditMessage(props: { messageId: string, content: string,
    */
   const updateMessage = async () => {
     setProcessing(true);
-    console.log("EditMessage :: updateMessage : messageContent->", props.messageId, messageContent());
+    //console.log("EditMessage :: updateMessage : messageContent->", props.messageId, messageContent());
     await POST_MESSAGE_EDIT(props.messageId, messageContent())
       .then(() => {
         setProcessing(false);
+        //メッセージ入力部分にフォーカスする
+        const msgInputEl = document.getElementById("messageInput") as HTMLInputElement;
+        msgInputEl?.focus();
+        //キャンセル処理を行う(編集モードを抜ける)
         props.onCancelEdit();
       })
       .catch((e) => {
@@ -56,6 +60,10 @@ export default function EditMessage(props: { messageId: string, content: string,
                     break;
                   }
                   case "Escape": {
+                    //メッセージ入力部分にフォーカスする
+                    const msgInputEl = document.getElementById("messageInput") as HTMLInputElement;
+                    msgInputEl?.focus();
+                    //編集モードを抜ける
                     props.onCancelEdit();
                     break;
                   }
