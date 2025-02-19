@@ -17,6 +17,8 @@ import InitLoad from "~/utils/InitLoad";
 import {storeMyUserinfo} from "~/stores/MyUserinfo";
 import WSUserProfileUpdate from "~/WS/User/UserProfileUpdate";
 import WSReadTimeUpdate from "~/WS/Message/ReadTimeUpdate";
+import {setStoreHistory} from "~/stores/History";
+import {produce} from "solid-js/store";
 
 //WSインスタンス
 export let ws: WebSocket | undefined = undefined;
@@ -134,7 +136,16 @@ export const initWS = async () => {
 
     //再接続フラグが立っていた場合は初期処理を再実行
     if (FLAGwsReconnect) {
+      //初期処理
       InitLoad(storeMyUserinfo.id);
+      //履歴の末端にいないことにしてアクセスしたとき履歴を取得できるようにする
+      setStoreHistory(produce((prev) => {
+        const keys = Object.keys(prev);
+        for (const channelId of keys) {
+          prev[channelId].atEnd = false;
+        }
+        return prev;
+      }));
     }
 
     //オンラインユーザーを取得、格納
