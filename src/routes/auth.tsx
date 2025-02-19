@@ -19,7 +19,7 @@ export default function Auth() {
     const token = GetCookie("token");
     if (token !== undefined) {
       await GET_USER_VERIFY_TOKEN().then((r) => {
-        InitLoad(r.data.userId);
+        InitLoad(r.data.userId, true);
         //もともと行こうとしていた場所を指定
         if (loc.search.split("?redirect=")[1]) {
           navi(`${loc.search.split("?redirect=")[1]}`);

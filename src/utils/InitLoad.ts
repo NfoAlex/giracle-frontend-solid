@@ -12,7 +12,7 @@ import { initWS } from "~/WS/WScontroller";
 import GET_MESSAGE_INBOX from "~/api/MESSAGE/MESSAGE_INBOX";
 import {setStoreInbox} from "~/stores/Inbox";
 
-export default function InitLoad(_userId: string) {
+export default function InitLoad(_userId: string, initWsToo = false) {
   //自分のユーザー情報を取得してStoreに格納
   GET_USER_INFO(_userId).then((r) => {
     //console.log("Login :: loginIt : 自分の情報r->", r);
@@ -49,7 +49,7 @@ export default function InitLoad(_userId: string) {
   // オンラインユーザーの同期は👇のinitWS関数で行う
 
   //WS接続の初期化
-  initWS();
+  if (initWsToo) initWS();
 
   //ログイン状態をtrueに
   storeAppStatus.loggedIn = true;
