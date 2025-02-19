@@ -13,10 +13,12 @@ import MentionReadWrapper from "~/components/Channel/ChannelContent/MentionReadW
 import {Badge} from "~/components/ui/badge";
 import {IMessage} from "~/types/Message";
 import UserinfoModalWrapper from "~/components/unique/UserinfoModalWrapper";
+import EditMessage from "~/components/Channel/ChannelContent/EditMessage";
 
 export default function ChannelContents() {
   const [isFocused, setIsFocused] = createSignal(true);
   const [hoveredMsgId, setHoveredMsgId] = createSignal("");
+  const [editingMsgId, setEditingMsgId] = createSignal("");
   const param = useParams();
   let channelIdBefore = "";
   let stateFetchingHistory = false;
@@ -286,21 +288,31 @@ export default function ChannelContents() {
                       <div
                         class={`relative shrink-0 grow-0 rounded-md px-2 ml-auto ${hoveredMsgId()===h.id ? "hover:bg-accent" : ""}`}
                         style="width:calc(100% - 45px)"
-                        onmouseenter={() => setHoveredMsgId(h.id)}
+                        onmouseenter={() => editingMsgId()!==h.id && setHoveredMsgId(h.id)}
                         onmouseleave={() => setHoveredMsgId("")}
                         on:touchend={() => setHoveredMsgId(h.id) /* スマホ用 */}
                       >
-                        <MentionReadWrapper messageId={h.id}>
-                          <MessageRender
-                            message={h}
-                            displayUserName={!sameSenderAsNext(index())}
-                          />
-                        </MentionReadWrapper>
+                        { //メッセージ表示部分。編集モードか否かで表示を変える
+                          editingMsgId() === h.id
+                          ?
+                            <EditMessage
+                              messageId={h.id}
+                              content={h.content}
+                              onCancelEdit={() => setEditingMsgId("")}
+                            />
+                          :
+                            <MentionReadWrapper messageId={h.id}>
+                              <MessageRender
+                                message={h}
+                                displayUserName={!sameSenderAsNext(index())}
+                              />
+                            </MentionReadWrapper>
+                        }
                         { //ホバーメニュー
                           hoveredMsgId() === h.id
                           &&
                           <div class={"absolute right-1 z-50"} style={"bottom:calc(100% - 15px);"}>
-                            <HoverMenu message={h} />
+                            <HoverMenu message={h} onEditMode={(msgId)=>setEditingMsgId(msgId)} />
                           </div>
                         }
                       </div>

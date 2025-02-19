@@ -1,11 +1,11 @@
 import {Card} from "~/components/ui/card";
-import {IconTrash} from "@tabler/icons-solidjs";
+import {IconPencil, IconTrash} from "@tabler/icons-solidjs";
 import DELETE_MESSAGE_DELETE from "~/api/MESSAGE/MESSAGE_DELETE";
 import {getRolePower, storeMyUserinfo} from "~/stores/MyUserinfo";
 import type {IMessage} from "~/types/Message";
 import {Button} from "~/components/ui/button";
 
-export default function HoverMenu(props: { message: IMessage }) {
+export default function HoverMenu(props: { message: IMessage, onEditMode: (id: string) => void }) {
 
   /**
    * メッセージの削除
@@ -19,10 +19,23 @@ export default function HoverMenu(props: { message: IMessage }) {
         console.error("DELETE_MESSAGE_DELETE :: e->", e);
       });
   }
+
+  /**
+   * 編集モードに入る
+   */
+  const enterEditMode = () => {
+    props.onEditMode(props.message.id);
+  }
+
   return (
-    <Card class={"p-2 flex items-center gap-1"}>
-      <p class={"text-sm font-extralight"}>{ new Date(props.message.createdAt).toLocaleString() }</p>
+    <Card class={"p-2 flex items-center"}>
+      <p class={"text-sm font-extralight mr-2"}>{ new Date(props.message.createdAt).toLocaleString() }</p>
       {
+        storeMyUserinfo.id === props.message.userId
+        &&
+        <Button onclick={enterEditMode} variant={"ghost"} class={"w-8 h-8"}><IconPencil /></Button>
+      }
+      { //削除ボタン
         (getRolePower("manageUser") || storeMyUserinfo.id === props.message.userId)
         &&
         <Button ondblclick={deleteMessage} variant={"ghost"} class={"w-8 h-8"}><IconTrash color={"hsl(var(--destructive))"} /></Button>
