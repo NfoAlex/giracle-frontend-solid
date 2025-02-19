@@ -312,7 +312,10 @@ export default function ChannelContents() {
                           hoveredMsgId() === h.id
                           &&
                           <div class={"absolute right-1 z-50"} style={"bottom:calc(100% - 15px);"}>
-                            <HoverMenu message={h} onEditMode={(msgId)=>setEditingMsgId(msgId)} />
+                            <HoverMenu
+                              message={h}
+                              onEditMode={(msgId)=>{ setEditingMsgId(msgId); setHoveredMsgId(""); }}
+                            />
                           </div>
                         }
                       </div>
