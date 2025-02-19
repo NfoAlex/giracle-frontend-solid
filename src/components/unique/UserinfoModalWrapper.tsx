@@ -1,24 +1,24 @@
-import { createSignal, For, Show } from "solid-js";
+import {createSignal, For, JSX, Show} from "solid-js";
+import {Dialog, DialogContent, DialogTrigger} from "~/components/ui/dialog";
 import {getterUserinfo, storeUserinfo, storeUserOnline} from "~/stores/Userinfo";
-import { Dialog, DialogContent, DialogTrigger } from "../ui/dialog";
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
-import { Card } from "../ui/card";
-import { Label } from "../ui/label";
-import { Button } from "../ui/button";
+import {Avatar, AvatarFallback, AvatarImage} from "~/components/ui/avatar";
+import {Badge} from "~/components/ui/badge";
 import {IconCircleFilled, IconPencil, IconPlus} from "@tabler/icons-solidjs";
-import { A } from "@solidjs/router";
 import {getRolePower, storeMyUserinfo} from "~/stores/MyUserinfo";
-import RoleChip from "./RoleChip";
-import { Badge } from "../ui/badge";
-import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
+import {Button} from "~/components/ui/button";
+import {A} from "@solidjs/router";
+import {Label} from "~/components/ui/label";
+import {Card} from "~/components/ui/card";
+import RoleChip from "~/components/unique/RoleChip";
+import {Popover, PopoverContent, PopoverTrigger} from "~/components/ui/popover";
+import type {IRole} from "~/types/Role";
+import {storeRoleInfo} from "~/stores/RoleInfo";
 import POST_ROLE_LINK from "~/api/ROLE/ROLE_LINK";
-import { storeRoleInfo } from "~/stores/RoleInfo";
-import type { IRole } from "~/types/Role";
 import POST_ROLE_UNLINK from "~/api/ROLE/ROLE_UNLINK";
 import POST_USER_BAN from "~/api/USER/USER_BAN";
 import POST_USER_UNBAN from "~/api/USER/USER_UNBAN";
 
-export default function UserName(props: { userId: string }) {
+export default function UserinfoModalWrapper(props: {children: JSX.Element, userId: string, class?: string}) {
   const [user] = createSignal(getterUserinfo(props.userId));
   const [open, setOpen] = createSignal(false);
 
@@ -105,14 +105,14 @@ export default function UserName(props: { userId: string }) {
               {
                 storeUserinfo[user().id].isBanned
                 &&
-                <Badge class="ml-auto" variant={"error"}>BANされたユーザー</Badge>
+                  <Badge class="ml-auto" variant={"error"}>BANされたユーザー</Badge>
               }
               {
                 storeMyUserinfo.id === user().id && !storeUserinfo[user().id].isBanned
                 &&
-                <Button as={A} href="/app/profile" class="ml-auto">
-                  <IconPencil />
-                </Button>
+                  <Button as={A} href="/app/profile" class="ml-auto">
+                      <IconPencil />
+                  </Button>
               }
             </span>
 
@@ -121,7 +121,7 @@ export default function UserName(props: { userId: string }) {
               <Label>自己紹介</Label>
               <Card class="px-4 py-2">{storeUserinfo[user().id].selfIntroduction}</Card>
             </div>
-            
+
             {/* ロール */}
             <div>
               <Label>ロール</Label>
@@ -130,10 +130,10 @@ export default function UserName(props: { userId: string }) {
                   {(role) =>
                     <RoleChip
                       deletable={getRolePower("manageRole")}
-                        roleId={role.roleId}
-                        userId={props.userId}
-                        onDelete={(roleId)=>unlinkRole(roleId)}
-                      />
+                      roleId={role.roleId}
+                      userId={props.userId}
+                      onDelete={(roleId)=>unlinkRole(roleId)}
+                    />
                   }
                 </For>
               </div>
@@ -153,7 +153,7 @@ export default function UserName(props: { userId: string }) {
                     <div class="max-h-[25vh] max-w-[75vw] overflow-y-auto flex flex-col gap-1">
                       <For each={roles}>
                         {(role) => //ロールリンクされていないものだけ表示
-                            !storeUserinfo[user().id].RoleLink.some((rl) => rl.roleId === role.id)
+                          !storeUserinfo[user().id].RoleLink.some((rl) => rl.roleId === role.id)
                           &&
                             <span onclick={()=>linkRole(role.id)} class="cursor-pointer pr-2">
                               <RoleChip deletable={false} roleId={role.id} />
@@ -186,8 +186,10 @@ export default function UserName(props: { userId: string }) {
       </DialogContent>
 
       <DialogTrigger>
-        <p class="font-bold hover:underline">{!user() ? props.userId : getterUserinfo(props.userId).name}</p>
+        <div class={props.class}>
+          {props.children}
+        </div>
       </DialogTrigger>
     </Dialog>
-  );
+  )
 }

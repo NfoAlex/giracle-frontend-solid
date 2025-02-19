@@ -12,6 +12,7 @@ import HoverMenu from "~/components/Channel/ChannelContent/HoverMenu";
 import MentionReadWrapper from "~/components/Channel/ChannelContent/MentionReadWrapper";
 import {Badge} from "~/components/ui/badge";
 import {IMessage} from "~/types/Message";
+import UserinfoModalWrapper from "~/components/unique/UserinfoModalWrapper";
 
 export default function ChannelContents() {
   const [isFocused, setIsFocused] = createSignal(true);
@@ -275,9 +276,11 @@ export default function ChannelContents() {
                     <>
                       <div class="w-[40px] shrink-0">
                         <Show when={!sameSenderAsNext(index())}>
-                          <Avatar class="mx-auto">
-                            <AvatarImage src={`/api/user/icon/${h.userId}`} />
-                          </Avatar>
+                          <UserinfoModalWrapper userId={h.userId} >
+                            <Avatar class="mx-auto">
+                              <AvatarImage src={`/api/user/icon/${h.userId}`} />
+                            </Avatar>
+                          </UserinfoModalWrapper>
                         </Show>
                       </div>
                       <div

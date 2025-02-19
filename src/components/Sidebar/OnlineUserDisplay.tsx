@@ -1,10 +1,10 @@
 import {Dialog, DialogContent, DialogHeader, DialogTrigger} from "~/components/ui/dialog";
-import {storeUserOnline} from "~/stores/Userinfo";
+import {getterUserinfo, storeUserOnline} from "~/stores/Userinfo";
 import {Badge} from "~/components/ui/badge";
 import {IconCircleFilled} from "@tabler/icons-solidjs";
 import {For} from "solid-js";
 import {Avatar, AvatarImage} from "~/components/ui/avatar";
-import UserName from "~/components/unique/UserName";
+import UserinfoModalWrapper from "~/components/unique/UserinfoModalWrapper";
 
 export default function OnlineUserDisplay() {
   return (
@@ -30,15 +30,17 @@ export default function OnlineUserDisplay() {
 
         <hr/>
 
-        <div class={"max-h-96 overflow-y-auto"}>
+        <div class={"max-h-96 overflow-y-auto flex flex-col"}>
           <For each={storeUserOnline}>
             {(userId) => (
-              <div class={"p-2 rounded-md flex items-center gap-2 hover:bg-accent"}>
+              <UserinfoModalWrapper userId={userId} class={"p-2 rounded-md flex items-center gap-2 hover:bg-accent"}>
                 <Avatar class={"w-8 h-auto"}>
                   <AvatarImage src={`/api/user/icon/${userId}`}/>
                 </Avatar>
-                <p class={"truncate"}><UserName userId={userId}/></p>
-              </div>
+                <p class={"truncate"}>
+                  {getterUserinfo(userId).name}
+                </p>
+              </UserinfoModalWrapper>
             )}
           </For>
         </div>

@@ -1,6 +1,7 @@
 import {Card} from "~/components/ui/card";
 import type {ISystemMessage} from "~/types/Message";
 import {getterUserinfo} from "~/stores/Userinfo";
+import UserinfoModalWrapper from "~/components/unique/UserinfoModalWrapper";
 
 export default function SystemMessageRender(props: { content: string }) {
   const systemMsg: ISystemMessage = JSON.parse(props.content);
@@ -8,13 +9,25 @@ export default function SystemMessageRender(props: { content: string }) {
   return (
     <Card class={"px-4 py-2 my-1"}>
       {systemMsg.messageTerm === "WELCOME" && (
-        <p>{getterUserinfo(systemMsg.targetUserId).name}さんがGiracleに参加しました!ようこそ</p>
+        <p>
+          <UserinfoModalWrapper userId={systemMsg.targetUserId} class={"hover:underline"}>
+            {getterUserinfo(systemMsg.targetUserId).name}
+          </UserinfoModalWrapper>さんがGiracleに参加しました!ようこそ
+        </p>
       )}
       {systemMsg.messageTerm === "CHANNEL_JOIN" && (
-        <p>{getterUserinfo(systemMsg.targetUserId).name}さんがチャンネルへ参加しました！</p>
+        <p>
+          <UserinfoModalWrapper userId={systemMsg.targetUserId} class={"hover:underline"}>
+            {getterUserinfo(systemMsg.targetUserId).name}
+          </UserinfoModalWrapper>さんがチャンネルへ参加しました！
+        </p>
       )}
       {systemMsg.messageTerm === "CHANNEL_LEFT" && (
-        <p>{getterUserinfo(systemMsg.targetUserId).name}さんがチャンネルを退出しました。</p>
+        <p>
+          <UserinfoModalWrapper userId={systemMsg.targetUserId} class={"hover:underline"}>
+            {getterUserinfo(systemMsg.targetUserId).name}
+          </UserinfoModalWrapper>さんがチャンネルを退出しました。
+        </p>
       )}
     </Card>
   );
