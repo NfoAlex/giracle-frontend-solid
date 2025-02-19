@@ -2,7 +2,7 @@ import {Card} from "~/components/ui/card";
 import {Button} from "~/components/ui/button";
 import {IconCancel, IconCheck} from "@tabler/icons-solidjs";
 import {createSignal, onMount} from "solid-js";
-import {TextField, TextFieldInput, TextFieldTextArea} from "~/components/ui/text-field";
+import {TextField, TextFieldTextArea} from "~/components/ui/text-field";
 import POST_MESSAGE_EDIT from "~/api/MESSAGE/MESSAGE_EDIT";
 
 export default function EditMessage(props: { messageId: string, content: string, onCancelEdit: () => void }) {
