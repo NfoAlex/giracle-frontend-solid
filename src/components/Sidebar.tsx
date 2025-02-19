@@ -26,13 +26,13 @@ export function AppSidebar() {
   const loc = useLocation();
 
   return (
-    <Sidebar>
+    <Sidebar class={"h-screen"}>
       <SidebarHeader>
         <p class=" text-xl">{storeServerinfo.name}</p>
       </SidebarHeader>
 
-      <SidebarContent id={"sidebar-content"}>
-        <SidebarGroup>
+      <SidebarContent id={"sidebar-content flex flex-col"}>
+        <SidebarGroup class={"shrink-0"}>
           <SidebarMenu>
             {storeAppStatus.wsConnected ?
                 <span class={"w-full"}>
@@ -43,16 +43,27 @@ export function AppSidebar() {
             }
           </SidebarMenu>
         </SidebarGroup>
-        <SidebarGroup>
-          <SidebarMenuButton as={A} href="/app/inbox" variant={loc.pathname === "/app/inbox" ? "outline" : "default"}>
-            <IconBell />
-            <p>通知</p>
-            <p class={"ml-auto"}>{ storeInbox.length!==0?storeInbox.length:"" }</p>
-          </SidebarMenuButton>
-          <SidebarMenuButton as={A} href="/app/channel-browser" variant={loc.pathname === "/app/channel-browser" ? "outline" : "default"}>
-            <IconList />
-            チャンネル一覧
-          </SidebarMenuButton>
+
+        <hr />
+
+        <div class={"flex flex-col overflow-y-auto"}>
+
+          <SidebarGroup>
+            <SidebarMenuButton as={A} href="/app/inbox" variant={loc.pathname === "/app/inbox" ? "outline" : "default"}>
+              <IconBell />
+              <p>通知</p>
+              <p class={"ml-auto"}>{ storeInbox.length!==0?storeInbox.length:"" }</p>
+            </SidebarMenuButton>
+            <SidebarMenuButton as={A} href="/app/channel-browser" variant={loc.pathname === "/app/channel-browser" ? "outline" : "default"}>
+              <IconList />
+              チャンネル一覧
+            </SidebarMenuButton>
+          </SidebarGroup>
+
+          <hr />
+
+          <SidebarGroup>
+
           <SidebarGroupLabel>参加チャンネル</SidebarGroupLabel>
           <SidebarMenu>
             <For each={storeMyUserinfo.ChannelJoin}>
@@ -73,6 +84,8 @@ export function AppSidebar() {
             </For>
           </SidebarMenu>
         </SidebarGroup>
+
+        </div>
 
         <SidebarGroup />
       </SidebarContent>
