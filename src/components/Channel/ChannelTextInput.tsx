@@ -38,6 +38,8 @@ export default function ChannelTextInput() {
         console.error("POST_MESSAGE_SEND :: e->", e);
       });
 
+    //送信ボタンを押されたことを考慮しフォーカスをテキスト入力へ移す（あとスマホ用）
+    document.getElementById("messageInput")?.focus();
     //初期化処理
     setText("");
     setFileIds([]);
