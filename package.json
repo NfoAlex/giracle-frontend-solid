@@ -7,7 +7,8 @@
     "start": "vite",
     "dev": "vite",
     "build": "vite build",
-    "serve": "vite preview"
+    "serve": "vite preview",
+    "serve-host": "vite preview --host"
   },
   "license": "MIT",
   "devDependencies": {
