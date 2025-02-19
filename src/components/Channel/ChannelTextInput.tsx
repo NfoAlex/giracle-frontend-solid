@@ -202,6 +202,9 @@ export default function ChannelTextInput() {
                     bindSearchedItem(userSearchResult()[searchOptions().selectIndex], "user");
                     break;
                   }
+                  //Macなら変換での勝手な送信をブロックする
+                  if (/Mac/.test(navigator.userAgent)) break;
+
                   sendMsg();
                   break;
                 }
