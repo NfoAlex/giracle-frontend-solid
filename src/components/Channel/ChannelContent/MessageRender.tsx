@@ -37,6 +37,11 @@ export default function MessageRender(props: {
             </For>
           )
         }
+
+        {/* 編集済み表示 */}
+        <Show when={props.message.isEdited}>
+          <p class={"text-muted-foreground text-xs"}>編集済み</p>
+        </Show>
       </div>
     </div>
   );
