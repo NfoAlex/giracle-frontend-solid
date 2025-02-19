@@ -203,7 +203,7 @@ export default function ChannelTextInput() {
                     break;
                   }
                   //Macなら変換での勝手な送信をブロックする
-                  if (/Mac/.test(navigator.userAgent)) break;
+                  if (/Mac/.test(navigator.userAgent) && e.isComposing) break;
 
                   sendMsg();
                   break;
