@@ -28,11 +28,11 @@ export default function ChannelTextInput() {
   });
 
   const sendMsg = () => {
-    console.log("ChannelTextInput :: sendMsg : params.id->", {...params});
+    //console.log("ChannelTextInput :: sendMsg : params.id->", {...params});
 
     POST_MESSAGE_SEND(params.channelId, text(), fileIds())
       .then((r) => {
-        console.log("POST_MESSAGE_SEND :: r->", r);
+        //console.log("POST_MESSAGE_SEND :: r->", r);
       })
       .catch((e) => {
         console.error("POST_MESSAGE_SEND :: e->", e);
