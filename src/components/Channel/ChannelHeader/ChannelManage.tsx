@@ -78,7 +78,7 @@ export default function ChannelManage(props: {channelId: string}) {
                     <Button onClick={updateChannel} class={"ml-auto h-10 w-10"}><IconCheck /></Button>
                     <Button onClick={()=>setEditName(false)} class={"ml-auto h-10 w-10"} variant={"outline"}><IconX /></Button>
                   </div>
-                  : //forthedebuggingchannelforthedebuggingchannel
+                  :
                   <div class={"flex items-center overflow-x-scroll gap-1"}>
                     <span class={"shrink max-w-48 md:max-w-80 overflow-x-scroll"}>
                       <p class={"text-2xl truncate"}>{ directGetterChannelInfo(props.channelId).name ?? "ロード中..." }</p>
@@ -91,7 +91,7 @@ export default function ChannelManage(props: {channelId: string}) {
             <hr class={"my-4"} />
 
             <Label class={"text-muted-foreground"}>概要</Label>
-            {/*
+            {
               !editDescription()
               ?
                 <div class={"pt-3 pb-12 relative max-h-64 overflow-y-auto"}>
@@ -113,7 +113,7 @@ export default function ChannelManage(props: {channelId: string}) {
                     <Button onClick={()=>setEditDescription(false)} class={"border rounded-md h-10 w-10"} variant={"outline"} ><IconX /></Button>
                   </div>
                 </div>
-            */}
+            }
           </Card>
 
           <hr class={"my-4"} />
