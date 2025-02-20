@@ -1,7 +1,6 @@
 import {Dialog, DialogContent, DialogDescription, DialogHeader, DialogTrigger} from "~/components/ui/dialog";
 import {directGetterChannelInfo} from "~/stores/ChannelInfo";
 import {Card} from "~/components/ui/card";
-import {getRolePower} from "~/stores/MyUserinfo";
 import {IconCheck, IconPencil, IconX} from "@tabler/icons-solidjs";
 import {createEffect, createSignal, on} from "solid-js";
 import {TextField, TextFieldInput, TextFieldTextArea} from "~/components/ui/text-field";
@@ -57,18 +56,18 @@ export default function ChannelManage(props: {channelId: string}) {
       <DialogTrigger>
         <Button variant={"secondary"} class={"w-9 h-9"}><IconPencil /></Button>
       </DialogTrigger>
-      <DialogContent class={"pt-10"}>
+      <DialogContent class={"pt-10 w-full"}>
         <DialogHeader>
           <p>チャンネル情報の編集</p>
         </DialogHeader>
         <DialogDescription class={"flex flex-col gap-2"}>
-          <Card class={"p-2 px-4"}>
+          <Card class={"p-4"}>
             <Label class={"text-muted-foreground"}>チャンネル名</Label>
-            <div class={"flex text-card-foreground items-center"}>
+            <div class={"flex text-card-foreground items-center truncate"}>
               {
                 editName()
                   ?
-                  <div class={"flex items-center gap-1 w-full"}>
+                  <div class={"w-full flex items-center gap-1"}>
                     <TextField class={"grow"}>
                       <TextFieldInput
                         placeholder={"チャンネル名"}
@@ -79,10 +78,12 @@ export default function ChannelManage(props: {channelId: string}) {
                     <Button onClick={updateChannel} class={"ml-auto h-10 w-10"}><IconCheck /></Button>
                     <Button onClick={()=>setEditName(false)} class={"ml-auto h-10 w-10"} variant={"outline"}><IconX /></Button>
                   </div>
-                  :
-                  <p class={"text-2xl truncate"}>{ directGetterChannelInfo(props.channelId).name ?? "ロード中..." }</p>
+                  : //forthedebuggingchannelforthedebuggingchannel
+                  <div class={"shrink flex w-full items-center truncate overflow-x-auto"}>
+                    <span class={"text-2xl grow shrink truncate"}>{ directGetterChannelInfo(props.channelId).name ?? "ロード中..." }</span>
+                    <Button onClick={()=>setEditName(true)} variant={"outline"} class={"ml-auto border rounded-md h-10 w-10"}><IconPencil /></Button>
+                  </div>
               }
-              { (getRolePower("manageChannel") && !editName()) && <Button onClick={()=>setEditName(true)} variant={"outline"} class={"ml-auto border rounded-md h-10 w-10"}><IconPencil /></Button> }
             </div>
 
             <hr class={"my-4"} />

@@ -17,9 +17,13 @@ export default function ChannelHeader() {
   return (
     <Card class="w-full py-3 px-5 flex items-center gap-2">
       <SidebarTriggerWithDot />
-      <p>{ directGetterChannelInfo(params.channelId).name }</p>
+      <span class={"shrink truncate"}>
+        <p class={"truncate"}>{ directGetterChannelInfo(params.channelId).name }</p>
+      </span>
       <p class="text-gray-400 mx-1"> | </p>
-      <p>{ directGetterChannelInfo(params.channelId).description }</p>
+      <span class={"shrink grow-0 truncate"}>
+        <p class={"truncate"}>{ directGetterChannelInfo(params.channelId).description }</p>
+      </span>
 
       {
         getRolePower("manageChannel")
