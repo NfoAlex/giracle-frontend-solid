@@ -1,7 +1,6 @@
 import {Dialog, DialogContent, DialogDescription, DialogHeader, DialogTrigger} from "~/components/ui/dialog";
 import {directGetterChannelInfo} from "~/stores/ChannelInfo";
 import {Card} from "~/components/ui/card";
-import {getRolePower} from "~/stores/MyUserinfo";
 import {IconCheck, IconPencil, IconX} from "@tabler/icons-solidjs";
 import {createEffect, createSignal, on} from "solid-js";
 import {TextField, TextFieldInput, TextFieldTextArea} from "~/components/ui/text-field";
