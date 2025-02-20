@@ -82,7 +82,7 @@ export default function MessageTextRender(props: { content: string }) {
             );
             break;
           case "breakLine":
-            MessageRenderingFinal.push(<br />);
+            MessageRenderingFinal.push(<span class={"w-full"} />);
             break;
           case "channel":
             MessageRenderingFinal.push(

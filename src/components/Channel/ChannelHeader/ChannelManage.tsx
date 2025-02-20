@@ -63,7 +63,7 @@ export default function ChannelManage(props: {channelId: string}) {
         <DialogDescription class={"flex flex-col gap-2"}>
           <Card class={"p-4"}>
             <Label class={"text-muted-foreground"}>チャンネル名</Label>
-            <div class={"flex text-card-foreground items-center truncate"}>
+            <div class={"text-card-foreground w-full overflow-x-scroll"}>
               {
                 editName()
                   ?
@@ -78,9 +78,11 @@ export default function ChannelManage(props: {channelId: string}) {
                     <Button onClick={updateChannel} class={"ml-auto h-10 w-10"}><IconCheck /></Button>
                     <Button onClick={()=>setEditName(false)} class={"ml-auto h-10 w-10"} variant={"outline"}><IconX /></Button>
                   </div>
-                  : //forthedebuggingchannelforthedebuggingchannel
-                  <div class={"shrink flex w-full items-center truncate overflow-x-auto"}>
-                    <span class={"text-2xl grow shrink truncate"}>{ directGetterChannelInfo(props.channelId).name ?? "ロード中..." }</span>
+                  :
+                  <div class={"flex items-center overflow-x-scroll gap-1"}>
+                    <span class={"shrink max-w-48 md:max-w-80 overflow-x-scroll"}>
+                      <p class={"text-2xl truncate"}>{ directGetterChannelInfo(props.channelId).name ?? "ロード中..." }</p>
+                    </span>
                     <Button onClick={()=>setEditName(true)} variant={"outline"} class={"ml-auto border rounded-md h-10 w-10"}><IconPencil /></Button>
                   </div>
               }

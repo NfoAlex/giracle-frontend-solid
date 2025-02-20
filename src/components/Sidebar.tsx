@@ -76,8 +76,8 @@ export function AppSidebar() {
                     class="truncate flex flex-row items-center md:p-2 p-5"
                   >
                     <IconHash />
-                    <p class={storeHasNewMessage[c.channelId]?"":"text-muted-foreground"}>{ directGetterChannelInfo(c.channelId).name }</p>
-                    { storeHasNewMessage[c.channelId] && <span class="text-xs ml-auto">●</span> }
+                    <p class={storeHasNewMessage[c.channelId]?"truncate":"text-muted-foreground truncate"}>{ directGetterChannelInfo(c.channelId).name }</p>
+                    { storeHasNewMessage[c.channelId] && <span class="text-xs ml-auto shrink-0">●</span> }
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               )}

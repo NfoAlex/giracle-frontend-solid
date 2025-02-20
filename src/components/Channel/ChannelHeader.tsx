@@ -15,14 +15,14 @@ export default function ChannelHeader() {
   });
 
   return (
-    <Card class="w-full py-3 px-5 flex items-center gap-2">
+    <Card class="py-3 px-5 flex items-center w-full gap-2">
       <SidebarTriggerWithDot />
-      <span class={"shrink truncate"}>
-        <p class={"truncate"}>{ directGetterChannelInfo(params.channelId).name }</p>
+      <span class={"shrink line-clamp-1"}>
+        <p>{ directGetterChannelInfo(params.channelId).name }</p>
       </span>
       <p class="text-gray-400 mx-1"> | </p>
-      <span class={"shrink grow-0 truncate"}>
-        <p class={"truncate"}>{ directGetterChannelInfo(params.channelId).description }</p>
+      <span class={"shrink grow-0 line-clamp-1"}>
+        <p>{ directGetterChannelInfo(params.channelId).description }</p>
       </span>
 
       {

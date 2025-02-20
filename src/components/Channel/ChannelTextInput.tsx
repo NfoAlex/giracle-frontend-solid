@@ -166,7 +166,7 @@ export default function ChannelTextInput() {
   }
 
   return (
-    <div class={"flex flex-col gap-2"}>
+    <div class={"flex flex-col gap-2 pb-1"}>
       <Show when={fileInput().length > 0}>
         <div class={"flex items-center overflow-x-auto gap-1"}>
           <For each={fileInput()}>
