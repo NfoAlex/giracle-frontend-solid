@@ -11,11 +11,35 @@ export default function MessageRender(props: {
   message: IMessage;
   displayUserName: boolean;
 }) {
+
+  /**
+   * メッセージの作成日時を優しく(同じ日付なら省くなど)表示する
+   * @param createdAt
+   */
+  const displayDate = (createdAt: string) => {
+    const timeObj = new Date(createdAt);
+    const now = new Date();
+
+    // 1年以上前のメッセージはすべて表示
+    if (timeObj.getFullYear() !== now.getFullYear()) {
+      return timeObj.toLocaleString();
+    }
+    // 1ヶ月以上あるいは１日前のメッセージはすべて表示
+    if (timeObj.getMonth() !== now.getMonth() || timeObj.getDate() !== now.getDate()) {
+      return timeObj.toLocaleString();
+    }
+    //時間のみ返す
+    return timeObj.toLocaleTimeString();
+  }
+
   return (
     <div class="w-full">
       <Show when={props.displayUserName}>
         <UserinfoModalWrapper userId={props.message.userId}>
-          <p class="font-bold hover:underline">{getterUserinfo(props.message.userId).name}</p>
+          <span class={"flex items-center gap-2"}>
+            <p class="font-bold hover:underline">{getterUserinfo(props.message.userId).name}</p>
+            <p class="text-sm text-muted-foreground">{displayDate(props.message.createdAt)}</p>
+          </span>
         </UserinfoModalWrapper>
       </Show>
       <div class="flex flex-col">
