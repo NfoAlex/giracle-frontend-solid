@@ -74,6 +74,15 @@ export default function EditMessage(props: { messageId: string, content: string,
         </TextField>
       </div>
       <span class={"flex items-center gap-2 justify-end"}>
+        <div class={"shrink mr-auto py-1 hidden sm:flex items-center gap-4 text-sm overflow-x-scroll"}>
+          <span class={"shrink-0"}>
+            <kbd class={"border py-1 px-2 rounded"}>Ctrl</kbd> + <kbd class={"border p-1 rounded"}>Enter</kbd>で更新
+          </span>
+          <span class={"shrink-0"}>
+            <kbd class={"border py-1 px-2 rounded"}>Esc</kbd>でキャンセル
+          </span>
+        </div>
+
         <Button
           onClick={updateMessage}
           disabled={processing()}
