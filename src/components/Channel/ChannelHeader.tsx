@@ -36,7 +36,7 @@ export default function ChannelHeader() {
         <p>{ directGetterChannelInfo(params.channelId).name }</p>
       </span>
       <p class="text-gray-400 mx-1"> | </p>
-      <span class={"shrink grow-0 line-clamp-1"}>
+      <span class={"shrink-[2] grow-0 line-clamp-1 max-w-[50%] md:max-w-full"}>
         <p>{ directGetterChannelInfo(params.channelId).description }</p>
       </span>
 
