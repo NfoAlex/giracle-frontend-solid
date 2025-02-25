@@ -4,8 +4,11 @@ import DELETE_MESSAGE_DELETE from "~/api/MESSAGE/MESSAGE_DELETE";
 import {getRolePower, storeMyUserinfo} from "~/stores/MyUserinfo";
 import type {IMessage} from "~/types/Message";
 import {Button} from "~/components/ui/button";
+import EmojiPicker from "~/components/Channel/ChannelContent/HoverMenu/EmojiPicker";
+import {createSignal} from "solid-js";
 
 export default function HoverMenu(props: { message: IMessage, onEditMode: (id: string) => void }) {
+  const [openEmoji, setOpenEmoji] = createSignal(false);
 
   /**
    * メッセージの削除
@@ -30,6 +33,11 @@ export default function HoverMenu(props: { message: IMessage, onEditMode: (id: s
   return (
     <Card class={"p-2 flex items-center"}>
       <p class={"text-sm font-extralight mr-2"}>{ new Date(props.message.createdAt).toLocaleString() }</p>
+
+      <div class={"relative"}>
+        <Button onClick={()=>setOpenEmoji(true)}>えもじ</Button>
+        { openEmoji() && <EmojiPicker /> }
+      </div>
       {
         storeMyUserinfo.id === props.message.userId
         &&
