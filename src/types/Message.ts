@@ -9,7 +9,8 @@ export interface IMessage {
   MessageUrlPreview: IMessageUrlPreview[];
   MessageFileAttached: IMessageFileAttached[];
   reactionSummary: {
-    [key: string]: number
+    emojiCode: string;
+    count: number;
   }[];
 }
 
