@@ -31,7 +31,7 @@ export default function ChannelTextInput() {
     //console.log("ChannelTextInput :: sendMsg : params.id->", {...params});
 
     POST_MESSAGE_SEND(params.channelId, text(), fileIds())
-      .then((r) => {
+      .then(() => {
         //console.log("POST_MESSAGE_SEND :: r->", r);
       })
       .catch((e) => {
