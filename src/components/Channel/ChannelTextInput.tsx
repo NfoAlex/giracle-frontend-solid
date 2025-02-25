@@ -192,7 +192,7 @@ export default function ChannelTextInput() {
           <textarea
             id={"messageInput"}
             class={"p-2 bg-background resize-none border rounded-md break-all h-fit whitespace-pre-wrap max-h-40"}
-            rows={text().match(/\n/g)?.length ?? 1}
+            rows={text().match(/\n/g)?.length===0 ? 1 : (text().match(/\n/g)?.length ?? 0) + 1}
             value={text()}
             onInput={(e) => {
               cursorPosition = e.currentTarget?.selectionStart || 0;
