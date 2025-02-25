@@ -6,6 +6,7 @@ import SystemMessageRender from "~/components/Channel/ChannelContent/MessageRend
 import FilePreview from "~/components/Channel/ChannelContent/MessageRender/FilePreview";
 import {getterUserinfo} from "~/stores/Userinfo";
 import UserinfoModalWrapper from "~/components/unique/UserinfoModalWrapper";
+import LongTextDisplay from "~/components/Channel/ChannelContent/MessageRender/LongTextDisplay";
 
 export default function MessageRender(props: {
   message: IMessage;
@@ -32,6 +33,15 @@ export default function MessageRender(props: {
     return timeObj.toLocaleTimeString();
   }
 
+  //システムメッセージだった時の表示
+  if (props.message.isSystemMessage) {
+    return (
+      <div class="w-full">
+        <SystemMessageRender content={props.message.content} />
+      </div>
+    );
+  }
+
   return (
     <div class="w-full">
       <Show when={props.displayUserName}>
@@ -43,16 +53,20 @@ export default function MessageRender(props: {
         </UserinfoModalWrapper>
       </Show>
       <div class="flex flex-col">
+        {/* メッセージ本文 */}
         {
-          props.message.isSystemMessage
-            ?
-            <SystemMessageRender content={props.message.content} />
+          props.message.content.length > 500
+          ?
+            <LongTextDisplay message={props.message} />
           :
             <MessageTextRender content={props.message.content} />
         }
 
-        { (props.message.MessageUrlPreview?.length > 0) && <URLPreview MessageUrlPreview={props.message.MessageUrlPreview} />}
-        {
+        { //URLプレビュー
+          (props.message.MessageUrlPreview?.length > 0) && <URLPreview MessageUrlPreview={props.message.MessageUrlPreview} />
+        }
+
+        { //ファイルプレビュー
           props.message.MessageFileAttached?.length > 0
           &&
           (

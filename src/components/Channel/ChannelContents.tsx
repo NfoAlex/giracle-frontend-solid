@@ -298,6 +298,7 @@ export default function ChannelContents() {
                 {
                   !h.isSystemMessage //システムメッセージかどうか
                   ?
+
                     <>
                       <div class="w-[40px] shrink-0">
                         <Show when={!sameSenderAsNext(index())}>
@@ -343,7 +344,9 @@ export default function ChannelContents() {
                         }
                       </div>
                     </>
+
                   :
+
                     <MessageRender
                       message={h}
                       displayUserName={false}
