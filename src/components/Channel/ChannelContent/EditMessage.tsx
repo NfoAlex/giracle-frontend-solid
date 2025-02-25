@@ -36,6 +36,17 @@ export default function EditMessage(props: { messageId: string, content: string,
       });
   }
 
+  /**
+   * 編集モードを抜け出してメッセ入力部分にフォーカスする
+   */
+  const escapeEdit = () => {
+    //メッセージ入力部分にフォーカスする
+    const msgInputEl = document.getElementById("messageInput") as HTMLInputElement;
+    msgInputEl?.focus();
+    //編集モードを抜ける
+    props.onCancelEdit();
+  }
+
   return (
     <Card class={"p-2 flex flex-col gap-2"}>
       <div>
@@ -55,16 +66,17 @@ export default function EditMessage(props: { messageId: string, content: string,
                 switch(e.key) {
                   case "Enter": {
                     if (e.ctrlKey) {
-                      updateMessage();
+                      if (messageContent() !== props.content) {
+                        updateMessage();
+                      } else {
+                        escapeEdit();
+                        break;
+                      }
                     }
                     break;
                   }
                   case "Escape": {
-                    //メッセージ入力部分にフォーカスする
-                    const msgInputEl = document.getElementById("messageInput") as HTMLInputElement;
-                    msgInputEl?.focus();
-                    //編集モードを抜ける
-                    props.onCancelEdit();
+                    escapeEdit();
                     break;
                   }
                 }
