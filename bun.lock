@@ -4,20 +4,21 @@
     "": {
       "name": "giracle-front-solid",
       "dependencies": {
-        "@kobalte/core": "^0.13.8",
+        "@kobalte/core": "^0.13.9",
         "@solidjs/router": "^0.15.3",
         "@tabler/icons-solidjs": "^3.30.0",
         "@tanstack/solid-table": "^8.21.2",
         "class-variance-authority": "^0.7.1",
         "clsx": "^2.1.1",
         "dotenv": "^16.4.7",
-        "solid-js": "^1.9.4",
+        "emoji-picker-element": "^1.26.1",
+        "solid-js": "^1.9.5",
         "tailwind-merge": "^2.6.0",
         "tailwindcss-animate": "^1.0.7",
         "vite-plugin-pwa": "^0.21.1",
       },
       "devDependencies": {
-        "@types/node": "^22.13.4",
+        "@types/node": "^22.13.5",
         "autoprefixer": "^10.4.20",
         "postcss": "^8.5.3",
         "tailwindcss": "^3.4.17",
@@ -481,6 +482,8 @@
     "ejs": ["ejs@3.1.10", "", { "dependencies": { "jake": "^10.8.5" }, "bin": { "ejs": "bin/cli.js" } }, "sha512-UeJmFfOrAQS8OJWPZ4qtgHyWExa088/MtK5UEyoJGFH67cDEXkZSviOiKRCZ4Xij0zxI3JECgYs3oKx+AizQBA=="],
 
     "electron-to-chromium": ["electron-to-chromium@1.5.80", "", {}, ""],
+
+    "emoji-picker-element": ["emoji-picker-element@1.26.1", "", {}, "sha512-XgQ9s2JdmworiqLfJC7eGbzQHGv8yb8U9XofjeRAnOMYaeLh0MfwVAz9oG1YE2U2WnzU0Pys1axMjYtPKJ7YSg=="],
 
     "emoji-regex": ["emoji-regex@9.2.2", "", {}, ""],
 
