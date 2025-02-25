@@ -17,7 +17,7 @@ export default function LongTextDisplay(props: { message: IMessage }) {
   const [open, setOpen] = createSignal(false);
 
   return (
-    <div>
+    <>
       {/* メッセージ展開の表示 */}
       <Dialog open={open()} onOpenChange={setOpen}>
         <DialogContent class={"overflow-y-auto w-[100vw] md:w-[75vw]"} style={"max-width:750px;"}>
@@ -53,7 +53,7 @@ export default function LongTextDisplay(props: { message: IMessage }) {
       </Dialog>
 
       {/* 通常表示 */}
-      <Card class={"w-fit p-2 flex flex-col gap-2"}>
+      <Card class={"w-full p-2 flex flex-col gap-2"}>
         <MessageTextRender content={props.message.content.slice(0,100) + "..."} />
         <hr />
         <span class={"flex items-center"}>
@@ -76,6 +76,6 @@ export default function LongTextDisplay(props: { message: IMessage }) {
           </span>
         </span>
       </Card>
-    </div>
+    </>
   );
 }
