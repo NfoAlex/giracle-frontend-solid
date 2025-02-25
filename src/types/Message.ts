@@ -17,6 +17,14 @@ export interface ICustomEmoji {
   category?: string
 }
 
+export interface IReaciton {
+  id: string,
+  userId: string,
+  channelId: string,
+  messageId: string,
+  emojiCode: string
+}
+
 export interface IInbox {
   type: "event" | "mention" | "reply";
   userId: string;
