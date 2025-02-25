@@ -281,7 +281,7 @@ export default function ChannelContents() {
       <div id="history" class="h-full w-full overflow-y-auto flex flex-col-reverse gap-1.5">
         <For each={storeHistory[param.channelId]?.history}>
           {(h, index) => (
-            <div id={`messageId::${h.id}`}>
+            <div id={`messageId::${h.id}`} class={"w-full"}>
 
               {/* 日付線 */}
               <Show when={new Date(h.createdAt).getDay().valueOf() !== new Date(storeHistory[param.channelId]?.history[index() + 1]?.createdAt).getDay().valueOf()}>

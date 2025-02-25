@@ -19,7 +19,7 @@ export default function MessageTextRender(props: { content: string }) {
     const codeSnippetPattern = /```([^`]+)```/g;
     const inlineCodePattern = /`([^`]+)`/g;
     const newlinePattern = /\n/g;
-  
+
     //レンダーする要素用データ
     const ObjectIndex: {
       context: string;
@@ -69,7 +69,7 @@ export default function MessageTextRender(props: { content: string }) {
     //レンダーする要素配列をループしてJSXへパース
     for (let i = 0; i < content.length; i++) {
       //まず最初のデータをパースする
-      MessageRenderingFinal.push(<span>{ content[i] }</span>);
+      MessageRenderingFinal.push(<span class={"w-full whitespace-pre-wrap break-words"}>{ content[i] }</span>);
       if (i < ObjectIndex.length) {
         const obj = ObjectIndex[i];
         switch (obj.type) {
@@ -104,9 +104,9 @@ export default function MessageTextRender(props: { content: string }) {
     linkify();
   })
 
-  return <p class="whitespace-pre-wrap break-all flex flex-wrap">
+  return <div class="whitespace-pre-wrap break-all flex flex-wrap">
     <For each={text()}>
       {(el) => <Dynamic component={() => <>{el}</>} Fallback={<span>{el}</span>} />}
     </For>
-  </p>;
+  </div>;
 }
