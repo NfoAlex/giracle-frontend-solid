@@ -7,6 +7,7 @@ import FilePreview from "~/components/Channel/ChannelContent/MessageRender/FileP
 import {getterUserinfo} from "~/stores/Userinfo";
 import UserinfoModalWrapper from "~/components/unique/UserinfoModalWrapper";
 import LongTextDisplay from "~/components/Channel/ChannelContent/MessageRender/LongTextDisplay";
+import RenderEmojiReactions from "~/components/Channel/ChannelContent/MessageRender/RenderEmojiReactions";
 
 export default function MessageRender(props: {
   message: IMessage;
@@ -79,6 +80,10 @@ export default function MessageRender(props: {
         {/* 編集済み表示 */}
         <Show when={props.message.isEdited}>
           <p class={"text-muted-foreground text-xs"}>編集済み</p>
+        </Show>
+
+        <Show when={props.message.reactionSummary.length > 0}>
+          <RenderEmojiReactions reaction={props.message.reactionSummary} />
         </Show>
       </div>
     </div>
