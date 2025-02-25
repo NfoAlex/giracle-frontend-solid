@@ -1,8 +1,8 @@
-import {Dialog, DialogContent, DialogHeader, DialogTrigger} from "~/components/ui/dialog";
+import {Dialog, DialogContent} from "~/components/ui/dialog";
 import {Card} from "~/components/ui/card";
 import {IMessage} from "~/types/Message";
 import MessageTextRender from "~/components/Channel/ChannelContent/MessageRender/MessageTextRender";
-import {createSignal, For, Show} from "solid-js";
+import {createSignal, For} from "solid-js";
 import {Button} from "~/components/ui/button";
 import {Badge} from "~/components/ui/badge";
 import URLPreview from "~/components/Channel/ChannelContent/MessageRender/URLPreview";
