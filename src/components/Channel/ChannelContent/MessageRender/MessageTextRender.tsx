@@ -68,8 +68,12 @@ export default function MessageTextRender(props: { content: string }) {
     const MessageRenderingFinal: JSX.Element[] = [];
     //レンダーする要素配列をループしてJSXへパース
     for (let i = 0; i < content.length; i++) {
-      //まず最初のデータをパースする
-      MessageRenderingFinal.push(<span class={"w-full whitespace-pre-wrap break-words"}>{ content[i] }</span>);
+      //まず最初のデータをパースする(空なら改行させる)
+      if (content[i] !== "") {
+        MessageRenderingFinal.push(<span class={"w-full whitespace-pre-wrap break-words"}>{content[i]}</span>);
+      } else {
+        MessageRenderingFinal.push(<span class={"w-full"}><br /></span>);
+      }
       if (i < ObjectIndex.length) {
         const obj = ObjectIndex[i];
         switch (obj.type) {
@@ -80,9 +84,6 @@ export default function MessageTextRender(props: { content: string }) {
             MessageRenderingFinal.push(
               <Badge variant={storeMyUserinfo.id===obj.context.slice(2, -1)?"default":"secondary"}>@  { getterUserinfo(obj.context.slice(2, -1)).name }</Badge>
             );
-            break;
-          case "breakLine":
-            MessageRenderingFinal.push(<span class={"w-full"} />);
             break;
           case "channel":
             MessageRenderingFinal.push(

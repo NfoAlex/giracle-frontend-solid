@@ -1,5 +1,5 @@
 import {createSignal, For, Show} from "solid-js";
-import { TextField, TextFieldInput } from "../ui/text-field";
+import { TextField } from "../ui/text-field";
 import { Button } from "../ui/button";
 import { useParams } from "@solidjs/router";
 import POST_MESSAGE_SEND from "~/api/MESSAGE/MESSAGE_SEND";
@@ -31,7 +31,7 @@ export default function ChannelTextInput() {
     //console.log("ChannelTextInput :: sendMsg : params.id->", {...params});
 
     POST_MESSAGE_SEND(params.channelId, text(), fileIds())
-      .then((r) => {
+      .then(() => {
         //console.log("POST_MESSAGE_SEND :: r->", r);
       })
       .catch((e) => {
@@ -189,9 +189,10 @@ export default function ChannelTextInput() {
 
         <Button onClick={bindFiles} variant={"secondary"} size={"icon"}><IconUpload /></Button>
         <TextField class="grow">
-          <TextFieldInput
-            type="text"
+          <textarea
             id={"messageInput"}
+            class={"p-2 bg-background resize-none border rounded-md break-all h-fit whitespace-pre-wrap max-h-40"}
+            rows={text().match(/\n/g)?.length===0 ? 1 : (text().match(/\n/g)?.length ?? 0) + 1}
             value={text()}
             onInput={(e) => {
               cursorPosition = e.currentTarget?.selectionStart || 0;
@@ -203,12 +204,15 @@ export default function ChannelTextInput() {
                 case "Enter": {
                   //検索モードが有効なら選択した情報をメッセージ文にバインド
                   if (searchOptions().isEnabled) {
+                    e.preventDefault();
                     bindSearchedItem(userSearchResult()[searchOptions().selectIndex], "user");
                     break;
                   }
                   //Macなら変換での勝手な送信をブロックする
                   if (/Mac/.test(navigator.userAgent) && e.isComposing) break;
+                  if (e.shiftKey) break;
 
+                  e.preventDefault();
                   sendMsg();
                   break;
                 }
