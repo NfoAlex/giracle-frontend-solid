@@ -82,6 +82,7 @@ export default function MessageRender(props: {
           <p class={"text-muted-foreground text-xs"}>編集済み</p>
         </Show>
 
+        {/* 絵文字リアクション表示 */}
         <Show when={props.message.reactionSummary.length > 0}>
           <RenderEmojiReactions reaction={props.message.reactionSummary} />
         </Show>
