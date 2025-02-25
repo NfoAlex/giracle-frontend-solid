@@ -1,6 +1,6 @@
 import {Dialog, DialogContent} from "~/components/ui/dialog";
 import {Card} from "~/components/ui/card";
-import {IMessage} from "~/types/Message";
+import type {IMessage} from "~/types/Message";
 import MessageTextRender from "~/components/Channel/ChannelContent/MessageRender/MessageTextRender";
 import {createSignal, For} from "solid-js";
 import {Button} from "~/components/ui/button";
@@ -10,6 +10,7 @@ import FilePreview from "~/components/Channel/ChannelContent/MessageRender/FileP
 import UserinfoModalWrapper from "~/components/unique/UserinfoModalWrapper";
 import {Avatar, AvatarImage} from "~/components/ui/avatar";
 import {getterUserinfo} from "~/stores/Userinfo";
+import {IconBrowserMaximize} from "@tabler/icons-solidjs";
 
 export default function LongTextDisplay(props: { message: IMessage }) {
   const [open, setOpen] = createSignal(false);
@@ -50,11 +51,15 @@ export default function LongTextDisplay(props: { message: IMessage }) {
         </DialogContent>
       </Dialog>
 
+      {/* 通常表示 */}
       <Card class={"w-fit p-2 flex flex-col gap-2"}>
         <MessageTextRender content={props.message.content.slice(0,100) + "..."} />
         <hr />
         <span class={"flex items-center"}>
-          <Button onClick={()=>setOpen(true)} size={"sm"}>メッセージを展開する</Button>
+          <Button onClick={()=>setOpen(true)} size={"sm"}>
+            <IconBrowserMaximize />
+            長文メッセージを展開する
+          </Button>
           <Badge class={"ml-auto"} variant={"secondary"}>
             { props.message.content.length }文字
           </Badge>
