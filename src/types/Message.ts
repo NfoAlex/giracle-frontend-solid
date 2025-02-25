@@ -10,6 +10,13 @@ export interface IMessage {
   MessageFileAttached: IMessageFileAttached[];
 }
 
+export interface ICustomEmoji {
+  name: string,
+  shortcodes: string[],
+  url: string,
+  category?: string
+}
+
 export interface IInbox {
   type: "event" | "mention" | "reply";
   userId: string;
