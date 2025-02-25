@@ -55,7 +55,10 @@ render(() =>
           <Show when={useLocation().pathname.startsWith("/app")}>
             <AppSidebar />
           </Show>
-          <Suspense>{props.children}</Suspense>
+          <Suspense>
+            {/* サイドバーを考慮した幅指定をしてメッセージレンダー部分の変なオーバーフローを無くす */}
+            <div class={"md:w-[calc(100%-16rem)] w-screen"}>{props.children}</div>
+          </Suspense>
         </SidebarProvider>
       </ColorModeProvider>
     </>
