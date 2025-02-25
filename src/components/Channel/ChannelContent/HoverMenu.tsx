@@ -36,7 +36,7 @@ export default function HoverMenu(props: { message: IMessage, onEditMode: (id: s
 
       <div class={"relative"}>
         <Button onClick={()=>setOpenEmoji(true)}>えもじ</Button>
-        { openEmoji() && <EmojiPicker /> }
+        { openEmoji() && <EmojiPicker message={props.message} /> }
       </div>
       {
         storeMyUserinfo.id === props.message.userId
