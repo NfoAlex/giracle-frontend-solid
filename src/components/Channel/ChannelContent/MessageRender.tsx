@@ -43,16 +43,19 @@ export default function MessageRender(props: {
         </UserinfoModalWrapper>
       </Show>
       <div class="flex flex-col">
-        {
+        { //システムメッセージかどうかで表示を変える
           props.message.isSystemMessage
-            ?
+          ?
             <SystemMessageRender content={props.message.content} />
           :
             <MessageTextRender content={props.message.content} />
         }
 
-        { (props.message.MessageUrlPreview?.length > 0) && <URLPreview MessageUrlPreview={props.message.MessageUrlPreview} />}
-        {
+        { //URLプレビュー
+          (props.message.MessageUrlPreview?.length > 0) && <URLPreview MessageUrlPreview={props.message.MessageUrlPreview} />
+        }
+
+        { //ファイルプレビュー
           props.message.MessageFileAttached?.length > 0
           &&
           (
