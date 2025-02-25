@@ -1,7 +1,6 @@
-import "emoji-picker-element";
 import {onCleanup, onMount} from "solid-js";
 import {Picker} from "emoji-picker-element";
-import {EmojiClickEvent} from "emoji-picker-element/shared";
+import type {EmojiClickEvent} from "emoji-picker-element/shared";
 import ja from 'emoji-picker-element/i18n/ja';
 import POST_MESSAGE_EMOJI_REACTION from "~/api/MESSAGE/MESSAGE_EMOJI_REACTION";
 import type {IMessage} from "~/types/Message";
