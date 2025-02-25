@@ -8,6 +8,9 @@ export interface IMessage {
   userId: string;
   MessageUrlPreview: IMessageUrlPreview[];
   MessageFileAttached: IMessageFileAttached[];
+  reactionSummary: {
+    [key: string]: number
+  };
 }
 
 export interface ICustomEmoji {
