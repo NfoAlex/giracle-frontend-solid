@@ -10,7 +10,7 @@ export interface IMessage {
   MessageFileAttached: IMessageFileAttached[];
   reactionSummary: {
     [key: string]: number
-  };
+  }[];
 }
 
 export interface ICustomEmoji {
