@@ -20,7 +20,7 @@ export default function LongTextDisplay(props: { message: IMessage }) {
     <div>
       {/* メッセージ展開の表示 */}
       <Dialog open={open()} onOpenChange={setOpen}>
-        <DialogContent class={"overflow-y-auto"}>
+        <DialogContent class={"overflow-y-auto"} style={"width:65vw; max-width:750px;"}>
           {/* アバターの名前表示 */}
           <span class={"mt-5 flex items-center gap-3 truncate"}>
             <UserinfoModalWrapper userId={props.message.userId} >
