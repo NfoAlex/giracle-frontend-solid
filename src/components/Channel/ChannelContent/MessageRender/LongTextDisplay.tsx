@@ -2,7 +2,7 @@ import {Dialog, DialogContent} from "~/components/ui/dialog";
 import {Card} from "~/components/ui/card";
 import type {IMessage} from "~/types/Message";
 import MessageTextRender from "~/components/Channel/ChannelContent/MessageRender/MessageTextRender";
-import {createSignal, For} from "solid-js";
+import {createSignal, For, Show} from "solid-js";
 import {Button} from "~/components/ui/button";
 import {Badge} from "~/components/ui/badge";
 import URLPreview from "~/components/Channel/ChannelContent/MessageRender/URLPreview";
@@ -11,6 +11,7 @@ import UserinfoModalWrapper from "~/components/unique/UserinfoModalWrapper";
 import {Avatar, AvatarImage} from "~/components/ui/avatar";
 import {getterUserinfo} from "~/stores/Userinfo";
 import {IconBrowserMaximize} from "@tabler/icons-solidjs";
+import {storeMyUserinfo} from "~/stores/MyUserinfo";
 
 export default function LongTextDisplay(props: { message: IMessage }) {
   const [open, setOpen] = createSignal(false);
@@ -60,9 +61,19 @@ export default function LongTextDisplay(props: { message: IMessage }) {
             <IconBrowserMaximize />
             長文メッセージを展開する
           </Button>
-          <Badge class={"ml-auto"} variant={"secondary"}>
-            { props.message.content.length }文字
-          </Badge>
+
+          <span class={"ml-auto flex items-center gap-2"}>
+            {/* 自分宛てのメンションがあったときのバッジ表示 */}
+            <Show when={props.message.content.includes("@<" + storeMyUserinfo.id + ">")}>
+              <Badge>
+                @メンションされています
+              </Badge>
+            </Show>
+
+            <Badge variant={"secondary"}>
+              { props.message.content.length }文字
+            </Badge>
+          </span>
         </span>
       </Card>
     </div>
