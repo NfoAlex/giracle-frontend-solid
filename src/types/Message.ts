@@ -11,6 +11,7 @@ export interface IMessage {
   reactionSummary: {
     emojiCode: string;
     count: number;
+    includingYou: boolean;
   }[];
 }
 
