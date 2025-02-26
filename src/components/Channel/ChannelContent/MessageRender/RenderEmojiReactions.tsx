@@ -4,6 +4,7 @@ import {Card} from "~/components/ui/card";
 import { Database } from 'emoji-picker-element';
 import {createMutable} from "solid-js/store";
 import DELETE_MESSAGE_DELETE_EMOJI_REACTION from "~/api/MESSAGE/MESSAGE_DELETE_EMOJI_REACTION";
+import POST_MESSAGE_EMOJI_REACTION from "~/api/MESSAGE/MESSAGE_EMOJI_REACTION";
 
 export default function RenderEmojiReactions(props: {reaction: IMessage["reactionSummary"], messageId: string, channelId: string}) {
   const db = new Database();
@@ -19,6 +20,20 @@ export default function RenderEmojiReactions(props: {reaction: IMessage["reactio
         console.log("RenderEmojiReactions :: deleteReaction : r->", r);
       })
       .catch((e) => console.error("RenderEmojiReactions :: deleteReaction : e->", e));
+  }
+
+  /**
+   * リアクションを追加する
+   * @param emojiCode
+   */
+  const addReaction = async (emojiCode: string) => {
+    POST_MESSAGE_EMOJI_REACTION(props.messageId, props.channelId, emojiCode)
+      .then((r) => {
+        console.log("EmojiPicker :: emojiClickHandler : r->", r);
+      })
+      .catch((e) => {
+        console.error("EmojiPicker :: emojiClickHandler : e->", e)
+      });
   }
 
   //props.reactionの長さの変更を検知して表示に使う絵文字データを取得、格納する
@@ -48,7 +63,7 @@ export default function RenderEmojiReactions(props: {reaction: IMessage["reactio
           (r)=> {
             return (
               <Card
-                onClick={() => r.includingYou && deleteReaction(r.emojiCode)}
+                onClick={() => r.includingYou ? deleteReaction(r.emojiCode) : addReaction(r.emojiCode)}
                 class={`p-1 text-sm flex items-center gap-1 cursor-pointer hover:bg-accent hover:border-background border-accent ${r.includingYou ? "bg-accent border-primary" : ""}`}
               >
                 <span>{ emojiToRender[r.emojiCode]!==undefined ? emojiToRender[r.emojiCode] : r.emojiCode.slice(0,5) }</span>
