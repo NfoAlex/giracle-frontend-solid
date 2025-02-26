@@ -1,18 +1,31 @@
 import {IMessage} from "~/types/Message";
-import {createEffect, createResource, For, on, onMount} from "solid-js";
+import {createEffect, For, on} from "solid-js";
 import {Card} from "~/components/ui/card";
 import { Database } from 'emoji-picker-element';
 import {createMutable} from "solid-js/store";
+import DELETE_MESSAGE_DELETE_EMOJI_REACTION from "~/api/MESSAGE/MESSAGE_DELETE_EMOJI_REACTION";
 
-export default function RenderEmojiReactions(props: {reaction: IMessage["reactionSummary"]}) {
+export default function RenderEmojiReactions(props: {reaction: IMessage["reactionSummary"], messageId: string, channelId: string}) {
   const db = new Database();
   const emojiToRender:{ [key: string]: string } = createMutable({})
+
+  /**
+   * リアクションを削除する
+   * @param emojiCode
+   */
+  const deleteReaction = async (emojiCode: string) => {
+    DELETE_MESSAGE_DELETE_EMOJI_REACTION(props.messageId, props.channelId, emojiCode)
+      .then((r) => {
+        console.log("RenderEmojiReactions :: deleteReaction : r->", r);
+      })
+      .catch((e) => console.error("RenderEmojiReactions :: deleteReaction : e->", e));
+  }
 
   //props.reactionの長さの変更を検知して表示に使う絵文字データを取得、格納する
   createEffect(on(
     ()=>props.reaction.length.toString(),
     async () => {
-      console.log("RenderEmojiReactions :: createEffect : props.reaction.length->", props.reaction.length);
+      //console.log("RenderEmojiReactions :: createEffect : props.reaction.length->", props.reaction.length);
 
       //リアクションデータごとに絵文字をレンダーする
       for (const r of props.reaction) {
@@ -21,7 +34,6 @@ export default function RenderEmojiReactions(props: {reaction: IMessage["reactio
         const emojiData = await db.getEmojiByShortcode(r.emojiCode);
         if (emojiData === null) return;
 
-        console.log("RenderEmojiReactions :: getEmoji : 結果->", emojiData);
         //絵文字そのものを格納
         // @ts-ignore - 参照は正常にできている
         emojiToRender[r.emojiCode] = emojiData.unicode;
@@ -36,6 +48,7 @@ export default function RenderEmojiReactions(props: {reaction: IMessage["reactio
           (r)=> {
             return (
               <Card
+                onClick={() => r.includingYou && deleteReaction(r.emojiCode)}
                 class={`p-1 text-sm flex items-center gap-1 cursor-pointer hover:bg-accent hover:border-background border-accent ${r.includingYou ? "bg-accent border-primary" : ""}`}
               >
                 <span>{ emojiToRender[r.emojiCode]!==undefined ? emojiToRender[r.emojiCode] : r.emojiCode.slice(0,5) }</span>

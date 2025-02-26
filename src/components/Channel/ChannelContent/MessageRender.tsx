@@ -84,7 +84,7 @@ export default function MessageRender(props: {
 
         {/* 絵文字リアクション表示 */}
         <Show when={props.message.reactionSummary && props.message.reactionSummary.length > 0}>
-          <RenderEmojiReactions reaction={props.message.reactionSummary} />
+          <RenderEmojiReactions reaction={props.message.reactionSummary} messageId={props.message.id} channelId={props.message.channelId} />
         </Show>
       </div>
     </div>
