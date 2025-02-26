@@ -19,6 +19,7 @@ import WSUserProfileUpdate from "~/WS/User/UserProfileUpdate";
 import WSReadTimeUpdate from "~/WS/Message/ReadTimeUpdate";
 import {setStoreHistory} from "~/stores/History";
 import {produce} from "solid-js/store";
+import WSMessageAddReaction from "~/WS/Message/MessageAddReaction";
 
 //WSインスタンス
 export let ws: WebSocket | undefined = undefined;
@@ -67,6 +68,11 @@ export const initWS = async () => {
         //既読時間更新の受け取り
         case "message::ReadTimeUpdated":
           WSReadTimeUpdate(json.data);
+          break;
+
+        //リアクションの受け取り
+        case "message::AddReaction":
+          WSMessageAddReaction(json.data);
           break;
 
         //インボックス項目の削除（既読）受け取り
