@@ -83,7 +83,7 @@ export default function MessageRender(props: {
         </Show>
 
         {/* 絵文字リアクション表示 */}
-        <Show when={props.message.reactionSummary.length > 0}>
+        <Show when={props.message.reactionSummary && props.message.reactionSummary.length > 0}>
           <RenderEmojiReactions reaction={props.message.reactionSummary} />
         </Show>
       </div>
