@@ -28,7 +28,9 @@ export default function RenderEmojiReactions(props: {reaction: IMessage["reactio
         {
           (r)=> {
             return (
-              <Card class={"p-1 text-sm flex items-center gap-1 cursor-pointer hover:bg-accent hover:border-background"}>
+              <Card
+                class={`p-1 text-sm flex items-center gap-1 cursor-pointer hover:bg-accent hover:border-background border-accent ${r.includingYou ? "bg-accent border-primary" : ""}`}
+              >
                 <span>{ emojiToRender[r.emojiCode]!==undefined ? emojiToRender[r.emojiCode] : r.emojiCode.slice(0,5) }</span>
                 <span>{ r.count }</span>
               </Card>
