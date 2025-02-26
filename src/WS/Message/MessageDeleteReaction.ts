@@ -30,6 +30,8 @@ export default function WSMessageDeleteReaction(dat: IReaciton) {
       };
     } else {
       reactionNow.count--;
+      //自分による削除なら自分はしていないと設定
+      reactionNow.includingYou = reactionNow.includingYou && storeMyUserinfo.id !== dat.userId;
 
       return {
         ...prev,
