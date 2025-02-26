@@ -1,5 +1,5 @@
 import {Card} from "~/components/ui/card";
-import {IconPencil, IconTrash} from "@tabler/icons-solidjs";
+import {IconMoodHappy, IconPencil, IconTrash} from "@tabler/icons-solidjs";
 import DELETE_MESSAGE_DELETE from "~/api/MESSAGE/MESSAGE_DELETE";
 import {getRolePower, storeMyUserinfo} from "~/stores/MyUserinfo";
 import type {IMessage} from "~/types/Message";
@@ -35,7 +35,7 @@ export default function HoverMenu(props: { message: IMessage, onEditMode: (id: s
       <p class={"text-sm font-extralight mr-2"}>{ new Date(props.message.createdAt).toLocaleString() }</p>
 
       <div class={"relative"}>
-        <Button onClick={()=>setOpenEmoji(true)}>えもじ</Button>
+        <Button onClick={()=>setOpenEmoji(true)} variant={"ghost"} class={"w-8 h-8"}><IconMoodHappy /></Button>
         { openEmoji() && <EmojiPicker message={props.message} /> }
       </div>
       {
