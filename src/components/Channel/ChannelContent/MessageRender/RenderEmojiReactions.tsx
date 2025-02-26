@@ -1,13 +1,13 @@
 import {IMessage} from "~/types/Message";
 import {createEffect, For, on} from "solid-js";
 import {Card} from "~/components/ui/card";
-import { Database } from 'emoji-picker-element';
 import {createMutable} from "solid-js/store";
 import DELETE_MESSAGE_DELETE_EMOJI_REACTION from "~/api/MESSAGE/MESSAGE_DELETE_EMOJI_REACTION";
 import POST_MESSAGE_EMOJI_REACTION from "~/api/MESSAGE/MESSAGE_EMOJI_REACTION";
+import {emojiDB} from "~/stores/CustomEmoji";
 
 export default function RenderEmojiReactions(props: {reaction: IMessage["reactionSummary"], messageId: string, channelId: string}) {
-  const db = new Database();
+
   const emojiToRender:{ [key: string]: string } = createMutable({})
 
   /**
@@ -46,7 +46,7 @@ export default function RenderEmojiReactions(props: {reaction: IMessage["reactio
       for (const r of props.reaction) {
         if (emojiToRender[r.emojiCode] !== undefined) continue;
         //データ取得、無ければ停止
-        const emojiData = await db.getEmojiByShortcode(r.emojiCode);
+        const emojiData = await emojiDB.getEmojiByShortcode(r.emojiCode);
         if (emojiData === null) return;
 
         //絵文字そのものを格納
