@@ -1,5 +1,5 @@
 import type {IReaciton} from "~/types/Message"
-import {setStoreHistory, storeHistory} from "~/stores/History";
+import {setStoreHistory} from "~/stores/History";
 import {produce} from "solid-js/store";
 import {storeMyUserinfo} from "~/stores/MyUserinfo";
 
