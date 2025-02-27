@@ -51,7 +51,7 @@ export const getEmojiDatasetWithCustomEmoji = () => {
     dataset.push({
       name: emoji.code,
       url: "/api/server/custom-emoji/" + emoji.code,
-      shortcodes: [emoji.code]
+      shortcodes: [emoji.code],
     });
   }
 

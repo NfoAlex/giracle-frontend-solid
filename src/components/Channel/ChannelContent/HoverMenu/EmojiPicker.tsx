@@ -12,14 +12,13 @@ export default function EmojiPicker(props: {message: IMessage, onClicked: () => 
   const [shiftPressed, setShiftPressed] = createSignal(false);
 
   const picker = new Picker({
+    customCategorySorting: (a, b) => {
+      if (a === "Custom") return 1;
+      return -1;
+    },
     locale: "ja",
     i18n: ja,
     customEmoji: [...getEmojiDatasetWithCustomEmoji()],
-    customCategorySorting: (a, b) => {
-      console.log("EmojiPicker :: customCategorySorting : a->", a, "b->", b);
-      if (a === "カスタム") return 1;
-      return -1;
-    },
   });
 
   /**
