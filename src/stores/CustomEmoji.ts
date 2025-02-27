@@ -31,6 +31,18 @@ export const updateCustomEmoji = (emoji: ICustomEmoji) => {
 }
 
 /**
+ * カスタム絵文字をデータセットとStoreから削除する
+ * @param emojiCode - 削除する絵文字コード
+ */
+export const deleteCustomEmojiData = (emojiCode: string) => {
+  setStoreCustomEmoji(storeCustomEmoji.filter((emoji) => emoji.code !== emojiCode));
+  const customEmojiDataset = getEmojiDatasetWithCustomEmoji();
+
+  //emojiDBを更新
+  emojiDB = new Database({customEmoji: customEmojiDataset});
+}
+
+/**
  * emoji-picker-element用にカスタム絵文字データセットをパース、渡す
  */
 export const getEmojiDatasetWithCustomEmoji = () => {

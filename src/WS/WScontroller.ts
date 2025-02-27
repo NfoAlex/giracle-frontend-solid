@@ -22,6 +22,7 @@ import {produce} from "solid-js/store";
 import WSMessageAddReaction from "~/WS/Message/MessageAddReaction";
 import WSMessageDeleteReaction from "~/WS/Message/MessageDeleteReaction";
 import WSCustomEmojiUploaded from "~/WS/Server/CustomEmojiUploaded";
+import WSCustomEmojiDeleted from "~/WS/Server/CustomEmojiDeleted";
 
 //WSインスタンス
 export let ws: WebSocket | undefined = undefined;
@@ -52,9 +53,14 @@ export const initWS = async () => {
 
       switch(json.signal) {
 
-        //カスタム絵文字の受け取り
+        //カスタム絵文字作成の受け取り
         case "server::CustomEmojiUploaded":
           WSCustomEmojiUploaded(json.data);
+          break;
+
+        //カスタム絵文字削除の受け取り
+        case "server::CustomEmojiDeleted":
+          WSCustomEmojiDeleted(json.data);
           break;
 
         //メッセージの受け取り
