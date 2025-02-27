@@ -1,5 +1,5 @@
 import {IMessage} from "~/types/Message";
-import {createEffect, For, on} from "solid-js";
+import {createEffect, For, on, Show} from "solid-js";
 import {Card} from "~/components/ui/card";
 import {createMutable} from "solid-js/store";
 import DELETE_MESSAGE_DELETE_EMOJI_REACTION from "~/api/MESSAGE/MESSAGE_DELETE_EMOJI_REACTION";
@@ -8,7 +8,8 @@ import {emojiDB} from "~/stores/CustomEmoji";
 
 export default function RenderEmojiReactions(props: {reaction: IMessage["reactionSummary"], messageId: string, channelId: string}) {
 
-  const emojiToRender:{ [key: string]: string } = createMutable({})
+  const emojiToRender:{ [key: string]: string } = createMutable({});
+  const urlToRender:{ [key: string]: string } = createMutable({});
 
   /**
    * リアクションを削除する
@@ -47,7 +48,17 @@ export default function RenderEmojiReactions(props: {reaction: IMessage["reactio
         if (emojiToRender[r.emojiCode] !== undefined) continue;
         //データ取得、無ければ停止
         const emojiData = await emojiDB.getEmojiByShortcode(r.emojiCode);
-        if (emojiData === null) return;
+        if (emojiData === null) continue;
+
+        console.log("RenderEmojiReactions :: createEffect : emojiData->", emojiData);
+        //カスタム絵文字だとURLがあるのでそれを使う
+        // @ts-ignore - 参照は正常にできている
+        if (emojiData.url !== undefined) {
+          //絵文字のURLを格納
+          // @ts-ignore - 参照は正常にできている
+          urlToRender[r.emojiCode] = emojiData.url;
+          continue;
+        }
 
         //絵文字そのものを格納
         // @ts-ignore - 参照は正常にできている
@@ -66,7 +77,12 @@ export default function RenderEmojiReactions(props: {reaction: IMessage["reactio
                 onClick={() => r.includingYou ? deleteReaction(r.emojiCode) : addReaction(r.emojiCode)}
                 class={`p-1 text-sm flex items-center gap-1 cursor-pointer hover:bg-accent hover:border-background border-accent ${r.includingYou ? "bg-accent border-primary" : ""}`}
               >
-                <span>{ emojiToRender[r.emojiCode]!==undefined ? emojiToRender[r.emojiCode] : r.emojiCode.slice(0,5) }</span>
+                <Show when={emojiToRender[r.emojiCode]!==undefined}>
+                  <span>{ emojiToRender[r.emojiCode]!==undefined ? emojiToRender[r.emojiCode] : r.emojiCode.slice(0,5) }</span>
+                </Show>
+                <Show when={urlToRender[r.emojiCode]!==undefined}>
+                  <img src={urlToRender[r.emojiCode]} alt={r.emojiCode} class={"w-5 h-5"} />
+                </Show>
                 <span>{ r.count }</span>
               </Card>
             )
