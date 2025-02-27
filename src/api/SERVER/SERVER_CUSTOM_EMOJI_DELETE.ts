@@ -8,6 +8,9 @@ export default async function DELETE_SERVER_CUSTOM_EMOJI_DELETE(
 }> {
   const res = await fetch("/api/server/custom-emoji/delete", {
     method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+    },
     body: JSON.stringify({
       emojiCode: _emojiCode,
     })
