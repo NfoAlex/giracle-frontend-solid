@@ -16,10 +16,9 @@ export interface IMessage {
 }
 
 export interface ICustomEmoji {
-  name: string,
-  shortcodes: string[],
-  url: string,
-  category?: string
+  id: string;
+  code: string;
+  uploadedUserId: string;
 }
 
 export interface IReaciton {
