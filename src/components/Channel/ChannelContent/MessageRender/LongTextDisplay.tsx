@@ -64,7 +64,7 @@ export default function LongTextDisplay(props: { message: IMessage }) {
       </Dialog>
 
       {/* 通常表示 */}
-      <Card class={"w-full p-2 flex flex-col gap-2"}>
+      <Card class={"w-full p-3 my-1 flex flex-col gap-2"}>
         <MessageTextRender content={props.message.content.slice(0,100) + "..."} />
         <hr />
         <span class={"flex items-center"}>
