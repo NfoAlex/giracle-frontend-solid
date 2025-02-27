@@ -21,6 +21,7 @@ import {setStoreHistory} from "~/stores/History";
 import {produce} from "solid-js/store";
 import WSMessageAddReaction from "~/WS/Message/MessageAddReaction";
 import WSMessageDeleteReaction from "~/WS/Message/MessageDeleteReaction";
+import WSCustomEmojiUploaded from "~/WS/Server/CustomEmojiUploaded";
 
 //WSインスタンス
 export let ws: WebSocket | undefined = undefined;
@@ -50,6 +51,11 @@ export const initWS = async () => {
       }
 
       switch(json.signal) {
+
+        //カスタム絵文字の受け取り
+        case "server::CustomEmojiUploaded":
+          WSCustomEmojiUploaded(json.data);
+          break;
 
         //メッセージの受け取り
         case "message::SendMessage":
