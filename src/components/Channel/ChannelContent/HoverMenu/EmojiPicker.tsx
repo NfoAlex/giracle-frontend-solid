@@ -4,7 +4,7 @@ import type {EmojiClickEvent} from "emoji-picker-element/shared";
 import ja from 'emoji-picker-element/i18n/ja';
 import POST_MESSAGE_EMOJI_REACTION from "~/api/MESSAGE/MESSAGE_EMOJI_REACTION";
 import type {IMessage} from "~/types/Message";
-import {getEmojiDatasetWithCustomEmoji, storeCustomEmoji} from "~/stores/CustomEmoji";
+import {getEmojiDatasetWithCustomEmoji} from "~/stores/CustomEmoji";
 
 export default function EmojiPicker(props: {message: IMessage}) {
   const picker = new Picker({
