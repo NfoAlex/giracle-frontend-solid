@@ -13,10 +13,13 @@ export default function CreateCustomEmoji() {
   const [customEmoji, setCustomEmoji] = createSignal<File|null>(null);
   const [customEmojiCode, setCustomEmojiCode] = createSignal<string>("");
   const [emojiPreviewUrl, setEmojiPreviewUrl] = createSignal<string>("");
+  const [processing, setProcessing] = createSignal<boolean>(false);
 
   const uploadEmoji = () => {
     const emojiFile = customEmoji();
     if (emojiFile === null) return;
+    //処理中と設定
+    setProcessing(true);
 
     PUT_SERVER_CUSTOM_EMOJI_UPLOAD(customEmojiCode(), emojiFile)
       .then((r) => {
@@ -24,7 +27,11 @@ export default function CreateCustomEmoji() {
         //ダイアログを閉じる
         setDialogDisplay(false);
       })
-      .catch((err) => console.error("CreateCustomEmoji :: uploadEmoji :: err->", err));
+      .catch((err) => {
+        console.error("CreateCustomEmoji :: uploadEmoji :: err->", err);
+        alert("アップロードに失敗しました。 エラー : " + err);
+        setProcessing(false);
+      });
   }
 
   /**
@@ -103,15 +110,15 @@ export default function CreateCustomEmoji() {
         <DialogFooter>
           <Button
             onClick={uploadEmoji}
-            disabled={emojiPreviewUrl()==="" || customEmojiCode()===""}
+            disabled={emojiPreviewUrl()==="" || customEmojiCode()==="" || processing()}
           >アップロードする</Button>
         </DialogFooter>
       </DialogContent>
 
       <DialogTrigger>
-        <Button class={"w-full p-4 md:absolute right-10 bottom-10 md:w-16 md:h-16 md:p-0"}>
+        <Button class={"w-full p-4 z-50"}>
           <IconPlus />
-          <p class={"md:hidden"}>カスタム絵文字を作成</p>
+          <p>カスタム絵文字を作成</p>
         </Button>
       </DialogTrigger>
     </Dialog>
