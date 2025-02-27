@@ -12,6 +12,7 @@ import {Avatar, AvatarImage} from "~/components/ui/avatar";
 import {getterUserinfo} from "~/stores/Userinfo";
 import {IconBrowserMaximize} from "@tabler/icons-solidjs";
 import {storeMyUserinfo} from "~/stores/MyUserinfo";
+import RenderEmojiReactions from "~/components/Channel/ChannelContent/MessageRender/RenderEmojiReactions";
 
 export default function LongTextDisplay(props: { message: IMessage }) {
   const [open, setOpen] = createSignal(false);
@@ -49,6 +50,16 @@ export default function LongTextDisplay(props: { message: IMessage }) {
               </For>
             )
           }
+
+          {/* 編集済み表示 */}
+          <Show when={props.message.isEdited}>
+            <p class={"text-muted-foreground text-xs"}>編集済み</p>
+          </Show>
+
+          {/* 絵文字リアクション表示 */}
+          <Show when={props.message.reactionSummary && props.message.reactionSummary.length > 0}>
+            <RenderEmojiReactions reaction={props.message.reactionSummary} messageId={props.message.id} channelId={props.message.channelId} />
+          </Show>
         </DialogContent>
       </Dialog>
 
