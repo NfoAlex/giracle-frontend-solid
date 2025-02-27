@@ -50,7 +50,7 @@ export default function RenderEmojiReactions(props: {reaction: IMessage["reactio
         const emojiData = await emojiDB.getEmojiByShortcode(r.emojiCode);
         if (emojiData === null) continue;
 
-        console.log("RenderEmojiReactions :: createEffect : emojiData->", emojiData);
+        //console.log("RenderEmojiReactions :: createEffect : emojiData->", emojiData);
         //カスタム絵文字だとURLがあるのでそれを使う
         // @ts-ignore - 参照は正常にできている
         if (emojiData.url !== undefined) {
@@ -82,6 +82,9 @@ export default function RenderEmojiReactions(props: {reaction: IMessage["reactio
                 </Show>
                 <Show when={urlToRender[r.emojiCode]!==undefined}>
                   <img src={urlToRender[r.emojiCode]} alt={r.emojiCode} class={"w-5 h-5"} />
+                </Show>
+                <Show when={urlToRender[r.emojiCode]===undefined && emojiToRender[r.emojiCode]===undefined}>
+                  <span>{ r.emojiCode.length > 5 ? r.emojiCode.slice(0,5) + "..." : r.emojiCode }</span>
                 </Show>
                 <span>{ r.count }</span>
               </Card>
