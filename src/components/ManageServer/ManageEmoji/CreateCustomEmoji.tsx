@@ -7,6 +7,7 @@ import {Card} from "~/components/ui/card";
 import {createSignal, Show} from "solid-js";
 import type { DOMElement } from "solid-js/jsx-runtime";
 import PUT_SERVER_CUSTOM_EMOJI_UPLOAD from "~/api/SERVER/SERVER_CUSTOM_EMOJI_UPLOAD";
+import {Callout, CalloutTitle} from "~/components/ui/callout";
 
 export default function CreateCustomEmoji() {
   const [dialogDisplay, setDialogDisplay] = createSignal<boolean>(false);
@@ -80,6 +81,11 @@ export default function CreateCustomEmoji() {
                 e.currentTarget.value.length<=32 && setCustomEmojiCode(e.currentTarget.value)
               }
             />
+            <Show when={customEmojiCode().includes(" ")}>
+              <Callout variant={"error"} class={"my-2"}>
+                <CalloutTitle>絵文字コードに空白は含められません。</CalloutTitle>
+              </Callout>
+            </Show>
           </TextField>
 
           <TextField>
