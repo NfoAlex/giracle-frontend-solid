@@ -34,9 +34,9 @@ export default function HoverMenu(props: { message: IMessage, onEditMode: (id: s
     <Card class={"p-2 flex items-center"}>
       <p class={"text-sm font-extralight mr-2"}>{ new Date(props.message.createdAt).toLocaleString() }</p>
 
-      <div class={"relative"}>
+      <div class={"md:relative"}>
         <Button onClick={()=>setOpenEmoji(true)} variant={"ghost"} class={"w-8 h-8"}><IconMoodHappy /></Button>
-        { openEmoji() && <EmojiPicker message={props.message} /> }
+        { openEmoji() && <EmojiPicker message={props.message} onClicked={()=>setOpenEmoji(false)} /> }
       </div>
       {
         storeMyUserinfo.id === props.message.userId

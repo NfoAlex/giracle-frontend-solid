@@ -51,6 +51,7 @@ export default function EmojiPicker(props: {message: IMessage}) {
       const htmlTheme: string = document.querySelector("html")?.style.getPropertyValue("color-scheme") as string; //テーマ取得
       picker.style.setProperty("--background", htmlTheme==="light" ? "white" : "black"); //テーマに合わせた背景色
       picker.style.setProperty("--border-radius", "0.5rem");
+      picker.style.setProperty("max-width", "90vw");
       picker.style.setProperty("--border-size", "1.5px");
 
       //絵文字クリックしたときのハンドラリンク
