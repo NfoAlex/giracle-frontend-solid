@@ -2,7 +2,11 @@ import {ICustomEmoji} from "~/types/Message";
 
 export default async function GET_SERVER_CUSTOM_EMOJI(): Promise<{
   message: string;
-  data: ICustomEmoji[];
+  data: {
+    id: string,
+    code: string,
+    uploadedUserId: string
+  };
 }> {
   const res = await fetch("/api/server/custom-emoji", {
     method: "GET",
