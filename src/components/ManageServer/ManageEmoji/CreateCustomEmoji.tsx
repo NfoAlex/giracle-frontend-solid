@@ -66,7 +66,7 @@ export default function CreateCustomEmoji() {
     <Dialog open={dialogDisplay()} onOpenChange={setDialogDisplay}>
       <DialogContent>
         <DialogHeader>
-          カスタム絵文字の作成
+          <p class={"font-bold"}>カスタム絵文字の作成</p>
           <hr class={"my-2"} />
         </DialogHeader>
 
@@ -116,7 +116,7 @@ export default function CreateCustomEmoji() {
       </DialogContent>
 
       <DialogTrigger>
-        <Button class={"w-full p-4 z-50"}>
+        <Button class={"w-full p-4 z-50"} variant={"secondary"}>
           <IconPlus />
           <p>カスタム絵文字を作成</p>
         </Button>
