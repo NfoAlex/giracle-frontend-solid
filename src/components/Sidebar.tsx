@@ -97,7 +97,7 @@ export function AppSidebar() {
       </SidebarContent>
 
       <hr class="pb-2" />
-      <Show when={getRolePower("manageRole") || getRolePower("manageServer")}>
+      <Show when={getRolePower("manageRole") || getRolePower("manageServer") || getRolePower("manageEmoji")}>
         <SidebarFooter class="py-2">
           <SidebarMenuButton
             as={A}

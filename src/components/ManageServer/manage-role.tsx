@@ -24,7 +24,8 @@ export default function ManageRole() {
     manageServer: false,
     manageChannel: false,
     manageRole: false,
-    manageUser: false
+    manageUser: false,
+    manageEmoji: false,
   });
   const roleChanged = () => {
     return JSON.stringify(roleEditing()) !== JSON.stringify(roles().find((r)=>r.id === roleEditing().id))
@@ -225,6 +226,17 @@ export default function ManageRole() {
               <SwitchThumb />
             </SwitchControl>
             <SwitchLabel>ユーザーの編集</SwitchLabel>
+          </Switch>
+
+          <Switch
+            checked={roleEditing().manageEmoji}
+            onChange={(e) => setRoleEditing({...roleEditing(), manageEmoji: e.valueOf()})}
+            class="flex items-center space-x-4"
+          >
+            <SwitchControl>
+              <SwitchThumb />
+            </SwitchControl>
+            <SwitchLabel>絵文字の管理</SwitchLabel>
           </Switch>
         </span>
 

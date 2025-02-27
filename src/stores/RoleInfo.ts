@@ -22,7 +22,7 @@ export const updateRoleInfo = (value: IRole) => {
 
 /**
  * ロール情報を返す。無いなら取得してから返す
- * @param channelId
+ * @param roleId
  */
 export const getterRoleInfo = (
   roleId: string,
@@ -38,7 +38,8 @@ export const getterRoleInfo = (
       manageServer: false,
       manageChannel: false,
       manageRole: false,
-      manageUser: false
+      manageUser: false,
+      manageEmoji: false,
     });
     //ロール情報を取得
     GET_ROLE(roleId)
@@ -57,7 +58,8 @@ export const getterRoleInfo = (
           manageServer: false,
           manageChannel: false,
           manageRole: false,
-          manageUser: false
+          manageUser: false,
+          manageEmoji: false,
         });
       });
   }

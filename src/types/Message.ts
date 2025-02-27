@@ -8,6 +8,25 @@ export interface IMessage {
   userId: string;
   MessageUrlPreview: IMessageUrlPreview[];
   MessageFileAttached: IMessageFileAttached[];
+  reactionSummary: {
+    emojiCode: string;
+    count: number;
+    includingYou: boolean;
+  }[];
+}
+
+export interface ICustomEmoji {
+  id: string;
+  code: string;
+  uploadedUserId: string;
+}
+
+export interface IReaciton {
+  id: string,
+  userId: string,
+  channelId: string,
+  messageId: string,
+  emojiCode: string
 }
 
 export interface IInbox {
