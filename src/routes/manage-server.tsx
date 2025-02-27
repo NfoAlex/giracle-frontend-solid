@@ -39,6 +39,7 @@ export default function ManageServer() {
                 {props.item.textValue === "community" && "コミュニティ設定"}
                 {props.item.textValue === "role" && "ロール"}
                 {props.item.textValue === "invite" && "招待"}
+                {props.item.textValue === "customEmoji" && "カスタム絵文字"}
               </SelectItem>
             }
           >
@@ -63,7 +64,7 @@ export default function ManageServer() {
       { displayMode() === "community" && (getRolePower("manageServer") ? <ManageCommunity /> : <p>サーバーの管理権限がありません</p>) }
       { displayMode() === "role" && (getRolePower("manageRole") ? <ManageRole /> : <p>ロールの管理権限がありません</p>) }
       { displayMode() === "invite" && (getRolePower("manageServer") ? <ManageInvite /> : <p>サーバーの管理権限がありません</p>) }
-      { displayMode() === "customEmoji" && (getRolePower("manageServer") ? <ManageEmoji /> : <p>カスタム絵文字の管理権限がありません</p>) }
+      { displayMode() === "customEmoji" && (getRolePower("manageEmoji") ? <ManageEmoji /> : <p>カスタム絵文字の管理権限がありません</p>) }
     </div>
   );
 }

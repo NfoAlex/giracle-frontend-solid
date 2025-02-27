@@ -16,7 +16,7 @@ export const [storeMyUserinfo, setStoreMyUserinfo] = createStore<IUser>({
  * @param roleTerm 確認する権限名
  */
 export const getRolePower = (
-  roleTerm: "manageRole" | "manageChannel" | "manageUser" | "manageServer"
+  roleTerm: "manageRole" | "manageChannel" | "manageUser" | "manageServer" | "manageEmoji"
 ): boolean => {
   for (const index in storeMyUserinfo.RoleLink) {
     //HOST権限を持っている場合はtrueを返す
