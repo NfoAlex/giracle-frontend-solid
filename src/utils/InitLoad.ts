@@ -49,7 +49,7 @@ export default function InitLoad(_userId: string, initWsToo = false) {
   }).catch((e) => console.error("InitLoad :: GET_MESSAGE_INBOX : インボックス取得エラー", e));
   //カスタム絵文字取得
   GET_SERVER_CUSTOM_EMOJI().then((r) => {
-    console.log("InitLoad :: GET_SERVER_CUSTOM_EMOJI : カスタム絵文字取得r->", r);
+    //console.log("InitLoad :: GET_SERVER_CUSTOM_EMOJI : カスタム絵文字取得r->", r);
     bindCustomEmoji(r.data);
   }).catch((e) => console.error("InitLoad :: GET_SERVER_CUSTOM_EMOJI : カスタム絵文字取得エラー", e));
 
