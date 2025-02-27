@@ -8,4 +8,5 @@ export interface IRole {
   manageChannel: boolean;
   manageRole: boolean;
   manageUser: boolean;
+  manageEmoji: boolean;
 }
