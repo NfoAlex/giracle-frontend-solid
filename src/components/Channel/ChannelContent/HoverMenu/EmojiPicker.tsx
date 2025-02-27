@@ -32,7 +32,7 @@ export default function EmojiPicker(props: {message: IMessage}) {
   }
 
   onMount(() => {
-    console.log("EmojiPicker :: onMount : emoji-picker-element", Picker);
+    //console.log("EmojiPicker :: onMount : emoji-picker-element", Picker);
 
     //絵文字ピッカー表示位置のための要素の高さ取得
     if (elementRef) {
@@ -44,6 +44,12 @@ export default function EmojiPicker(props: {message: IMessage}) {
     const emojiPickerDiv = document.getElementById("emojiPickerDiv");
     if (emojiPickerDiv) {
       emojiPickerDiv.appendChild(picker);
+
+      //スタイル適用
+      const htmlTheme: string = document.querySelector("html")?.style.getPropertyValue("color-scheme") as string; //テーマ取得
+      picker.style.setProperty("--background", htmlTheme==="light" ? "white" : "black"); //テーマに合わせた背景色
+      picker.style.setProperty("--border-radius", "0.5rem");
+      picker.style.setProperty("--border-size", "1.5px");
 
       //絵文字クリックしたときのハンドラリンク
       picker.addEventListener('emoji-click', emojiClickHandler);
