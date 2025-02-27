@@ -17,9 +17,6 @@ export default function RenderEmojiReactions(props: {reaction: IMessage["reactio
    */
   const deleteReaction = async (emojiCode: string) => {
     DELETE_MESSAGE_DELETE_EMOJI_REACTION(props.messageId, props.channelId, emojiCode)
-      .then((r) => {
-        console.log("RenderEmojiReactions :: deleteReaction : r->", r);
-      })
       .catch((e) => console.error("RenderEmojiReactions :: deleteReaction : e->", e));
   }
 
@@ -29,9 +26,6 @@ export default function RenderEmojiReactions(props: {reaction: IMessage["reactio
    */
   const addReaction = async (emojiCode: string) => {
     POST_MESSAGE_EMOJI_REACTION(props.messageId, props.channelId, emojiCode)
-      .then((r) => {
-        console.log("EmojiPicker :: emojiClickHandler : r->", r);
-      })
       .catch((e) => {
         console.error("EmojiPicker :: emojiClickHandler : e->", e)
       });

@@ -12,7 +12,12 @@ export default function EmojiPicker(props: {message: IMessage}) {
   const picker = new Picker({
     locale: "ja",
     i18n: ja,
-    customEmoji: [...getEmojiDatasetWithCustomEmoji()]
+    customEmoji: [...getEmojiDatasetWithCustomEmoji()],
+    customCategorySorting: (a, b) => {
+      console.log("EmojiPicker :: customCategorySorting : a->", a, "b->", b);
+      if (a === "カスタム") return 1;
+      return -1;
+    },
   });
 
   const emojiClickHandler = async (event: EmojiClickEvent) => {
