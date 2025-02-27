@@ -4,7 +4,7 @@ import {produce} from "solid-js/store";
 import {storeMyUserinfo} from "~/stores/MyUserinfo";
 
 export default function WSMessageDeleteReaction(dat: IReaciton) {
-  console.log("WSMessageDeleteReaction :: triggered dat->", dat);
+  //console.log("WSMessageDeleteReaction :: triggered dat->", dat);
 
   //履歴Storeのメッセージデータ更新
   setStoreHistory(produce((prev) => {
