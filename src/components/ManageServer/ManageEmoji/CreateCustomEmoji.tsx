@@ -9,6 +9,7 @@ import type { DOMElement } from "solid-js/jsx-runtime";
 import PUT_SERVER_CUSTOM_EMOJI_UPLOAD from "~/api/SERVER/SERVER_CUSTOM_EMOJI_UPLOAD";
 
 export default function CreateCustomEmoji() {
+  const [dialogDisplay, setDialogDisplay] = createSignal<boolean>(false);
   const [customEmoji, setCustomEmoji] = createSignal<File|null>(null);
   const [customEmojiCode, setCustomEmojiCode] = createSignal<string>("");
   const [emojiPreviewUrl, setEmojiPreviewUrl] = createSignal<string>("");
@@ -20,6 +21,8 @@ export default function CreateCustomEmoji() {
     PUT_SERVER_CUSTOM_EMOJI_UPLOAD(customEmojiCode(), emojiFile)
       .then((r) => {
         console.log("CreateCustomEmoji :: uploadEmoji :: r->", r);
+        //ダイアログを閉じる
+        setDialogDisplay(false);
       })
       .catch((err) => console.error("CreateCustomEmoji :: uploadEmoji :: err->", err));
   }
@@ -53,7 +56,7 @@ export default function CreateCustomEmoji() {
   }
 
   return (
-    <Dialog>
+    <Dialog open={dialogDisplay()} onOpenChange={setDialogDisplay}>
       <DialogContent>
         <DialogHeader>
           カスタム絵文字の作成

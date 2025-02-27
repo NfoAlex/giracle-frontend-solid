@@ -53,7 +53,7 @@ export default function ManageEmoji() {
                       <img src={"/api/server/custom-emoji/" + emoji.code} alt={emoji.code} class={"my-1 w-8 h-8"}/>
                     </td>
                     <td><code>{emoji.code}</code></td>
-                    <td>{getterUserinfo(emoji.uploadedUserId).name}</td>
+                    <td class={"overflow-x-auto"}>{getterUserinfo(emoji.uploadedUserId).name}</td>
                     <td class={"text-right"}>
                       <Button ondblclick={() => deleteEmoji(emoji.code)} class={"text-red-500 my-1"} size={"sm"} variant={"outline"}>
                         <IconTrash />
