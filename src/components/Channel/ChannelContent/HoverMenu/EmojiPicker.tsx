@@ -16,16 +16,13 @@ export default function EmojiPicker(props: {message: IMessage}) {
   });
 
   const emojiClickHandler = async (event: EmojiClickEvent) => {
-    console.log("EmojiPicker :: onMount : クリックしたやつ->", event.detail);
+    //console.log("EmojiPicker :: onMount : クリックしたやつ->", event.detail);
 
     //絵文字コードを取得、無ければ停止
     const emojiCode = event.detail.emoji.shortcodes;
     if (emojiCode === undefined) return;
     //リアクション
     POST_MESSAGE_EMOJI_REACTION(props.message.id, props.message.channelId, emojiCode[0])
-      .then((r) => {
-        console.log("EmojiPicker :: emojiClickHandler : r->", r);
-      })
       .catch((e) => {
         console.error("EmojiPicker :: emojiClickHandler : e->", e)
       });
