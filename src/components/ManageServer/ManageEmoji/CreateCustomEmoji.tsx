@@ -86,6 +86,11 @@ export default function CreateCustomEmoji() {
                 <CalloutTitle>絵文字コードに空白は含められません。</CalloutTitle>
               </Callout>
             </Show>
+            <Show when={(/[^\u0020-\u007E]/).test(customEmojiCode())}>
+              <Callout variant={"error"} class={"my-2"}>
+                <CalloutTitle>絵文字コードに全角文字は使えません。</CalloutTitle>
+              </Callout>
+            </Show>
           </TextField>
 
           <TextField>
@@ -116,7 +121,9 @@ export default function CreateCustomEmoji() {
         <DialogFooter>
           <Button
             onClick={uploadEmoji}
-            disabled={emojiPreviewUrl()==="" || customEmojiCode()==="" || processing()}
+            disabled={
+              emojiPreviewUrl()==="" || customEmojiCode()==="" || processing() || (/[^\u0020-\u007E]/).test(customEmojiCode()) || customEmojiCode().includes(" ")
+            }
           >アップロードする</Button>
         </DialogFooter>
       </DialogContent>
