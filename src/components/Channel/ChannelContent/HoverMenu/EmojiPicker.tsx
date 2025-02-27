@@ -6,9 +6,11 @@ import POST_MESSAGE_EMOJI_REACTION from "~/api/MESSAGE/MESSAGE_EMOJI_REACTION";
 import type {IMessage} from "~/types/Message";
 import {getEmojiDatasetWithCustomEmoji} from "~/stores/CustomEmoji";
 
-export default function EmojiPicker(props: {message: IMessage}) {
+export default function EmojiPicker(props: {message: IMessage, onClicked: () => void}) {
   let elementRef: HTMLDivElement | undefined;
-  let [onUpperHalf, setOnUpperHalf] = createSignal(false);
+  const [onUpperHalf, setOnUpperHalf] = createSignal(false);
+  const [shiftPressed, setShiftPressed] = createSignal(false);
+
   const picker = new Picker({
     locale: "ja",
     i18n: ja,
@@ -20,6 +22,10 @@ export default function EmojiPicker(props: {message: IMessage}) {
     },
   });
 
+  /**
+   * 絵文字クリック時のハンドラ
+   * @param event
+   */
   const emojiClickHandler = async (event: EmojiClickEvent) => {
     //console.log("EmojiPicker :: onMount : クリックしたやつ->", event.detail);
 
@@ -31,6 +37,20 @@ export default function EmojiPicker(props: {message: IMessage}) {
       .catch((e) => {
         console.error("EmojiPicker :: emojiClickHandler : e->", e)
       });
+
+    //Shiftキーが押されていたら閉じない
+    if (!shiftPressed()) {
+      props.onClicked();
+    }
+  }
+
+
+  //Shiftキー押下時のハンドラ
+  const shiftDownHandler = (e: KeyboardEvent) => {
+    if (e.key === "Shift") setShiftPressed(true);
+  }
+  const shiftUpHandler = (e: KeyboardEvent) => {
+    if (e.key === "Shift") setShiftPressed(false);
   }
 
   onMount(() => {
@@ -57,10 +77,16 @@ export default function EmojiPicker(props: {message: IMessage}) {
       //絵文字クリックしたときのハンドラリンク
       picker.addEventListener('emoji-click', emojiClickHandler);
     }
+
+    //Shiftキー押下時のハンドラリンク
+    window.addEventListener('keydown', shiftDownHandler);
+    window.addEventListener('keyup', shiftUpHandler);
   });
 
   onCleanup(() => {
     picker.removeEventListener('emoji-click', emojiClickHandler);
+    window.removeEventListener('keydown', shiftDownHandler);
+    window.removeEventListener('keyup', shiftUpHandler);
   });
 
   return (
