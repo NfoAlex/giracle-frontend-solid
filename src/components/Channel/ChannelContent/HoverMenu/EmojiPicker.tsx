@@ -1,4 +1,4 @@
-import {onCleanup, onMount} from "solid-js";
+import {createSignal, onCleanup, onMount} from "solid-js";
 import {Picker} from "emoji-picker-element";
 import type {EmojiClickEvent} from "emoji-picker-element/shared";
 import ja from 'emoji-picker-element/i18n/ja';
@@ -7,6 +7,8 @@ import type {IMessage} from "~/types/Message";
 import {getEmojiDatasetWithCustomEmoji} from "~/stores/CustomEmoji";
 
 export default function EmojiPicker(props: {message: IMessage}) {
+  let elementRef: HTMLDivElement | undefined;
+  let [onUpperHalf, setOnUpperHalf] = createSignal(false);
   const picker = new Picker({
     locale: "ja",
     i18n: ja,
@@ -31,6 +33,14 @@ export default function EmojiPicker(props: {message: IMessage}) {
 
   onMount(() => {
     console.log("EmojiPicker :: onMount : emoji-picker-element", Picker);
+
+    //絵文字ピッカー表示位置のための要素の高さ取得
+    if (elementRef) {
+      //console.log("EmojiPicker :: onMount : elementRef.getBoundingClientRect().height->", elementRef.getBoundingClientRect().top);
+      setOnUpperHalf(Math.abs(elementRef.getBoundingClientRect().top) < window.innerHeight / 2);
+    }
+
+    //絵文字ピッカーをマウント
     const emojiPickerDiv = document.getElementById("emojiPickerDiv");
     if (emojiPickerDiv) {
       emojiPickerDiv.appendChild(picker);
@@ -45,7 +55,12 @@ export default function EmojiPicker(props: {message: IMessage}) {
   });
 
   return (
-    <div id={"emojiPickerDiv"} class={"absolute top-0 right-0"}>
+    <div
+      id={"emojiPickerDiv"}
+      ref={elementRef}
+      class={`z-50 absolute ${onUpperHalf() ? "top-full" : "bottom-full"} right-0`}
+      style={"max-height: 50vh;"}
+    >
     </div>
   )
 }
