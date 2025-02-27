@@ -25,6 +25,8 @@ export default function ManageEmoji() {
   return (
     <div class="flex flex-col overflow-y-auto h-full gap-2">
 
+      <CreateCustomEmoji />
+
       <Card class={"p-2 max-h-full overflow-y-auto flex flex-col"}>
         <Show when={storeCustomEmoji.length === 0}>
           <div class={"text-center py-5"}>
@@ -38,22 +40,22 @@ export default function ManageEmoji() {
               <TableHead>絵文字</TableHead>
               <TableHead>コード</TableHead>
               <TableHead>作成したユーザー</TableHead>
-              <TableHead class="text-right">操作</TableHead>
+              <TableHead class="text-right">削除操作</TableHead>
             </TableRow>
           </TableHeader>
 
-          <TableBody class={"overflow-y-auto"}>
+          <TableBody class={"overflow-y-auto pb-80"}>
             <For each={storeCustomEmoji}>
               {
                 (emoji) => (
                   <TableRow>
                     <td>
-                      <img src={"/api/server/custom-emoji/" + emoji.code} alt={emoji.code} class={"my-1 w-8 h-8"} />
+                      <img src={"/api/server/custom-emoji/" + emoji.code} alt={emoji.code} class={"my-1 w-8 h-8"}/>
                     </td>
-                    <td><code>{ emoji.code }</code></td>
-                    <td>{ getterUserinfo(emoji.uploadedUserId).name }</td>
+                    <td><code>{emoji.code}</code></td>
+                    <td>{getterUserinfo(emoji.uploadedUserId).name}</td>
                     <td class={"text-right"}>
-                      <Button ondblclick={()=>deleteEmoji(emoji.code)} class={"text-red-500 my-1"} size={"sm"} variant={"outline"}>
+                      <Button ondblclick={() => deleteEmoji(emoji.code)} class={"text-red-500 my-1"} size={"sm"} variant={"outline"}>
                         <IconTrash />
                         <p>削除</p>
                       </Button>
@@ -65,8 +67,6 @@ export default function ManageEmoji() {
           </TableBody>
         </Table>
       </Card>
-
-      <CreateCustomEmoji />
     </div>
   );
 }

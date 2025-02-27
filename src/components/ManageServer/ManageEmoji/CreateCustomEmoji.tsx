@@ -106,8 +106,9 @@ export default function CreateCustomEmoji() {
       </DialogContent>
 
       <DialogTrigger>
-        <Button class={"absolute right-10 bottom-10 w-16 h-16 p-0"}>
+        <Button class={"w-full p-4 md:absolute right-10 bottom-10 md:w-16 md:h-16 md:p-0"}>
           <IconPlus />
+          <p class={"md:hidden"}>カスタム絵文字を作成</p>
         </Button>
       </DialogTrigger>
     </Dialog>
