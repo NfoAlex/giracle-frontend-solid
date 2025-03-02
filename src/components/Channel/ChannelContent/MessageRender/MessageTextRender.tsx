@@ -13,12 +13,12 @@ export default function MessageTextRender(props: { content: string }) {
     const urlPattern =
       /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/gi;
     const mentionPattern = /@<([a-f0-9-]+)>/g;
-    const scriptPattern = /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi;
-    const htmlTagPattern = /<\/?[^>]+(>|$)/g;
+    //const scriptPattern = /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi;
+    //const htmlTagPattern = /<\/?[^>]+(>|$)/g;
     const channelPattern = /#<([a-f0-9-]+)>/g;
-    const codeSnippetPattern = /```([^`]+)```/g;
+    //const codeSnippetPattern = /```([^`]+)```/g;
     const inlineCodePattern = /`([^`]+)`/g;
-    const newlinePattern = /\n/g;
+    //const newlinePattern = /\n/g;
 
     //レンダーする要素用データ
     const ObjectIndex: {
