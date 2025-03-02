@@ -13,12 +13,12 @@ export default function MessageTextRender(props: { content: string }) {
     const urlPattern =
       /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/gi;
     const mentionPattern = /@<([a-f0-9-]+)>/g;
-    const scriptPattern = /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi;
-    const htmlTagPattern = /<\/?[^>]+(>|$)/g;
+    //const scriptPattern = /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi;
+    //const htmlTagPattern = /<\/?[^>]+(>|$)/g;
     const channelPattern = /#<([a-f0-9-]+)>/g;
-    const codeSnippetPattern = /```([^`]+)```/g;
+    //const codeSnippetPattern = /```([^`]+)```/g;
     const inlineCodePattern = /`([^`]+)`/g;
-    const newlinePattern = /\n/g;
+    //const newlinePattern = /\n/g;
 
     //レンダーする要素用データ
     const ObjectIndex: {
@@ -50,30 +50,28 @@ export default function MessageTextRender(props: { content: string }) {
     //ここでメッセージ本文から抜き出し処理
     addMatches(urlPattern, "link");
     addMatches(mentionPattern, "userId");
-    addMatches(newlinePattern, "breakLine");
+    //addMatches(newlinePattern, "breakLine");
     addMatches(channelPattern, "channel");
     addMatches(inlineCodePattern, "inlineCode");
 
     ObjectIndex.sort((a, b) => a.index - b.index);
 
+    //レンダーする内容を配列化
     const content: string[] = [];
     let lastIndex = 0;
     for (const obj of ObjectIndex) {
       content.push(props.content.slice(lastIndex, obj.index));
       lastIndex = obj.index + obj.context.length;
     }
+    //ObjectIndexで残ったデータをプッシュ
     content.push(props.content.slice(lastIndex));
 
     //最終的なレンダリング用配列
     const MessageRenderingFinal: JSX.Element[] = [];
     //レンダーする要素配列をループしてJSXへパース
     for (let i = 0; i < content.length; i++) {
-      //まず最初のデータをパースする(空なら改行させる)
-      if (content[i] !== "") {
-        MessageRenderingFinal.push(<span class={"w-full whitespace-pre-wrap break-words"}>{content[i]}</span>);
-      } else {
-        MessageRenderingFinal.push(<span class={"w-full"}><br /></span>);
-      }
+      //まず最初のデータをパースする
+      MessageRenderingFinal.push(<span class={"w-full whitespace-pre-wrap break-words"}>{content[i]}</span>);
       if (i < ObjectIndex.length) {
         const obj = ObjectIndex[i];
         switch (obj.type) {
