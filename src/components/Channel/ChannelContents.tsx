@@ -235,8 +235,8 @@ export default function ChannelContents() {
           c.channelId === param.channelId
         )?.readTime;
 
-        //履歴を取得、格納した時点でもう一度履歴取得を試す
-        FetchHistory(param.channelId, { messageTimeFrom: time, fetchLength: 1 }, "newer");
+        //履歴を取得
+        FetchHistory(param.channelId, { messageTimeFrom: time, fetchLength: 1 }, "older");
       } else {
         initScroll();
       }
