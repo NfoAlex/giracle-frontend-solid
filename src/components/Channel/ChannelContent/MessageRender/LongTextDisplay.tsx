@@ -17,6 +17,15 @@ import RenderEmojiReactions from "~/components/Channel/ChannelContent/MessageRen
 export default function LongTextDisplay(props: { message: IMessage }) {
   const [open, setOpen] = createSignal(false);
 
+  /**
+   * 改行の数計算(長文表示用)
+   */
+  const breakLinesNum = () => {
+    const breakLines = props.message.content.match(/\n/g);
+    if (breakLines === null) return 0;
+    return breakLines.length;
+  };
+
   return (
     <>
       {/* メッセージ展開の表示 */}
@@ -65,7 +74,10 @@ export default function LongTextDisplay(props: { message: IMessage }) {
 
       {/* 通常表示 */}
       <Card class={"w-full p-3 my-1 flex flex-col gap-2"}>
-        <MessageTextRender content={props.message.content.slice(0,100) + "..."} />
+        {/* メッセージレンダー、改行が多ければ省略表示する文字数を減らす */}
+        <MessageTextRender
+          content={breakLinesNum() > 5 ? props.message.content.slice(0,10) + "..." : props.message.content.slice(0,100) + "..."}
+        />
         <hr />
         <span class={"flex items-center"}>
           <Button onClick={()=>setOpen(true)} size={"sm"}>
