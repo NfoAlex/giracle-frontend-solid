@@ -63,7 +63,6 @@ export default function MessageRender(props: {
       </Show>
       <div class="flex flex-col">
         {/* メッセージ本文 */}
-        num : { breakLinesNum() }
         {
           props.message.content.length > 500 || breakLinesNum() > 5
           ?
