@@ -57,7 +57,7 @@ render(() =>
           </Show>
           <Suspense>
             {/* サイドバーを考慮した幅指定をしてメッセージレンダー部分の変なオーバーフローを無くす */}
-            <div class={"md:w-[calc(100%-16rem)] w-screen"}>{props.children}</div>
+            <div class={"md:w-[calc(100%-16rem)] w-screen mx-auto"}>{props.children}</div>
           </Suspense>
         </SidebarProvider>
       </ColorModeProvider>
