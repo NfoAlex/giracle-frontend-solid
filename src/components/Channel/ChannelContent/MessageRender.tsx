@@ -13,6 +13,14 @@ export default function MessageRender(props: {
   message: IMessage;
   displayUserName: boolean;
 }) {
+  /**
+   * 改行の数計算(長文表示用)
+   */
+  const breakLinesNum = () => {
+    const breakLines = props.message.content.match(/\n/g);
+    if (breakLines === null) return 0;
+    return breakLines.length;
+  };
 
   /**
    * メッセージの作成日時を優しく(同じ日付なら省くなど)表示する
@@ -55,8 +63,9 @@ export default function MessageRender(props: {
       </Show>
       <div class="flex flex-col">
         {/* メッセージ本文 */}
+        num : { breakLinesNum() }
         {
-          props.message.content.length > 500
+          props.message.content.length > 500 || breakLinesNum() > 5
           ?
             <LongTextDisplay message={props.message} />
           :
