@@ -70,8 +70,15 @@ export default function MessageTextRender(props: { content: string }) {
     const MessageRenderingFinal: JSX.Element[] = [];
     //レンダーする要素配列をループしてJSXへパース
     for (let i = 0; i < content.length; i++) {
-      //まず最初のデータをパースする
-      MessageRenderingFinal.push(<span class={"max-w-full whitespace-pre-wrap break-words"}>{content[i]}</span>);
+      //まず最初のデータをパースする、改行(\n)を含むならw-fullで改行を適用させる
+      if (content[i].includes("\n")) {
+        MessageRenderingFinal.push(
+          <span class={"w-full whitespace-pre-wrap break-words"}>{content[i]}</span>
+        );
+      } else {
+        MessageRenderingFinal.push(<span class={"max-w-full whitespace-pre-wrap break-words"}>{content[i]}</span>);
+      }
+
       if (i < ObjectIndex.length) {
         const obj = ObjectIndex[i];
         switch (obj.type) {
