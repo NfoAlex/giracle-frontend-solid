@@ -5,9 +5,13 @@ import {getRolePower, storeMyUserinfo} from "~/stores/MyUserinfo";
 import type {IMessage} from "~/types/Message";
 import {Button} from "~/components/ui/button";
 import EmojiPicker from "~/components/Channel/ChannelContent/HoverMenu/EmojiPicker";
-import {createSignal} from "solid-js";
+import {createEffect, createSignal, on} from "solid-js";
 
-export default function HoverMenu(props: { message: IMessage, onEditMode: (id: string) => void }) {
+export default function HoverMenu(props: {
+  message: IMessage,
+  onEditMode: (id: string) => void,
+  onReacting: (id: string) => void
+}) {
   const [openEmoji, setOpenEmoji] = createSignal(false);
 
   /**
@@ -29,6 +33,17 @@ export default function HoverMenu(props: { message: IMessage, onEditMode: (id: s
   const enterEditMode = () => {
     props.onEditMode(props.message.id);
   }
+
+  //絵文字リアクション途中の表示ロック用(親コンポで表示判別しています)
+  createEffect(
+    on(
+      () => openEmoji(),
+      (v) => {
+        //console.log("HoverMenu :: createEffect : openEmoji->", v);
+        if (openEmoji()) props.onReacting(props.message.id);
+      }
+    )
+  )
 
   return (
     <Card class={"p-2 flex items-center"}>

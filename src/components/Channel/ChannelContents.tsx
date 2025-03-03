@@ -19,6 +19,7 @@ import {storeMyUserinfo} from "~/stores/MyUserinfo";
 export default function ChannelContents() {
   const [isFocused, setIsFocused] = createSignal(true);
   const [hoveredMsgId, setHoveredMsgId] = createSignal("");
+  const [reactingMsgId, setReactingMsgId] = createSignal("");
   const [editingMsgId, setEditingMsgId] = createSignal("");
   const param = useParams();
   let channelIdBefore = "";
@@ -332,13 +333,14 @@ export default function ChannelContents() {
                               />
                             </MentionReadWrapper>
                         }
-                        { //ホバーメニュー
-                          hoveredMsgId() === h.id
+                        { //ホバーメニュー(リアクション用の絵文字選択途中も表示を残す)
+                          (hoveredMsgId() === h.id || reactingMsgId() === h.id)
                           &&
                           <div class={"absolute right-1 z-50"} style={"bottom:calc(100% - 15px);"}>
                             <HoverMenu
                               message={h}
                               onEditMode={(msgId)=>{ setEditingMsgId(msgId); setHoveredMsgId(""); }}
+                              onReacting={(msgId) => { setReactingMsgId(msgId); }}
                             />
                           </div>
                         }
