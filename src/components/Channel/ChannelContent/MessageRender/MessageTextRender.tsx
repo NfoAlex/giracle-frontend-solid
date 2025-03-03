@@ -71,7 +71,7 @@ export default function MessageTextRender(props: { content: string }) {
     //レンダーする要素配列をループしてJSXへパース
     for (let i = 0; i < content.length; i++) {
       //まず最初のデータをパースする
-      MessageRenderingFinal.push(<span class={"w-full whitespace-pre-wrap break-words"}>{content[i]}</span>);
+      MessageRenderingFinal.push(<span class={"max-w-full whitespace-pre-wrap break-words"}>{content[i]}</span>);
       if (i < ObjectIndex.length) {
         const obj = ObjectIndex[i];
         switch (obj.type) {
@@ -103,9 +103,9 @@ export default function MessageTextRender(props: { content: string }) {
     linkify();
   })
 
-  return <div class="w-full overflow-x-auto whitespace-pre-wrap break-all flex flex-wrap">
+  return <div class="w-full overflow-x-auto flex flex-wrap">
     <For each={text()}>
-      {(el) => <Dynamic component={() => <>{el}</>} Fallback={<span>{el}</span>} />}
+      {(el) => <Dynamic component={() => <>{el}</>} Fallback={<span class={"max-w-full"}>{el}</span>} />}
     </For>
   </div>;
 }
