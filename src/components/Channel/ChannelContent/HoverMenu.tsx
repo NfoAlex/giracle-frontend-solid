@@ -5,7 +5,7 @@ import {getRolePower, storeMyUserinfo} from "~/stores/MyUserinfo";
 import type {IMessage} from "~/types/Message";
 import {Button} from "~/components/ui/button";
 import EmojiPicker from "~/components/Channel/ChannelContent/HoverMenu/EmojiPicker";
-import {createEffect, createSignal, on} from "solid-js";
+import {createSignal} from "solid-js";
 
 export default function HoverMenu(props: {
   message: IMessage,
@@ -34,24 +34,33 @@ export default function HoverMenu(props: {
     props.onEditMode(props.message.id);
   }
 
-  //絵文字リアクション途中の表示ロック用(親コンポで表示判別しています)
-  createEffect(
-    on(
-      () => openEmoji(),
-      (v) => {
-        //console.log("HoverMenu :: createEffect : openEmoji->", v);
-        if (openEmoji()) props.onReacting(props.message.id);
-      }
-    )
-  )
+  /**
+   * リアクション画面表示を切り替える、また親コンポにも伝える
+   */
+  const toggleOpenEmoji = () => {
+    if (openEmoji()) {
+      setOpenEmoji(false);
+      props.onReacting("");
+    } else {
+      setOpenEmoji(true);
+      props.onReacting(props.message.id);
+    }
+  }
 
   return (
     <Card class={"p-2 flex items-center"}>
       <p class={"text-sm font-extralight mr-2"}>{ new Date(props.message.createdAt).toLocaleString() }</p>
 
       <div class={"md:relative"}>
-        <Button onClick={()=>setOpenEmoji(true)} variant={"ghost"} class={"w-8 h-8"}><IconMoodHappy /></Button>
-        { openEmoji() && <EmojiPicker message={props.message} onClicked={()=>setOpenEmoji(false)} /> }
+        <Button onClick={()=>toggleOpenEmoji()} variant={"ghost"} class={"w-8 h-8"}><IconMoodHappy /></Button>
+        {
+          openEmoji()
+          &&
+          <EmojiPicker
+            message={props.message}
+            onClicked={()=> { setOpenEmoji(false); props.onReacting(""); } }
+          />
+        }
       </div>
       {
         storeMyUserinfo.id === props.message.userId

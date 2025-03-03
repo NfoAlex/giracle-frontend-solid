@@ -310,11 +310,13 @@ export default function ChannelContents() {
                           </UserinfoModalWrapper>
                         </Show>
                       </div>
+
+                      {/* ホバー判定部分 */}
                       <div
-                        class={`relative shrink-0 grow-0 rounded-md px-2 ml-auto ${hoveredMsgId()===h.id ? "hover:bg-accent" : ""}`}
+                        class={`relative shrink-0 grow-0 rounded-md px-2 ml-auto ${(hoveredMsgId()===h.id || reactingMsgId()===h.id) ? "hover:bg-accent" : ""}`}
                         style="width:calc(100% - 45px)"
-                        onmouseenter={() => editingMsgId()!==h.id && setHoveredMsgId(h.id)}
-                        onmouseleave={() => setHoveredMsgId("")}
+                        onmouseenter={() => (editingMsgId()!==h.id && reactingMsgId()==="") && setHoveredMsgId(h.id)}
+                        onmouseleave={() => reactingMsgId()==="" && setHoveredMsgId("")}
                         on:touchend={() => setHoveredMsgId(h.id) /* スマホ用 */}
                       >
                         { //メッセージ表示部分。編集モードか否かで表示を変える
