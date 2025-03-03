@@ -89,12 +89,20 @@ export default function EmojiPicker(props: {message: IMessage, onClicked: () => 
   });
 
   return (
-    <div
-      id={"emojiPickerDiv"}
-      ref={elementRef}
-      class={`z-50 absolute ${onUpperHalf() ? "top-full" : "bottom-full"} right-0`}
-      style={"max-height: 50vh;"}
-    >
-    </div>
+    <>
+      {/* 絵文字ピッカー外すべてを覆うspan、クリックで絵文字ピッカー閉じる用 */}
+      <span
+        onclick={props.onClicked}
+        class={"z-10 fixed w-screen h-screen border-2 top-0 left-0"}
+      ></span>
+      {/* 絵文字ピッカー */}
+      <div
+        id={"emojiPickerDiv"}
+        ref={elementRef}
+        class={`z-50 absolute ${onUpperHalf() ? "top-full" : "bottom-full"} right-0`}
+        style={"max-height: 50vh;"}
+      >
+      </div>
+    </>
   )
 }
