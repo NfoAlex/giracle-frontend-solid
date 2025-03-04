@@ -110,7 +110,7 @@ export default function MessageTextRender(props: { content: string }) {
     linkify();
   })
 
-  return <div class="w-full overflow-x-auto flex flex-wrap">
+  return <div class="py-1 w-full overflow-x-auto flex flex-wrap">
     <For each={text()}>
       {(el) => <Dynamic component={() => <>{el}</>} Fallback={<span class={"max-w-full"}>{el}</span>} />}
     </For>

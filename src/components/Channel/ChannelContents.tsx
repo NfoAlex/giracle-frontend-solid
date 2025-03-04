@@ -279,7 +279,7 @@ export default function ChannelContents() {
 
   return (
     <div class="w-full overflow-y-auto p-2 grow">
-      <div id="history" class="h-full w-full overflow-y-auto flex flex-col-reverse gap-2">
+      <div id="history" class="h-full w-full overflow-y-auto flex flex-col-reverse gap-1">
         <For each={storeHistory[param.channelId]?.history}>
           {(h, index) => (
             <div id={`messageId::${h.id}`} class={"w-full"}>
@@ -314,7 +314,7 @@ export default function ChannelContents() {
                       {/* ホバー判定部分 */}
                       <div
                         class={
-                          `relative shrink-0 grow-0 rounded-md px-2 ml-auto ${hoveredMsgId()===h.id ? "hover:bg-accent" : ""} ${h.content.includes("@<" + storeMyUserinfo.id + ">") && "border-dotted border-2"}`
+                          `relative shrink-0 grow-0 rounded-md px-2 ml-auto ${hoveredMsgId()===h.id ? "hover:bg-accent" : ""} ${h.content.includes("@<" + storeMyUserinfo.id + ">") && "border-2"}`
                         }
                         style="width:calc(100% - 45px)"
                         onmouseenter={() => editingMsgId()!==h.id && setHoveredMsgId(h.id)}
