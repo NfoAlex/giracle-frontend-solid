@@ -313,7 +313,9 @@ export default function ChannelContents() {
 
                       {/* ホバー判定部分 */}
                       <div
-                        class={`relative shrink-0 grow-0 rounded-md px-2 ml-auto ${hoveredMsgId()===h.id ? "hover:bg-accent" : ""}`}
+                        class={
+                          `relative shrink-0 grow-0 rounded-md px-2 ml-auto ${hoveredMsgId()===h.id ? "hover:bg-accent" : ""} ${h.content.includes("@<" + storeMyUserinfo.id + ">") && "border-dotted border-2"}`
+                        }
                         style="width:calc(100% - 45px)"
                         onmouseenter={() => editingMsgId()!==h.id && setHoveredMsgId(h.id)}
                         onmouseleave={() => setHoveredMsgId("")}
