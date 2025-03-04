@@ -87,7 +87,7 @@ export default function MessageTextRender(props: { content: string }) {
             break;
           case "userId":
             MessageRenderingFinal.push(
-              <Badge variant={storeMyUserinfo.id===obj.context.slice(2, -1)?"default":"secondary"}>@  { getterUserinfo(obj.context.slice(2, -1)).name }</Badge>
+              <Badge variant={storeMyUserinfo.id===obj.context.slice(2, -1)?"default":"secondary"} class="h-5 my-auto">@  { getterUserinfo(obj.context.slice(2, -1)).name }</Badge>
             );
             break;
           case "channel":
@@ -110,7 +110,7 @@ export default function MessageTextRender(props: { content: string }) {
     linkify();
   })
 
-  return <div class="w-full overflow-x-auto flex flex-wrap">
+  return <div class="py-1 w-full overflow-x-auto flex flex-wrap">
     <For each={text()}>
       {(el) => <Dynamic component={() => <>{el}</>} Fallback={<span class={"max-w-full"}>{el}</span>} />}
     </For>
