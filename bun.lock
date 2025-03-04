@@ -4,6 +4,7 @@
     "": {
       "name": "giracle-front-solid",
       "dependencies": {
+        "@fontsource/noto-sans": "^5.2.5",
         "@kobalte/core": "^0.13.9",
         "@solidjs/router": "^0.15.3",
         "@tabler/icons-solidjs": "^3.30.0",
@@ -18,7 +19,7 @@
         "vite-plugin-pwa": "^0.21.1",
       },
       "devDependencies": {
-        "@types/node": "^22.13.8",
+        "@types/node": "^22.13.9",
         "autoprefixer": "^10.4.20",
         "postcss": "^8.5.3",
         "tailwindcss": "^3.4.17",
@@ -274,6 +275,8 @@
     "@floating-ui/dom": ["@floating-ui/dom@1.6.13", "", { "dependencies": { "@floating-ui/core": "^1.6.0", "@floating-ui/utils": "^0.2.9" } }, ""],
 
     "@floating-ui/utils": ["@floating-ui/utils@0.2.9", "", {}, ""],
+
+    "@fontsource/noto-sans": ["@fontsource/noto-sans@5.2.5", "", {}, "sha512-g3hWgsQayHQGVXgQKjbHKpS7YQFQY8azwXFCi3ZkhgCK5fZXe3udeQYrZJJ4PMswGkNhoDPRR9OJZBlMjzZAEQ=="],
 
     "@internationalized/date": ["@internationalized/date@3.6.0", "", { "dependencies": { "@swc/helpers": "^0.5.0" } }, ""],
 
