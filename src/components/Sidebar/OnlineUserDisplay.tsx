@@ -11,7 +11,7 @@ export default function OnlineUserDisplay() {
     <Dialog>
       <DialogTrigger class={"w-full"}>
         <Badge variant={"secondary"} class={"w-full flex items-center px-3 py-2"}>
-          <p>オンラインユーザー : </p>
+          <p class="font-bold">オンラインユーザー : </p>
           <span class={"ml-auto flex items-center gap-1"}>
             <IconCircleFilled color={"green"} size={16} />
             { storeUserOnline.length }
