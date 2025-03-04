@@ -7,8 +7,9 @@ export default function MentionReadWrapper(props: {children: JSX.Element, messag
   onMount(() => {
     const msg = storeInbox.find((inbx) => inbx.Message.id === props.messageId);
     if (msg) {
+      //console.log("MentionReadWrapper :: onMount : msg->", msg);
       POST_MESSAGE_INBOX_READ(props.messageId).then(() => {
-        console.log("MentionReadWrapper :: onMounted : message read");
+        //console.log("MentionReadWrapper :: onMounted : message read");
       }).catch((e) => console.error("MentionReadWrapper :: onMounted : 既読error->", e));
     }
   });
