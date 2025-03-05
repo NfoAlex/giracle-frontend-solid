@@ -2,7 +2,7 @@
 import { render } from 'solid-js/web';
 import { Route, Router, useLocation, useNavigate } from "@solidjs/router";
 
-import "@fontsource/noto-sans";
+import '@fontsource-variable/noto-sans-jp';
 import './index.css';
 
 import { lazy, Show, Suspense } from 'solid-js';

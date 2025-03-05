@@ -22,6 +22,7 @@
     "vite-plugin-solid": "^2.11.6"
   },
   "dependencies": {
+    "@fontsource-variable/noto-sans-jp": "^5.2.5",
     "@fontsource/noto-sans": "^5.2.5",
     "@kobalte/core": "^0.13.9",
     "@solidjs/router": "^0.15.3",
