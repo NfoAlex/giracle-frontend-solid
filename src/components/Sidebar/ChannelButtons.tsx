@@ -68,7 +68,7 @@ export default function ChannelButtons() {
     }
 
     //Sortable用の要素取得
-    const el = document.getElementById("sidebar-content");
+    const el = document.getElementById("channelButtonDisplay");
     if (el === null) {
       console.error("Element not found");
       return;
@@ -110,31 +110,29 @@ export default function ChannelButtons() {
   });
 
   return (
-    <SidebarMenu>
-      <div id="sidebar-content" class={"p-2"}>
-        <For each={channelListSorted()}>
-          {(c) => (
-            <SidebarMenuItem>
-              <SidebarMenuButton
-                as={A}
-                href={`/app/channel/${c.channelId}`}
-                variant={loc.pathname === `/app/channel/${c.channelId}` ? "outline" : "default"}
-                class="truncate flex flex-row items-center md:p-2 p-5"
-              >
-                { //チャンネルの閲覧権限がある時の錠前アイコン、違うなら"#"アイコン
-                  directGetterChannelInfo(c.channelId).ChannelViewableRole.length !== 0
-                  ?
-                    <IconLock class={"shrink-0 cursor-help"} size={"18"} />
-                  :
-                    <IconHash />
-                }
-                <p class={storeHasNewMessage[c.channelId]?"truncate":"text-muted-foreground truncate"}>{ directGetterChannelInfo(c.channelId).name }</p>
-                { storeHasNewMessage[c.channelId] && <span class="text-xs ml-auto shrink-0">●</span> }
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          )}
-        </For>
-      </div>
+    <SidebarMenu id="channelButtonDisplay">
+      <For each={channelListSorted()}>
+        {(c) => (
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              as={A}
+              href={`/app/channel/${c.channelId}`}
+              variant={loc.pathname === `/app/channel/${c.channelId}` ? "outline" : "default"}
+              class="truncate flex flex-row items-center md:p-2 p-5"
+            >
+              { //チャンネルの閲覧権限がある時の錠前アイコン、違うなら"#"アイコン
+                directGetterChannelInfo(c.channelId).ChannelViewableRole.length !== 0
+                ?
+                  <IconLock class={"shrink-0 cursor-help"} size={"18"} />
+                :
+                  <IconHash />
+              }
+              <p class={storeHasNewMessage[c.channelId]?"truncate":"text-muted-foreground truncate"}>{ directGetterChannelInfo(c.channelId).name }</p>
+              { storeHasNewMessage[c.channelId] && <span class="text-xs ml-auto shrink-0">●</span> }
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        )}
+      </For>
     </SidebarMenu>
   )
 }
