@@ -23,7 +23,6 @@
   },
   "dependencies": {
     "@fontsource-variable/noto-sans-jp": "^5.2.5",
-    "@formkit/drag-and-drop": "^0.4.1",
     "@kobalte/core": "^0.13.9",
     "@solidjs/router": "^0.15.3",
     "@tabler/icons-solidjs": "^3.31.0",
