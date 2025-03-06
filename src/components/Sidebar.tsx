@@ -66,33 +66,9 @@ export function AppSidebar() {
           <SidebarGroup>
 
           <SidebarGroupLabel>参加チャンネル</SidebarGroupLabel>
-            <SidebarMenu>
-              <For each={storeMyUserinfo.ChannelJoin}>
-                {(c) => (
-                  <SidebarMenuItem>
-                    <SidebarMenuButton
-                      as={A}
-                      href={`/app/channel/${c.channelId}`}
-                      variant={loc.pathname === `/app/channel/${c.channelId}` ? "outline" : "default"}
-                      class="truncate flex flex-row items-center md:p-2 p-5"
-                    >
-                      { //チャンネルの閲覧権限がある時の錠前アイコン、違うなら"#"アイコン
-                        directGetterChannelInfo(c.channelId).ChannelViewableRole.length !== 0
-                        ?
-                          <IconLock class={"shrink-0 cursor-help"} size={"18"} />
-                        :
-                          <IconHash />
-                      }
-                      <p class={storeHasNewMessage[c.channelId]?"truncate":"text-muted-foreground truncate"}>{ directGetterChannelInfo(c.channelId).name }</p>
-                      { storeHasNewMessage[c.channelId] && <span class="text-xs ml-auto shrink-0">●</span> }
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                )}
-              </For>
-            </SidebarMenu>
+            <ChannelButtons />
           </SidebarGroup>
 
-          <ChannelButtons />
 
         </div>
 
