@@ -76,6 +76,8 @@ export default function ChannelButtons() {
 
     new Sortable(el, {
       animation: 150,
+      draggable: ".draggable",
+      handle: ".drag-handler",
       onEnd: (evt) => {
         //console.log("ChannelButons :: ", evt);
         if (evt.newIndex === undefined || evt.oldIndex === undefined) return;
@@ -113,7 +115,7 @@ export default function ChannelButtons() {
     <SidebarMenu id="channelButtonDisplay">
       <For each={channelListSorted()}>
         {(c) => (
-          <SidebarMenuItem>
+          <SidebarMenuItem class="draggable">
             <SidebarMenuButton
               as={A}
               href={`/app/channel/${c.channelId}`}
@@ -123,9 +125,9 @@ export default function ChannelButtons() {
               { //チャンネルの閲覧権限がある時の錠前アイコン、違うなら"#"アイコン
                 directGetterChannelInfo(c.channelId).ChannelViewableRole.length !== 0
                 ?
-                  <IconLock class={"shrink-0 cursor-help"} size={"18"} />
+                  <IconLock class={"shrink-0 cursor-help drag-handler"} size={"18"} />
                 :
-                  <IconHash />
+                  <IconHash class={"drag-handler"} />
               }
               <p class={storeHasNewMessage[c.channelId]?"truncate":"text-muted-foreground truncate"}>{ directGetterChannelInfo(c.channelId).name }</p>
               { storeHasNewMessage[c.channelId] && <span class="text-xs ml-auto shrink-0">●</span> }
