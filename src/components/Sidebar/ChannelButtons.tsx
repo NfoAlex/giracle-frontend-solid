@@ -9,39 +9,52 @@ import Sortable from 'sortablejs';
 
 export default function ChannelButtons() {
   const loc = useLocation();
+  
+  //チャンネルのソート順を保持する変数
   let channelIndexes: { [channelId: string]: number } | null = null;
-  const [channelListSorted, setChannelListSorted] = createSignal(storeMyUserinfo.ChannelJoin);
+  //内部ソート計算用のチャンネルリスト
+  let virtualList = [] as { channelId: string }[];
+  //表示に使うチャンネルリスト
+  const [channelListSorted, setChannelListSorted] = createSignal([...storeMyUserinfo.ChannelJoin]);
 
+  /**
+   * チャンネル表示をソートする
+   */
+  const sortIt = () => {
+    const indx = channelIndexes;
+    if (indx) {
+      const sorted = [...channelListSorted()];
+      sorted.sort((a, b) => {
+        const aIndex = indx[a.channelId];
+        const bIndex = indx[b.channelId];
+        if (aIndex === undefined && bIndex === undefined) {
+          return 0;
+        }
+        if (aIndex === undefined) {
+          return 1;
+        }
+        if (bIndex === undefined) {
+          return -1;
+        }
+        
+        return aIndex - bIndex;
+      });
+      console.log("ChannelButtons :: createEffect : sorted->", sorted);
+      setChannelListSorted(sorted);
+      virtualList = sorted;
+    }
+  }
+
+  //チャンネルの入退出を監視してそのたびにソートする
   createEffect(
     on(
       () => storeMyUserinfo.ChannelJoin.length,
-      () => {
-        const indx = channelIndexes;
-        if (indx) {
-          const sorted = [...channelListSorted()];
-          sorted.sort((a, b) => {
-            const aIndex = indx[a.channelId];
-            const bIndex = indx[b.channelId];
-            if (aIndex === undefined && bIndex === undefined) {
-              return 0;
-            }
-            if (aIndex === undefined) {
-              return 1;
-            }
-            if (bIndex === undefined) {
-              return -1;
-            }
-            
-            return aIndex - bIndex;
-          });
-          console.log("ChannelButtons :: createEffect : sorted->", sorted);
-          setChannelListSorted(sorted);
-        }
-      }
+      () => sortIt()
     )
   );
 
   onMount(() => {
+    //ソート順をLocalStorageから取得
     const indexString = localStorage.getItem("channelIndexes");
     if (indexString) {
       try {
@@ -51,6 +64,7 @@ export default function ChannelButtons() {
       }
     }
 
+    //Sortable用の要素取得
     const el = document.getElementById("sidebar-content");
     if (el === null) {
       console.error("Element not found");
@@ -59,28 +73,45 @@ export default function ChannelButtons() {
 
     new Sortable(el, {
       animation: 150,
+      onUpdate: (evt) => {
+        console.log("ChannelButons :: ", channelListSorted());
+      },
       onEnd: (evt) => {
-        //console.log(channelListSorted());
-        const sorted = [...channelListSorted()];
-        if (evt.oldIndex === undefined || evt.newIndex === undefined) return;
-        const [removed] = sorted.splice(evt.oldIndex, 1);
-        sorted.splice(evt.newIndex, 0, removed);
-        console.log("sorted->", sorted, channelListSorted());
-        //setChannelListSorted(sorted);
+        //console.log("ChannelButons :: ", evt);
+        if (evt.newIndex === undefined || evt.oldIndex === undefined) return;
+
+        //ソートした方向に合わせてvirtualListを更新
+        if (evt.newIndex > evt.oldIndex) {
+          const oldPosItem = virtualList[evt.oldIndex];
+          for (let i=evt.oldIndex; i<evt.newIndex; i++) {
+            virtualList[i] = virtualList[i+1];
+          }
+          virtualList[evt.newIndex] = oldPosItem;
+        } else {
+          const oldPosItem = virtualList[evt.oldIndex];
+          for (let i=evt.oldIndex; i>evt.newIndex; i--) {
+            virtualList[i] = virtualList[i-1];
+          }
+          virtualList[evt.newIndex] = oldPosItem;
+        }
+        //console.log("ChannelButtons :: onMount : sorted->", virtualList, evt.oldIndex, evt.newIndex);
 
         //順番をLocalStorageへ保存
         const newIndexes: { [channelId: string]: number } = {};
-        for (const index in sorted) {
-          newIndexes[sorted[index].channelId] = Number.parseInt(index);
+        for (const index in virtualList) {
+          newIndexes[virtualList[index].channelId] = Number.parseInt(index);
         }
         localStorage.setItem("channelIndexes", JSON.stringify(newIndexes));
       },
     });
+
+    //初回表示用のチャンネルソート
+    sortIt();
   });
 
   return (
     <SidebarMenu>
-      <div id="sidebar-content">
+      <div id="sidebar-content" class={"p-2"}>
         <For each={channelListSorted()}>
           {(c) => (
             <SidebarMenuItem>
