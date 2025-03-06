@@ -9,7 +9,7 @@ import Sortable from 'sortablejs';
 
 export default function ChannelButtons() {
   const loc = useLocation();
-  
+
   //チャンネルのソート順を保持する変数
   let channelIndexes: { [channelId: string]: number } | null = null;
   //内部ソート計算用のチャンネルリスト
@@ -21,9 +21,11 @@ export default function ChannelButtons() {
    * チャンネル表示をソートする
    */
   const sortIt = () => {
+    //ソート順番を取得して確認してからソートする
     const indx = channelIndexes;
     if (indx) {
-      const sorted = [...channelListSorted()];
+      //参加チャンネルデータを取得しなおす
+      const sorted = [...storeMyUserinfo.ChannelJoin];
       sorted.sort((a, b) => {
         const aIndex = indx[a.channelId];
         const bIndex = indx[b.channelId];
@@ -39,7 +41,8 @@ export default function ChannelButtons() {
         
         return aIndex - bIndex;
       });
-      console.log("ChannelButtons :: createEffect : sorted->", sorted);
+      //console.log("ChannelButtons :: createEffect : sorted->", sorted);
+      //ソート後のリストを仮想と表示用どっちもセット
       setChannelListSorted(sorted);
       virtualList = sorted;
     }
@@ -48,7 +51,7 @@ export default function ChannelButtons() {
   //チャンネルの入退出を監視してそのたびにソートする
   createEffect(
     on(
-      () => storeMyUserinfo.ChannelJoin.length,
+      () => storeMyUserinfo.ChannelJoin,
       () => sortIt()
     )
   );
@@ -73,9 +76,6 @@ export default function ChannelButtons() {
 
     new Sortable(el, {
       animation: 150,
-      onUpdate: (evt) => {
-        console.log("ChannelButons :: ", channelListSorted());
-      },
       onEnd: (evt) => {
         //console.log("ChannelButons :: ", evt);
         if (evt.newIndex === undefined || evt.oldIndex === undefined) return;
