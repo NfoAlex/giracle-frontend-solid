@@ -24,13 +24,15 @@ export default function ChannelButtons() {
             const bIndex = indx[b.channelId];
             if (aIndex === undefined && bIndex === undefined) {
               return 0;
-            } else if (aIndex === undefined) {
-              return 1;
-            } else if (bIndex === undefined) {
-              return -1;
-            } else {
-              return aIndex - bIndex;
             }
+            if (aIndex === undefined) {
+              return 1;
+            }
+            if (bIndex === undefined) {
+              return -1;
+            }
+            
+            return aIndex - bIndex;
           });
           console.log("ChannelButtons :: createEffect : sorted->", sorted);
           setChannelListSorted(sorted);
