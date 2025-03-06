@@ -1,5 +1,5 @@
 import { A, useLocation } from "@solidjs/router";
-import { For, Show } from "solid-js";
+import { Show } from "solid-js";
 import {
   Sidebar,
   SidebarContent,
@@ -9,15 +9,12 @@ import {
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
-  SidebarMenuItem,
 } from "~/components/ui/sidebar";
 import { getRolePower, storeMyUserinfo } from "~/stores/MyUserinfo";
 import { storeServerinfo } from "~/stores/Serverinfo";
 import { Avatar, AvatarImage } from "./ui/avatar";
 import { storeAppStatus } from "~/stores/AppStatus";
-import { storeHasNewMessage } from "~/stores/HasNewMessage";
-import {IconBell, IconDatabaseCog, IconHash, IconList, IconLock} from "@tabler/icons-solidjs";
-import {directGetterChannelInfo} from "~/stores/ChannelInfo";
+import {IconBell, IconDatabaseCog, IconList} from "@tabler/icons-solidjs";
 import {storeInbox} from "~/stores/Inbox";
 import {Badge} from "~/components/ui/badge";
 import OnlineUserDisplay from "~/components/Sidebar/OnlineUserDisplay";
@@ -68,7 +65,6 @@ export function AppSidebar() {
           <SidebarGroupLabel>参加チャンネル</SidebarGroupLabel>
             <ChannelButtons />
           </SidebarGroup>
-
 
         </div>
 
