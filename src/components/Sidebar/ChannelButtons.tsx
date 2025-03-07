@@ -45,6 +45,10 @@ export default function ChannelButtons() {
       //ソート後のリストを仮想と表示用どっちもセット
       setChannelListSorted(sorted);
       virtualList = sorted;
+    } else {
+      //ソート順がない場合はそのまま表示、仮想リストも格納
+      setChannelListSorted([...storeMyUserinfo.ChannelJoin]);
+      virtualList = [...storeMyUserinfo.ChannelJoin];
     }
   }
 
