@@ -1,5 +1,5 @@
 import { A, useLocation } from "@solidjs/router";
-import { For, Show } from "solid-js";
+import { Show } from "solid-js";
 import {
   Sidebar,
   SidebarContent,
@@ -9,18 +9,16 @@ import {
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
-  SidebarMenuItem,
 } from "~/components/ui/sidebar";
 import { getRolePower, storeMyUserinfo } from "~/stores/MyUserinfo";
 import { storeServerinfo } from "~/stores/Serverinfo";
 import { Avatar, AvatarImage } from "./ui/avatar";
 import { storeAppStatus } from "~/stores/AppStatus";
-import { storeHasNewMessage } from "~/stores/HasNewMessage";
-import {IconBell, IconDatabaseCog, IconHash, IconList, IconLock} from "@tabler/icons-solidjs";
-import {directGetterChannelInfo} from "~/stores/ChannelInfo";
+import {IconBell, IconDatabaseCog, IconList} from "@tabler/icons-solidjs";
 import {storeInbox} from "~/stores/Inbox";
 import {Badge} from "~/components/ui/badge";
 import OnlineUserDisplay from "~/components/Sidebar/OnlineUserDisplay";
+import ChannelButtons from "./Sidebar/ChannelButtons";
 
 export function AppSidebar() {
   const loc = useLocation();
@@ -65,31 +63,8 @@ export function AppSidebar() {
           <SidebarGroup>
 
           <SidebarGroupLabel>参加チャンネル</SidebarGroupLabel>
-          <SidebarMenu>
-            <For each={storeMyUserinfo.ChannelJoin}>
-              {(c) => (
-                <SidebarMenuItem>
-                  <SidebarMenuButton
-                    as={A}
-                    href={`/app/channel/${c.channelId}`}
-                    variant={loc.pathname === `/app/channel/${c.channelId}` ? "outline" : "default"}
-                    class="truncate flex flex-row items-center md:p-2 p-5"
-                  >
-                    { //チャンネルの閲覧権限がある時の錠前アイコン、違うなら"#"アイコン
-                      directGetterChannelInfo(c.channelId).ChannelViewableRole.length !== 0
-                      ?
-                        <IconLock class={"shrink-0 cursor-help"} size={"18"} />
-                      :
-                        <IconHash />
-                    }
-                    <p class={storeHasNewMessage[c.channelId]?"truncate":"text-muted-foreground truncate"}>{ directGetterChannelInfo(c.channelId).name }</p>
-                    { storeHasNewMessage[c.channelId] && <span class="text-xs ml-auto shrink-0">●</span> }
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              )}
-            </For>
-          </SidebarMenu>
-        </SidebarGroup>
+            <ChannelButtons />
+          </SidebarGroup>
 
         </div>
 

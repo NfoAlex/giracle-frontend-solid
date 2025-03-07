@@ -5,6 +5,7 @@ import ja from 'emoji-picker-element/i18n/ja';
 import POST_MESSAGE_EMOJI_REACTION from "~/api/MESSAGE/MESSAGE_EMOJI_REACTION";
 import type {IMessage} from "~/types/Message";
 import {getEmojiDatasetWithCustomEmoji} from "~/stores/CustomEmoji";
+import DELETE_MESSAGE_DELETE_EMOJI_REACTION from "~/api/MESSAGE/MESSAGE_DELETE_EMOJI_REACTION";
 
 export default function EmojiPicker(props: {message: IMessage, onClicked: () => void}) {
   let elementRef: HTMLDivElement | undefined;
@@ -31,11 +32,30 @@ export default function EmojiPicker(props: {message: IMessage, onClicked: () => 
     //絵文字コードを取得、無ければ停止
     const emojiCode = event.detail.emoji.shortcodes;
     if (emojiCode === undefined) return;
-    //リアクション
-    POST_MESSAGE_EMOJI_REACTION(props.message.id, props.message.channelId, emojiCode[0])
-      .catch((e) => {
-        console.error("EmojiPicker :: emojiClickHandler : e->", e)
-      });
+
+    //自分のリアクションを抜き出し
+    const currentMyReaction = props.message.reactionSummary.filter(reaction => reaction.includingYou);
+
+    //もし対象メッセージに自分からの同じ絵文字コードによるリアクションがあるのなら削除、違うならリアクション
+    if (currentMyReaction.some((reaction) => reaction.emojiCode === emojiCode[0])) {
+      //削除
+      DELETE_MESSAGE_DELETE_EMOJI_REACTION(props.message.id, props.message.channelId, emojiCode[0])
+        .catch((e) => console.error("EmojiPicker :: emojiClickHandler(DELETE_MESSAGE_DELETE_EMOJI_REACTION) : e->", e));
+    } else {
+
+      //自分のが１０個以上あるなら停止
+      if (currentMyReaction.length >= 10) {
+        alert("同一ユーザーによるリアクションは10個までです。");
+        return;
+      }
+
+      //リアクション
+      POST_MESSAGE_EMOJI_REACTION(props.message.id, props.message.channelId, emojiCode[0])
+        .catch((e) => {
+          console.error("EmojiPicker :: emojiClickHandler(POST_MESSAGE_EMOJI_REACTION) : e->", e)
+        });
+    }
+
 
     //Shiftキーが押されていたら閉じない
     if (!shiftPressed()) {
@@ -94,7 +114,7 @@ export default function EmojiPicker(props: {message: IMessage, onClicked: () => 
       <span
         onclick={props.onClicked}
         class={"z-10 fixed w-screen h-screen border-2 top-0 left-0"}
-      ></span>
+      />
       {/* 絵文字ピッカー */}
       <div
         id={"emojiPickerDiv"}
