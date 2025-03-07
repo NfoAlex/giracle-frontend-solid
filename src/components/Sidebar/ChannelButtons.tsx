@@ -104,6 +104,8 @@ export default function ChannelButtons() {
           newIndexes[virtualList[index].channelId] = Number.parseInt(index);
         }
         localStorage.setItem("channelIndexes", JSON.stringify(newIndexes));
+        //Index用の変数を更新
+        channelIndexes = newIndexes;
       },
     });
 
