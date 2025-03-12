@@ -18,7 +18,7 @@ export default function WSUpdateMessage(dat: IMessage) {
     //メッセージを更新
     const newHistory = prev[dat.channelId].history.map((message) => {
       if (message.id === dat.id) {
-        return dat;
+        return {...message, ...dat};
       } else {
         return message;
       }
