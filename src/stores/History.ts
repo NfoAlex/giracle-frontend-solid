@@ -86,12 +86,25 @@ export const insertHistory = (history: IMessage[]) => {
  * @returns 
  */
 export const addMessage = (message: IMessage) => {
+  //メッセージひな形(バックエンドとバージョン違う時のデータ不足対策用)
+  const messageTemplate: IMessage = {
+    channelId: "",
+    content: "",
+    isEdited: false,
+    createdAt: "",
+    id: "",
+    isSystemMessage: false,
+    userId: "",
+    MessageUrlPreview: [],
+    MessageFileAttached: [],
+    reactionSummary: []
+  }
   if (message === undefined) console.error("History :: addMessage : message is undefined");
   if (storeHistory[message.channelId] === undefined) return;
 
-  //格納
+  //格納(//メッセージひな形にマージする形で格納する)
   setStoreHistory(produce((history) => {
-    history[message.channelId].history.unshift(message);
+    history[message.channelId].history.unshift({...messageTemplate, ...message});
   }));
 };
 

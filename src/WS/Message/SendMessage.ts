@@ -7,7 +7,7 @@ export default function WSSendMessage(dat: IMessage) {
   //console.log("WSSendMessage :: triggered dat->", dat);
 
   //履歴に追加
-  addMessage({...dat, MessageUrlPreview: []});
+  addMessage(dat);
 
   //もし受け取ったメッセージのチャンネルにいない、あるいはフォーカスしていないなら新着設定
   if (!location.pathname.includes(dat.channelId) || !document.hasFocus()) {
