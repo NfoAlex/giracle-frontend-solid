@@ -22,15 +22,15 @@ export default function URLPreview(props: { MessageUrlPreview: IMessageUrlPrevie
               </Show>
             </div>
             <CardHeader>
-              <CardTitle class={"flex flex-row items-center gap-1"}>
+              <CardTitle class={"flex flex-row items-center gap-2"}>
                 {
                   urlPreview.faviconLink
                   ?
-                  <img class={"w-2 h-fit shrink"} src={urlPreview.faviconLink} alt="favicon" />
+                  <img class={"w-5 h-fit shrink-0"} src={urlPreview.faviconLink} alt="favicon" />
                   :
                   <IconLink />
                 }
-                <a href={urlPreview.url} target="_blank" rel="noreferrer">
+                <a href={urlPreview.url} target="_blank" rel="noreferrer" class="shrink line-clamp-2">
                   {urlPreview.title}
                 </a>
               </CardTitle>
