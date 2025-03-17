@@ -42,6 +42,7 @@ export interface IMessageUrlPreview {
   faviconLink: string;
   id: number;
   imageLink: string | null;
+  videoLink: string | null;
   title: string;
   type: "article" | "video.other" | "UNKNOWN";
   url: string;
