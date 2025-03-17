@@ -18,7 +18,7 @@ export default function RenderEmoji(props: { emojiCode: string }) {
 
   //型エラーが出ているが動作する。型エラーが出る理由は不明。
   return (
-    <div class="w-5 overflow-x-hidden">
+    <div class="max-w-7 h-6 overflow-x-hidden">
       <Show when={emojiData() !== null}>
         {
           emojiData().url !== undefined
@@ -26,10 +26,10 @@ export default function RenderEmoji(props: { emojiCode: string }) {
           <img
             src={emojiData().url}
             alt={props.emojiCode}
-            class={"w-5 h-5"}
+            class={"w-6 h-6"}
           />
           :
-          <span>{ emojiData().unicode }</span>
+          <span class="h-6" style="font-size:18px;">{ emojiData().unicode }</span>
         }
       </Show>
     </div>
