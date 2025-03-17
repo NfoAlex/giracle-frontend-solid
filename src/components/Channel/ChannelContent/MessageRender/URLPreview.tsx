@@ -15,7 +15,7 @@ export default function URLPreview(props: { MessageUrlPreview: IMessageUrlPrevie
             <div class={"border-b-2 grow relative"}>
               <ImageWithModal class={"mx-auto rounded-t max-h-32 md:max-h-fit w-fit object-cover"} src={urlPreview.imageLink} />
 
-              <Show when={urlPreview.videoLink}>
+              <Show when={urlPreview.videoLink && !urlPreview.videoLink.startsWith("https://www.youtube")}>
                 <span class={"absolute bottom-3 right-3 shadow-xl"}>
                   <VideoPlayerModal urlPreview={urlPreview} />
                 </span>
