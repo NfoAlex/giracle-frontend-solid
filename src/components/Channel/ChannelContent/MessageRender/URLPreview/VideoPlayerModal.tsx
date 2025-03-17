@@ -17,7 +17,7 @@ export default function VideoPlayerModal(props: { urlPreview: IMessageUrlPreview
       </DialogTrigger>
 
       <DialogContent class="width-fit height-fit p-0 pt-10 m-0 rounded-md">
-        <div class="flex items-center gap-2 px-6 truncate line-clamp-1">
+        <div class="w-full flex items-center gap-2 px-6 truncate line-clamp-1">
           {
             props.urlPreview.faviconLink
             ?
@@ -25,7 +25,7 @@ export default function VideoPlayerModal(props: { urlPreview: IMessageUrlPreview
             :
             <IconLink />
           }
-          <p>{ props.urlPreview.title }</p>
+          <p class="shrink truncate">{ props.urlPreview.title }</p>
         </div>
 
         <video
@@ -33,6 +33,7 @@ export default function VideoPlayerModal(props: { urlPreview: IMessageUrlPreview
           width={"auto"}
           src={props.urlPreview.videoLink}
           controls
+          class="mx-auto"
         />
       </DialogContent>
 
