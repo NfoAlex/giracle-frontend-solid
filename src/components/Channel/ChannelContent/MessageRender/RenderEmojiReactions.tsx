@@ -1,4 +1,4 @@
-import {IMessage} from "~/types/Message";
+import type {IMessage} from "~/types/Message";
 import {For} from "solid-js";
 import {Card} from "~/components/ui/card";
 import DELETE_MESSAGE_DELETE_EMOJI_REACTION from "~/api/MESSAGE/MESSAGE_DELETE_EMOJI_REACTION";
