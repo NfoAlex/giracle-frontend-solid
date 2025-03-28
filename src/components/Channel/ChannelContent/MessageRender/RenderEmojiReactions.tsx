@@ -97,8 +97,8 @@ export default function RenderEmojiReactions(props: {reaction: IMessage["reactio
                 <Show when={hoveringEmojiCode() === r.emojiCode}>
                   <Card class="absolute bottom-full p-2 left-0 w-max max-w-52">
                     <code>{ r.emojiCode }</code>
-                    <hr />
-                    <span class="flex flex-wrap gap-1">
+                    <hr class="my-1" />
+                    <span class="flex flex-wrap gap-2">
                       { reactedUserArrs[r.emojiCode] !== undefined
                         ?
                           <For each={reactedUserArrs[r.emojiCode]}>
