@@ -1,11 +1,12 @@
 import type {IMessage} from "~/types/Message";
-import {createSignal, For, Show} from "solid-js";
+import {createEffect, createSignal, For, on, Show} from "solid-js";
 import {Card} from "~/components/ui/card";
 import DELETE_MESSAGE_DELETE_EMOJI_REACTION from "~/api/MESSAGE/MESSAGE_DELETE_EMOJI_REACTION";
 import POST_MESSAGE_EMOJI_REACTION from "~/api/MESSAGE/MESSAGE_EMOJI_REACTION";
 import GET_MESSAGE_WHO_REACTED from "~/api/MESSAGE/MESSAGE_WHO_REACTED";
 import RenderEmoji from "~/components/unique/RenderEmoji";
 import { createMutable } from "solid-js/store";
+import { getterUserinfo } from "~/stores/Userinfo";
 
 export default function RenderEmojiReactions(props: {reaction: IMessage["reactionSummary"], messageId: string, channelId: string}) {
   //リアクションをしているユーザー取得のためのデータJSONと取得状態用JSON
@@ -54,6 +55,27 @@ export default function RenderEmojiReactions(props: {reaction: IMessage["reactio
       .finally(() => statusFetchingEmojiCode[emojiCode] = false);
   }
 
+  //リアクションデータの変更を監視してリアクションしたユーザーデータを初期化
+  createEffect(
+    on(
+      () => props.reaction.map((r) => r.count).join(","),
+      () => {
+        if (props) {
+          //リアクションしたユーザーを初期化
+          for (const emojiCode in reactedUserArrs) {
+            if (reactedUserArrs[emojiCode] !== undefined) {
+              delete reactedUserArrs[emojiCode];
+            }
+          }
+          //もしホバー中なら再取得させる
+          if (hoveringEmojiCode() !== "") {
+            fetchReactedUser(hoveringEmojiCode());
+          }
+        }
+      }
+    )
+  );
+
   return (
     <div class={"py-1 flex items-center flex-wrap gap-1"}>
       <For each={props.reaction}>
@@ -73,15 +95,25 @@ export default function RenderEmojiReactions(props: {reaction: IMessage["reactio
 
                 {/* ホバー表示 */}
                 <Show when={hoveringEmojiCode() === r.emojiCode}>
-                  <Card class="absolute bottom-full p-2 left-0">
+                  <Card class="absolute bottom-full p-2 left-0 w-max max-w-52">
                     <code>{ r.emojiCode }</code>
                     <hr />
-                    { reactedUserArrs[r.emojiCode] !== undefined
-                      ?
-                        <span>{ reactedUserArrs[r.emojiCode].join(",") }</span>
-                      :
-                        <p>...</p>
-                    }
+                    <span class="flex flex-wrap gap-1">
+                      { reactedUserArrs[r.emojiCode] !== undefined
+                        ?
+                          <For each={reactedUserArrs[r.emojiCode]}>
+                            {(userId) => {
+                              return (
+                                <span class="text-sm text-primary">
+                                  {getterUserinfo(userId)?.name ?? userId}
+                                </span>
+                              )
+                            }}
+                          </For>
+                        :
+                          <p>...</p>
+                      }
+                    </span>
                   </Card>
                 </Show>
               </Card>
