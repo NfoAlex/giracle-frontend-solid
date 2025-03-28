@@ -76,8 +76,11 @@ export default function RenderEmojiReactions(props: {reaction: IMessage["reactio
                   <Card class="absolute bottom-full p-2 left-0">
                     <code>{ r.emojiCode }</code>
                     <hr />
-                    { reactedUserArrs[r.emojiCode] !== undefined &&
-                      <span>{ reactedUserArrs[r.emojiCode].join(",") }</span>
+                    { reactedUserArrs[r.emojiCode] !== undefined
+                      ?
+                        <span>{ reactedUserArrs[r.emojiCode].join(",") }</span>
+                      :
+                        <p>...</p>
                     }
                   </Card>
                 </Show>
