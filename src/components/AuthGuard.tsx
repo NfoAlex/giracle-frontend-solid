@@ -27,12 +27,12 @@ export default function AuthGuard(props: {children?: JSX.Element}) {
           document.title = "(*) Giracle"
           const link = document.getElementById("favicon") as HTMLLinkElement;
           if (link)
-            link.href = "/src/assets/favicon_dot.svg";
+            link.href = "/favicon_dot.svg";
         } else {
           document.title = "Giracle";
           const link = document.getElementById("favicon") as HTMLLinkElement;
           if (link)
-            link.href = "/src/assets/favicon.svg";
+            link.href = "/favicon.svg";
         }
       }
     )
