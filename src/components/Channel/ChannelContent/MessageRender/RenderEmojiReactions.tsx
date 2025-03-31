@@ -7,6 +7,7 @@ import GET_MESSAGE_WHO_REACTED from "~/api/MESSAGE/MESSAGE_WHO_REACTED";
 import RenderEmoji from "~/components/unique/RenderEmoji";
 import { createMutable } from "solid-js/store";
 import { getterUserinfo } from "~/stores/Userinfo";
+import DisplayAllReactedUserModal from "./RenderEmojiReactions/DisplayAllReactedUserModal";
 
 export default function RenderEmojiReactions(props: {reaction: IMessage["reactionSummary"], messageId: string, channelId: string}) {
   //リアクションをしているユーザー取得のためのデータJSONと取得状態用JSON
@@ -101,15 +102,21 @@ export default function RenderEmojiReactions(props: {reaction: IMessage["reactio
                     <span class="flex flex-wrap gap-2">
                       { reactedUserArrs[r.emojiCode] !== undefined
                         ?
-                          <For each={reactedUserArrs[r.emojiCode]}>
-                            {(userId) => {
-                              return (
-                                <span class="text-sm text-primary">
-                                  {getterUserinfo(userId)?.name ?? userId}
-                                </span>
-                              )
-                            }}
-                          </For>
+                          <>
+                            <For each={reactedUserArrs[r.emojiCode]}>
+                              {(userId) => {
+                                return (
+                                  <span class="text-sm text-primary">
+                                    {getterUserinfo(userId)?.name ?? userId}
+                                  </span>
+                                )
+                              }}
+                            </For>
+                            {
+                              reactedUserArrs[r.emojiCode].length >= 5 &&
+                              <DisplayAllReactedUserModal messageId={props.messageId} />
+                            }
+                          </>
                         :
                           <p>...</p>
                       }
