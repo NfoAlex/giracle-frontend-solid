@@ -1,7 +1,7 @@
-import { createEffect, createSignal, For, on, Show } from "solid-js";
+import { createEffect, createSignal, For, on } from "solid-js";
 import GET_MESSAGE_WHO_REACTED from "~/api/MESSAGE/MESSAGE_WHO_REACTED";
 import { Avatar, AvatarImage } from "~/components/ui/avatar";
-import { Dialog, DialogContent, DialogHeader, DialogTrigger } from "~/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader } from "~/components/ui/dialog";
 import RenderEmoji from "~/components/unique/RenderEmoji";
 import { getterUserinfo } from "~/stores/Userinfo";
 
