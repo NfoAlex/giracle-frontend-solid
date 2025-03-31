@@ -90,9 +90,10 @@ export default function RenderEmojiReactions(props: {reaction: IMessage["reactio
             return (
               <Card
                 onClick={() => r.includingYou ? deleteReaction(r.emojiCode) : addReaction(r.emojiCode)}
-                onMouseEnter={() =>
-                  setTimeout(()=>{ setHoverEmojiCode(r.emojiCode); fetchReactedUser(r.emojiCode); }, 500)
-                }
+                onMouseEnter={() => {
+                  setHoverEmojiCode(r.emojiCode);
+                  setTimeout(()=>{ if (hoveringEmojiCode()!=="") fetchReactedUser(r.emojiCode); }, 500)
+                }}
                 onMouseLeave={() => setHoverEmojiCode("")}
                 class={`relative p-1 text-sm flex items-center gap-1 cursor-pointer hover:bg-accent hover:border-background border-accent ${r.includingYou ? "bg-accent border-primary" : ""}`}
               >
