@@ -3,6 +3,7 @@
  * 対象のメッセージIdに対して、指定された絵文字をリアクションしているユーザーを取得する
  * @param _messageId 調べたいメッセージId
  * @param _emojiCode リアクションしたユーザーを調べる絵文字コード
+ * @param _length 取得するユーザー数、デフォルトは5人
  * @returns 
  */
 export default async function GET_MESSAGE_WHO_REACTED(
