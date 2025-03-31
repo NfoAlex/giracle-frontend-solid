@@ -8,6 +8,7 @@ import RenderEmoji from "~/components/unique/RenderEmoji";
 import { createMutable } from "solid-js/store";
 import { getterUserinfo } from "~/stores/Userinfo";
 import DisplayAllReactedUserModal from "./RenderEmojiReactions/DisplayAllReactedUserModal";
+import { Button } from "~/components/ui/button";
 
 export default function RenderEmojiReactions(props: {reaction: IMessage["reactionSummary"], messageId: string, channelId: string}) {
   //リアクションをしているユーザー取得のためのデータJSONと取得状態用JSON
@@ -15,6 +16,9 @@ export default function RenderEmojiReactions(props: {reaction: IMessage["reactio
   const statusFetchingEmojiCode = createMutable<{ [emojiCode:string]: boolean }>({});
   //ホバー状態に入っている絵文字コード
   const [hoveringEmojiCode, setHoverEmojiCode] = createSignal<string>("");
+
+  //リアクションした人詳細表示モーダルのトリガー用
+  const [dialogOpen, setDialogOpen] = createSignal(false);
 
   /**
    * リアクションを削除する
@@ -96,7 +100,7 @@ export default function RenderEmojiReactions(props: {reaction: IMessage["reactio
 
                 {/* ホバー表示 */}
                 <Show when={hoveringEmojiCode() === r.emojiCode}>
-                  <Card class="absolute bottom-full p-2 left-0 w-max max-w-52">
+                  <Card class="absolute bottom-full p-2 left-0 w-max max-w-52" onClick={(e) => e.stopPropagation()}>
                     <code>{ r.emojiCode }</code>
                     <hr class="my-1" />
                     <span class="flex flex-wrap gap-2">
@@ -112,9 +116,9 @@ export default function RenderEmojiReactions(props: {reaction: IMessage["reactio
                                 )
                               }}
                             </For>
-                            {
+                            { //リアクションした人が5人以上いる場合はもっと見るボタンを表示(詳細モーダル表示)
                               reactedUserArrs[r.emojiCode].length >= 5 &&
-                              <DisplayAllReactedUserModal messageId={props.messageId} />
+                              <Button onClick={()=>setDialogOpen(true)}>もっと見る</Button>
                             }
                           </>
                         :
@@ -128,6 +132,8 @@ export default function RenderEmojiReactions(props: {reaction: IMessage["reactio
           }
         }
       </For>
+
+      <DisplayAllReactedUserModal messageId={props.messageId} emojiCode={hoveringEmojiCode()} onOpen={dialogOpen()} onOpenChange={setDialogOpen} />
     </div>
   )
 }
