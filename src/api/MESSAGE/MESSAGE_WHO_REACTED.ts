@@ -7,12 +7,13 @@
  */
 export default async function GET_MESSAGE_WHO_REACTED(
   _messageId: string,
-  _emojiCode: string
+  _emojiCode: string,
+  _length: number = 5
 ): Promise<{
   message: "Fetched reactions",
   data: string[]
 }> {
-  const res = await fetch(`/api/message/who-reacted?messageId=${_messageId}&emojiCode=${_emojiCode}`, {
+  const res = await fetch(`/api/message/who-reacted?messageId=${_messageId}&emojiCode=${_emojiCode}&length=${_length}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
