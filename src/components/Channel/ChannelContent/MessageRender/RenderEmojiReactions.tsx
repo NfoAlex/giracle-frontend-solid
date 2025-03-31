@@ -9,6 +9,7 @@ import { createMutable } from "solid-js/store";
 import { getterUserinfo } from "~/stores/Userinfo";
 import DisplayAllReactedUserModal from "./RenderEmojiReactions/DisplayAllReactedUserModal";
 import { Button } from "~/components/ui/button";
+import { Badge } from "~/components/ui/badge";
 
 export default function RenderEmojiReactions(props: {reaction: IMessage["reactionSummary"], messageId: string, channelId: string}) {
   //リアクションをしているユーザー取得のためのデータJSONと取得状態用JSON
@@ -100,10 +101,14 @@ export default function RenderEmojiReactions(props: {reaction: IMessage["reactio
 
                 {/* ホバー表示 */}
                 <Show when={hoveringEmojiCode() === r.emojiCode}>
-                  <Card class="absolute bottom-full p-2 left-0 w-max max-w-52 z-50" onClick={(e) => e.stopPropagation()}>
+                  <Card
+                    onClick={(e) => e.stopPropagation()}
+                    onMouseEnter={(e) => e.stopPropagation()}
+                    class="absolute bottom-full p-2 left-0 w-max max-w-52 z-50"
+                  >
                     <code>{ r.emojiCode }</code>
                     <hr class="my-1" />
-                    <span class="flex flex-wrap gap-2">
+                    <span class="flex flex-wrap gap-1">
                       { reactedUserArrs[r.emojiCode] !== undefined
                         ?
                           <>
@@ -111,14 +116,17 @@ export default function RenderEmojiReactions(props: {reaction: IMessage["reactio
                               {(userId) => {
                                 return (
                                   <span class="text-sm text-primary">
-                                    {getterUserinfo(userId)?.name ?? userId}
+                                    <Badge variant={"secondary"}>
+                                      {getterUserinfo(userId)?.name ?? userId}
+                                    </Badge>
                                   </span>
                                 )
                               }}
                             </For>
+                            <span class="w-full"></span>
                             { //リアクションした人が5人以上いる場合はもっと見るボタンを表示(詳細モーダル表示)
                               reactedUserArrs[r.emojiCode].length >= 5 &&
-                              <Button onClick={()=>setDialogOpen(true)} class="ml-auto" size={"sm"}>もっと見る</Button>
+                              <Button onClick={()=>setDialogOpen(true)} class="w-full" size={"sm"}>もっと見る</Button>
                             }
                           </>
                         :
