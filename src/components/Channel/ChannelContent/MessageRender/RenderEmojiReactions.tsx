@@ -107,7 +107,10 @@ export default function RenderEmojiReactions(props: {reaction: IMessage["reactio
                     onMouseEnter={(e) => e.stopPropagation()}
                     class="absolute bottom-full p-2 left-0 w-max max-w-52 z-50"
                   >
-                    <code>{ r.emojiCode }</code>
+                    <span class="flex items-center gap-1">
+                      <RenderEmoji emojiCode={r.emojiCode} />
+                      <code>{ r.emojiCode }</code>
+                    </span>
                     <hr class="my-1" />
                     <span class="flex flex-wrap gap-1">
                       { reactedUserArrs[r.emojiCode] !== undefined
