@@ -100,7 +100,7 @@ export default function RenderEmojiReactions(props: {reaction: IMessage["reactio
 
                 {/* ホバー表示 */}
                 <Show when={hoveringEmojiCode() === r.emojiCode}>
-                  <Card class="absolute bottom-full p-2 left-0 w-max max-w-52" onClick={(e) => e.stopPropagation()}>
+                  <Card class="absolute bottom-full p-2 left-0 w-max max-w-52 z-50" onClick={(e) => e.stopPropagation()}>
                     <code>{ r.emojiCode }</code>
                     <hr class="my-1" />
                     <span class="flex flex-wrap gap-2">
