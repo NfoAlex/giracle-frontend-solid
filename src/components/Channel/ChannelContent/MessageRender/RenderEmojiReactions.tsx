@@ -89,7 +89,7 @@ export default function RenderEmojiReactions(props: {reaction: IMessage["reactio
             return (
               <Card
                 onClick={() => r.includingYou ? deleteReaction(r.emojiCode) : addReaction(r.emojiCode)}
-                onMouseOver={() =>
+                onMouseEnter={() =>
                   setTimeout(()=>{ setHoverEmojiCode(r.emojiCode); fetchReactedUser(r.emojiCode); }, 500)
                 }
                 onMouseLeave={() => setHoverEmojiCode("")}
