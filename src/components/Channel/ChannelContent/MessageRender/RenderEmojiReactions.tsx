@@ -113,9 +113,11 @@ export default function RenderEmojiReactions(props: {reaction: IMessage["reactio
                     </span>
                     <hr class="my-1" />
                     <span class="flex flex-wrap gap-1">
-                      { reactedUserArrs[r.emojiCode] !== undefined
+                      {
+                        reactedUserArrs[r.emojiCode] !== undefined
                         ?
                           <>
+
                             <For each={reactedUserArrs[r.emojiCode]}>
                               {(userId) => {
                                 return (
@@ -127,6 +129,8 @@ export default function RenderEmojiReactions(props: {reaction: IMessage["reactio
                                 )
                               }}
                             </For>
+
+                            {/* 改行用 */}
                             <span class="w-full"></span>
                             { //リアクションした人が5人以上いる場合はもっと見るボタンを表示(詳細モーダル表示)
                               reactedUserArrs[r.emojiCode].length >= 5 &&
@@ -136,6 +140,7 @@ export default function RenderEmojiReactions(props: {reaction: IMessage["reactio
                                 size={"sm"}
                               >もっと見る</Button>
                             }
+
                           </>
                         :
                           <p>...</p>
