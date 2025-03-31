@@ -141,7 +141,9 @@ export default function RenderEmojiReactions(props: {reaction: IMessage["reactio
         }
       </For>
 
-      <DisplayAllReactedUserModal messageId={props.messageId} emojiCode={hoveringEmojiCode()} onOpen={dialogOpen()} onOpenChange={setDialogOpen} />
+      <Show when={dialogOpen()}>
+        <DisplayAllReactedUserModal messageId={props.messageId} emojiCode={hoveringEmojiCode()} onOpen={dialogOpen()} onOpenChange={setDialogOpen} />
+      </Show>
     </div>
   )
 }

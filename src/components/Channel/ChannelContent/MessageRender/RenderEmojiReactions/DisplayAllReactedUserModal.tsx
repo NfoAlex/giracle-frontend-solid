@@ -36,23 +36,21 @@ export default function DisplayAllReactedUserModal(props: { messageId: string, e
         <hr />
 
         <span class="grow shrink flex flex-col gap-2 overflow-y-auto">
-          <Show when={props.onOpen}>
-            <For each={reactedUserArrs()}>
-              {(userId) => {
-                return (
-                  <div class="px-2 flex items-center gap-2">
-                    <Avatar class="w-8 h-8">
-                      <AvatarImage
-                        src={"/api/user/icon/" + getterUserinfo(userId)?.id}
-                        alt={userId}
-                      />
-                    </Avatar>
-                    <p>{ getterUserinfo(userId)?.name || "..." }</p>
-                  </div>
-                )
-              }}
-            </For>
-          </Show>
+          <For each={reactedUserArrs()}>
+            {(userId) => {
+              return (
+                <div class="px-2 flex items-center gap-2">
+                  <Avatar class="w-8 h-8">
+                    <AvatarImage
+                      src={"/api/user/icon/" + getterUserinfo(userId)?.id}
+                      alt={userId}
+                    />
+                  </Avatar>
+                  <p>{ getterUserinfo(userId)?.name || "..." }</p>
+                </div>
+              )
+            }}
+          </For>
         </span>
       </DialogContent>
     </Dialog>
