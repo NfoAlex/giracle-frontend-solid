@@ -105,7 +105,7 @@ export default function RenderEmojiReactions(props: {reaction: IMessage["reactio
                   <Card
                     onClick={(e) => e.stopPropagation()}
                     onMouseEnter={(e) => e.stopPropagation()}
-                    class="absolute bottom-full p-2 left-0 w-max max-w-52 z-50"
+                    class="absolute bottom-full p-2 left-0 w-max max-w-52 z-50 cursor-default"
                   >
                     <span class="flex items-center gap-1">
                       <RenderEmoji emojiCode={r.emojiCode} />
@@ -130,7 +130,11 @@ export default function RenderEmojiReactions(props: {reaction: IMessage["reactio
                             <span class="w-full"></span>
                             { //リアクションした人が5人以上いる場合はもっと見るボタンを表示(詳細モーダル表示)
                               reactedUserArrs[r.emojiCode].length >= 5 &&
-                              <Button onClick={()=>setDialogOpen(true)} class="w-full" size={"sm"}>もっと見る</Button>
+                              <Button
+                                onClick={()=>setDialogOpen(true)}
+                                class="w-full cursor-pointer"
+                                size={"sm"}
+                              >もっと見る</Button>
                             }
                           </>
                         :
