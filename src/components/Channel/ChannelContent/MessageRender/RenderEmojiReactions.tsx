@@ -118,7 +118,7 @@ export default function RenderEmojiReactions(props: {reaction: IMessage["reactio
                             </For>
                             { //リアクションした人が5人以上いる場合はもっと見るボタンを表示(詳細モーダル表示)
                               reactedUserArrs[r.emojiCode].length >= 5 &&
-                              <Button onClick={()=>setDialogOpen(true)}>もっと見る</Button>
+                              <Button onClick={()=>setDialogOpen(true)} class="ml-auto" size={"sm"}>もっと見る</Button>
                             }
                           </>
                         :

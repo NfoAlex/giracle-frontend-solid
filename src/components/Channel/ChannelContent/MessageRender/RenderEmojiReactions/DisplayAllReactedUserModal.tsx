@@ -1,7 +1,8 @@
-import { createEffect, createSignal, on, Show } from "solid-js";
+import { createEffect, createSignal, For, on, Show } from "solid-js";
 import GET_MESSAGE_WHO_REACTED from "~/api/MESSAGE/MESSAGE_WHO_REACTED";
-import { Button } from "~/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTrigger } from "~/components/ui/dialog";
+import RenderEmoji from "~/components/unique/RenderEmoji";
+import { getterUserinfo } from "~/stores/Userinfo";
 
 // ToDo :: 指定した人数しかとれない
 export default function DisplayAllReactedUserModal(props: { messageId: string, emojiCode: string, onOpen: boolean, onOpenChange: (open: boolean) => void }) {
@@ -24,12 +25,25 @@ export default function DisplayAllReactedUserModal(props: { messageId: string, e
   
   return (
     <Dialog onOpenChange={props.onOpenChange} open={props.onOpen}>
-      <DialogContent>
-        <DialogHeader>リアクションしたユーザー</DialogHeader>
-        <Show when={props.onOpen}>
-          <p>ここで人表示 : { props.emojiCode }</p>
-          { reactedUserArrs().join(",") }
-        </Show>
+      <DialogContent class="flex flex-col gap-2">
+        <DialogHeader>
+          <span class="flex items-center gap-2 my-2">
+            <p>リアクションしたユーザー表示</p> <RenderEmoji emojiCode={props.emojiCode} />
+          </span>
+        </DialogHeader>
+        <span class="grow shrink">
+          <Show when={props.onOpen}>
+            <For each={reactedUserArrs()}>
+              {(userId) => {
+                return (
+                  <div>
+                    { getterUserinfo(userId)?.name || "..." }
+                  </div>
+                )
+              }}
+            </For>
+          </Show>
+        </span>
       </DialogContent>
     </Dialog>
   )
