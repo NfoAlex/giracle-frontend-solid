@@ -86,7 +86,7 @@ export default function MessageTextRender(props: { content: string }) {
       switch (obj.type) {
         case "link":
           messageRenderingFinal.push(
-            <a href={obj.idOrValue} target="_blank" rel="noopener noreferrer" class="underline text-blue-500 hover:text-blue-700">
+            <a href={obj.idOrValue} target="_blank" rel="noopener noreferrer" class="underline">
               {obj.idOrValue}
             </a>
           );
@@ -105,7 +105,7 @@ export default function MessageTextRender(props: { content: string }) {
           // directGetterChannelInfo もリアクティブなソースであれば追跡される
           const channelInfo = directGetterChannelInfo(obj.idOrValue);
           messageRenderingFinal.push(
-            <span class="text-blue-600 font-medium cursor-pointer hover:underline mx-px">
+            <span class="font-medium cursor-pointer hover:underline mx-px">
               #{channelInfo?.name ?? obj.idOrValue} {/* fallback */}
             </span>
           );
