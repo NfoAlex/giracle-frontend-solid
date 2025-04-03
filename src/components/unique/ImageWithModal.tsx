@@ -3,7 +3,7 @@ import { Dialog as KDialog } from "@kobalte/core/dialog";
 
 /**
  * img要素として使うことができクリックするとモーダルとして拡大もできるコンポーネント。
- * @param props - {class: 適用したいCSSのクラス, src: 画像のURL}
+ * @param props - `{class: 適用したいCSSのクラス, src: 画像のURL}`
  */
 export default function ImageWithModal(props: { class: string, src: string | null }) {
   const [isOpen, setIsOpen] = createSignal(false);
