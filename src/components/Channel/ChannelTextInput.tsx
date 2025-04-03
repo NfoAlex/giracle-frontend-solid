@@ -184,61 +184,60 @@ export default function ChannelTextInput() {
         </div>
         <hr />
       </Show>
-      <div class="relative flex items-center gap-1">
+      <div class="w-full relative flex items-center gap-1">
         <input type={"file"} id={"fileInput"} class={"hidden"} />
 
-        <Button onClick={bindFiles} variant={"secondary"} size={"icon"}><IconUpload /></Button>
-        <TextField class="grow">
-          <textarea
-            id={"messageInput"}
-            class={"p-2 bg-background resize-none border rounded-md break-all h-fit whitespace-pre-wrap max-h-40"}
-            rows={text().match(/\n/g)?.length===0 ? 1 : (text().match(/\n/g)?.length ?? 0) + 1}
-            value={text()}
-            onInput={(e) => {
-              cursorPosition = e.currentTarget?.selectionStart || 0;
-              setText(e.currentTarget.value);
-              checkMode();
-            }}
-            onKeyDown={(e) => {
-              switch(e.key) {
-                case "Enter": {
-                  //検索モードが有効なら選択した情報をメッセージ文にバインド
-                  if (searchOptions().isEnabled) {
-                    e.preventDefault();
-                    bindSearchedItem(userSearchResult()[searchOptions().selectIndex], "user");
-                    break;
-                  }
-                  //Macなら変換での勝手な送信をブロックする
-                  if (/Mac/.test(navigator.userAgent) && e.isComposing) break;
-                  if (e.shiftKey) break;
+        <Button onClick={bindFiles} variant={"secondary"} size={"icon"} class="shrink-0"><IconUpload /></Button>
 
+        <textarea
+          id={"messageInput"}
+          class={"shrink min-w-0 grow p-2 bg-background resize-none border rounded-md break-all h-fit whitespace-pre-wrap max-h-40"}
+          rows={text().match(/\n/g)?.length===0 ? 1 : (text().match(/\n/g)?.length ?? 0) + 1}
+          value={text()}
+          onInput={(e) => {
+            cursorPosition = e.currentTarget?.selectionStart || 0;
+            setText(e.currentTarget.value);
+            checkMode();
+          }}
+          onKeyDown={(e) => {
+            switch(e.key) {
+              case "Enter": {
+                //検索モードが有効なら選択した情報をメッセージ文にバインド
+                if (searchOptions().isEnabled) {
                   e.preventDefault();
-                  sendMsg();
+                  bindSearchedItem(userSearchResult()[searchOptions().selectIndex], "user");
                   break;
                 }
-                case "ArrowUp": { //検索モード用の選択移動
-                  if (searchOptions().isEnabled) {
-                    e.preventDefault();
-                    if (0 < searchOptions().selectIndex)
-                      setSearchOptions({...searchOptions(), selectIndex: searchOptions().selectIndex - 1});
-                  }
-                  break;
-                }
-                case "ArrowDown": { //検索モード用の選択移動
-                  if (searchOptions().isEnabled) {
-                    e.preventDefault();
-                    if (userSearchResult().length > searchOptions().selectIndex + 1)
-                      setSearchOptions({...searchOptions(), selectIndex: searchOptions().selectIndex + 1});
-                  }
-                  break;
-                }
-              }
-            }}
-            onPaste={(e) => receiveFiles(e)}
-          />
-        </TextField>
+                //Macなら変換での勝手な送信をブロックする
+                if (/Mac/.test(navigator.userAgent) && e.isComposing) break;
+                if (e.shiftKey) break;
 
-        <Button onClick={sendMsg} size={"icon"}><IconSend /></Button>
+                e.preventDefault();
+                sendMsg();
+                break;
+              }
+              case "ArrowUp": { //検索モード用の選択移動
+                if (searchOptions().isEnabled) {
+                  e.preventDefault();
+                  if (0 < searchOptions().selectIndex)
+                    setSearchOptions({...searchOptions(), selectIndex: searchOptions().selectIndex - 1});
+                }
+                break;
+              }
+              case "ArrowDown": { //検索モード用の選択移動
+                if (searchOptions().isEnabled) {
+                  e.preventDefault();
+                  if (userSearchResult().length > searchOptions().selectIndex + 1)
+                    setSearchOptions({...searchOptions(), selectIndex: searchOptions().selectIndex + 1});
+                }
+                break;
+              }
+            }
+          }}
+          onPaste={(e) => receiveFiles(e)}
+        />
+
+        <Button onClick={sendMsg} size={"icon"} class={"shrink-0"}><IconSend /></Button>
 
         {/* メンション用ユーザー検索 */}
         <Show when={searchOptions().isEnabled && searchOptions().type === "user"}>
