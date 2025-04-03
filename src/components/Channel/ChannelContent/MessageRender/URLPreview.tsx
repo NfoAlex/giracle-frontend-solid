@@ -21,14 +21,14 @@ export default function URLPreview(props: { MessageUrlPreview: IMessageUrlPrevie
                   class={"z-0 absolute inset-0 bg-cover bg-center filter blur-sm w-full h-full rounded-t"}
                   style={`background-image: url(${urlPreview.imageLink});`}
                 ></div>
-              </div>
 
-              {/* 動画URLがある場合の表示 */}
-              <Show when={urlPreview.videoLink && !urlPreview.videoLink.startsWith("https://www.youtube")}>
-                <span class={"absolute bottom-3 right-3 shadow-xl"}>
-                  <VideoPlayerModal urlPreview={urlPreview} />
-                </span>
-              </Show>
+                {/* 動画URLがある場合の表示 */}
+                <Show when={urlPreview.videoLink && !urlPreview.videoLink.startsWith("https://www.youtube")}>
+                  <span class={"absolute bottom-3 right-3 shadow-xl"}>
+                    <VideoPlayerModal urlPreview={urlPreview} />
+                  </span>
+                </Show>
+              </div>
             </div>
             <CardHeader>
               <CardTitle class={"flex flex-row items-center gap-2"}>
