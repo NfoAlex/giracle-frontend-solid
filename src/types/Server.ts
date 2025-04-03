@@ -15,6 +15,5 @@ export interface IInvite {
   id: number;
   isActive: boolean;
   createdUserId: string;
-  expireDate: Date;
   usedCount: number;
 }

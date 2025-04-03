@@ -36,14 +36,6 @@ export default function ManageInvite() {
       header: "招待コード",
     },
     {
-      accessorKey: "expireDate",
-      id: "expireDate",
-      header: "有効期限",
-      cell: (props) => <div class="capitalize">
-        { new Date(props.row.getValue("expireDate")).toLocaleString() }
-      </div>
-    },
-    {
       accessorKey: "usedCount",
       id: "usedCount",
       header: "使用回数",
