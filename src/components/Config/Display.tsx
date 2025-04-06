@@ -9,6 +9,8 @@ export default function Display() {
   
   return (
     <div class="flex flex-col gap-6">
+
+      {/* テーマ */}
       <Card class="p-4 flex flex-col gap-4">
         <span class="flex items-center">
           <p class="font-bold">アプリテーマ</p>
@@ -25,6 +27,7 @@ export default function Display() {
         </div>
       </Card>
 
+      {/* メッセージ間余白設定 */}
       <Card class="p-4 flex flex-col gap-4">
         <span class="flex flex-col gap-4">
           <p class="font-bold">メッセージ間の空白</p>
