@@ -6,6 +6,6 @@ export const storeClientConfig = createMutable({
     notifyAll: false
   },
   display: {
-    messageGapLevel: 0,
+    messageGapLevel: 0, //0-6
   },
 });
