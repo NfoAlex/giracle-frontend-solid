@@ -52,7 +52,8 @@ export default function Display() {
             </Slider>
             <div class="flex items-center justify-between">
               <p>0</p>
-              <p>3</p>
+              <p>2</p>
+              <p>4</p>
               <p>6</p>
             </div>
           </span>
