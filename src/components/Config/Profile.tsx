@@ -62,9 +62,8 @@ export default function Profile() {
   };
 
   return (
-    <div class="md:max-w-[450px] w-11/12 h-full pb-2 mx-auto flex flex-col gap-2">
+    <div class="md:max-w-[450px] w-11/12 h-full mx-auto flex flex-col gap-2">
       <span class="flex items-center gap-2">
-        <SidebarTriggerWithDot />
         <p class="font-bold text-2xl my-2">プロフィール</p>
       </span>
       <Card class="w-full">
