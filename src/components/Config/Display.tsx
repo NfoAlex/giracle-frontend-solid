@@ -2,7 +2,7 @@ import { storeClientConfig } from "~/stores/ClientConfig";
 import { Card } from "../ui/card";
 import { Slider, SliderFill, SliderThumb, SliderTrack } from "../ui/slider";
 import { useColorMode } from "@kobalte/core/color-mode";
-import { IconMoonFilled, IconSunFilled } from "@tabler/icons-solidjs";
+import { IconBrush, IconMoonFilled, IconSpacingVertical, IconSunFilled } from "@tabler/icons-solidjs";
 
 export default function Display() {
   const { setColorMode, colorMode } = useColorMode()
@@ -13,7 +13,10 @@ export default function Display() {
       {/* テーマ */}
       <Card class="p-4 flex flex-col gap-4">
         <span class="flex items-center">
-          <p class="font-bold">アプリテーマ</p>
+          <span class="font-bold flex items-center gap-2">
+            <IconBrush />
+            テーマ
+          </span>
           <div class={"ml-auto"}>
             {colorMode() === "dark" && <IconMoonFilled onClick={()=>setColorMode("light")} />}
             {colorMode() === "light" && <IconSunFilled onClick={()=>setColorMode("dark")} />}
@@ -30,7 +33,10 @@ export default function Display() {
       {/* メッセージ間余白設定 */}
       <Card class="p-4 flex flex-col gap-4">
         <span class="flex flex-col gap-4">
-          <p class="font-bold">メッセージ間の空白</p>
+          <span class="font-bold flex items-center gap-2">
+            <IconSpacingVertical />
+            メッセージ間の空白
+          </span>
           <span class="flex flex-col gap-2">
             <Slider
               step={1}
