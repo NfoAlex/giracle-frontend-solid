@@ -17,7 +17,8 @@ export default function Display() {
             <IconBrush />
             テーマ
           </span>
-          <div class={"ml-auto"}>
+          <div class={"ml-auto flex items-center gap-2"}>
+            <p class="italic text-sm">クリックで変更</p>
             {colorMode() === "dark" && <IconMoonFilled onClick={()=>setColorMode("light")} />}
             {colorMode() === "light" && <IconSunFilled onClick={()=>setColorMode("dark")} />}
           </div>
