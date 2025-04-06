@@ -1,5 +1,6 @@
 import { useParams } from "@solidjs/router";
 import { createSignal } from "solid-js";
+import Display from "~/components/Config/Display";
 import Profile from "~/components/Config/Profile";
 import { Button } from "~/components/ui/button";
 import { Card } from "~/components/ui/card";
@@ -72,6 +73,7 @@ export default function Config() {
 
         <div class="overflow-y-auto grow p-2">
           { displayMode()==="profile" && <Profile /> }
+          { displayMode()==="display" && <Display /> }
         </div>
 
       </div>
