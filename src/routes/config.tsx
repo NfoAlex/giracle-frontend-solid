@@ -79,7 +79,7 @@ export default function Config() {
           >表示</Button>
         </Card>
 
-        <div class="overflow-y-auto grow md:px-2 pt-4">
+        <div class="overflow-y-auto grow md:px-2 md:pt-0 pt-4">
           { displayMode()==="profile" && <ConfigProfile /> }
           { displayMode()==="chat" && <ConfigChat /> }
           { displayMode()==="display" && <ConfigDisplay /> }
