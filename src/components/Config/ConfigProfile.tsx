@@ -1,4 +1,4 @@
-import {IconCheck, IconCircleX, IconMoonFilled, IconPencil, IconSunFilled} from "@tabler/icons-solidjs";
+import {IconCheck, IconCircleX, IconPencil} from "@tabler/icons-solidjs";
 import { Show, createSignal } from "solid-js";
 import POST_USER_PROFILE_UPDATE from "~/api/USER/USER_PROFILE_UPDATE";
 import ChangeIcon from "~/components/Profile/ChangeIcon";
