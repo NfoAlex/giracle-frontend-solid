@@ -14,7 +14,7 @@ import { getRolePower, storeMyUserinfo } from "~/stores/MyUserinfo";
 import { storeServerinfo } from "~/stores/Serverinfo";
 import { Avatar, AvatarImage } from "./ui/avatar";
 import { storeAppStatus } from "~/stores/AppStatus";
-import {IconBell, IconDatabaseCog, IconList} from "@tabler/icons-solidjs";
+import {IconBell, IconDatabaseCog, IconList, IconSettings} from "@tabler/icons-solidjs";
 import {storeInbox} from "~/stores/Inbox";
 import {Badge} from "~/components/ui/badge";
 import OnlineUserDisplay from "~/components/Sidebar/OnlineUserDisplay";
@@ -84,13 +84,15 @@ export function AppSidebar() {
           </SidebarMenuButton>
         </SidebarFooter>
       </Show>
-      <A href={"/app/profile"}>
+      <A href={"/app/config"}>
         <SidebarFooter class="pb-5 pt-2">
           <div class="flex items-center gap-2">
             <Avatar class="w-auto h-8">
               <AvatarImage src={`/api/user/icon/${storeMyUserinfo.id}`} />
             </Avatar>
             <p>{storeMyUserinfo.name}</p>
+
+            <IconSettings class="ml-auto w-5" />
           </div>
         </SidebarFooter>
       </A>
