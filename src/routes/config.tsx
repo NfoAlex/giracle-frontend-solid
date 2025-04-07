@@ -61,7 +61,7 @@ export default function Config() {
         </div>
           
         {/* デスクトップ用設定ページ選択 */}
-        <Card class="shrink-0 p-1 h-full w-64 hidden md:flex flex-col gap-1 overflow-y-auto text-left">
+        <Card class="shrink-0 p-2 h-full w-64 hidden md:flex flex-col gap-1 overflow-y-auto text-left">
           <SidebarMenuButton
             onClick={()=>setDisplayMode("profile")}
             variant={displayMode()==="profile"?"outline":"default"}
