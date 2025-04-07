@@ -1,4 +1,4 @@
-import { IconBell } from "@tabler/icons-solidjs";
+import { IconBell, IconMessage2Exclamation } from "@tabler/icons-solidjs";
 import { Card } from "../ui/card";
 import { Switch, SwitchControl, SwitchThumb } from "../ui/switch";
 import { storeClientConfig } from "~/stores/ClientConfig";
@@ -37,7 +37,7 @@ export default function Notification() {
       <Card class="p-4 flex flex-col gap-4">
         <span class="flex items-center">
           <span class="font-bold flex items-center gap-2">
-            <IconBell />
+            <IconMessage2Exclamation />
             全てのメッセージ通知を有効化
           </span>
           <div class={"ml-auto flex items-center gap-2"}>
