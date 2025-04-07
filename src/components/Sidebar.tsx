@@ -84,7 +84,7 @@ export function AppSidebar() {
           </SidebarMenuButton>
         </SidebarFooter>
       </Show>
-      <A href={"/app/config/profile"}>
+      <A href={"/app/config"}>
         <SidebarFooter class="pb-5 pt-2">
           <div class="flex items-center gap-2">
             <Avatar class="w-auto h-8">
