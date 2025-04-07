@@ -8,6 +8,7 @@ import { Button } from "../ui/button";
 export default function ConfigNotification() {
   const [notifyOk, setNotifyOk] = createSignal(false);
 
+  //通知権限の確認
   if (Notification.permission === "granted") {
     setNotifyOk(true);
   } else if (Notification.permission === "denied") {
