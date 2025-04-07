@@ -1,5 +1,7 @@
 import { IconBell } from "@tabler/icons-solidjs";
 import { Card } from "../ui/card";
+import { Switch, SwitchControl, SwitchThumb } from "../ui/switch";
+import { storeClientConfig } from "~/stores/ClientConfig";
 
 export default function Notification() {
   return (
@@ -13,7 +15,14 @@ export default function Notification() {
             通知を有効化
           </span>
           <div class={"ml-auto flex items-center gap-2"}>
-            asdf
+            <Switch
+              onChange={(v) => storeClientConfig.notification.enabled = v}
+              defaultChecked={storeClientConfig.notification.enabled}
+            >
+              <SwitchControl>
+                <SwitchThumb />
+              </SwitchControl>
+            </Switch>
           </div>
         </span>
 
@@ -32,7 +41,14 @@ export default function Notification() {
             全てのメッセージ通知を有効化
           </span>
           <div class={"ml-auto flex items-center gap-2"}>
-            asdf
+            <Switch
+              onChange={(v) => storeClientConfig.notification.notifyAll = v}
+              defaultChecked={storeClientConfig.notification.notifyAll}
+            >
+              <SwitchControl>
+                <SwitchThumb />
+              </SwitchControl>
+            </Switch>
           </div>
         </span>
 
