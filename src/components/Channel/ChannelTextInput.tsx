@@ -9,6 +9,7 @@ import type {IUser} from "~/types/User";
 import GET_USER_SEARCH from "~/api/USER/USER_SEARCH.";
 import { Card } from "../ui/card";
 import { IChannel } from "~/types/Channel";
+import { storeClientConfig } from "~/stores/ClientConfig";
 
 export default function ChannelTextInput() {
   const params = useParams(); //URLパラメータを取得するやつ
@@ -211,6 +212,11 @@ export default function ChannelTextInput() {
                 //Macなら変換での勝手な送信をブロックする
                 if (/Mac/.test(navigator.userAgent) && e.isComposing) break;
                 if (e.shiftKey) break;
+                
+                //設定でCtrlキーを押す必要がある場合
+                if (storeClientConfig.chat.sendWithCtrlKey) {
+                  if (!e.ctrlKey) break;
+                }
 
                 e.preventDefault();
                 sendMsg();

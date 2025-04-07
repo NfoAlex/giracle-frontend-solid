@@ -1,5 +1,6 @@
 import { useParams } from "@solidjs/router";
 import { createSignal } from "solid-js";
+import ConfigChat from "~/components/Config/ConfigChat";
 import ConfigDisplay from "~/components/Config/ConfigDisplay";
 import ConfigNotification from "~/components/Config/ConfigNotification";
 import ConfigProfile from "~/components/Config/ConfigProfile";
@@ -10,7 +11,7 @@ import SidebarTriggerWithDot from "~/components/unique/SidebarTriggerWithDot";
 
 export default function Config() {
   const param = useParams();
-  const [displayMode, setDisplayMode] = createSignal<"profile" | "notification" | "display">("profile");
+  const [displayMode, setDisplayMode] = createSignal<"profile" | "chat" | "notification" | "display">("profile");
 
   return (
     <div class="p-2 h-full flex flex-col">
@@ -35,17 +36,19 @@ export default function Config() {
             itemComponent={(props) =>
               <SelectItem item={props.item}>
                 {props.item.textValue === "profile" && "プロフィール"}
+                {props.item.textValue === "chat" && "会話"}
                 {props.item.textValue === "notification" && "通知"}
                 {props.item.textValue === "display" && "表示"}
               </SelectItem>
             }
           >
             <SelectTrigger aria-label="manage-display-mode">
-              <SelectValue<"profile" | "notification" | "display">>
+              <SelectValue<"profile" | "chat" | "notification" | "display">>
                 {
                   (state) =>
                   <span class="flex items-center">
                     { state.selectedOption() === "profile" && <p>プロフィール</p> }
+                    { state.selectedOption() === "chat" && <p>会話</p> }
                     { state.selectedOption() === "notification" && <p>通知</p> }
                     { state.selectedOption() === "display" && <p>表示</p> }
                   </span>
@@ -63,6 +66,10 @@ export default function Config() {
             variant={displayMode()==="profile" ? "secondary" : "ghost"}
           >プロフィール</Button>
           <Button
+            onClick={()=>setDisplayMode("chat")}
+            variant={displayMode()==="chat" ? "secondary" : "ghost"}
+          >会話</Button>
+          <Button
             onClick={()=>setDisplayMode("notification")}
             variant={displayMode()==="notification" ? "secondary" : "ghost"}
           >通知</Button>
@@ -74,6 +81,7 @@ export default function Config() {
 
         <div class="overflow-y-auto grow px-2">
           { displayMode()==="profile" && <ConfigProfile /> }
+          { displayMode()==="chat" && <ConfigChat /> }
           { displayMode()==="display" && <ConfigDisplay /> }
           { displayMode()==="notification" && <ConfigNotification /> }
         </div>
