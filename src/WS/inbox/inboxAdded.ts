@@ -14,7 +14,7 @@ export default function WSInboxAdded(dat: { type: IInbox["type"], message: IMess
   const onSameChannel = location.pathname.endsWith("/channel/" + dat.message.channelId);
 
   //フォーカスされていないなら通知する
-  if (!hasFocus && storeClientConfig.notification.enabled) {
+  if (!hasFocus && storeClientConfig.notification.notifyInbox) {
     notifyIt(dat.message.userId, dat.message.content);
   }
 
