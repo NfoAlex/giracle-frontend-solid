@@ -1,4 +1,5 @@
 import POST_MESSAGE_INBOX_READ from "~/api/MESSAGE/MESSAGE_INBOX_READ";
+import { storeClientConfig } from "~/stores/ClientConfig";
 import { storeHistory } from "~/stores/History";
 import {setStoreInbox} from "~/stores/Inbox";
 import type {IInbox, IMessage} from "~/types/Message";
@@ -13,7 +14,7 @@ export default function WSInboxAdded(dat: { type: IInbox["type"], message: IMess
   const onSameChannel = location.pathname.endsWith("/channel/" + dat.message.channelId);
 
   //フォーカスされていないなら通知する
-  if (!hasFocus) {
+  if (!hasFocus && storeClientConfig.notification.enabled) {
     notifyIt(dat.message.userId, dat.message.content);
   }
 
