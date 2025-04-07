@@ -15,6 +15,7 @@ import {IMessage} from "~/types/Message";
 import UserinfoModalWrapper from "~/components/unique/UserinfoModalWrapper";
 import EditMessage from "~/components/Channel/ChannelContent/EditMessage";
 import {storeMyUserinfo} from "~/stores/MyUserinfo";
+import { storeClientConfig } from "~/stores/ClientConfig";
 
 export default function ChannelContents() {
   const [isFocused, setIsFocused] = createSignal(true);
@@ -279,7 +280,10 @@ export default function ChannelContents() {
 
   return (
     <div class="w-full overflow-y-auto p-2 grow">
-      <div id="history" class="h-full w-full overflow-y-auto flex flex-col-reverse gap-1">
+      <div
+        id="history"
+        class={`h-full w-full overflow-y-auto flex flex-col-reverse gap-${storeClientConfig.display.messageGapLevel}`}
+      >
         <For each={storeHistory[param.channelId]?.history}>
           {(h, index) => (
             <div id={`messageId::${h.id}`} class={"w-full"}>

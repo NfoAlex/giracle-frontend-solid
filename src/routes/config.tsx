@@ -72,7 +72,7 @@ export default function Config() {
           >表示</Button>
         </Card>
 
-        <div class="overflow-y-auto grow p-2">
+        <div class="overflow-y-auto grow px-2">
           { displayMode()==="profile" && <Profile /> }
           { displayMode()==="display" && <Display /> }
           { displayMode()==="notification" && <Notification /> }
