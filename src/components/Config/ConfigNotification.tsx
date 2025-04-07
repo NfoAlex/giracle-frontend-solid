@@ -3,10 +3,30 @@ import { Card } from "../ui/card";
 import { Switch, SwitchControl, SwitchThumb } from "../ui/switch";
 import { storeClientConfig } from "~/stores/ClientConfig";
 
-export default function Notification() {
+export default function ConfigNotification() {
+  const getNotifyPermission = () => {
+    if (Notification.permission === "granted") {
+      return true;
+    } else if (Notification.permission === "denied") {
+      return false;
+    } else {
+      Notification.requestPermission().then((permission) => {
+        if (permission === "granted") {
+          return true;
+        } else {
+          return false;
+        }
+      });
+    }
+  }
+
   return (
     <div class="flex flex-col gap-6">
       
+      <div class="flex items-center justify-center p-4">
+        <span>asdf</span>
+      </div>
+
       {/* メンション通知の有効化 */}
       <Card class="p-4 flex flex-col gap-4">
         <span class="flex items-center">

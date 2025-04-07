@@ -1,8 +1,8 @@
 import { useParams } from "@solidjs/router";
 import { createSignal } from "solid-js";
-import Display from "~/components/Config/Display";
-import Notification from "~/components/Config/Notification";
-import Profile from "~/components/Config/Profile";
+import ConfigDisplay from "~/components/Config/ConfigDisplay";
+import ConfigNotification from "~/components/Config/ConfigNotification";
+import ConfigProfile from "~/components/Config/ConfigProfile";
 import { Button } from "~/components/ui/button";
 import { Card } from "~/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~/components/ui/select";
@@ -73,9 +73,9 @@ export default function Config() {
         </Card>
 
         <div class="overflow-y-auto grow px-2">
-          { displayMode()==="profile" && <Profile /> }
-          { displayMode()==="display" && <Display /> }
-          { displayMode()==="notification" && <Notification /> }
+          { displayMode()==="profile" && <ConfigProfile /> }
+          { displayMode()==="display" && <ConfigDisplay /> }
+          { displayMode()==="notification" && <ConfigNotification /> }
         </div>
 
       </div>
