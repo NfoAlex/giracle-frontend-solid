@@ -1,30 +1,55 @@
-import { IconBell, IconMessage2Exclamation } from "@tabler/icons-solidjs";
+import { IconBell, IconBellX, IconMessage2Exclamation } from "@tabler/icons-solidjs";
 import { Card } from "../ui/card";
 import { Switch, SwitchControl, SwitchThumb } from "../ui/switch";
 import { storeClientConfig } from "~/stores/ClientConfig";
+import { createSignal } from "solid-js";
+import { Button } from "../ui/button";
 
 export default function ConfigNotification() {
+  const [notifyOk, setNotifyOk] = createSignal(false);
+
+  if (Notification.permission === "granted") {
+    setNotifyOk(true);
+  } else if (Notification.permission === "denied") {
+    setNotifyOk(false);
+  }
+
+  /**
+   * 通知権限の取得
+   */
   const getNotifyPermission = () => {
     if (Notification.permission === "granted") {
-      return true;
-    } else if (Notification.permission === "denied") {
-      return false;
-    } else {
-      Notification.requestPermission().then((permission) => {
-        if (permission === "granted") {
-          return true;
-        } else {
-          return false;
-        }
-      });
+      return;
     }
+
+    Notification.requestPermission().then((permission) => {
+      if (permission === "granted") {
+        setNotifyOk(true);
+      } else {
+        setNotifyOk(false);
+      }
+    });
   }
 
   return (
     <div class="flex flex-col gap-6">
       
-      <div class="flex items-center justify-center p-4">
-        <span>asdf</span>
+      {/* 通知権限確認・取得用枠 */}
+      <div class="flex flex-col items-center justify-center p-4 gap-2">
+        {
+          notifyOk()
+          ?
+            <>
+              <IconBell />
+              <p>ブラウザによるプッシュ通知が有効です。</p>
+            </>
+          :
+            <>
+              <IconBellX />
+              <p>通知が有効化されていません。</p>
+              <Button onClick={getNotifyPermission}>通知許可を取得する</Button>
+            </>
+        }
       </div>
 
       {/* メンション通知の有効化 */}
