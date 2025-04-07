@@ -10,9 +10,8 @@ import { TextField, TextFieldInput } from "~/components/ui/text-field";
 import { setStoreMyUserinfo, storeMyUserinfo } from "~/stores/MyUserinfo";
 import ChangeBanner from "~/components/Profile/ChangeBanner";
 import {useColorMode} from "@kobalte/core";
-import SidebarTriggerWithDot from "~/components/unique/SidebarTriggerWithDot";
 
-export default function Profile() {
+export default function ConfigProfile() {
   const [nameEditMode, setNameEditMode] = createSignal(false);
   const [newName, setNewName] = createSignal(storeMyUserinfo.name);
   const [selfIntroEditMode, setSelfIntroEditMode] = createSignal(false);

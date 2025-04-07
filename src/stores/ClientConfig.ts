@@ -2,7 +2,7 @@ import { createMutable } from "solid-js/store";
 
 export const storeClientConfig = createMutable({
   notification: {
-    enabled: true,
+    notifyInbox: true,
     notifyAll: false
   },
   display: {

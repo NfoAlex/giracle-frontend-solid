@@ -4,7 +4,7 @@ import { Slider, SliderFill, SliderThumb, SliderTrack } from "../ui/slider";
 import { useColorMode } from "@kobalte/core/color-mode";
 import { IconBrush, IconMoonFilled, IconSpacingVertical, IconSunFilled } from "@tabler/icons-solidjs";
 
-export default function Display() {
+export default function ConfigDisplay() {
   const { setColorMode, colorMode } = useColorMode()
   
   return (
