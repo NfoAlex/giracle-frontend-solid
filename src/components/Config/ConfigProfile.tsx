@@ -9,7 +9,6 @@ import { Label } from "~/components/ui/label";
 import { TextField, TextFieldInput } from "~/components/ui/text-field";
 import { setStoreMyUserinfo, storeMyUserinfo } from "~/stores/MyUserinfo";
 import ChangeBanner from "~/components/Profile/ChangeBanner";
-import {useColorMode} from "@kobalte/core";
 
 export default function ConfigProfile() {
   const [nameEditMode, setNameEditMode] = createSignal(false);
@@ -18,7 +17,6 @@ export default function ConfigProfile() {
   const [newSelfIntro, setNewSelfIntro] = createSignal(
     storeMyUserinfo.selfIntroduction,
   );
-  const { setColorMode, colorMode } = useColorMode()
 
   /**
    * 名前の変更
@@ -178,16 +176,6 @@ export default function ConfigProfile() {
             {/* ロール一覧 */}
             <Label>ロール</Label>
             <p>Coming soon...</p>
-
-            <hr class="my-3"/>
-
-            <div class={"flex flex-col gap-2"}>
-              <Label>テーマ</Label>
-              <div class={"mx-auto"}>
-                {colorMode() === "dark" && <IconMoonFilled onClick={()=>setColorMode("light")} />}
-                {colorMode() === "light" && <IconSunFilled onClick={()=>setColorMode("dark")} />}
-              </div>
-            </div>
           </div>
         </CardContent>
       </Card>
