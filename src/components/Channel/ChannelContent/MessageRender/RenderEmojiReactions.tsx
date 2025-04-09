@@ -108,8 +108,10 @@ export default function RenderEmojiReactions(props: {reaction: IMessage["reactio
                     class="absolute bottom-full p-2 left-0 w-max max-w-52 z-50 cursor-default"
                   >
                     <span class="flex items-center gap-1">
-                      <RenderEmoji emojiCode={r.emojiCode} />
-                      <code>{ r.emojiCode }</code>
+                      <span class="shrink-0">
+                        <RenderEmoji emojiCode={r.emojiCode} />
+                      </span>
+                      <p class="line-clamp-2 overflow-x-auto">{ r.emojiCode }</p>
                     </span>
                     <hr class="my-1" />
                     <span class="flex flex-wrap gap-1">
