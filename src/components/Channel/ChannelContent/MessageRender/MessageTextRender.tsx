@@ -78,7 +78,7 @@ export default function MessageTextRender(props: { content: string }) {
         // textSegment を改行文字 (\n) で分割し、それぞれを span でラップするか、
         // 単一の span に white-space: pre-wrap を適用する
         messageRenderingFinal.push(
-             <span class="whitespace-pre-wrap break-words">{textSegment}</span>
+          <span class="whitespace-pre-wrap break-words">{textSegment}</span>
         );
       }
 
@@ -112,9 +112,9 @@ export default function MessageTextRender(props: { content: string }) {
           break;
         case "inlineCode":
           messageRenderingFinal.push(
-             <code class="bg-gray-200 dark:bg-gray-700 rounded px-1 py-0.5 text-sm font-mono mx-px">
-               {obj.idOrValue}
-             </code>
+            <code class="bg-gray-200 dark:bg-gray-700 rounded px-1 py-0.5 text-sm font-mono mx-px">
+              {obj.idOrValue}
+            </code>
           );
           break;
       }
@@ -124,9 +124,9 @@ export default function MessageTextRender(props: { content: string }) {
     // 最後のマッチ以降の残りのテキストを追加
     if (lastIndex < props.content.length) {
       const remainingText = props.content.slice(lastIndex);
-       messageRenderingFinal.push(
-           <span class="whitespace-pre-wrap break-words">{remainingText}</span>
-       );
+      messageRenderingFinal.push(
+        <span class="whitespace-pre-wrap break-words">{remainingText}</span>
+      );
     }
 
     // 空のコンテンツの場合のフォールバック
@@ -141,10 +141,6 @@ export default function MessageTextRender(props: { content: string }) {
   // biome-ignore lint/correctness/useJsxKeyInIterable: SolidのForは通常Keyなしで効率的
   return (
     <div class="py-1 w-full overflow-x-auto flex flex-wrap items-baseline"> {/* items-baselineを追加するとBadgeなどの縦位置が揃いやすい */}
-      {/*
-        createMemo の結果を直接 <For> でレンダリングする。
-        <Dynamic> は不要。
-      */}
       <For each={parsedContent()}>{(el) => el}</For>
     </div>
   );
