@@ -65,7 +65,7 @@ export default function EditMessage(props: { messageId: string, content: string,
               (e) => {
                 switch(e.key) {
                   case "Enter": {
-                    if (e.ctrlKey) {
+                    if (!e.shiftKey) {
                       if (messageContent() !== props.content) {
                         updateMessage();
                       } else {
@@ -88,7 +88,7 @@ export default function EditMessage(props: { messageId: string, content: string,
       <span class={"flex items-center gap-2 justify-end"}>
         <div class={"shrink mr-auto py-1 hidden sm:flex items-center gap-4 text-sm overflow-x-scroll"}>
           <span class={"shrink-0"}>
-            <kbd class={"border py-1 px-2 rounded"}>Ctrl</kbd> + <kbd class={"border p-1 rounded"}>Enter</kbd>で更新
+            <kbd class={"border p-1 rounded"}>Enter</kbd>で更新
           </span>
           <span class={"shrink-0"}>
             <kbd class={"border py-1 px-2 rounded"}>Esc</kbd>でキャンセル
