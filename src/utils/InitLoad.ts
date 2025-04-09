@@ -13,7 +13,7 @@ import GET_MESSAGE_INBOX from "~/api/MESSAGE/MESSAGE_INBOX";
 import {setStoreInbox} from "~/stores/Inbox";
 import GET_SERVER_CUSTOM_EMOJI from "~/api/SERVER/SERVER_CUSTOM_EMOJI";
 import {bindCustomEmoji} from "~/stores/CustomEmoji";
-import { bindClientConfig, storeClientConfig } from "~/stores/ClientConfig";
+import { bindClientConfig } from "~/stores/ClientConfig";
 
 export default function InitLoad(_userId: string, initWsToo = false) {
   //クライアント設定を呼び出して適用
