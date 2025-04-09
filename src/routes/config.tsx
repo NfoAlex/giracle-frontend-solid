@@ -18,6 +18,9 @@ export default function Config() {
     () => JSON.stringify(storeClientConfig),
     () => {
       console.log("config :: createEffect : 設定が変更されました。")
+
+      //保存
+      localStorage.setItem("clientConfig", JSON.stringify(storeClientConfig));
     }
   ));
 
