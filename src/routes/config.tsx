@@ -1,6 +1,5 @@
-import { useParams } from "@solidjs/router";
 import { IconBell, IconEye, IconHash, IconUser } from "@tabler/icons-solidjs";
-import { createSignal } from "solid-js";
+import { createEffect, createSignal, on } from "solid-js";
 import ConfigChat from "~/components/Config/ConfigChat";
 import ConfigDisplay from "~/components/Config/ConfigDisplay";
 import ConfigNotification from "~/components/Config/ConfigNotification";
@@ -9,10 +8,18 @@ import { Card } from "~/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~/components/ui/select";
 import { SidebarMenuButton } from "~/components/ui/sidebar";
 import SidebarTriggerWithDot from "~/components/unique/SidebarTriggerWithDot";
+import { storeClientConfig } from "~/stores/ClientConfig";
 
 export default function Config() {
-  const param = useParams();
   const [displayMode, setDisplayMode] = createSignal<"profile" | "chat" | "notification" | "display">("profile");
+
+  //設定の変更を監視してLocalStorageに保存する
+  createEffect(on(
+    () => JSON.stringify(storeClientConfig),
+    () => {
+      localStorage.setItem("clientConfig", JSON.stringify(storeClientConfig));
+    }
+  ));
 
   return (
     <div class="p-2 h-full flex flex-col">
