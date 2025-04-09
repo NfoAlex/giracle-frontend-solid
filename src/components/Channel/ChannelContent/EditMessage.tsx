@@ -4,6 +4,7 @@ import {IconCancel, IconCheck} from "@tabler/icons-solidjs";
 import {createSignal, onMount} from "solid-js";
 import {TextField, TextFieldTextArea} from "~/components/ui/text-field";
 import POST_MESSAGE_EDIT from "~/api/MESSAGE/MESSAGE_EDIT";
+import { storeClientConfig } from "~/stores/ClientConfig";
 
 export default function EditMessage(props: { messageId: string, content: string, onCancelEdit: () => void }) {
   const [messageContent, setMessageContent] = createSignal(props.content);
@@ -65,7 +66,10 @@ export default function EditMessage(props: { messageId: string, content: string,
               (e) => {
                 switch(e.key) {
                   case "Enter": {
-                    if (e.ctrlKey) {
+                    //もしCtrlキーでの送信をオンにしているならCtrlキーで編集するようにする
+                    if (storeClientConfig.chat.sendWithCtrlKey && !e.ctrlKey) break;
+                    //Shiftキーでの改行用の条件を挟む
+                    if (!e.shiftKey) {
                       if (messageContent() !== props.content) {
                         updateMessage();
                       } else {
@@ -87,8 +91,9 @@ export default function EditMessage(props: { messageId: string, content: string,
       </div>
       <span class={"flex items-center gap-2 justify-end"}>
         <div class={"shrink mr-auto py-1 hidden sm:flex items-center gap-4 text-sm overflow-x-scroll"}>
-          <span class={"shrink-0"}>
-            <kbd class={"border py-1 px-2 rounded"}>Ctrl</kbd> + <kbd class={"border p-1 rounded"}>Enter</kbd>で更新
+          <span class={"shrink-0 flex items-center gap-1"}>
+            { storeClientConfig.chat.sendWithCtrlKey && <kbd class={"border p-1 rounded"}>Ctrl</kbd> }
+            <kbd class={"border p-1 rounded"}>Enter</kbd>で更新
           </span>
           <span class={"shrink-0"}>
             <kbd class={"border py-1 px-2 rounded"}>Esc</kbd>でキャンセル
