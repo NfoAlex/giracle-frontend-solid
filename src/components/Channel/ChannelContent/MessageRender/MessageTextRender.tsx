@@ -140,7 +140,7 @@ export default function MessageTextRender(props: { content: string }) {
 
   // biome-ignore lint/correctness/useJsxKeyInIterable: SolidのForは通常Keyなしで効率的
   return (
-    <div class="py-1 w-full overflow-x-auto flex flex-wrap items-baseline"> {/* items-baselineを追加するとBadgeなどの縦位置が揃いやすい */}
+    <div class="py-1 w-full"> {/* items-baselineを追加するとBadgeなどの縦位置が揃いやすい */}
       <For each={parsedContent()}>{(el) => el}</For>
     </div>
   );
