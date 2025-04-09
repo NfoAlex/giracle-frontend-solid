@@ -8,6 +8,7 @@ import { Card } from "~/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~/components/ui/select";
 import { SidebarMenuButton } from "~/components/ui/sidebar";
 import SidebarTriggerWithDot from "~/components/unique/SidebarTriggerWithDot";
+import { storeAppStatus } from "~/stores/AppStatus";
 import { storeClientConfig } from "~/stores/ClientConfig";
 
 export default function Config() {
@@ -17,6 +18,9 @@ export default function Config() {
   createEffect(on(
     () => JSON.stringify(storeClientConfig),
     () => {
+      //もしログインしてなければ停止
+      if (!storeAppStatus.loggedIn) return;
+      //保存
       localStorage.setItem("clientConfig", JSON.stringify(storeClientConfig));
     }
   ));
