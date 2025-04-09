@@ -13,8 +13,15 @@ import GET_MESSAGE_INBOX from "~/api/MESSAGE/MESSAGE_INBOX";
 import {setStoreInbox} from "~/stores/Inbox";
 import GET_SERVER_CUSTOM_EMOJI from "~/api/SERVER/SERVER_CUSTOM_EMOJI";
 import {bindCustomEmoji} from "~/stores/CustomEmoji";
+import { bindClientConfig, storeClientConfig } from "~/stores/ClientConfig";
 
 export default function InitLoad(_userId: string, initWsToo = false) {
+  //クライアント設定を呼び出して適用
+  const localConfig = localStorage.getItem("clientConfig");
+  if (localConfig) {
+    bindClientConfig(JSON.parse(localConfig));
+  }
+
   //自分のユーザー情報を取得してStoreに格納
   GET_USER_INFO(_userId).then((r) => {
     //console.log("Login :: loginIt : 自分の情報r->", r);
