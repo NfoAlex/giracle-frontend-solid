@@ -14,7 +14,7 @@ export default function URLPreview(props: { MessageUrlPreview: IMessageUrlPrevie
           <Card class={"flex flex-col md:w-72 lg:w-96 sm:w-1/2 w-full"}>
             <div class={"border-b-2 grow relative"}>
               {/* 画像URLがある場合の表示 */}
-              <div class="z-10 relative sm:h-28 md:h-54 rounded-t flex flex-col items-center justify-center">
+              <div class="z-10 relative h-28 md:h-52 rounded-t flex flex-col items-center justify-center">
                 <ImageWithModal class={"rounded z-20 mx-auto my-auto max-w-full max-h-full"} src={urlPreview.imageLink} />
 
                 <div
