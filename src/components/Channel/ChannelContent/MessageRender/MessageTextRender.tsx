@@ -86,7 +86,7 @@ export default function MessageTextRender(props: { content: string }) {
       switch (obj.type) {
         case "link":
           messageRenderingFinal.push(
-            <a href={obj.idOrValue} target="_blank" rel="noopener noreferrer" class="underline">
+            <a href={obj.idOrValue} target="_blank" rel="noopener noreferrer" class="underline whitespace-pre-wrap break-words">
               {obj.idOrValue}
             </a>
           );
