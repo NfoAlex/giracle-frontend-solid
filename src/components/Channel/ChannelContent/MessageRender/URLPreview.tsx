@@ -24,7 +24,7 @@ export default function URLPreview(props: { MessageUrlPreview: IMessageUrlPrevie
 
                 {/* 動画URLがある場合の表示 */}
                 <Show when={urlPreview.videoLink && !urlPreview.videoLink.startsWith("https://www.youtube")}>
-                  <span class={"absolute bottom-3 right-3 shadow-xl"}>
+                  <span class={"absolute bottom-3 right-3 shadow-xl z-50"}>
                     <VideoPlayerModal urlPreview={urlPreview} />
                   </span>
                 </Show>
