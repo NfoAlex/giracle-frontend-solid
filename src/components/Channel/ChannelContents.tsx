@@ -289,7 +289,21 @@ export default function ChannelContents() {
             <div id={`messageId::${h.id}`} class={"w-full"}>
 
               {/* 日付線 */}
-              <Show when={new Date(h.createdAt).getDay().valueOf() !== new Date(storeHistory[param.channelId]?.history[index() + 1]?.createdAt).getDay().valueOf()}>
+              <Show when={
+                index() !== 0
+                &&
+                (
+                  new Date(h.createdAt).getDay()
+                    !==
+                  new Date(storeHistory[param.channelId]?.history[index() + 1]?.createdAt).getDay()
+                )
+                ||
+                (
+                  new Date(h.createdAt).getDate()
+                    !==
+                  new Date(storeHistory[param.channelId]?.history[index() + 1]?.createdAt).getDate()
+                )
+              }>
                 <div class="flex justify-center items-center gap-3 py-1">
                   <hr class={"grow"} />
                   <Badge class={"shrink-0"} variant={"secondary"}>{ new Date(h.createdAt).toLocaleDateString() }</Badge>
