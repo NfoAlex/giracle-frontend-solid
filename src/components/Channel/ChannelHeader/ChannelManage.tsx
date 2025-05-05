@@ -8,6 +8,7 @@ import {Button} from "~/components/ui/button";
 import POST_CHANNEL_UPDATE from "~/api/CHANNEL/CHANNEL_UPDATE";
 import RoleLinker from "~/components/unique/RoleLinker";
 import {Label} from "~/components/ui/label";
+import { Tabs, TabsList, TabsTrigger } from "~/components/ui/tabs";
 
 export default function ChannelManage(props: {channelId: string}) {
   const [editName, setEditName] = createSignal(false);
@@ -61,6 +62,14 @@ export default function ChannelManage(props: {channelId: string}) {
           <p>チャンネル情報の編集</p>
         </DialogHeader>
         <DialogDescription class={"flex flex-col gap-2"}>
+
+          <Tabs defaultValue="info" class="w-full">
+            <TabsList>
+              <TabsTrigger value="info">概要</TabsTrigger>
+              <TabsTrigger value="info">参加者</TabsTrigger>
+            </TabsList>
+          </Tabs>
+
           <Card class={"p-4"}>
             <Label class={"text-muted-foreground"}>チャンネル名</Label>
             <div class={"text-card-foreground w-full overflow-x-scroll"}>
