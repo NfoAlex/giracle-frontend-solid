@@ -117,7 +117,7 @@ export default function ChannelInfo(props: {channelId: string}) {
       <Button
         onClick={updateChannel}
         size={"sm"}
-        class={"w-fit"}
+        class={"w-fit mt-2"}
         variant={"secondary"}
         disabled={!roleIsDiff()}
       >ロールを更新</Button>
