@@ -1,5 +1,5 @@
 import { IconSearch } from "@tabler/icons-solidjs";
-import { createSignal, For, onMount } from "solid-js";
+import { createSignal, For, onMount, Show } from "solid-js";
 import GET_USER_SEARCH from "~/api/USER/USER_SEARCH.";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Button } from "~/components/ui/button";
@@ -12,9 +12,10 @@ import type { IUser } from "~/types/User";
 export default function ChannelMembers(props: {channelId: string}) {
   const [users, setUsers] = createSignal<IUser[]>([]);
   const [searchQuery, setSearchQuery] = createSignal<string>("");
+  const [cursor, setCursor] = createSignal<number>(0);
 
-  // ユーザー一覧を取得
-  const fetchUsers = async () => {
+  // ユーザー一覧を取得、オプションで挿入か格納かを選択
+  const fetchUsers = async (optionInsert = false) => {
     GET_USER_SEARCH(
       searchQuery(),
       props.channelId,
@@ -22,8 +23,12 @@ export default function ChannelMembers(props: {channelId: string}) {
     )
     .then((r) => {
       console.log(r);
-      // const userIdArr = r.map((u) => u.userId);
-      setUsers(r.data);
+
+      if (optionInsert) {
+        setUsers((u) => [...u, ...r.data]);
+      } else {
+        setUsers(r.data);
+      }
     })
     .catch((e) => console.error("ChannelMembers :: fetchUsers : e", e));
   };
@@ -41,11 +46,15 @@ export default function ChannelMembers(props: {channelId: string}) {
             onInput={(e)=>setSearchQuery(e.currentTarget.value)}
             placeholder="ユーザー名検索"
           />
-          <Button onClick={fetchUsers} size={"icon"} class="shrink-0"><IconSearch /></Button>
+          <Button onClick={() => fetchUsers(false)} size={"icon"} class="shrink-0"><IconSearch /></Button>
         </span>
       </TextField>
 
       <Card class="p-1 overflow-y-auto flex flex-col grow">
+        <Show when={users().length === 0}>
+          <p class="text-center">検索中...</p>
+        </Show>
+
         <For each={users()}>
           {
             (user) => (
@@ -61,6 +70,10 @@ export default function ChannelMembers(props: {channelId: string}) {
             )
           }
         </For>
+
+        <Show when={users().length === cursor() * 30 + 30}>
+          <Button onClick={() => { setCursor(((c) => c+1)); fetchUsers(true); } }>さらに読み込む</Button>
+        </Show>
       </Card>
     </div>
   );
