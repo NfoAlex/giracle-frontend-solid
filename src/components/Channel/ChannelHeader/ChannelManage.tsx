@@ -18,7 +18,7 @@ export default function ChannelManage(props: {channelId: string}) {
         </DialogHeader>
         <DialogDescription class={"flex flex-col gap-2"}>
 
-          <Tabs defaultValue="info" class="w-full">
+          <Tabs defaultValue="info" class="w-full h-[450px]">
             <TabsList>
               <TabsTrigger value="info">概要</TabsTrigger>
               <TabsTrigger value="users">参加者</TabsTrigger>
