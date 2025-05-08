@@ -51,7 +51,7 @@ export default function ChannelInfo(props: {channelId: string}) {
     }));
 
   return (
-    <div>
+    <div class="mt-2">
       <Card class={"p-4"}>
         <Label class={"text-muted-foreground"}>チャンネル名</Label>
         <div class={"text-card-foreground w-full overflow-x-scroll"}>

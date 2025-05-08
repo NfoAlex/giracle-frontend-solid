@@ -3,6 +3,7 @@ import {IconInfoCircle, IconPencil} from "@tabler/icons-solidjs";
 import {Button} from "~/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import ChannelInfo from "./ChannelManage/ChannelInfos";
+import ChannelMembers from "./ChannelManage/ChannelMembers";
 
 export default function ChannelManage(props: {channelId: string}) {
 
@@ -27,7 +28,7 @@ export default function ChannelManage(props: {channelId: string}) {
               <ChannelInfo channelId={props.channelId} />
             </TabsContent>
             <TabsContent value="users">
-              <p>ここで参加者</p>
+              <ChannelMembers channelId={props.channelId} />
             </TabsContent>
           </Tabs>
           
