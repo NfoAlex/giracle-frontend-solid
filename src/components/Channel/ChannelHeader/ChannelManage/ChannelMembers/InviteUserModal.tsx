@@ -1,9 +1,12 @@
 import { IconSearch } from "@tabler/icons-solidjs";
-import { createSignal } from "solid-js";
+import { createSignal, For } from "solid-js";
 import GET_USER_SEARCH from "~/api/USER/USER_SEARCH.";
+import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Button } from "~/components/ui/button";
 import { Dialog, DialogContent, DialogTrigger } from "~/components/ui/dialog";
 import { TextField, TextFieldInput } from "~/components/ui/text-field";
+import UserinfoModalWrapper from "~/components/unique/UserinfoModalWrapper";
+import { getterUserinfo } from "~/stores/Userinfo";
 import { IUser } from "~/types/User";
 
 export default function InviteUserModal(props: { channelId: string }) {
@@ -48,7 +51,21 @@ export default function InviteUserModal(props: { channelId: string }) {
 
         <hr class={"my-4"} />
 
-        <div>ここで結果表示</div>
+        <For each={userList()}>
+          {
+            (user) => (
+              <UserinfoModalWrapper userId={user.id}>
+                <div class="p-2 w-full flex flex-row items-center gap-2 hover:bg-border rounded cursor-pointer">
+                  <Avatar class="w-8 h-8">
+                    <AvatarFallback >{ user.id.slice(0,2) }</AvatarFallback>
+                    <AvatarImage src={"/api/user/icon/" + user.id} alt={user.id} />
+                  </Avatar>
+                  { getterUserinfo(user.id).name }
+                </div>
+              </UserinfoModalWrapper>
+            )
+          }
+        </For>
       </DialogContent>
     </Dialog>
   );
