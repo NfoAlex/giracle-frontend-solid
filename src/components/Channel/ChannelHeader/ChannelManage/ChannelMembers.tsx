@@ -39,6 +39,11 @@ export default function ChannelMembers(props: {channelId: string}) {
   
   return (
     <div class="max-h-[400px] flex flex-col gap-3 mt-2">
+
+      <Button variant={"secondary"}>ユーザーを招待する</Button>
+
+      <hr class={"my-4"} />
+
       <TextField>
         <span class="flex items-center gap-2">
           <TextFieldInput
