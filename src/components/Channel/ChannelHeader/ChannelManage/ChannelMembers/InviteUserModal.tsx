@@ -46,9 +46,9 @@ export default function InviteUserModal(props: { channelId: string }) {
           <Button onclick={()=>searchIt(false)} size="icon"><IconSearch /></Button>
         </div>
 
-          <hr class={"my-4"} />
+        <hr class={"my-4"} />
 
-          <div>ここで結果表示</div>
+        <div>ここで結果表示</div>
       </DialogContent>
     </Dialog>
   );
