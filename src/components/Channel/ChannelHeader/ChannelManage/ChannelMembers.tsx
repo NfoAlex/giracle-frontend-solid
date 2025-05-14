@@ -20,7 +20,7 @@ export default function ChannelMembers(props: {channelId: string}) {
     GET_USER_SEARCH(
       searchQuery(),
       props.channelId,
-      0
+      cursor()
     )
     .then((r) => {
       console.log(r);
