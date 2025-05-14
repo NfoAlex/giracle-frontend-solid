@@ -8,6 +8,7 @@ import { TextField, TextFieldInput, TextFieldLabel } from "~/components/ui/text-
 import UserinfoModalWrapper from "~/components/unique/UserinfoModalWrapper";
 import { getterUserinfo } from "~/stores/Userinfo";
 import type { IUser } from "~/types/User";
+import InviteUserModal from "./ChannelMembers/InviteUserModal";
 
 export default function ChannelMembers(props: {channelId: string}) {
   const [users, setUsers] = createSignal<IUser[]>([]);
@@ -40,7 +41,7 @@ export default function ChannelMembers(props: {channelId: string}) {
   return (
     <div class="max-h-[400px] flex flex-col gap-3 mt-2">
 
-      <Button variant={"secondary"}>ユーザーを招待する</Button>
+      <InviteUserModal channelId={props.channelId} />
 
       <hr class={"my-4"} />
 
