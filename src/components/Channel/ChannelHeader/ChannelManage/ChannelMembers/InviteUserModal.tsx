@@ -1,4 +1,4 @@
-import { IconCheck, IconPlus, IconSearch } from "@tabler/icons-solidjs";
+import { IconCheck, IconExternalLink, IconPlus, IconSearch } from "@tabler/icons-solidjs";
 import { createSignal, For, Show } from "solid-js";
 import { createMutable } from "solid-js/store";
 import POST_CHANNEL_INVITE from "~/api/CHANNEL/CHANNEL_INVITE";
@@ -71,7 +71,7 @@ export default function InviteUserModal(props: { channelId: string }) {
     <Dialog>
       <DialogTrigger>
         <Button variant={"secondary"} class="w-full">
-          <IconPlus />
+          <IconExternalLink />
           ユーザーを招待する
         </Button>
       </DialogTrigger>
