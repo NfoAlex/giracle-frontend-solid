@@ -32,9 +32,9 @@ export default function InviteUserModal(props: { channelId: string }) {
       .then((r) => {
         setStatus("success");
         if (optionInsert) {
-          setUserList(r.data);
-        } else {
           setUserList((u) => [...u, ...r.data]);
+        } else {
+          setUserList(r.data);
         }
       })
       .catch((e) => {
