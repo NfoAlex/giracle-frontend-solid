@@ -29,6 +29,13 @@ export default function SystemMessageRender(props: { content: string }) {
           </UserinfoModalWrapper>さんがチャンネルを退出しました。
         </p>
       )}
+      {systemMsg.messageTerm === "CHANNEL_INVITE" && (
+        <p>
+          <UserinfoModalWrapper userId={systemMsg.targetUserId} class={"hover:underline"}>
+            {getterUserinfo(systemMsg.targetUserId).name}
+          </UserinfoModalWrapper>さんが招待されました!
+        </p>
+      )}
     </Card>
   );
 }
