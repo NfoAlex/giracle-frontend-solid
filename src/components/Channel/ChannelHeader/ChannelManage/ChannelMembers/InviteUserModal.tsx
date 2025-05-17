@@ -1,5 +1,7 @@
 import { IconPlus, IconSearch } from "@tabler/icons-solidjs";
 import { createSignal, For, Show } from "solid-js";
+import { createMutable } from "solid-js/store";
+import POST_CHANNEL_INVITE from "~/api/CHANNEL/CHANNEL_INVITE";
 import GET_USER_SEARCH from "~/api/USER/USER_SEARCH.";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Button } from "~/components/ui/button";
@@ -14,6 +16,12 @@ export default function InviteUserModal(props: { channelId: string }) {
   const [userList, setUserList] = createSignal<IUser[]>([]);
   const [cursor, setCursor] = createSignal<number>(0);
   const [status, setStatus] = createSignal<"waiting"|"success"|"fail">("waiting");
+  
+  //招待時の結果、状態管理
+  const inviteJson = createMutable({
+    processing: false,
+    invitingUserId: ""
+  });
 
   /**
    * ユーザーの検索をする
@@ -32,6 +40,30 @@ export default function InviteUserModal(props: { channelId: string }) {
       .catch((e) => {
         console.error("InviteUserModal :: searchIt : エラー -> ", e);
         setStatus("fail");
+      });
+  };
+
+  /**
+   * ユーザーをチャンネルへ招待する
+   * @param userId 
+   */
+  const inviteIt = (userId: string) => {
+    //招待中のユーザーIDと処理中状態をセット
+    inviteJson.invitingUserId = userId;
+    inviteJson.processing = true;
+
+    POST_CHANNEL_INVITE(userId)
+      .then((r) => {
+        console.log("InviteUserModal :: inviteIt : 招待成功 -> ", r);
+      })
+      .catch((e) => {
+        console.error("InviteUserModal :: inviteIt : 招待失敗 -> ", e);
+        alert("招待に失敗しました。\n" + e);
+      })
+      .finally(() => {
+        //招待中のユーザーIDと処理中状態をリセット
+        inviteJson.invitingUserId = "";
+        inviteJson.processing = false;
       });
   };
 
@@ -82,7 +114,7 @@ export default function InviteUserModal(props: { channelId: string }) {
                   <p class="hover:underline">{ getterUserinfo(user.id).name }</p>
                 </UserinfoModalWrapper>
 
-                <Button class="ml-auto" size="icon"><IconPlus /></Button>
+                <Button class="ml-auto" size="icon" disabled={inviteJson.processing}><IconPlus /></Button>
               </div>
             )
           }
