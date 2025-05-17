@@ -1,4 +1,4 @@
-import { IconSearch } from "@tabler/icons-solidjs";
+import { IconPlus, IconSearch } from "@tabler/icons-solidjs";
 import { createSignal, For } from "solid-js";
 import GET_USER_SEARCH from "~/api/USER/USER_SEARCH.";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
@@ -33,15 +33,15 @@ export default function InviteUserModal(props: { channelId: string }) {
   return (
     <Dialog>
       <DialogTrigger>
-        <Button>ユーザーを招待する</Button>
+        <Button class="w-full">ユーザーを招待する</Button>
       </DialogTrigger>
 
       <DialogContent>
-        <div class="flex items-center gap-2">
-          <TextField>
+        <div class="mt-9 w-full flex items-center gap-2">
+          <TextField class="w-full">
             <TextFieldInput
               value={searchQuery()}
-              onInput={setSearchQuery}
+              onInput={(e)=>setSearchQuery(e.currentTarget.value)}
               placeholder="招待するユーザー名を検索"
             />
           </TextField>
@@ -49,7 +49,7 @@ export default function InviteUserModal(props: { channelId: string }) {
           <Button onclick={()=>searchIt(false)} size="icon"><IconSearch /></Button>
         </div>
 
-        <hr class={"my-4"} />
+        <hr class={"my-2"} />
 
         <For each={userList()}>
           {
@@ -61,6 +61,8 @@ export default function InviteUserModal(props: { channelId: string }) {
                     <AvatarImage src={"/api/user/icon/" + user.id} alt={user.id} />
                   </Avatar>
                   { getterUserinfo(user.id).name }
+
+                  <Button class="ml-auto" size="icon"><IconPlus /></Button>
                 </div>
               </UserinfoModalWrapper>
             )

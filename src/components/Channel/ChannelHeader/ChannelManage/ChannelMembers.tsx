@@ -43,8 +43,6 @@ export default function ChannelMembers(props: {channelId: string}) {
 
       <InviteUserModal channelId={props.channelId} />
 
-      <hr class={"my-4"} />
-
       <TextField>
         <span class="flex items-center gap-2">
           <TextFieldInput
