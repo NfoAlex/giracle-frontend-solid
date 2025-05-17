@@ -61,5 +61,5 @@ export interface IMessageFileAttached {
 
 export interface ISystemMessage {
   targetUserId: string,
-  messageTerm: "WELCOME" | "CHANNEL_JOIN" | "CHANNEL_LEFT" | "CHANNEL_INVITED";
+  messageTerm: "WELCOME" | "CHANNEL_JOIN" | "CHANNEL_LEFT" | "CHANNEL_INVITED" | "CHANNEL_KICKED";
 }

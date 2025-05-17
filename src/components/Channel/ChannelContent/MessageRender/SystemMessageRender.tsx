@@ -36,6 +36,13 @@ export default function SystemMessageRender(props: { content: string }) {
           </UserinfoModalWrapper>さんが招待されました!
         </p>
       )}
+      {systemMsg.messageTerm === "CHANNEL_KICKED" && (
+        <p>
+          <UserinfoModalWrapper userId={systemMsg.targetUserId} class={"hover:underline"}>
+            {getterUserinfo(systemMsg.targetUserId).name}
+          </UserinfoModalWrapper>さんがチャンネルからキックされました。
+        </p>
+      )}
     </Card>
   );
 }
