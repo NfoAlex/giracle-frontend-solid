@@ -29,7 +29,7 @@ export default function SystemMessageRender(props: { content: string }) {
           </UserinfoModalWrapper>さんがチャンネルを退出しました。
         </p>
       )}
-      {systemMsg.messageTerm === "CHANNEL_INVITE" && (
+      {systemMsg.messageTerm === "CHANNEL_INVITED" && (
         <p>
           <UserinfoModalWrapper userId={systemMsg.targetUserId} class={"hover:underline"}>
             {getterUserinfo(systemMsg.targetUserId).name}
