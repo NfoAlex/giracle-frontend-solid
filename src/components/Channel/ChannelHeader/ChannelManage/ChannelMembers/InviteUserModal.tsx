@@ -52,7 +52,7 @@ export default function InviteUserModal(props: { channelId: string }) {
     inviteJson.invitingUserId = userId;
     inviteJson.processing = true;
 
-    POST_CHANNEL_INVITE(userId)
+    POST_CHANNEL_INVITE(userId, props.channelId)
       .then((r) => {
         console.log("InviteUserModal :: inviteIt : 招待成功 -> ", r);
       })
@@ -115,11 +115,11 @@ export default function InviteUserModal(props: { channelId: string }) {
                 </UserinfoModalWrapper>
 
                 {
-                  user.ChannelJoin.some((c) => c.channelId === props.channelId)
+                  (user.ChannelJoin.some((c) => c.channelId === props.channelId) || inviteJson.invitingUserId === user.id)
                   ?
                     <IconCheck class="ml-auto" />
                   :
-                    <Button class="ml-auto" size="icon" disabled={inviteJson.processing}><IconPlus /></Button>
+                    <Button onclick={()=>inviteIt(user.id)} class="ml-auto" size="icon" disabled={inviteJson.processing}><IconPlus /></Button>
                 }
               </div>
             )
