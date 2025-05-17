@@ -1,9 +1,9 @@
 import { IconPlus, IconSearch } from "@tabler/icons-solidjs";
-import { createSignal, For } from "solid-js";
+import { createSignal, For, Show } from "solid-js";
 import GET_USER_SEARCH from "~/api/USER/USER_SEARCH.";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Button } from "~/components/ui/button";
-import { Dialog, DialogContent, DialogTrigger } from "~/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTrigger } from "~/components/ui/dialog";
 import { TextField, TextFieldInput } from "~/components/ui/text-field";
 import UserinfoModalWrapper from "~/components/unique/UserinfoModalWrapper";
 import { getterUserinfo } from "~/stores/Userinfo";
@@ -13,6 +13,7 @@ export default function InviteUserModal(props: { channelId: string }) {
   const [searchQuery, setSearchQuery] = createSignal("");
   const [userList, setUserList] = createSignal<IUser[]>([]);
   const [cursor, setCursor] = createSignal<number>(0);
+  const [status, setStatus] = createSignal<"waiting"|"success"|"fail">("waiting");
 
   /**
    * ユーザーの検索をする
@@ -21,13 +22,17 @@ export default function InviteUserModal(props: { channelId: string }) {
   const searchIt = (optionInsert = false) => {
     GET_USER_SEARCH(searchQuery(), "", cursor())
       .then((r) => {
+        setStatus("success");
         if (optionInsert) {
           setUserList(r.data);
         } else {
           setUserList((u) => [...u, ...r.data]);
         }
       })
-      .catch((e) => console.error("InviteUserModal :: searchIt : エラー -> ", e));
+      .catch((e) => {
+        console.error("InviteUserModal :: searchIt : エラー -> ", e);
+        setStatus("fail");
+      });
   };
 
   return (
@@ -37,7 +42,12 @@ export default function InviteUserModal(props: { channelId: string }) {
       </DialogTrigger>
 
       <DialogContent>
-        <div class="mt-9 w-full flex items-center gap-2">
+
+        <DialogHeader>
+          <p>ユーザーを招待</p>
+        </DialogHeader>
+
+        <div class="w-full flex items-center gap-2">
           <TextField class="w-full">
             <TextFieldInput
               value={searchQuery()}
@@ -50,6 +60,15 @@ export default function InviteUserModal(props: { channelId: string }) {
         </div>
 
         <hr class={"my-2"} />
+
+        <Show when={status() === "waiting"}>
+          <p class="text-center">ユーザー名を入力してください。</p>
+        </Show>
+        {
+          (userList().length === 0 && status() === "success")
+          &&
+          <p class="text-center">ユーザーが見つかりません。</p>
+        }
 
         <For each={userList()}>
           {
