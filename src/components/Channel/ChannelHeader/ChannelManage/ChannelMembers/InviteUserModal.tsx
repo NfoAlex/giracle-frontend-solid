@@ -1,4 +1,4 @@
-import { IconPlus, IconSearch } from "@tabler/icons-solidjs";
+import { IconCheck, IconPlus, IconSearch } from "@tabler/icons-solidjs";
 import { createSignal, For, Show } from "solid-js";
 import { createMutable } from "solid-js/store";
 import POST_CHANNEL_INVITE from "~/api/CHANNEL/CHANNEL_INVITE";
@@ -114,7 +114,13 @@ export default function InviteUserModal(props: { channelId: string }) {
                   <p class="hover:underline">{ getterUserinfo(user.id).name }</p>
                 </UserinfoModalWrapper>
 
-                <Button class="ml-auto" size="icon" disabled={inviteJson.processing}><IconPlus /></Button>
+                {
+                  user.ChannelJoin.some((c) => c.channelId === props.channelId)
+                  ?
+                    <IconCheck class="ml-auto" />
+                  :
+                    <Button class="ml-auto" size="icon" disabled={inviteJson.processing}><IconPlus /></Button>
+                }
               </div>
             )
           }
