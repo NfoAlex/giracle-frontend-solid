@@ -70,7 +70,10 @@ export default function InviteUserModal(props: { channelId: string }) {
   return (
     <Dialog>
       <DialogTrigger>
-        <Button class="w-full">ユーザーを招待する</Button>
+        <Button variant={"secondary"} class="w-full">
+          <IconPlus />
+          ユーザーを招待する
+        </Button>
       </DialogTrigger>
 
       <DialogContent>
