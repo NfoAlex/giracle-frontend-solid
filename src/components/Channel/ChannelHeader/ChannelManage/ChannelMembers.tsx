@@ -9,6 +9,8 @@ import UserinfoModalWrapper from "~/components/unique/UserinfoModalWrapper";
 import { getterUserinfo } from "~/stores/Userinfo";
 import type { IUser } from "~/types/User";
 import InviteUserModal from "./ChannelMembers/InviteUserModal";
+import POST_CHANNEL_KICK from "~/api/CHANNEL/CHANNEL_KICK";
+import { getRolePower } from "~/stores/MyUserinfo";
 
 export default function ChannelMembers(props: {channelId: string}) {
   const [users, setUsers] = createSignal<IUser[]>([]);
@@ -34,6 +36,21 @@ export default function ChannelMembers(props: {channelId: string}) {
     .catch((e) => console.error("ChannelMembers :: fetchUsers : e", e));
   };
 
+  /**
+   * ユーザーをチャンネルからキック
+   * @param userId 
+   */
+  const kickIt = (userId: string) => {
+    POST_CHANNEL_KICK(userId, props.channelId)
+      .then((r) => {
+        console.log("ChannelMember :: kickIt : 招待成功 -> ", r);
+      })
+      .catch((e) => {
+        console.error("ChannelMember :: kickIt : 招待失敗 -> ", e);
+        alert("キックに失敗しました。\n" + e);
+      });
+  };
+
   onMount(() => {
     fetchUsers();
   });
@@ -41,7 +58,11 @@ export default function ChannelMembers(props: {channelId: string}) {
   return (
     <div class="max-h-[400px] flex flex-col gap-3 mt-2">
 
-      <InviteUserModal channelId={props.channelId} />
+      { //チャンネル招待ボタン
+        getRolePower("manageChannel")
+        &&
+        <InviteUserModal channelId={props.channelId} />
+      }
 
       <TextField>
         <span class="flex items-center gap-2">
