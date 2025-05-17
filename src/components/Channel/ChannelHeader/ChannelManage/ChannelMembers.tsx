@@ -97,7 +97,11 @@ export default function ChannelMembers(props: {channelId: string}) {
         </For>
 
         <Show when={users().length === cursor() * 30 + 30}>
-          <Button onClick={() => { setCursor(((c) => c+1)); fetchUsers(true); } }>さらに読み込む</Button>
+          <Button
+            onClick={() => { setCursor(((c) => c+1)); fetchUsers(true); } }
+            class="w-full mt-2"
+            variant={"secondary"}
+          >さらに読み込む</Button>
         </Show>
       </Card>
     </div>

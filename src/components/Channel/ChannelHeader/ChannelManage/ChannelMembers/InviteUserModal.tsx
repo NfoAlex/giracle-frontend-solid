@@ -125,6 +125,14 @@ export default function InviteUserModal(props: { channelId: string }) {
             )
           }
         </For>
+
+        <Show when={userList().length === cursor() * 30 + 30}>
+          <Button
+            onClick={() => { setCursor(((c) => c+1)); searchIt(true); } }
+            class="w-full mt-2"
+            variant={"secondary"}
+          >さらに読み込む</Button>
+        </Show>
       </DialogContent>
     </Dialog>
   );
