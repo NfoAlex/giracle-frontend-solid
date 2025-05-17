@@ -1,5 +1,6 @@
 export default async function POST_CHANNEL_INVITE(
   _userId: string,
+  _channelId: string
 ): Promise<{
   message: "User invited"
 }> {
@@ -10,6 +11,7 @@ export default async function POST_CHANNEL_INVITE(
     },
     body: JSON.stringify({
       userId: _userId,
+      channelId: _channelId,
     }),
   }).catch((err) => {
     throw new Error("CHANNEL_INVITE :: err->", err);
