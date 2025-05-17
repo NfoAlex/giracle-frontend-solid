@@ -73,17 +73,17 @@ export default function InviteUserModal(props: { channelId: string }) {
         <For each={userList()}>
           {
             (user) => (
-              <UserinfoModalWrapper userId={user.id}>
-                <div class="p-2 w-full flex flex-row items-center gap-2 hover:bg-border rounded cursor-pointer">
-                  <Avatar class="w-8 h-8">
-                    <AvatarFallback >{ user.id.slice(0,2) }</AvatarFallback>
-                    <AvatarImage src={"/api/user/icon/" + user.id} alt={user.id} />
-                  </Avatar>
-                  { getterUserinfo(user.id).name }
+              <div class="p-2 w-full flex flex-row items-center gap-2 rounded cursor-pointer">
+                <Avatar class="w-8 h-8">
+                  <AvatarFallback >{ user.id.slice(0,2) }</AvatarFallback>
+                  <AvatarImage src={"/api/user/icon/" + user.id} alt={user.id} />
+                </Avatar>
+                <UserinfoModalWrapper userId={user.id}>
+                  <p class="hover:underline">{ getterUserinfo(user.id).name }</p>
+                </UserinfoModalWrapper>
 
-                  <Button class="ml-auto" size="icon"><IconPlus /></Button>
-                </div>
-              </UserinfoModalWrapper>
+                <Button class="ml-auto" size="icon"><IconPlus /></Button>
+              </div>
             )
           }
         </For>
