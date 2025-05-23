@@ -1,4 +1,4 @@
-import { IconSearch } from "@tabler/icons-solidjs";
+import { IconKarate, IconSearch } from "@tabler/icons-solidjs";
 import { createSignal, For, onMount, Show } from "solid-js";
 import GET_USER_SEARCH from "~/api/USER/USER_SEARCH.";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
@@ -90,6 +90,8 @@ export default function ChannelMembers(props: {channelId: string}) {
                     <AvatarImage src={"/api/user/icon/" + user.id} alt={user.id} />
                   </Avatar>
                   { getterUserinfo(user.id).name }
+
+                  { getRolePower("manageChannel") && <Button onClick={()=>kickIt(user.id)}><IconKarate /></Button> }
                 </div>
               </UserinfoModalWrapper>
             )
