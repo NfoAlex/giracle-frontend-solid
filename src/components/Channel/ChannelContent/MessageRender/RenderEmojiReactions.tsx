@@ -95,7 +95,7 @@ export default function RenderEmojiReactions(props: {reaction: IMessage["reactio
                   setTimeout(()=>{ if (hoveringEmojiCode()!=="") fetchReactedUser(r.emojiCode); }, 500)
                 }}
                 onMouseLeave={() => setHoverEmojiCode("")}
-                class={`relative p-1 text-sm flex items-center gap-1 cursor-pointer hover:bg-accent hover:border-background border-accent ${r.includingYou ? "bg-accent border-primary" : ""}`}
+                class={`select-none relative p-1 text-sm flex items-center gap-1 cursor-pointer hover:bg-accent hover:border-background border-accent ${r.includingYou ? "bg-accent border-primary" : ""}`}
               >
                 <RenderEmoji emojiCode={r.emojiCode} />
                 <span>{ r.count }</span>
