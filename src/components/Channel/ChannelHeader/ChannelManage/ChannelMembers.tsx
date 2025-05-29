@@ -63,7 +63,10 @@ export default function ChannelMembers(props: {channelId: string}) {
       { //チャンネル招待ボタン
         getRolePower("manageChannel")
         &&
-        <InviteUserModal channelId={props.channelId} />
+        <InviteUserModal
+          channelId={props.channelId}
+          onInvite={(u) => setUsers([...users(), u])}
+        />
       }
 
       <TextField>

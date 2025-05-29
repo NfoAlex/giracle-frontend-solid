@@ -9,9 +9,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTrigger } from "~/components
 import { TextField, TextFieldInput } from "~/components/ui/text-field";
 import UserinfoModalWrapper from "~/components/unique/UserinfoModalWrapper";
 import { getterUserinfo } from "~/stores/Userinfo";
-import { IUser } from "~/types/User";
+import type { IUser } from "~/types/User";
 
-export default function InviteUserModal(props: { channelId: string }) {
+export default function InviteUserModal(props: { channelId: string, onInvite?: (user: IUser) => void }) {
   const [searchQuery, setSearchQuery] = createSignal("");
   const [userList, setUserList] = createSignal<IUser[]>([]);
   const [cursor, setCursor] = createSignal<number>(0);
@@ -47,14 +47,15 @@ export default function InviteUserModal(props: { channelId: string }) {
    * ユーザーをチャンネルへ招待する
    * @param userId 
    */
-  const inviteIt = (userId: string) => {
+  const inviteIt = (user: IUser) => {
     //招待中のユーザーIDと処理中状態をセット
-    inviteJson.invitedUserIds.push(userId);
+    inviteJson.invitedUserIds.push(user.id);
     inviteJson.processing = true;
 
-    POST_CHANNEL_INVITE(userId, props.channelId)
+    POST_CHANNEL_INVITE(user.id, props.channelId)
       .then((r) => {
         console.log("InviteUserModal :: inviteIt : 招待成功 -> ", r);
+        props.onInvite?.(user);
       })
       .catch((e) => {
         console.error("InviteUserModal :: inviteIt : 招待失敗 -> ", e);
@@ -122,7 +123,7 @@ export default function InviteUserModal(props: { channelId: string }) {
                     <IconCheck class="ml-auto" />
                   :
                     <Button
-                      onclick={()=>inviteIt(user.id)}
+                      onclick={()=>inviteIt(user)}
                       class="ml-auto"
                       size="icon"
                       disabled={inviteJson.processing}
