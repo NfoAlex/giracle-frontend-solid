@@ -5,6 +5,7 @@ import {Badge} from "~/components/ui/badge";
 import RoleChip from "~/components/unique/RoleChip";
 import {storeRoleInfo} from "~/stores/RoleInfo";
 import {Card} from "~/components/ui/card";
+import { getRolePower } from "~/stores/MyUserinfo";
 
 export default function RoleLinker(props: { roles: string[], onUpdate?: (roles: string[])=>void }) {
   const [newRoles, setNewRoles] = createSignal(props.roles);
@@ -45,13 +46,17 @@ export default function RoleLinker(props: { roles: string[], onUpdate?: (roles: 
       {/* ロール追加ボタン */}
       <Popover>
         <PopoverTrigger class={"w-fit"}>
-          <Badge
-            variant={"outline"}
-            class="cursor-pointer h-full"
-            itemType={"button"}
-          >
-            <IconPlus size={16} />
-          </Badge>
+          { //チャンネル編集権限がある時のロール追加ボタン表示
+            getRolePower("manageChannel")
+            &&
+            <Badge
+              variant={"outline"}
+              class="cursor-pointer h-full"
+              itemType={"button"}
+            >
+              <IconPlus size={16} />
+            </Badge>
+          }
         </PopoverTrigger>
         <PopoverContent class="w-fit">
           <div class="max-h-[25vh] max-w-[75vw] overflow-y-auto flex flex-col gap-1">

@@ -7,6 +7,7 @@ import { Label } from "~/components/ui/label";
 import { TextField, TextFieldInput, TextFieldTextArea } from "~/components/ui/text-field";
 import RoleLinker from "~/components/unique/RoleLinker";
 import { directGetterChannelInfo } from "~/stores/ChannelInfo";
+import { getRolePower } from "~/stores/MyUserinfo";
 
 export default function ChannelInfo(props: {channelId: string}) {
   const [editName, setEditName] = createSignal(false);
@@ -74,7 +75,11 @@ export default function ChannelInfo(props: {channelId: string}) {
                 <span class={"shrink max-w-48 md:max-w-80 overflow-x-scroll"}>
                   <p class={"text-2xl truncate"}>{ directGetterChannelInfo(props.channelId).name ?? "ロード中..." }</p>
                 </span>
-                <Button onClick={()=>setEditName(true)} variant={"outline"} class={"ml-auto border rounded-md h-10 w-10"}><IconPencil /></Button>
+                { //権限ある場合の編集ボタン
+                  getRolePower("manageChannel") 
+                  &&
+                  <Button onClick={()=>setEditName(true)} variant={"outline"} class={"ml-auto border rounded-md h-10 w-10"}><IconPencil /></Button>
+                }
               </div>
           }
         </div>
@@ -89,7 +94,11 @@ export default function ChannelInfo(props: {channelId: string}) {
                 <p>{ directGetterChannelInfo(props.channelId).description }</p>
                 { directGetterChannelInfo(props.channelId).description==="" && <p class={"text-muted-foreground"}>概要が空です。</p> }
 
-                <Button onClick={()=>setEditDescription(true)} class={"absolute bottom-2 right-0 border rounded-md h-10 w-10"} variant={"outline"} ><IconPencil /></Button>
+                { //権限ある場合の編集ボタン
+                  getRolePower("manageChannel")
+                  &&
+                  <Button onClick={()=>setEditDescription(true)} class={"absolute bottom-2 right-0 border rounded-md h-10 w-10"} variant={"outline"} ><IconPencil /></Button>
+                }
             </div>
           :
             <div class={"flex flex-col gap-1"}>
@@ -114,13 +123,17 @@ export default function ChannelInfo(props: {channelId: string}) {
         roles={newRoles()}
         onUpdate={(roles)=>setNewRoles(roles)}
       />
-      <Button
-        onClick={updateChannel}
-        size={"sm"}
-        class={"w-fit mt-2"}
-        variant={"secondary"}
-        disabled={!roleIsDiff()}
-      >ロールを更新</Button>
+      { //権限がある場合のロール更新ボタン
+        getRolePower("manageChannel")
+        &&
+        <Button
+          onClick={updateChannel}
+          size={"sm"}
+          class={"w-fit mt-2"}
+          variant={"secondary"}
+          disabled={!roleIsDiff()}
+        >ロールを更新</Button>
+      }
     </div>
   );
 }
