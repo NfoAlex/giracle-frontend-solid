@@ -54,7 +54,7 @@ export default function InviteUserModal(props: { channelId: string, onInvite?: (
 
     POST_CHANNEL_INVITE(user.id, props.channelId)
       .then((r) => {
-        console.log("InviteUserModal :: inviteIt : 招待成功 -> ", r);
+        //console.log("InviteUserModal :: inviteIt : 招待成功 -> ", r);
         props.onInvite?.(user);
       })
       .catch((e) => {

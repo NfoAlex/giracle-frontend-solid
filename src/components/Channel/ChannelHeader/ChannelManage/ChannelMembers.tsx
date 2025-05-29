@@ -43,7 +43,7 @@ export default function ChannelMembers(props: {channelId: string}) {
   const kickIt = (userId: string) => {
     POST_CHANNEL_KICK(userId, props.channelId)
       .then((r) => {
-        console.log("ChannelMember :: kickIt : 招待成功 -> ", r);
+        //console.log("ChannelMember :: kickIt : 招待成功 -> ", r);
         // キックしたユーザーを一覧から削除
         setUsers((u) => u.filter((user) => user.id !== userId));
       })
