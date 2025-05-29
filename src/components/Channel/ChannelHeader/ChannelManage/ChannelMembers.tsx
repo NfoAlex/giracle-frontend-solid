@@ -10,7 +10,7 @@ import { getterUserinfo } from "~/stores/Userinfo";
 import type { IUser } from "~/types/User";
 import InviteUserModal from "./ChannelMembers/InviteUserModal";
 import POST_CHANNEL_KICK from "~/api/CHANNEL/CHANNEL_KICK";
-import { getRolePower } from "~/stores/MyUserinfo";
+import { getRolePower, storeMyUserinfo } from "~/stores/MyUserinfo";
 
 export default function ChannelMembers(props: {channelId: string}) {
   const [users, setUsers] = createSignal<IUser[]>([]);
@@ -85,17 +85,23 @@ export default function ChannelMembers(props: {channelId: string}) {
         <For each={users()}>
           {
             (user) => (
-              <UserinfoModalWrapper userId={user.id}>
-                <div class="p-2 w-full flex flex-row items-center gap-2 hover:bg-border rounded cursor-pointer">
-                  <Avatar class="w-8 h-8">
-                    <AvatarFallback >{ user.id.slice(0,2) }</AvatarFallback>
-                    <AvatarImage src={"/api/user/icon/" + user.id} alt={user.id} />
-                  </Avatar>
-                  { getterUserinfo(user.id).name }
+              <div class="p-2 w-full flex flex-row items-center gap-2 rounded">
+                <UserinfoModalWrapper userId={user.id}>
+                  <span class="flex items-center gap-2 cursor-pointer hover:underline">
+                    <Avatar class="w-8 h-8">
+                      <AvatarFallback >{ user.id.slice(0,2) }</AvatarFallback>
+                      <AvatarImage src={"/api/user/icon/" + user.id} alt={user.id} />
+                    </Avatar>
+                    { getterUserinfo(user.id).name }
+                  </span>
+                </UserinfoModalWrapper>
 
-                  { getRolePower("manageChannel") && <Button onClick={()=>kickIt(user.id)}><IconKarate /></Button> }
-                </div>
-              </UserinfoModalWrapper>
+                {
+                  (getRolePower("manageChannel") && storeMyUserinfo.id !== user.id)
+                  &&
+                  <Button onClick={()=>kickIt(user.id)} class="ml-auto" size={"icon"} variant={"outline"}><IconKarate /></Button>
+                }
+              </div>
             )
           }
         </For>
