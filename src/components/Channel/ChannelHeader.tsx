@@ -3,7 +3,6 @@ import {createEffect, createSignal, Show} from "solid-js";
 import {directGetterChannelInfo} from "~/stores/ChannelInfo";
 import { Card } from "../ui/card";
 import ChannelManage from "~/components/Channel/ChannelHeader/ChannelManage";
-import {getRolePower} from "~/stores/MyUserinfo";
 import SidebarTriggerWithDot from "~/components/unique/SidebarTriggerWithDot";
 import {IconLock} from "@tabler/icons-solidjs";
 import {HoverCard, HoverCardContent, HoverCardTrigger} from "~/components/ui/hover-card";
@@ -40,13 +39,9 @@ export default function ChannelHeader() {
         <p>{ directGetterChannelInfo(params.channelId).description }</p>
       </span>
 
-      {
-        getRolePower("manageChannel")
-        &&
-        <span class={"ml-auto"}>
-          <ChannelManage channelId={currentChannelId()} />
-        </span>
-      }
+      <span class={"ml-auto"}>
+        <ChannelManage channelId={currentChannelId()} />
+      </span>
     </Card>
   );
 }

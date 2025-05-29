@@ -23,6 +23,8 @@ import WSMessageAddReaction from "~/WS/Message/MessageAddReaction";
 import WSMessageDeleteReaction from "~/WS/Message/MessageDeleteReaction";
 import WSCustomEmojiUploaded from "~/WS/Server/CustomEmojiUploaded";
 import WSCustomEmojiDeleted from "~/WS/Server/CustomEmojiDeleted";
+import WSChannelLeft from "./Channel/ChannelLeft";
+import WSChannelJoined from "./Channel/ChannelJoined";
 
 //WSインスタンス
 export let ws: WebSocket | undefined = undefined;
@@ -111,6 +113,16 @@ export const initWS = async () => {
         //チャンネル削除通知の受け取り
         case "channel::Deleted":
           WSChannelDeleted(json.data);
+          break;
+
+        //チャンネル退出の受け取り(個人)
+        case "channel::Left":
+          WSChannelLeft(json.data);
+          break;
+
+        //チャンネル参加の受け取り(個人)
+        case "channel::Join":
+          WSChannelJoined(json.data);
           break;
 
         //ロール情報の受け取り
