@@ -20,7 +20,7 @@ export default function InviteUserModal(props: { channelId: string }) {
   //招待時の結果、状態管理
   const inviteJson = createMutable({
     processing: false,
-    invitingUserId: ""
+    invitedUserIds: [] as string[]
   });
 
   /**
@@ -49,7 +49,7 @@ export default function InviteUserModal(props: { channelId: string }) {
    */
   const inviteIt = (userId: string) => {
     //招待中のユーザーIDと処理中状態をセット
-    inviteJson.invitingUserId = userId;
+    inviteJson.invitedUserIds.push(userId);
     inviteJson.processing = true;
 
     POST_CHANNEL_INVITE(userId, props.channelId)
@@ -62,7 +62,6 @@ export default function InviteUserModal(props: { channelId: string }) {
       })
       .finally(() => {
         //招待中のユーザーIDと処理中状態をリセット
-        inviteJson.invitingUserId = "";
         inviteJson.processing = false;
       });
   };
@@ -118,11 +117,18 @@ export default function InviteUserModal(props: { channelId: string }) {
                 </UserinfoModalWrapper>
 
                 {
-                  (user.ChannelJoin.some((c) => c.channelId === props.channelId) || inviteJson.invitingUserId === user.id)
+                  (user.ChannelJoin.some((c) => c.channelId === props.channelId) || inviteJson.invitedUserIds.includes(user.id))
                   ?
                     <IconCheck class="ml-auto" />
                   :
-                    <Button onclick={()=>inviteIt(user.id)} class="ml-auto" size="icon" disabled={inviteJson.processing}><IconPlus /></Button>
+                    <Button
+                      onclick={()=>inviteIt(user.id)}
+                      class="ml-auto"
+                      size="icon"
+                      disabled={inviteJson.processing}
+                    >
+                      <IconPlus />
+                    </Button>
                 }
               </div>
             )
