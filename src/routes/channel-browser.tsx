@@ -25,8 +25,6 @@ export default function ChannelBrowser() {
     POST_CHANNEL_JOIN(channelId)
       .then((r) => {
         console.log("ChannelBrowser :: joinChannel :: r ->", r);
-        //StoreにチャンネルIdを追加
-        setStoreMyUserinfo((prev) => ({...prev, ChannelJoin: [...prev.ChannelJoin, {channelId: channelId}]}));
       })
       .catch((err) => console.error("ChannelBrowser :: joinChannel :: err ->", err));
   }
