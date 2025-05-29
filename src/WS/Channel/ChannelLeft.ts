@@ -1,5 +1,6 @@
 import { setStoreHasNewMessage, storeHasNewMessage } from "~/stores/HasNewMessage";
 import { setStoreHistory, storeHistory } from "~/stores/History";
+import { produce } from "solid-js/store";
 import { setStoreMyUserinfo, storeMyUserinfo } from "~/stores/MyUserinfo";
 
 export default function WSChannelLeft(dat: { channelId: string }) {
@@ -9,21 +10,17 @@ export default function WSChannelLeft(dat: { channelId: string }) {
 
   //履歴Storeから対象チャンネル分を削除
   if (storeHistory[dat.channelId] !== undefined) {
-    setStoreHistory((prev) => {
-      const newHistory = { ...prev };
-      delete newHistory[dat.channelId];
-      return newHistory;
-    });
+    setStoreHistory(produce((prev) => {
+      delete prev[dat.channelId];
+      return prev;
+    }));
   }
   //未読メッセージ通知Storeから対象チャンネル分を削除
   if (storeHasNewMessage[dat.channelId] !== undefined) {
-    setStoreHasNewMessage((prev) => {
-      const newHasNewMessage = { ...prev };
-      delete newHasNewMessage[dat.channelId];
-      return {
-        ...newHasNewMessage
-      };
-    });
+    setStoreHasNewMessage(produce((prev) => {
+      delete prev[dat.channelId];
+      return prev;
+    }));
   }
   
   //チャンネル参加しているなら削除
