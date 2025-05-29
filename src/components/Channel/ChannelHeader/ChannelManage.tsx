@@ -4,13 +4,16 @@ import {Button} from "~/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import ChannelInfo from "./ChannelManage/ChannelInfos";
 import ChannelMembers from "./ChannelManage/ChannelMembers";
+import { getRolePower } from "~/stores/MyUserinfo";
 
 export default function ChannelManage(props: {channelId: string}) {
 
   return (
     <Dialog>
       <DialogTrigger>
-        <Button variant={"secondary"} class={"w-9 h-9"}><IconPencil /></Button>
+        <Button variant={"secondary"} class={"w-9 h-9"}>
+          { getRolePower("manageChannel") ? <IconPencil /> : <IconInfoCircle /> }
+        </Button>
       </DialogTrigger>
       <DialogContent class={"pt-10 w-full"}>
         <DialogHeader>

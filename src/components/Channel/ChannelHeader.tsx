@@ -40,13 +40,9 @@ export default function ChannelHeader() {
         <p>{ directGetterChannelInfo(params.channelId).description }</p>
       </span>
 
-      {
-        getRolePower("manageChannel")
-        &&
-        <span class={"ml-auto"}>
-          <ChannelManage channelId={currentChannelId()} />
-        </span>
-      }
+      <span class={"ml-auto"}>
+        <ChannelManage channelId={currentChannelId()} />
+      </span>
     </Card>
   );
 }
