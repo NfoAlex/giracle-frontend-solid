@@ -19,7 +19,7 @@ export default function Login() {
         setResult("success");
         console.log("r->", r);
 
-        InitLoad(r.data.userId);
+        InitLoad(r.data.userId, true);
 
         //ページ移動
         navi("/");
