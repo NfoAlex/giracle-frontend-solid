@@ -1,6 +1,6 @@
 {
   "name": "giracle-front-solid",
-  "version": "0.14.2-alpha",
+  "version": "0.15.0-alpha",
   "description": "",
   "type": "module",
   "scripts": {
@@ -13,7 +13,7 @@
   },
   "license": "MIT",
   "devDependencies": {
-    "@types/node": "^22.15.24",
+    "@types/node": "^22.15.29",
     "autoprefixer": "^10.4.21",
     "postcss": "^8.5.4",
     "tailwindcss": "^3.4.17",
@@ -23,9 +23,9 @@
   },
   "dependencies": {
     "@fontsource-variable/noto-sans-jp": "^5.2.5",
-    "@kobalte/core": "^0.13.9",
+    "@kobalte/core": "^0.13.10",
     "@solidjs/router": "^0.15.3",
-    "@tabler/icons-solidjs": "^3.33.0",
+    "@tabler/icons-solidjs": "^3.34.0",
     "@tanstack/solid-table": "^8.21.3",
     "@types/sortablejs": "^1.15.8",
     "class-variance-authority": "^0.7.1",
