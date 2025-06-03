@@ -1,6 +1,6 @@
 import { useParams } from "@solidjs/router";
 import {For, Show, createEffect, createSignal, onCleanup, onMount, on} from "solid-js";
-import { storeHistory } from "~/stores/History";
+import { setStoreHistory, storeHistory } from "~/stores/History";
 import { setStoreMessageReadTimeBefore, storeMessageReadTime, storeMessageReadTimeBefore, updateReadTime } from "~/stores/Readtime";
 import FetchHistory from "~/utils/FethchHistory";
 import { Avatar, AvatarImage } from "../ui/avatar";
@@ -170,6 +170,28 @@ export default function ChannelContents() {
       el.scrollIntoView({block});
     }
   };
+
+  /**
+   * 最新の履歴を取得して、移動する
+   */
+  const moveToNewest = async () => {
+    //履歴取得状態を設定
+    stateFetchingHistory = true;
+    
+    //履歴をStoreから削除
+    setStoreHistory((prev) => {
+      const newStore = { ...prev };
+      newStore[param.channelId].history = [];
+      return newStore;
+    });
+    //取得して格納
+    await FetchHistory(param.channelId, { messageTimeFrom: "" }, "older").then(()=>
+      scrollTo(storeHistory[param.channelId].history[0].id, "start", true)
+    );
+
+    //履歴取得状態解除
+    stateFetchingHistory = false;
+  }
 
   /**
    * スクロールの監視用
@@ -404,9 +426,11 @@ export default function ChannelContents() {
         </Show>
       </div>
 
-      <div class="absolute bottom-10 right-10">
-        <Button class="w-16 h-16 z-50"><IconArrowDown style="height:28px; width:28px;" /></Button>
-      </div>
+      { !storeHistory[param.channelId]?.atEnd &&
+        <div class="absolute bottom-10 right-10">
+          <Button onClick={moveToNewest} class="w-16 h-16 z-50"><IconArrowDown style="height:28px; width:28px;" /></Button>
+        </div>
+      }
     </div>
   );
 }
