@@ -10,6 +10,12 @@ export default async function POST_CHANNEL_GET_HISTORY(
   message: "History fetched";
   data: {
     history: IMessage[];
+    ImageDimensions: {
+      [fileId: string]: {
+        width: number;
+        height: number;
+      };
+    };
     atTop: boolean;
     atEnd: boolean;
   };

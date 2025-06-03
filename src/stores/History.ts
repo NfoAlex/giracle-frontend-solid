@@ -9,6 +9,13 @@ export const [storeHistory, setStoreHistory] = createStore<{
   };
 }>({});
 
+export const [storeImageDimensions, setStoreImageDimensions] = createStore<{
+  [fileId: string]: {
+    width: number;
+    height: number;
+  };
+}>({});
+
 /**
  * 履歴Storeに挿入する
  * @param history

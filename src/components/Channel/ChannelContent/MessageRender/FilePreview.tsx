@@ -1,11 +1,11 @@
 import {IMessageFileAttached} from "~/types/Message";
 import {Card} from "~/components/ui/card";
-
 import {IconDownload} from "@tabler/icons-solidjs";
 import {Badge} from "~/components/ui/badge";
 import ConvertSizeToHumanSize from "~/utils/ConvertSizeToHumanSize";
 import {Button} from "~/components/ui/button";
 import ImageWithModal from "~/components/unique/ImageWithModal";
+import { storeImageDimensions } from "~/stores/History";
 
 export default function FilePreview(props: { file: IMessageFileAttached }) {
 
@@ -27,6 +27,8 @@ export default function FilePreview(props: { file: IMessageFileAttached }) {
           <ImageWithModal
             src={`/api/message/file/${props.file.id}`}
             class="max-w-1/3 max-h-64 rounded"
+            height={storeImageDimensions[props.file.id]?.height}
+            width={storeImageDimensions[props.file.id]?.width}
           />
         :
           <Card class={"px-6 py-4 lg:w-1/2"}>
