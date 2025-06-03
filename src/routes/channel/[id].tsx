@@ -5,7 +5,7 @@ import {storeAppStatus} from "~/stores/AppStatus";
 
 export default function Channel() {
   return (
-    <div class="w-full h-screen mx-auto p-1 flex flex-col">
+    <div class="w-full h-screen mx-auto p-2 flex flex-col">
       <ChannelHeader />
       {
         storeAppStatus.loggedIn ? (
