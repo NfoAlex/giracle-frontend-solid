@@ -16,6 +16,8 @@ import UserinfoModalWrapper from "~/components/unique/UserinfoModalWrapper";
 import EditMessage from "~/components/Channel/ChannelContent/EditMessage";
 import {storeMyUserinfo} from "~/stores/MyUserinfo";
 import { storeClientConfig } from "~/stores/ClientConfig";
+import { Button } from "../ui/button";
+import { IconArrowDown } from "@tabler/icons-solidjs";
 
 export default function ChannelContents() {
   const [isFocused, setIsFocused] = createSignal(true);
@@ -279,7 +281,7 @@ export default function ChannelContents() {
   });
 
   return (
-    <div class="w-full overflow-y-auto grow">
+    <div class="relative w-full overflow-y-auto grow">
       <div
         id="history"
         class={`h-full w-full overflow-y-auto flex flex-col-reverse gap-${storeClientConfig.display.messageGapLevel}`}
@@ -400,6 +402,10 @@ export default function ChannelContents() {
         <Show when={storeHistory[param.channelId]?.atTop}>
           <p>履歴の末端まで到達しました。</p>
         </Show>
+      </div>
+
+      <div class="absolute bottom-10 right-10">
+        <Button class="w-16 h-16 z-50"><IconArrowDown style="height:28px; width:28px;" /></Button>
       </div>
     </div>
   );
