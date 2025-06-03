@@ -5,6 +5,7 @@ import { directGetterChannelInfo } from "~/stores/ChannelInfo";
 import { getterUserinfo } from "~/stores/Userinfo";
 import { Badge } from "~/components/ui/badge";
 import { storeMyUserinfo } from "~/stores/MyUserinfo";
+import UserinfoModalWrapper from "~/components/unique/UserinfoModalWrapper";
 
 export default function MessageTextRender(props: { content: string }) {
   // props.content や依存するストアの値が変わった時だけ再計算されるメモを作成
@@ -96,9 +97,11 @@ export default function MessageTextRender(props: { content: string }) {
           const userInfo = getterUserinfo(obj.idOrValue);
           const isMe = () => storeMyUserinfo.id === obj.idOrValue; // storeMyUserinfo.id もリアクティブに追跡
           messageRenderingFinal.push(
-            <Badge variant={isMe() ? "default" : "secondary"} class="h-5 my-auto mx-px align-baseline inline-flex">
-              @{userInfo?.name ?? obj.idOrValue} {/* fallback */}
-            </Badge>
+            <UserinfoModalWrapper userId={userInfo.id} class="cursor-pointer">
+              <span class={`${isMe() ? "bg-primary text-primary-foreground" : "bg-border"} hover:underline my-auto mx-px align-baseline inline-flex rounded px-1`}>
+                @{userInfo?.name ?? obj.idOrValue}
+              </span>
+            </UserinfoModalWrapper>
           );
           break;
         case "channel":
