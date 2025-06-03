@@ -11,6 +11,7 @@ import { getRolePower, setStoreMyUserinfo, storeMyUserinfo } from "~/stores/MyUs
 import type { IChannel } from "~/types/Channel";
 import DeleteChannel from "~/components/ChannelBrowser/DeleteChannel";
 import SidebarTriggerWithDot from "~/components/unique/SidebarTriggerWithDot";
+import { A } from "@solidjs/router";
 
 export default function ChannelBrowser() {
   const [processing, setProcessing] = createSignal(true);
@@ -105,7 +106,9 @@ export default function ChannelBrowser() {
           {(channel) => (
             <Show when={!channel.isArchived || displayArchived()}>
               <Card class="w-full py-5 md:py-3 px-5 flex items-center gap-2">
-                <p>{channel.name}</p>
+                <A href={`/app/channel/${channel.id}`} class="shrink line-clamp-1 hover:underline">
+                  <p>{channel.name}</p>
+                </A>
                 <p class="font-thin"> | </p>
                 <p>{channel.description}</p>
                 <div class="ml-auto flex items-center gap-2">
