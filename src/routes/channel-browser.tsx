@@ -67,7 +67,7 @@ export default function ChannelBrowser() {
   });
 
   return (
-    <div class="pt-2 px-2 flex flex-col h-full">
+    <div class="w-full pt-2 px-2 flex flex-col h-full">
       <Card class="w-full py-3 px-5 flex items-center gap-2">
         <SidebarTriggerWithDot />
         <p>チャンネルブラウザ</p>
@@ -106,11 +106,11 @@ export default function ChannelBrowser() {
           {(channel) => (
             <Show when={!channel.isArchived || displayArchived()}>
               <Card class="w-full py-5 md:py-3 px-5 flex items-center gap-2">
-                <A href={`/app/channel/${channel.id}`} class="shrink line-clamp-1 hover:underline">
+                <A href={`/app/channel/${channel.id}`} class="shrink-0 max-w-1/2 line-clamp-1 hover:underline">
                   <p>{channel.name}</p>
                 </A>
                 <p class="font-thin"> | </p>
-                <p>{channel.description}</p>
+                <p class="grow max-w-1/2 line-clamp-2">{channel.description}</p>
                 <div class="ml-auto flex items-center gap-2">
                   { channel.isArchived && <IconArchiveFilled color="orange" /> }
 
