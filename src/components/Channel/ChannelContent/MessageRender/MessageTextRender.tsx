@@ -96,9 +96,9 @@ export default function MessageTextRender(props: { content: string }) {
           const userInfo = getterUserinfo(obj.idOrValue);
           const isMe = () => storeMyUserinfo.id === obj.idOrValue; // storeMyUserinfo.id もリアクティブに追跡
           messageRenderingFinal.push(
-            <Badge variant={isMe() ? "default" : "secondary"} class="h-5 my-auto mx-px align-baseline inline-flex">
-              @{userInfo?.name ?? obj.idOrValue} {/* fallback */}
-            </Badge>
+            <span class={`${isMe() ? "bg-primary text-primary-foreground" : "bg-border"} my-auto mx-px align-baseline inline-flex rounded px-1`}>
+              @{userInfo?.name ?? obj.idOrValue}
+            </span>
           );
           break;
         case "channel":
