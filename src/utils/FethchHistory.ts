@@ -1,5 +1,5 @@
 import POST_CHANNEL_GET_HISTORY from "~/api/CHANNEL/CHANNEL_GET_HISTORY";
-import { insertHistory, updateHistoryPosition } from "~/stores/History";
+import { insertHistory, setStoreImageDimensions, storeImageDimensions, updateHistoryPosition } from "~/stores/History";
 
 let fetching = false;
 
@@ -35,6 +35,9 @@ export default async function FetchHistory(
         atTop: r.data.atTop,
       });
       new Promise((resolve) => {
+        //画像サイズを格納
+        setStoreImageDimensions({...storeImageDimensions, ...r.data.ImageDimensions});
+        //履歴を格納
         insertHistory(r.data.history);
         resolve(null);
       })
