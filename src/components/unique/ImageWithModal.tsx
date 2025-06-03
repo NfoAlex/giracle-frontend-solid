@@ -20,7 +20,7 @@ export default function ImageWithModal(props: { class: string, src: string | nul
         onClick={() => setIsOpen(true)} 
         src={srcUrl}
         class={`${props.class} cursor-pointer`}
-        style={`${props.width!==undefined ? `width: ${props.width}px;` : ''} ${props.height!==undefined ? `height: ${props.height}px;` : ''}`}
+        style={`${props.height!==undefined ? `height: ${props.height}px;` : ''}`}
         alt={srcUrl.length > 30 ? srcUrl.slice(0,15) + "..." : srcUrl}
       />
 
