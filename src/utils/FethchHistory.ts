@@ -1,3 +1,4 @@
+import { produce } from "solid-js/store";
 import POST_CHANNEL_GET_HISTORY from "~/api/CHANNEL/CHANNEL_GET_HISTORY";
 import { insertHistory, setStoreImageDimensions, storeImageDimensions, updateHistoryPosition } from "~/stores/History";
 
@@ -36,11 +37,11 @@ export default async function FetchHistory(
       });
       new Promise((resolve) => {
         //画像サイズを格納
-        setStoreImageDimensions({...storeImageDimensions, ...r.data.ImageDimensions});
+        setStoreImageDimensions(produce(prev => (Object.assign(prev, r.data.ImageDimensions))));
         //履歴を格納
         insertHistory(r.data.history);
         resolve(null);
-      })
+      });
     })
     .catch((e) =>
       console.error("ChannelContent :: fetchHistory : エラー->", e),
