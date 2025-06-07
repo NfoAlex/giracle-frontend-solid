@@ -13,13 +13,16 @@ import type { IMessage } from "~/types/Message";
 export default function Search() {
   const [query, setQuery] = createSignal("");
   const [searchResults, setSearchResults] = createSignal<IMessage[]>([]);
+  const [searchedOnce, setSearchedOnce] = createSignal(false);
 
   const searchIt = () => {
     GET_MESSAGE_SEARCH({ _content: query() })
       .then((r) => {
         console.log("Search :: search :: r ->", r);
         setSearchResults(r.data);
-      });
+        setSearchedOnce(true);
+      })
+      .catch((e) => console.error("Search :: search :: e ->", e));
   }
 
   return (
@@ -33,6 +36,7 @@ export default function Search() {
         <TextField class="grow">
           <TextFieldInput
             value={query()}
+            placeholder="メッセージ文を検索"
             onChange={(e) => setQuery(e.currentTarget.value)}
           ></TextFieldInput>
         </TextField>
@@ -44,6 +48,8 @@ export default function Search() {
 
       <div class="lg:w-4/5 mx-auto grow overflow-y-auto py-4">
         <span class="flex flex-col gap-2 overflow-y-auto">
+          { !searchedOnce() && <p class="text-center">メッセージ文を検索してください。</p> }
+          { searchedOnce() && searchResults().length === 0 && <p class="text-center">結果が見つかりませんでした...</p>}
           <For each={searchResults()}>
             {(message) => message.userId !== "SYSTEM" && (
               <Card class="p-2">
