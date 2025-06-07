@@ -14,7 +14,7 @@ import { getRolePower, storeMyUserinfo } from "~/stores/MyUserinfo";
 import { storeServerinfo } from "~/stores/Serverinfo";
 import { Avatar, AvatarImage } from "./ui/avatar";
 import { storeAppStatus } from "~/stores/AppStatus";
-import {IconBell, IconDatabaseCog, IconList, IconSettings} from "@tabler/icons-solidjs";
+import {IconBell, IconDatabaseCog, IconList, IconSearch, IconSettings} from "@tabler/icons-solidjs";
 import {storeInbox} from "~/stores/Inbox";
 import {Badge} from "~/components/ui/badge";
 import OnlineUserDisplay from "~/components/Sidebar/OnlineUserDisplay";
@@ -55,6 +55,10 @@ export function AppSidebar() {
             <SidebarMenuButton as={A} href="/app/channel-browser" variant={loc.pathname === "/app/channel-browser" ? "outline" : "default"}>
               <IconList />
               チャンネル一覧
+            </SidebarMenuButton>
+            <SidebarMenuButton as={A} href="/app/search" variant={loc.pathname === "/app/search" ? "outline" : "default"}>
+              <IconSearch />
+              検索
             </SidebarMenuButton>
           </SidebarGroup>
 
