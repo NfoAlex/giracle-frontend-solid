@@ -45,37 +45,50 @@ export default function ChannelContents() {
     const scrollAtTop = Math.abs(scrollPos) + el.offsetHeight >= el.scrollHeight - 1;
     const scrollAtBottom = Math.abs(scrollPos) <= 1; //paddingに合わせて1pxの誤差を許容
 
-    //履歴の最古到達用
-    if (!storeHistory[param.channelId].atTop && scrollAtTop) {
-      //最後のメッセージIdを取得
-      const messageIdLast = storeHistory[param.channelId].history.at(-1)?.id;
-      if (messageIdLast === undefined) {
-        console.error(
-          "ChannelContent :: checkScrollPosAndFetchHistory : 最古のメッセIdを取得できなかった",
-        );
-        return;
-      }
-      //履歴を取得、格納
-      stateFetchingHistory = true;
-      await FetchHistory(param.channelId, { messageIdFrom: messageIdLast }, "older");
-      setTimeout(() => scrollTo(messageIdLast));
-    }
-    //履歴の最新到達用
-    if (
-      !storeHistory[param.channelId].atEnd && scrollAtBottom
+    //履歴の状況によってデータを使い分けて取得
+    if (                                                                                        //履歴がStoreに無いケース
+      storeHistory[param.channelId]?.history.length === 0 ||
+      storeHistory[param.channelId] === undefined
     ) {
-      //最後のメッセージIdを取得
-      const messageIdNewest = storeHistory[param.channelId].history[0]?.id;
-      if (messageIdNewest === undefined) {
-        console.error(
-          "ChannelContent :: checkScrollPosAndFetchHistory : 最新のメッセIdを取得できなかった",
-        );
-        return;
+      const time = storeMessageReadTime.find((c) =>
+        c.channelId === param.channelId
+      )?.readTime;
+
+      //履歴を取得
+      FetchHistory(param.channelId, { messageTimeFrom: time, fetchLength: 1 }, "older");
+    } else {                                                                                    //履歴がStoreにあるケース、上か下にスクロールしてるかで履歴取得方法を変える
+      //履歴の最古到達用
+      if (!storeHistory[param.channelId].atTop && scrollAtTop) {
+        //最後のメッセージIdを取得
+        const messageIdLast = storeHistory[param.channelId].history.at(-1)?.id;
+        if (messageIdLast === undefined) {
+          console.error(
+            "ChannelContent :: checkScrollPosAndFetchHistory : 最古のメッセIdを取得できなかった",
+          );
+          return;
+        }
+        //履歴を取得、格納
+        stateFetchingHistory = true;
+        await FetchHistory(param.channelId, { messageIdFrom: messageIdLast }, "older");
+        setTimeout(() => scrollTo(messageIdLast));
       }
-      //履歴を取得、格納
-      stateFetchingHistory = true;
-      await FetchHistory(param.channelId, { messageIdFrom: messageIdNewest }, "newer");
-      setTimeout(() => scrollTo(messageIdNewest, "start", true));
+      //履歴の最新到達用
+      if (
+        !storeHistory[param.channelId].atEnd && scrollAtBottom
+      ) {
+        //最後のメッセージIdを取得
+        const messageIdNewest = storeHistory[param.channelId].history[0]?.id;
+        if (messageIdNewest === undefined) {
+          console.error(
+            "ChannelContent :: checkScrollPosAndFetchHistory : 最新のメッセIdを取得できなかった",
+          );
+          return;
+        }
+        //履歴を取得、格納
+        stateFetchingHistory = true;
+        await FetchHistory(param.channelId, { messageIdFrom: messageIdNewest }, "newer");
+        setTimeout(() => scrollTo(messageIdNewest, "start", true));
+      }
     }
 
     //履歴取得中状態を解除
