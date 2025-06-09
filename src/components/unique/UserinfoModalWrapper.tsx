@@ -142,7 +142,6 @@ export default function UserinfoModalWrapper(props: {children: JSX.Element, user
                 <Popover onOpenChange={setOpenRoleList}>
                   <PopoverTrigger>
                     <Badge
-                      onclick={()=>console.log("asdf")}
                       variant={"outline"}
                       class="cursor-pointer h-full mt-1"
                     >

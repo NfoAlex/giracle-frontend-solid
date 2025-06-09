@@ -174,10 +174,12 @@ export const initWS = async () => {
     if (FLAGwsReconnect) {
       //初期処理
       InitLoad(storeMyUserinfo.id);
-      //履歴の末端にいないことにしてアクセスしたとき履歴を取得できるようにする
+      //履歴を初期化してアクセスしたときに履歴を取得できるようにする
       setStoreHistory(produce((prev) => {
         const keys = Object.keys(prev);
         for (const channelId of keys) {
+          prev[channelId].history = [];
+          prev[channelId].atTop = false;
           prev[channelId].atEnd = false;
         }
         return prev;
