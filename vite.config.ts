@@ -47,19 +47,7 @@ export default defineConfig({
     __VERSION__: `"${pkg.version}"`,
   },
   server: {
-    port: 3333,
-    /*
-    proxy: {
-      "/api": {
-        target: apiURI,
-        rewrite: (path) => path.replace(/^\/api/, ""),
-      },
-      "/ws": {
-        target: apiURI,
-        ws: true,
-      },
-    },
-    */
+    port: 3000,
   },
   preview: {
     port: prodPort,
