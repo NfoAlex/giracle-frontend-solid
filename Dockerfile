@@ -28,7 +28,7 @@ FROM nginx:stable-alpine
 
 # ビルドステージ(builder)から、ビルド済みの静的ファイルのみをNginxの公開ディレクトリにコピー
 # /app/dist の中身が /usr/share/nginx/html にコピーされる
-COPY --from=builder /app/dist /usr/share/nginx/html
+COPY --from=builder /APP/dist /usr/share/nginx/html
 
 # カスタムNginx設定ファイルをコンテナ内の設定ディレクトリにコピー
 # これでデフォルト設定が上書きされる
