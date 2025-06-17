@@ -32,7 +32,7 @@ COPY --from=builder /app/dist /usr/share/nginx/html
 
 # カスタムNginx設定ファイルをコンテナ内の設定ディレクトリにコピー
 # これでデフォルト設定が上書きされる
-COPY nginx/nginx.conf /etc/nginx/conf.d/default.conf
+COPY ./nginx.conf /etc/nginx/conf.d/default.conf
 
 # コンテナが3000番ポートを公開することを明示
 EXPOSE 3000
