@@ -48,6 +48,7 @@ export default defineConfig({
   },
   server: {
     port: 3333,
+    /*
     proxy: {
       "/api": {
         target: apiURI,
@@ -58,6 +59,7 @@ export default defineConfig({
         ws: true,
       },
     },
+    */
   },
   preview: {
     port: prodPort,
