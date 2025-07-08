@@ -14,6 +14,8 @@ import {setStoreInbox} from "~/stores/Inbox";
 import GET_SERVER_CUSTOM_EMOJI from "~/api/SERVER/SERVER_CUSTOM_EMOJI";
 import {bindCustomEmoji} from "~/stores/CustomEmoji";
 import { bindClientConfig } from "~/stores/ClientConfig";
+import GET_SERVER_CONFIG from "~/api/SERVER/SERVER_CONFIG";
+import { setStoreServerinfo } from "~/stores/Serverinfo";
 
 export default function InitLoad(_userId: string, initWsToo = false) {
   //クライアント設定を呼び出して適用
@@ -26,6 +28,13 @@ export default function InitLoad(_userId: string, initWsToo = false) {
   GET_USER_INFO(_userId).then((r) => {
     //console.log("Login :: loginIt : 自分の情報r->", r);
     setStoreMyUserinfo(r.data);
+  });
+  //サーバー情報を取得してStoreに格納
+  GET_SERVER_CONFIG().then((r) => {
+    //console.log("InitLoad :: GET_SERVER_CONFIG : サーバー情報r->", r);
+    const serverConfig = r.data;
+    //サーバーの設定をStoreに格納
+    setStoreServerinfo(serverConfig);
   });
   //ロールリストを取得してStoreに格納
   GET_ROLE_LIST().then((r) => {
