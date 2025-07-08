@@ -11,6 +11,6 @@ export const [storeServerinfo, setStoreServerinfo] = createStore<IServer>({
   defaultJoinChannel: []
 });
 
-export const bindServerinfo = (value: IServer) => {
-  setStoreServerinfo(value);
+export const bindServerinfo = (value: Partial<IServer>) => {
+  setStoreServerinfo({...storeServerinfo, ...value});
 };
