@@ -186,6 +186,15 @@ export const initWS = async () => {
       }));
     }
 
+    //PING
+    const pingInterval = setInterval(() => {
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({ signal: "ping", data: "ping" }));
+      } else {
+        clearInterval(pingInterval);
+      }
+    }, 20000);
+
     //オンラインユーザーを取得、格納
     GET_USER_GET_ONLINE()
       .then((r) => {
