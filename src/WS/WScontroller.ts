@@ -186,6 +186,9 @@ export const initWS = async () => {
       }));
     }
 
+    //PING
+    pingInterval;
+
     //オンラインユーザーを取得、格納
     GET_USER_GET_ONLINE()
       .then((r) => {
@@ -233,3 +236,12 @@ export const initWS = async () => {
     }
   });
 }
+
+//PINGを20秒ごとに送信する
+const pingInterval = setInterval(() => {
+  if (ws && ws.readyState === WebSocket.OPEN) {
+    ws.send(JSON.stringify({ signal: "ping", data: "ping" }));
+  } else {
+    clearInterval(pingInterval);
+  }
+}, 20000);
