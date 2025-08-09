@@ -19,8 +19,8 @@ export default function ImageWithModal(props: { class: string, src: string | nul
       <img
         onClick={() => setIsOpen(true)} 
         src={srcUrl}
-        class={`${props.class} cursor-pointer`}
-        style={`${props.height!==undefined ? `height: ${props.height}px;` : ''}`}
+        class={`${props.class} cursor-pointer object-contain`}
+        style={`height: ${props.height}px;`}
         alt={srcUrl.length > 30 ? srcUrl.slice(0,15) + "..." : srcUrl}
       />
 
