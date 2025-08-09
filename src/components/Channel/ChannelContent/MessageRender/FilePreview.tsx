@@ -6,6 +6,7 @@ import ConvertSizeToHumanSize from "~/utils/ConvertSizeToHumanSize";
 import {Button} from "~/components/ui/button";
 import ImageWithModal from "~/components/unique/ImageWithModal";
 import { storeImageDimensions } from "~/stores/History";
+import { createSignal, onCleanup, onMount } from "solid-js";
 
 export default function FilePreview(props: { file: IMessageFileAttached }) {
 
@@ -19,29 +20,68 @@ export default function FilePreview(props: { file: IMessageFileAttached }) {
     document.body.removeChild(link);
   };
 
+  //画像以外のファイルの場合はここで表示して終わり
+  if (!props.file.type.startsWith("image")) {
+    return (
+      <div class={"py-2 overflow-hidden"}>
+        <Card class={"px-6 py-4 lg:w-1/2"}>
+          <div class="flex items-center gap-2">
+            <p class={"truncate shrink grow-0 overflow-hidden text-wrap break-all line-clamp-1"}>{props.file.actualFileName}</p>
+
+            <Badge class={"shrink-0 ml-auto"}>{ ConvertSizeToHumanSize(props.file.size) }</Badge>
+            <Button onClick={downloadFile} size={"icon"} class={"shrink-0"} variant={"secondary"}>
+              <IconDownload />
+            </Button>
+          </div>
+        </Card>
+      </div>
+    )
+  }
+
+  //画像の縦幅、横幅
+  const imageHeight = storeImageDimensions[props.file.id]?.height ?? 256;
+  const imageWidth = storeImageDimensions[props.file.id]?.width ?? 256;
+  //画像のサムネイルの高さと横幅を保持するSignal
+  const [thumbnailDimension, setThumbnailDimension] = createSignal({ height: imageHeight, width: imageWidth });
+
+  //画像のサムネイルの高さを画面と画像横幅を元に計算する関数
+  const resizeHeight = () => {
+    let calculatedHeight = imageHeight;
+    //スマホUIかどうか調べる
+    const mediaQuery = window.matchMedia('(max-width: 767px)');
+
+    //サムネイル用高さを計算する(サイドバー分の256pxを引く、スマホUIなら引かない)
+    const contentWidth= !mediaQuery.matches ? window.innerWidth - 256 : window.innerWidth;
+    if ((imageWidth > contentWidth || imageHeight > imageWidth)) {
+      calculatedHeight = imageHeight / (imageWidth / contentWidth); //サムネイルの高さを計算
+    }
+
+    setThumbnailDimension({
+      height: calculatedHeight,
+      width: imageWidth
+    });
+  }
+
+  //ウィンドウのリサイズイベントにサムネイルの高さを再計算する関数を登録
+  onMount(() => {
+    window.addEventListener('resize', resizeHeight);
+    
+    onCleanup(() => {
+      window.removeEventListener('resize', resizeHeight);
+    });
+  });
+
+  //初期表示時にサムネイルの高さを計算
+  resizeHeight();
+
   return (
     <div class={"py-2 overflow-hidden"}>
-      {
-        props.file.type.startsWith("image")
-        ?
-          <ImageWithModal
-            src={`/api/message/file/${props.file.id}`}
-            class="max-w-1/3 max-h-64 rounded"
-            height={storeImageDimensions[props.file.id]?.height}
-            width={storeImageDimensions[props.file.id]?.width}
-          />
-        :
-          <Card class={"px-6 py-4 lg:w-1/2"}>
-            <div class="flex items-center gap-2">
-              <p class={"truncate shrink grow-0 overflow-hidden text-wrap break-all line-clamp-1"}>{props.file.actualFileName}</p>
-
-              <Badge class={"shrink-0 ml-auto"}>{ ConvertSizeToHumanSize(props.file.size) }</Badge>
-              <Button onClick={downloadFile} size={"icon"} class={"shrink-0"} variant={"secondary"}>
-                <IconDownload />
-              </Button>
-            </div>
-          </Card>
-      }
+      <ImageWithModal
+        src={`/api/message/file/${props.file.id}`}
+        class="rounded max-w-full max-h-52 md:max-h-64"
+        height={thumbnailDimension().height}
+        width={thumbnailDimension().width}
+      />
     </div>
-  )
+  );
 }

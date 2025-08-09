@@ -19,8 +19,8 @@ export default function ImageWithModal(props: { class: string, src: string | nul
       <img
         onClick={() => setIsOpen(true)} 
         src={srcUrl}
-        class={`${props.class} cursor-pointer`}
-        style={`${props.height!==undefined ? `height: ${props.height}px;` : ''}`}
+        class={`${props.class} cursor-pointer object-contain`}
+        style={`height: ${props.height}px;`}
         alt={srcUrl.length > 30 ? srcUrl.slice(0,15) + "..." : srcUrl}
       />
 
@@ -32,7 +32,7 @@ export default function ImageWithModal(props: { class: string, src: string | nul
             class={"inset-0 z-50 p-2 fixed flex justify-center items-center w-full h-full bg-black bg-opacity-50"}
           >
             <KDialog.Content
-              class={"h-4/5 w-10/12 flex justify-center items-center"}
+              class={"h-4/5 w-11/12 flex justify-center items-center"}
             >
               <img
                 src={srcUrl}
