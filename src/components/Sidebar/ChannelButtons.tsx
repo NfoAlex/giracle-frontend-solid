@@ -6,6 +6,7 @@ import { IconLock, IconHash } from "@tabler/icons-solidjs";
 import { directGetterChannelInfo } from "~/stores/ChannelInfo";
 import { storeHasNewMessage } from "~/stores/HasNewMessage";
 import Sortable from 'sortablejs';
+import { storeInbox } from "~/stores/Inbox";
 
 export default function ChannelButtons() {
   const loc = useLocation();
@@ -117,6 +118,9 @@ export default function ChannelButtons() {
     sortIt();
   });
 
+  //チャンネルにメンションがあるかどうか
+  const hasMention = (channelId: string) => storeInbox.some((i) => i.Message.channelId === channelId);
+
   return (
     <SidebarMenu id="channelButtonDisplay">
       <For each={channelListSorted()}>
@@ -135,8 +139,14 @@ export default function ChannelButtons() {
                 :
                   <IconHash class={"drag-handler"} />
               }
-              <p class={storeHasNewMessage[c.channelId]?"truncate":"text-muted-foreground truncate"}>{ directGetterChannelInfo(c.channelId).name }</p>
-              { storeHasNewMessage[c.channelId] && <span class="text-xs ml-auto shrink-0">●</span> }
+              <p class={storeHasNewMessage[c.channelId] ? "truncate" : "text-muted-foreground truncate"}>
+                { directGetterChannelInfo(c.channelId).name }
+              </p>
+              {
+                (storeHasNewMessage[c.channelId] || hasMention(c.channelId))
+                &&
+                <span class={`text-xs ml-auto shrink-0 ${hasMention(c.channelId) && 'text-red-500'}`}>●</span>
+              }
             </SidebarMenuButton>
           </SidebarMenuItem>
         )}
