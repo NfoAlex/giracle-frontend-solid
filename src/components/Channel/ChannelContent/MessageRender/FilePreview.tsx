@@ -47,10 +47,12 @@ export default function FilePreview(props: { file: IMessageFileAttached }) {
   //画像のサムネイルの高さを画面と画像横幅を元に計算する関数
   const resizeHeight = () => {
     let calculatedHeight = imageHeight;
+    //スマホUIかどうか調べる
+    const mediaQuery = window.matchMedia('(max-width: 767px)');
 
-    //サムネイル用高さを計算する
-    const contentWidth= window.innerWidth - 256; //サイドバーを考慮した幅を引いた
-    if (imageWidth > contentWidth || imageHeight > imageWidth) {
+    //サムネイル用高さを計算する(サイドバー分の256pxを引く、スマホUIなら引かない)
+    const contentWidth= !mediaQuery.matches ? window.innerWidth - 256 : window.innerWidth;
+    if ((imageWidth > contentWidth || imageHeight > imageWidth)) {
       calculatedHeight = imageHeight / (imageWidth / contentWidth); //サムネイルの高さを計算
     }
 
@@ -76,7 +78,7 @@ export default function FilePreview(props: { file: IMessageFileAttached }) {
     <div class={"py-2 overflow-hidden"}>
       <ImageWithModal
         src={`/api/message/file/${props.file.id}`}
-        class="rounded max-w-full max-h-64"
+        class="rounded max-w-full max-h-52 md:max-h-64"
         height={thumbnailDimension().height}
         width={thumbnailDimension().width}
       />
