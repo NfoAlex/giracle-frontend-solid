@@ -4,7 +4,7 @@ import { produce } from "solid-js/store";
 import { setStoreMyUserinfo, storeMyUserinfo } from "~/stores/MyUserinfo";
 
 export default function WSChannelLeft(dat: { channelId: string }) {
-  console.log("WSChannelLeft :: triggered dat->", dat);
+  //console.log("WSChannelLeft :: triggered dat->", dat);
 
   const myJoinedChannel = storeMyUserinfo.ChannelJoin;
 

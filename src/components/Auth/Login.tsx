@@ -17,7 +17,7 @@ export default function Login() {
     POST_USER_LOGIN(username(), password())
       .then((r) => {
         setResult("success");
-        console.log("r->", r);
+        //console.log("r->", r);
 
         InitLoad(r.data.userId, true);
 
@@ -26,7 +26,7 @@ export default function Login() {
       })
       .catch((e) => {
         setResult("error");
-        console.log("e->", e);
+        console.error("e->", e);
       });
   };
 

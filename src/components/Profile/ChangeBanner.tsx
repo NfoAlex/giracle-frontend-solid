@@ -31,7 +31,7 @@ export default function ChangeBanner() {
         setResult("success");
       })
       .catch((e) => {
-        console.log("ChangeBanner :: changeBanner : e->", e);
+        console.error("ChangeBanner :: changeBanner : e->", e);
         setResult("error");
       });
   };

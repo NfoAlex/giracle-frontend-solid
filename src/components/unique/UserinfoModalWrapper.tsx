@@ -58,13 +58,13 @@ export default function UserinfoModalWrapper(props: {children: JSX.Element, user
     if (banState) {
       await POST_USER_BAN(props.userId)
         .then((r) => {
-          console.log("UserName :: controlBanState(BAN) :: r ->", r);
+          //console.log("UserName :: controlBanState(BAN) :: r ->", r);
         })
         .catch((e) => console.error("UserName :: controlBanState :: err ->", e));
     } else {
       await POST_USER_UNBAN(props.userId)
         .then((r) => {
-          console.log("UserName :: controlBanState(UNBAN) :: r ->", r);
+          //console.log("UserName :: controlBanState(UNBAN) :: r ->", r);
         })
         .catch((e) => console.error("UserName :: controlBanState :: err ->", e));
     }

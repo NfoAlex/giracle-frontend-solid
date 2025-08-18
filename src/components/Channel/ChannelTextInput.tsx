@@ -140,7 +140,7 @@ export default function ChannelTextInput() {
       const files = (e.target as HTMLInputElement).files;
       if (files) {
         setFileInput([...fileInput(), ...files]);
-        console.log("ChannelTextInput :: bindFiles : fileInput->", fileInput());
+        //console.log("ChannelTextInput :: bindFiles : fileInput->", fileInput());
       }
     }
   }
@@ -162,7 +162,7 @@ export default function ChannelTextInput() {
         }
       }
       setFileInput([...fileInput(), ...files]);
-      console.log("ChannelTextInput :: receiveFiles : fileInput->", fileInput());
+      //console.log("ChannelTextInput :: receiveFiles : fileInput->", fileInput());
     }
   }
 

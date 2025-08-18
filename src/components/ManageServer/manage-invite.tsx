@@ -45,7 +45,7 @@ export default function ManageInvite() {
   const fetchInvites = () => {
     GET_SERVER_GET_INVITE()
       .then((r) => {
-        console.log("ManageInvite :: fetchInvites :: r->", r);
+        //console.log("ManageInvite :: fetchInvites :: r->", r);
         setInvites(r.data);
       })
       .catch((e) => {
@@ -58,7 +58,7 @@ export default function ManageInvite() {
    * @param dat 
    */
   const inviteActionTaken = (dat: IInvite) => {
-    console.log("ManageInvite :: sig : dat->", dat);
+    //console.log("ManageInvite :: sig : dat->", dat);
 
     fetchInvites();
   }

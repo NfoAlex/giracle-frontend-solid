@@ -25,7 +25,7 @@ export default function ChannelBrowser() {
   const joinChannel = (channelId: string) => {
     POST_CHANNEL_JOIN(channelId)
       .then((r) => {
-        console.log("ChannelBrowser :: joinChannel :: r ->", r);
+        //console.log("ChannelBrowser :: joinChannel :: r ->", r);
       })
       .catch((err) => console.error("ChannelBrowser :: joinChannel :: err ->", err));
   }
@@ -37,7 +37,7 @@ export default function ChannelBrowser() {
   const leaveChannel = (channelId: string) => {
     POST_CHANNEL_LEAVE(channelId)
       .then((r) => {
-        console.log("ChannelBrowser :: leaveChannel :: r ->", r);
+        //console.log("ChannelBrowser :: leaveChannel :: r ->", r);
         //StoreからチャンネルIdをを削除
         setStoreMyUserinfo((prev) => (
           {...prev, ChannelJoin: prev.ChannelJoin.filter((cj) => cj.channelId !== channelId)}

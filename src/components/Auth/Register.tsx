@@ -14,11 +14,11 @@ export default function Register() {
   const signUp = async () => {
     await POST_USER_REGISTER(username(), password(), inviteCode())
       .then((res) => {
-        console.log("Register :: signUp : res->", res);
+        //console.log("Register :: signUp : res->", res);
         setResult("success");
       })
       .catch((err) => {
-        console.log("Register :: signUp : err->", err);
+        console.error("Register :: signUp : err->", err);
         setResult("error");
       });
   };

@@ -16,7 +16,7 @@ export default function CreateChannel() {
   const createChannel = () => {
     PUT_CHANNEL_CREATE(channelName(), description())
       .then((r) => {
-        console.log("CreateChannel :: createChannel :: r ->", r);
+        //console.log("CreateChannel :: createChannel :: r ->", r);
         setOpen(false); //ダイアログを閉じる
       })
       .catch((err) => {

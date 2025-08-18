@@ -24,7 +24,7 @@ export default function CreateCustomEmoji() {
 
     PUT_SERVER_CUSTOM_EMOJI_UPLOAD(customEmojiCode(), emojiFile)
       .then((r) => {
-        console.log("CreateCustomEmoji :: uploadEmoji :: r->", r);
+        //console.log("CreateCustomEmoji :: uploadEmoji :: r->", r);
         //ダイアログを閉じる
         setDialogDisplay(false);
       })
