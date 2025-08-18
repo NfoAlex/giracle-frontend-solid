@@ -16,7 +16,7 @@ export default function CreateInvite(props: { inviteActionTaken: (dat: IInvite) 
   const createInvite = () => {
     PUT_SERVER_CREATE_INVITE(code())
       .then((r) => {
-        console.log("CreateInvite :: createInvite :: r->", r);
+        //console.log("CreateInvite :: createInvite :: r->", r);
         setCode("");
         props.inviteActionTaken(r.data); //親に伝える
         setOpen(false); //ダイアログを閉じる

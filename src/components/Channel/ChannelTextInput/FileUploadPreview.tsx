@@ -16,7 +16,7 @@ export default function FileUploadPreview(
    * ファイルをアップロードする
    */
   const uploadFile = async () => {
-    console.log("FileUploadPreview :: uploadFile : props.file->", props.file, " : params.channelId->", params.channelId);
+    //console.log("FileUploadPreview :: uploadFile : props.file->", props.file, " : params.channelId->", params.channelId);
 
     //アップロードするデータフォームオブジェクト生成
     const formData = new FormData();
@@ -42,7 +42,7 @@ export default function FileUploadPreview(
     //アップロードの結果用
     xhr.addEventListener("load", () => {
       if (xhr.status === 200) {
-        console.log("FileUploadPreview :: uploadFile : 成功!->", xhr.responseText);
+        //console.log("FileUploadPreview :: uploadFile : 成功!->", xhr.responseText);
         const result: { result: string; data: { fileId: string } } = JSON.parse(
           xhr.responseText,
         );

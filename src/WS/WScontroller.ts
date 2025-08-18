@@ -40,7 +40,7 @@ export const initWS = async () => {
     ws = new WebSocket("/ws");
   }
 
-  console.log("WScontroller :: initWS : triggered");
+  //console.log("WScontroller :: initWS : triggered");
 
   ws.onmessage = async (event) => {
     //console.log("WScontroller :: initWS(.onmessage) : triggered", await JSON.parse(event.data));

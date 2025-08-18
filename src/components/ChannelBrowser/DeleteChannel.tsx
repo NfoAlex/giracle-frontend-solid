@@ -15,7 +15,7 @@ export default function DeleteChannel(props: {channel: IChannel}) {
   const deleteChannel = () => {
     DELETE_CHANNEL_DELETE(props.channel.id)
       .then((r) => {
-        console.log("DeleteChannel :: deleteChannel :: r ->", r);
+        //console.log("DeleteChannel :: deleteChannel :: r ->", r);
         setOpen(false); //ダイアログを閉じる
       })
       .catch((err) => {

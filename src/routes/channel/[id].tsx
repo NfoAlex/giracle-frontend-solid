@@ -19,7 +19,7 @@ export default function Channel() {
     const joinChannel = () => {
       POST_CHANNEL_JOIN(params.channelId)
         .then((r) => {
-          console.log("/channel/[id] :: joinChannel :: r ->", r);
+          //console.log("/channel/[id] :: joinChannel :: r ->", r);
         })
         .catch((err) => console.error("/channel/[id] :: joinChannel :: err ->", err));
     }

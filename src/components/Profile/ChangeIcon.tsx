@@ -28,11 +28,10 @@ export default function ChangeIcon() {
     //アイコンの変更
     POST_USER_CHANGE_ICON(_file)
       .then(() => {
-        console.log("アイコンを変更しました。");
         setResult("success");
       })
       .catch((e) => {
-        console.log("ChangeIcon :: changeIcon : e->", e);
+        console.error("ChangeIcon :: changeIcon : e->", e);
         setResult("error");
       });
   };

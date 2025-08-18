@@ -37,7 +37,7 @@ export default function ManageRole() {
   const saveRole = () => {
     POST_ROLE_UPDATE(roleEditing().id, roleEditing())
       .then((r) => {
-        console.log("ManageRole :: saveRole :: r->", r);
+        //console.log("ManageRole :: saveRole :: r->", r);
         setRoles(roles().map((role) => role.id === roleEditing().id ? roleEditing() : role));
       })
       .catch((err) => console.error("ManageRole :: saveRole :: err->", err));
@@ -49,7 +49,7 @@ export default function ManageRole() {
   const deleteRole = () => {
     DELETE_ROLE_DELETE(roleEditing().id)
       .then((r) => {
-        console.log("ManageRole :: deleteRole :: r->", r);
+        //console.log("ManageRole :: deleteRole :: r->", r);
         setRoles(roles().filter((role) => role.id !== roleEditing().id));
         setRoleEditing(roles()[1]);
       })
@@ -62,7 +62,7 @@ export default function ManageRole() {
   const createRole = () => {
     POST_ROLE_CREATE(`ロール : ${new Date().toLocaleString()}`)
       .then((r) => {
-        console.log("ManageRole :: createRole :: r->", r);
+        //console.log("ManageRole :: createRole :: r->", r);
         setRoles([...roles(), r.data]);
         setRoleEditing(r.data);
       })

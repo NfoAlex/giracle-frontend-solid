@@ -19,7 +19,7 @@ export default function Inbox() {
    */
   const readIt = (messageId: string) => {
     POST_MESSAGE_INBOX_READ(messageId).then((r) => {
-      console.log("Inbox :: readIt : r->", r);
+      //console.log("Inbox :: readIt : r->", r);
     }).catch((e) => console.error("Inbox :: readIt : e->", e));
   }
 

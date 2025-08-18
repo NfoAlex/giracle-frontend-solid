@@ -33,7 +33,7 @@ export default function ConfigProfile() {
         setNameEditMode(false);
       })
       .catch((e) => {
-        console.log("profile :: changeName : e->", e);
+        console.error("profile :: changeName : e->", e);
       });
   };
 
@@ -54,7 +54,7 @@ export default function ConfigProfile() {
         setSelfIntroEditMode(false);
       })
       .catch((e) => {
-        console.log("profile :: changeSelfIntro : e->", e);
+        console.error("profile :: changeSelfIntro : e->", e);
       });
   };
 

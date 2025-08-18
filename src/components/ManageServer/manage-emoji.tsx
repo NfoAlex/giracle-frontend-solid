@@ -17,7 +17,7 @@ export default function ManageEmoji() {
   const deleteEmoji = (emojiCode: string) => {
     DELETE_SERVER_CUSTOM_EMOJI_DELETE(emojiCode)
       .then((r) => {
-        console.log("ManageEmoji :: deleteEmoji : r->", r);
+        //console.log("ManageEmoji :: deleteEmoji : r->", r);
       })
       .catch((e) => console.error("ManageEmoji :: deleteEmoji : e->", e));
   }

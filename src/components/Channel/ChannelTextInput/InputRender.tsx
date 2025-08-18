@@ -52,14 +52,14 @@ export default function InputRender() {
     const el = document.getElementById("MsgInput:" + (currentFocusIndex));
     if (el !== null) el.innerText = user.name;
 
-    console.log("bindUserId : inputs->", inputs()[currentFocusIndex]);
+    //console.log("bindUserId : inputs->", inputs()[currentFocusIndex]);
     insertBlock("text", currentFocusIndex);
   }
 
   const AtSignTrigger = (index: number) => {
-    console.log("@");
+    //console.log("@");
     insertBlock("mention", index);
-    console.log("inputs->", inputs());
+    //console.log("inputs->", inputs());
   }
 
   const insertBlock = (type: IMessageInput["type"], index: number) => {
@@ -173,7 +173,7 @@ export default function InputRender() {
                               break;
                             }
                             default: {
-                              console.log("mention : key->", e.key);
+                              //console.log("mention : key->", e.key);
                             }
                           }
                         }

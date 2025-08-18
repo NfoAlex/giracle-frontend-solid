@@ -48,7 +48,7 @@ export function InviteTable<TData, TValue>(props: DataTableProps<TData, TValue>)
       //id指定でエラーが出てますがきちんと割り当てられています。
       DELETE_SERVER_DELETE_INVITE(inviteData.id)
         .then((r) => {
-          console.log("ManageInvite :: deleteInvite :: r->", r);
+          //console.log("ManageInvite :: deleteInvite :: r->", r);
           setRowSelection({}); // 選択を解除
           props.inviteActionTaken(row.getValue("id")); //親に伝える
         })

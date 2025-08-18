@@ -25,7 +25,7 @@ export default function Search() {
         //システムメッセージを除外
         const result = r.data.filter((msg) => msg.userId !== "SYSTEM");
 
-        console.log("Search :: search :: r ->", r);
+        //console.log("Search :: search :: r ->", r);
         //挿入かどうかで処理を分ける
         if (insertMode) {
           setSearchResults((prev) => [...prev, ...result]);
