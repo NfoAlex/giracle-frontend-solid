@@ -27,8 +27,7 @@ export default function FilePreview(props: { file: IMessageFileAttached }) {
         <Card class={"px-6 py-4 lg:w-1/2"}>
           <div class="flex items-center gap-2">
             <p class={"truncate shrink grow-0 overflow-hidden text-wrap break-all line-clamp-1"}>{props.file.actualFileName}</p>
-
-            <Badge class={"shrink-0 ml-auto"}>{ ConvertSizeToHumanSize(props.file.size) }</Badge>
+            <Card class={"ml-auto h-full p-2"}>{ ConvertSizeToHumanSize(props.file.size) }</Card>
             <Button onClick={downloadFile} size={"icon"} class={"shrink-0"} variant={"secondary"}>
               <IconDownload />
             </Button>
