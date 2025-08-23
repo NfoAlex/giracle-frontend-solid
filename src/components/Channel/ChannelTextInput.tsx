@@ -166,6 +166,15 @@ export default function ChannelTextInput() {
     }
   }
 
+  /**
+   * ファイル用のデータ群から特定のファイル分を削る
+   * @param fileId
+   */
+  const removeFileId = (fileId: string, fileName: string) => {
+    setFileInput(fileInput().filter(f=>f.name!==fileName));
+    setFileIds(fileIds().filter(id => id !== fileId));
+  }
+
   return (
     <div class={"flex flex-col gap-2 pb-1"}>
       <Show when={fileInput().length > 0}>
@@ -177,6 +186,7 @@ export default function ChannelTextInput() {
                   <FileUploadPreview
                     file={file}
                     dataSetter={pushFileIds}
+                    onRemove={(fileId, fileName)=>{ removeFileId(fileId, fileName) }}
                   />
                 </div>
               );
