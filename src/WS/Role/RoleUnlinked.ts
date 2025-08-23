@@ -7,10 +7,7 @@ export default function WSRoleUnlinked(dat: { roleId: string, userId: string }) 
 
   //リンクされていて自分のユーザーId宛てなら解除
   if (storeMyUserinfo.id === dat.userId) {
-    setStoreMyUserinfo((prev) => {
-      prev.RoleLink.filter((role) => role.roleId !== dat.roleId);
-      return prev;
-    });
+    setStoreMyUserinfo("RoleLink", prev => prev.filter((role) => role.roleId !== dat.roleId));
   }
 
   //ユーザー情報Storeを更新

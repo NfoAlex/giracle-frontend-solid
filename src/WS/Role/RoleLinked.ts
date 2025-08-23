@@ -7,10 +7,10 @@ export default function WSRoleLinked(dat: { roleId: string, userId: string }) {
 
   //自分に対する付与なら自分のStoreを更新
   if (storeMyUserinfo.id === dat.userId) {
-    setStoreMyUserinfo((prev) => {
+    setStoreMyUserinfo(produce((prev) => {
       prev.RoleLink.push({ roleId: dat.roleId });
       return prev;
-    });
+    }));
   }
 
   //ユーザー情報Storeを更新
