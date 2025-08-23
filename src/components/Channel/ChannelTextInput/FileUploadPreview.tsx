@@ -4,6 +4,7 @@ import {useParams} from "@solidjs/router";
 import { Button } from "~/components/ui/button";
 import { IconSquareRoundedX, IconFileFilled } from '@tabler/icons-solidjs';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "~/components/ui/hover-card";
+import { ProgressCircle } from "~/components/ui/progress-circle";
 
 export default function FileUploadPreview(
   props: {
@@ -110,8 +111,8 @@ export default function FileUploadPreview(
 
         <span class="px-2 w-full shrink-0 flex items-center gap-1 truncate">
           {/* アップロードの進捗か結果表示 */}
-          <span class="shrink-0 grow-0 text-sm" style="font-family: 'consolas'">
-            {result() === "" && progress() }
+          <span class="shrink-0 grow-0 text-sm w-4 h-4 text-center" style="font-family: 'consolas'">
+            {result() === "" && <ProgressCircle value={progress()} class="w-4 h-4 mx-auto" /> }
             {result() === "SUCCESS" && "✅" }
             {result() === "内部エラー" && "!" }
             {result().startsWith("error::") && result() }
