@@ -3,6 +3,7 @@ import {createSignal, onCleanup, onMount, Show} from "solid-js";
 import {useParams} from "@solidjs/router";
 import { Button } from "~/components/ui/button";
 import { IconSquareRoundedX, IconFileFilled } from '@tabler/icons-solidjs';
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "~/components/ui/hover-card";
 
 export default function FileUploadPreview(
   props: {
@@ -14,6 +15,7 @@ export default function FileUploadPreview(
   const params = useParams();
   const [progress, setProgress] = createSignal(0);
   const [result, setResult] = createSignal<"" | "SUCCESS" | "内部エラー" | `error::${string}`>("");
+  const [openFileNameCard, setOpenFileNameCard] = createSignal(false);
   const [previewUrl, setPreviewUrl] = createSignal<string>("");
   let fileIdBinded = "";
 
@@ -107,15 +109,29 @@ export default function FileUploadPreview(
         <span class="border-b-2"></span>
 
         <span class="px-2 w-full shrink-0 flex items-center gap-1 truncate">
-          <span class="shrink-0 grow-0 text-sm">
+          {/* アップロードの進捗か結果表示 */}
+          <span class="shrink-0 grow-0 text-sm" style="font-family: 'consolas'">
             {result() === "" && progress() }
             {result() === "SUCCESS" && "✅" }
             {result() === "内部エラー" && "!" }
             {result().startsWith("error::") && result() }
           </span>
-          <p class="shrink text-sm truncate">
-            { props.file.name }
-          </p>
+
+          {/* ファイル名表示 */}
+          <div class="shrink truncate">
+            <HoverCard open={openFileNameCard()} onOpenChange={setOpenFileNameCard} >
+              <HoverCardTrigger>
+                <p onClick={()=>setOpenFileNameCard(true)} class="text-sm truncate">
+                  { props.file.name }
+                </p>
+              </HoverCardTrigger>
+              <HoverCardContent>
+                { props.file.name }
+              </HoverCardContent>
+            </HoverCard>
+          </div>
+
+          {/* 削除ボタン */}
           <Button
             onClick={()=>props.onRemove && props.onRemove(fileIdBinded, props.file.name)}
             size={"icon"}
