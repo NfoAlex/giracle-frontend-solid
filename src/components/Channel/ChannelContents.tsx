@@ -306,7 +306,7 @@ export default function ChannelContents() {
     <div class="relative w-full overflow-y-auto grow">
       <div
         id="history"
-        class={`h-full w-full py-2 overflow-y-auto flex flex-col-reverse gap-${storeClientConfig.display.messageGapLevel}`}
+        class={`h-full w-full overflow-y-auto flex flex-col-reverse gap-${storeClientConfig.display.messageGapLevel}`}
       >
         <For each={storeHistory[param.channelId]?.history}>
           {(h, index) => (

@@ -110,8 +110,8 @@ export default function UserinfoModalWrapper(props: {children: JSX.Element, user
               {
                 storeMyUserinfo.id === user().id && !storeUserinfo[user().id].isBanned
                 &&
-                  <Button as={A} href="/app/profile" class="ml-auto">
-                      <IconPencil />
+                  <Button size="icon" as={A} href="/app/config" class="ml-auto">
+                    <IconPencil />
                   </Button>
               }
             </span>

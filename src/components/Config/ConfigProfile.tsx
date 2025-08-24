@@ -16,6 +16,7 @@ import { Badge } from "../ui/badge";
 import POST_ROLE_LINK from "~/api/ROLE/ROLE_LINK";
 import { storeRoleInfo } from "~/stores/RoleInfo";
 import type { IRole } from "~/types/Role";
+import ChangePasswordModal from "./ConfigProfile/ChangePasswordModal";
 
 export default function ConfigProfile() {
   const [nameEditMode, setNameEditMode] = createSignal(false);
@@ -126,40 +127,40 @@ export default function ConfigProfile() {
             {/* 名前部分 */}
             <span>
             <Label>名前</Label>
-              <Show
-                when={nameEditMode()}
-                fallback={
-                  <div class="flex flex-row items-center gap-2">
-                    <p class="grow truncate">{storeMyUserinfo.name}</p>
-                    <Button onClick={() => setNameEditMode(!nameEditMode())} size={"icon"}>
-                      <IconPencil stroke="2"/>
-                    </Button>
-                  </div>
-                }
-              >
-                <div class="flex md:flex-row flex-col gap-2">
-                  <TextField class="grow">
-                    <TextFieldInput
-                      type="text"
-                      placeholder="新しいユーザー名"
-                      value={newName()}
-                      onInput={(e) => setNewName(e.currentTarget.value)}
-                    />
-                  </TextField>
-                  <div class="flex flex-row items-center gap-1">
-                    <Button onClick={changeName} variant={"ghost"} size={"icon"}>
-                      <IconCheck stroke="2"/>
-                    </Button>
-                    <Button
-                      onClick={() => setNameEditMode(!nameEditMode())}
-                      variant={"ghost"}
-                      size={"icon"}
-                    >
-                      <IconCircleX stroke="2"/>
-                    </Button>
-                  </div>
+            <Show
+              when={nameEditMode()}
+              fallback={
+                <div class="flex flex-row items-center gap-2">
+                  <p class="grow truncate">{storeMyUserinfo.name}</p>
+                  <Button onClick={() => setNameEditMode(!nameEditMode())} size={"icon"}>
+                    <IconPencil stroke="2"/>
+                  </Button>
                 </div>
-              </Show>
+              }
+            >
+              <div class="flex md:flex-row flex-col gap-2">
+                <TextField class="grow">
+                  <TextFieldInput
+                    type="text"
+                    placeholder="新しいユーザー名"
+                    value={newName()}
+                    onInput={(e) => setNewName(e.currentTarget.value)}
+                  />
+                </TextField>
+                <div class="flex flex-row items-center gap-1">
+                  <Button onClick={changeName} variant={"ghost"} size={"icon"}>
+                    <IconCheck stroke="2"/>
+                  </Button>
+                  <Button
+                    onClick={() => setNameEditMode(!nameEditMode())}
+                    variant={"ghost"}
+                    size={"icon"}
+                  >
+                    <IconCircleX stroke="2"/>
+                  </Button>
+                </div>
+              </div>
+            </Show>
             </span>
 
             <hr />
@@ -253,6 +254,14 @@ export default function ConfigProfile() {
                     </PopoverContent>
                   </Popover>
                 </Show>
+              </div>
+            </span>
+
+            <hr />
+
+            <span>
+              <div class="mt-2">
+                <ChangePasswordModal />
               </div>
             </span>
           </div>
