@@ -1,11 +1,12 @@
 import {Card} from "~/components/ui/card";
-import {IconMoodHappy, IconPencil, IconTrash} from "@tabler/icons-solidjs";
+import {IconMoodHappy, IconPencil, IconTrash, IconCornerUpLeft} from "@tabler/icons-solidjs";
 import DELETE_MESSAGE_DELETE from "~/api/MESSAGE/MESSAGE_DELETE";
 import {getRolePower, storeMyUserinfo} from "~/stores/MyUserinfo";
 import type {IMessage} from "~/types/Message";
 import {Button} from "~/components/ui/button";
 import EmojiPicker from "~/components/Channel/ChannelContent/HoverMenu/EmojiPicker";
 import {createSignal} from "solid-js";
+import storeReplyingMessageId from "~/stores/ReplyingMessageId";
 
 export default function HoverMenu(props: {
   message: IMessage,
@@ -62,6 +63,14 @@ export default function HoverMenu(props: {
           />
         }
       </div>
+      <Button
+        onClick={() => storeReplyingMessageId[props.message.channelId] = props.message.id}
+        size="icon"
+        variant={"ghost"}
+        class={"w-8 h-8"}
+      >
+        <IconCornerUpLeft />
+      </Button>
       {
         storeMyUserinfo.id === props.message.userId
         &&
