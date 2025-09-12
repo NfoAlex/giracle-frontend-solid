@@ -3,7 +3,7 @@ import {For, Show, createEffect, createSignal, onCleanup, onMount, on} from "sol
 import { setStoreHistory, storeHistory } from "~/stores/History";
 import { setStoreMessageReadTimeBefore, storeMessageReadTime, storeMessageReadTimeBefore, updateReadTime } from "~/stores/Readtime";
 import FetchHistory from "~/utils/FethchHistory";
-import { Avatar, AvatarImage } from "../ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import MessageRender from "./ChannelContent/MessageRender";
 import NewMessageLine from "./ChannelContent/NewMessageLine";
 import POST_MESSAGE_UPDATE_READTIME from "~/api/MESSAGE/MESSAGE_UPDATE_READTIME";
@@ -343,11 +343,13 @@ export default function ChannelContents() {
                   ?
 
                     <>
+                      {/* アイコン表示部分 */}
                       <div class="w-[40px] shrink-0">
                         <Show when={!sameSenderAsNext(index())}>
                           <UserinfoModalWrapper userId={h.userId} >
                             <Avatar class="mx-auto">
                               <AvatarImage src={`/api/user/icon/${h.userId}`} />
+                              <AvatarFallback>{ h.userId.slice(0,2) }</AvatarFallback>
                             </Avatar>
                           </UserinfoModalWrapper>
                         </Show>
