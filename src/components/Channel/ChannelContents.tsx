@@ -18,6 +18,7 @@ import {storeMyUserinfo} from "~/stores/MyUserinfo";
 import { storeClientConfig } from "~/stores/ClientConfig";
 import { Button } from "../ui/button";
 import { IconArrowDown } from "@tabler/icons-solidjs";
+import DisplayReply from "./ChannelContent/DisplayReply";
 
 export default function ChannelContents() {
   const [isFocused, setIsFocused] = createSignal(true);
@@ -335,10 +336,18 @@ export default function ChannelContents() {
                 </div>
               </Show>
 
+              { //返信先の表示
+                h.replyingMessageId !== null
+                &&
+                <div class="ml-auto mt-1" style={"width: calc(100% - 45px);"}>
+                  <DisplayReply replyingMessageId={h.replyingMessageId} />
+                </div>
+              }
+
               <div
                 class="flex flex-row items-start"
               >
-                {
+                { //メッセージ表示
                   !h.isSystemMessage //システムメッセージかどうか
                   ?
 
