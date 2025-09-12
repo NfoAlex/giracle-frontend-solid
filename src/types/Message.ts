@@ -6,6 +6,7 @@ export interface IMessage {
   id: string;
   isSystemMessage: false;
   userId: string;
+  replyingMessageId: string | null;
   MessageUrlPreview: IMessageUrlPreview[];
   MessageFileAttached: IMessageFileAttached[];
   reactionSummary: {
