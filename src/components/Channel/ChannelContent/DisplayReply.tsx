@@ -42,12 +42,12 @@ export default function DisplayReply(props: {replyingMessageId: string}) {
                 <AvatarImage src={`/api/user/icon/${messageData()!.userId}`} />
                 <AvatarFallback>{ messageData()!.userId.slice(0,2) }</AvatarFallback>
               </Avatar>
-              <span>
+              <span class="font-bold">
                 { getterUserinfo(messageData()!.userId).name }
               </span>
             </UserinfoModalWrapper>
             <span class="truncate">
-              : { messageData()?.content }
+              { messageData()?.content }
             </span>
           </div>
         </Match>
