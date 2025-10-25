@@ -132,7 +132,7 @@ export default function ChannelBrowser() {
       </div>
 
       {/* チャンネル作成FAB */}
-      { getRolePower("manageChannel") && <CreateChannel /> }
+      { getRolePower("manageChannel") && <CreateChannel fetchChannels={fetchChannels} /> }
     </div>
   )
 }
