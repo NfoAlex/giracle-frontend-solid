@@ -40,6 +40,16 @@ export function AppSidebar() {
               <Badge variant={"secondary"} class={"px-3 py-2"}>再接続中...</Badge>
             }
           </SidebarMenu>
+          {
+            storeAppStatus.wsConnected ?
+              <span class={"w-full"}>
+                <SidebarMenuButton as={A} href="/app/online-user" variant={loc.pathname === "/app/online-user" ? "outline" : "default"}>
+                  online user
+                </SidebarMenuButton>
+              </span>
+            :
+              <Badge variant={"secondary"} class={"px-3 py-2"}>再接続中...</Badge>
+          }
         </SidebarGroup>
 
         <hr />
