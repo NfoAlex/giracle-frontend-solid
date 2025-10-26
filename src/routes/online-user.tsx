@@ -42,11 +42,6 @@ export default function Search() {
             onInput={(e) => setQuery(e.currentTarget.value)} 
           />
         </TextField>
-
-        <Button
-          size={"icon"}
-          class="md:w-10 md:h-10 h-12 w-12"
-        ><IconSearch /></Button>
       </span>
 
       <hr class=" mt-2" />
