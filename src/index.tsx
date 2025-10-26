@@ -74,6 +74,7 @@ render(() =>
         <Route path="/channel">
           <Route path="/:channelId" component={Channel} />
         </Route>
+        <Route path="/online-user" component={lazy(() => import("./routes/online-user"))} />
         <Route path="/config" component={lazy(() => import("./routes/config"))} />
         <Route path="/inbox" component={lazy(() => import("./routes/Inbox"))} />
         <Route path="/channel-browser" component={lazy(() => import("./routes/channel-browser"))} />
