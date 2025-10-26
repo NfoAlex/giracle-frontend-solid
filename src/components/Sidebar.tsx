@@ -7,7 +7,6 @@ import {
   SidebarGroup,
   SidebarGroupLabel,
   SidebarHeader,
-  SidebarMenu,
   SidebarMenuButton,
 } from "~/components/ui/sidebar";
 import { getRolePower, storeMyUserinfo } from "~/stores/MyUserinfo";
