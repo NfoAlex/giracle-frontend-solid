@@ -11,10 +11,11 @@ import {
   SidebarMenuButton,
 } from "~/components/ui/sidebar";
 import { getRolePower, storeMyUserinfo } from "~/stores/MyUserinfo";
+import { storeUserOnline } from "~/stores/Userinfo";
 import { storeServerinfo } from "~/stores/Serverinfo";
 import { Avatar, AvatarImage } from "./ui/avatar";
 import { storeAppStatus } from "~/stores/AppStatus";
-import {IconBell, IconDatabaseCog, IconList, IconSearch, IconSettings} from "@tabler/icons-solidjs";
+import {IconBell, IconCircleFilled, IconDatabaseCog, IconList, IconSearch, IconSettings} from "@tabler/icons-solidjs";
 import {storeInbox} from "~/stores/Inbox";
 import {Badge} from "~/components/ui/badge";
 import OnlineUserDisplay from "~/components/Sidebar/OnlineUserDisplay";
@@ -43,9 +44,15 @@ export function AppSidebar() {
           {
             storeAppStatus.wsConnected ?
               <span class={"w-full"}>
-                <SidebarMenuButton as={A} href="/app/online-user" variant={loc.pathname === "/app/online-user" ? "outline" : "default"}>
-                  online user
-                </SidebarMenuButton>
+                <A href="/app/online-user">
+                  <Badge variant={"secondary"} class={"w-full flex items-center px-3 py-2"}>
+                    <p class="font-bold">online user : </p>
+                    <span class={"ml-auto flex items-center gap-1"}>
+                      <IconCircleFilled color={"green"} size={16} />
+                      { storeUserOnline.length }
+                    </span>
+                  </Badge>
+                </A>
               </span>
             :
               <Badge variant={"secondary"} class={"px-3 py-2"}>再接続中...</Badge>
