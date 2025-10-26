@@ -29,7 +29,7 @@ export default function Search() {
     <div class="h-svh pt-2 px-2 overflow-y-hidden flex flex-col">
       <Card class="w-full py-3 px-5 flex items-center gap-2">
         <SidebarTriggerWithDot />
-        <p>おんらいんゆーざー</p>
+        <p>オンラインユーザー</p>
         <Badge class={"ml-auto"}>{storeUserOnline.length}</Badge>
       </Card>
       
