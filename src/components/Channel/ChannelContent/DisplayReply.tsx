@@ -7,11 +7,19 @@ import { IconCornerUpRight } from "@tabler/icons-solidjs";
 import type { IMessage } from "~/types/Message";
 import { storeMyUserinfo } from "~/stores/MyUserinfo";
 
-export default function DisplayReply(props: {replyingMessageId: string}) {
+export default function DisplayReply(props: {replyingMessageId?: string | null}) {
   const [messageData, setMessageData] = createSignal<IMessage | null>(null);
   const [flagNotFound, setFlagNotFound] = createSignal(false);
 
+  if (props.replyingMessageId === null || props.replyingMessageId === undefined) {
+    return <></>;
+  }
+
   onMount(() => {
+    if (!props.replyingMessageId) {
+      setFlagNotFound(true);
+      return;
+    }
     GET_MESSAGE_GET(props.replyingMessageId)
       .then((r) => {
         console.log("DisplayReply :: onMount : r->", r);
