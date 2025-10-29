@@ -1,4 +1,4 @@
-import { createMemo, For, Show } from "solid-js";
+import { createMemo, For } from "solid-js";
 import { Card } from "../ui/card";
 import { directGetterChannelInfo } from "~/stores/ChannelInfo";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";

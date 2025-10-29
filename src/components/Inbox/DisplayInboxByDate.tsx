@@ -7,7 +7,6 @@ import MessageRender from "../Channel/ChannelContent/MessageRender";
 import { Button } from "../ui/button";
 import { IconCheck, IconCornerUpRight, IconAt } from "@tabler/icons-solidjs";
 import { storeInbox } from "~/stores/Inbox";
-import { Badge } from "../ui/badge";
 import DisplayReply from "../Channel/ChannelContent/DisplayReply";
 
 export default function DisplayInboxByDate(props: { onReadIt: (messageId: string) => void }) {
