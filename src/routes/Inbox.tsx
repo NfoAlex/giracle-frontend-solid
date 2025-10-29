@@ -1,13 +1,15 @@
 import { Card } from "~/components/ui/card";
 import { storeInbox } from "~/stores/Inbox";
-import { Show } from "solid-js";
+import { createSignal, Show } from "solid-js";
 import { IconBed } from "@tabler/icons-solidjs";
 import POST_MESSAGE_INBOX_READ from "~/api/MESSAGE/MESSAGE_INBOX_READ";
 import SidebarTriggerWithDot from "~/components/unique/SidebarTriggerWithDot";
 import { Switch, SwitchControl, SwitchLabel, SwitchThumb } from "~/components/ui/switch";
 import DisplayInboxByChannel from "~/components/Inbox/DisplayInboxByChannel";
+import DisplayInboxByDate from "~/components/Inbox/DisplayInboxByDate";
 
 export default function Inbox() {
+  const [groupByChannel, setGroupByChannel] = createSignal(false);
 
   /**
    * インボックス通知を既読にする
@@ -36,15 +38,24 @@ export default function Inbox() {
 
         <Card class="py-3 px-5 flex items-center">
           <p>{storeInbox.length}件のお知らせがあります。</p>
-          <Switch class="flex items-center space-x-2 ml-auto">
-            <SwitchControl checked={false}>
+          <Switch
+            class="flex items-center space-x-2 ml-auto"
+            checked={groupByChannel()}
+            onChange={setGroupByChannel}
+          >
+            <SwitchControl>
               <SwitchThumb />
             </SwitchControl>
             <SwitchLabel>チャンネルで分ける</SwitchLabel>
           </Switch>
         </Card>
 
-        <DisplayInboxByChannel onReadIt={readIt} />
+        <Show when={groupByChannel()}>
+          <DisplayInboxByChannel onReadIt={readIt} />
+        </Show>
+        <Show when={!groupByChannel()}>
+          <DisplayInboxByDate onReadIt={readIt} />
+        </Show>
       </div>
     </div>
   );

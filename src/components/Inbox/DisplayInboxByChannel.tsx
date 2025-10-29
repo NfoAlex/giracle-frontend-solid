@@ -1,4 +1,4 @@
-import { createMemo, For } from "solid-js";
+import { createMemo, For, Show } from "solid-js";
 import { Card } from "../ui/card";
 import { directGetterChannelInfo } from "~/stores/ChannelInfo";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
@@ -8,6 +8,7 @@ import { Button } from "../ui/button";
 import { IconCheck } from "@tabler/icons-solidjs";
 import { storeInbox } from "~/stores/Inbox";
 import type { IInbox } from "~/types/Message";
+import DisplayReply from "../Channel/ChannelContent/DisplayReply";
 
 export default function DisplayInboxByChannel(props: { onReadIt: (messageId: string) => void }) {
   //チャンネルごとに通知データをグループ化
@@ -35,6 +36,11 @@ export default function DisplayInboxByChannel(props: { onReadIt: (messageId: str
           <For each={inboxGroup[1]} fallback={<p>No messages</p>}>
             {(inboxItem) =>
               <Card class={"p-2 flex flex-col gap-2 mt-1"}>
+                { //返信表示
+                  inboxItem.Message.replyingMessageId !== null
+                  &&
+                  <DisplayReply replyingMessageId={inboxItem.Message.replyingMessageId} />
+                }
                 <span class={"flex gap-4"}>
                   <Avatar>
                     <AvatarImage src={"/api/user/icon/" + inboxItem.Message.userId} />
