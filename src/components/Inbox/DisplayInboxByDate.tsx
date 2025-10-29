@@ -18,10 +18,8 @@ export default function DisplayInboxByDate(props: { onReadIt: (messageId: string
           <span class={"flex items-center gap-1"}>
             <p class={"font-bold text-xl"}>#</p>
             <p>{ directGetterChannelInfo(inboxItem.Message.channelId).name }</p>
-            <Badge variant={"secondary"} class={"ml-auto py-1 flex items-center gap-2"}>
-              { inboxItem.type === "mention" && <><IconAt class="w-4 h-4" /><p>メンション</p></> }
-              { inboxItem.type === "reply" && <><IconCornerUpRight class="w-4 h-4" /><p>返信</p></> }
-            </Badge>
+            { inboxItem.type === "mention" && <IconAt class="ml-auto w-4 h-4" /> }
+            { inboxItem.type === "reply" && <IconCornerUpRight class="ml-auto w-4 h-4" /> }
           </span>
           <hr />
           { //返信表示
