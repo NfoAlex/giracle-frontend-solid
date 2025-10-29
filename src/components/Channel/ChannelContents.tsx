@@ -1,5 +1,5 @@
 import { useParams } from "@solidjs/router";
-import {For, Show, createEffect, createSignal, onCleanup, onMount, on} from "solid-js";
+import { Show, createEffect, createSignal, onCleanup, onMount, on, Index } from "solid-js";
 import { setStoreHistory, storeHistory } from "~/stores/History";
 import { setStoreMessageReadTimeBefore, storeMessageReadTime, storeMessageReadTimeBefore, updateReadTime } from "~/stores/Readtime";
 import FetchHistory from "~/utils/FethchHistory";
@@ -309,29 +309,29 @@ export default function ChannelContents() {
         id="history"
         class={`h-full w-full overflow-y-auto flex flex-col-reverse gap-${storeClientConfig.display.messageGapLevel}`}
       >
-        <For each={storeHistory[param.channelId]?.history}>
+        <Index each={storeHistory[param.channelId]?.history}>
           {(h, index) => (
-            <div id={`messageId::${h.id}`} class={"w-full"}>
+            <div data-index={h().id} id={`messageId::${h().id}`} class={"w-full"}>
 
               {/* 日付線 */}
               <Show when={
-                index() !== 0
+                index !== 0
                 &&
                 (
-                  new Date(h.createdAt).getDay()
+                  new Date(h().createdAt).getDay()
                     !==
-                  new Date(storeHistory[param.channelId]?.history[index() + 1]?.createdAt).getDay()
+                  new Date(storeHistory[param.channelId]?.history[index + 1]?.createdAt).getDay()
                 )
                 ||
                 (
-                  new Date(h.createdAt).getDate()
+                  new Date(h().createdAt).getDate()
                     !==
-                  new Date(storeHistory[param.channelId]?.history[index() + 1]?.createdAt).getDate()
+                  new Date(storeHistory[param.channelId]?.history[index + 1]?.createdAt).getDate()
                 )
               }>
                 <div class="flex justify-center items-center gap-3 py-1">
                   <hr class={"grow"} />
-                  <Badge class={"shrink-0"} variant={"secondary"}>{ new Date(h.createdAt).toLocaleDateString() }</Badge>
+                  <Badge class={"shrink-0"} variant={"secondary"}>{ new Date(h().createdAt).toLocaleDateString() }</Badge>
                   <hr class={"grow"} />
                 </div>
               </Show>
@@ -354,8 +354,8 @@ export default function ChannelContents() {
                     <>
                       {/* アイコン表示部分 */}
                       <div class="w-[40px] shrink-0">
-                        <Show when={!sameSenderAsNext(index())}>
-                          <UserinfoModalWrapper userId={h.userId} >
+                        <Show when={!sameSenderAsNext(index)}>
+                          <UserinfoModalWrapper userId={h().userId} >
                             <Avatar class="mx-auto">
                               <AvatarImage src={`/api/user/icon/${h.userId}`} />
                               <AvatarFallback>{ h.userId.slice(0,2) }</AvatarFallback>
@@ -367,35 +367,35 @@ export default function ChannelContents() {
                       {/* ホバー判定部分 */}
                       <div
                         class={
-                          `relative shrink-0 grow-0 rounded-md px-2 ml-auto ${hoveredMsgId()===h.id ? "hover:bg-accent" : ""} ${h.content.includes("@<" + storeMyUserinfo.id + ">") && "border-2"}`
+                          `relative shrink-0 grow-0 rounded-md px-2 ml-auto ${hoveredMsgId()===h().id ? "hover:bg-accent" : ""} ${h().content.includes("@<" + storeMyUserinfo.id + ">") && "border-2"}`
                         }
                         style="width:calc(100% - 45px)"
-                        onmouseenter={() => editingMsgId()!==h.id && setHoveredMsgId(h.id)}
+                        onmouseenter={() => editingMsgId()!==h().id && setHoveredMsgId(h().id)}
                         onmouseleave={() => setHoveredMsgId("")}
-                        on:touchend={() => setHoveredMsgId(h.id) /* スマホ用 */}
+                        on:touchend={() => setHoveredMsgId(h().id) /* スマホ用 */}
                       >
                         { //メッセージ表示部分。編集モードか否かで表示を変える
-                          editingMsgId() === h.id
+                          editingMsgId() === h().id
                           ?
                             <EditMessage
-                              messageId={h.id}
-                              content={h.content}
+                              messageId={h().id}
+                              content={h().content}
                               onCancelEdit={() => setEditingMsgId("")}
                             />
                           :
-                            <MentionReadWrapper messageId={h.id}>
+                            <MentionReadWrapper messageId={h().id}>
                               <MessageRender
-                                message={h}
-                                displayUserName={!sameSenderAsNext(index())}
+                                message={h()}
+                                displayUserName={!sameSenderAsNext(index)}
                               />
                             </MentionReadWrapper>
                         }
                         { //ホバーメニュー(リアクション用の絵文字選択途中も表示を残す)
-                          (hoveredMsgId() === h.id || reactingMsgId() === h.id)
+                          (hoveredMsgId() === h().id || reactingMsgId() === h().id)
                           &&
                           <div class={"absolute right-1 z-50"} style={"bottom:calc(100% - 15px);"}>
                             <HoverMenu
-                              message={h}
+                              message={h()}
                               onEditMode={(msgId)=>{ setEditingMsgId(msgId); setHoveredMsgId(""); }}
                               onReacting={(msgId) => { setReactingMsgId(msgId); }}
                             />
@@ -407,7 +407,7 @@ export default function ChannelContents() {
                   :
 
                     <MessageRender
-                      message={h}
+                      message={h()}
                       displayUserName={false}
                     />
                 }
@@ -420,17 +420,17 @@ export default function ChannelContents() {
                       (c) => c.channelId === useParams().channelId
                     )?.readTime.valueOf() //一つ古い既読時間
                       ===
-                    h.createdAt.valueOf() //メッセージの時間
+                    h().createdAt.valueOf() //メッセージの時間
                   )
                     &&
-                  index() !== 0 //最新メッセージ以外条件
+                  index !== 0 //最新メッセージ以外条件
                 )
                   &&
                 (<NewMessageLine />)
               }
             </div>
           )}
-        </For>
+        </Index>
 
         <Show when={storeHistory[param.channelId]?.atTop}>
           <p>履歴の末端まで到達しました。</p>

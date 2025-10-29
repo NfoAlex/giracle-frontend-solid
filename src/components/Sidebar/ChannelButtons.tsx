@@ -135,7 +135,7 @@ export default function ChannelButtons() {
               { //チャンネルの閲覧権限がある時の錠前アイコン、違うなら"#"アイコン
                 directGetterChannelInfo(c.channelId).ChannelViewableRole.length !== 0
                 ?
-                  <IconLock class={"shrink-0 cursor-help drag-handler"} size={"18"} />
+                  <IconLock class={"shrink-0 drag-handler"} size={"18"} />
                 :
                   <IconHash class={"drag-handler"} />
               }
