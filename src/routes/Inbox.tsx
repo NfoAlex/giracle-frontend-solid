@@ -26,7 +26,7 @@ export default function Inbox() {
         <p>通知</p>
       </Card>
 
-      <div class={"flex flex-col-reverse gap-1"}>
+      <div class={"flex flex-col gap-1"}>
         <Show when={storeInbox.length === 0}>
           <span class={"p-2 text-center flex flex-col items-center"}>
             <IconBed size={44} />
