@@ -24,7 +24,8 @@ export default function ReplyMessageDisplay(props: {messageId: string, channelId
       isSystemMessage: false,
       MessageUrlPreview: [],
       MessageFileAttached: [],
-      reactionSummary: []
+      reactionSummary: [],
+      replyingMessageId: null
     };
     try {
       const msg = storeHistory[props.channelId].history.find(m => m.id===storeReplyingMessageId[props.channelId]);
