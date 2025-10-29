@@ -36,25 +36,27 @@ export default function Inbox() {
           </span>
         </Show>
 
-        <Card class="py-3 px-5 flex items-center">
-          <p>{storeInbox.length}件のお知らせがあります。</p>
-          <Switch
-            class="flex items-center space-x-2 ml-auto"
-            checked={groupByChannel()}
-            onChange={setGroupByChannel}
-          >
-            <SwitchControl>
-              <SwitchThumb />
-            </SwitchControl>
-            <SwitchLabel>チャンネルで分ける</SwitchLabel>
-          </Switch>
-        </Card>
+        <Show when={storeInbox.length !== 0}>
+          <Card class="py-3 px-5 flex items-center">
+            <p>{storeInbox.length}件のお知らせがあります。</p>
+            <Switch
+              class="flex items-center space-x-2 ml-auto"
+              checked={groupByChannel()}
+              onChange={setGroupByChannel}
+            >
+              <SwitchControl>
+                <SwitchThumb />
+              </SwitchControl>
+              <SwitchLabel>チャンネルで分ける</SwitchLabel>
+            </Switch>
+          </Card>
 
-        <Show when={groupByChannel()}>
-          <DisplayInboxByChannel onReadIt={readIt} />
-        </Show>
-        <Show when={!groupByChannel()}>
-          <DisplayInboxByDate onReadIt={readIt} />
+          <Show when={groupByChannel()}>
+            <DisplayInboxByChannel onReadIt={readIt} />
+          </Show>
+          <Show when={!groupByChannel()}>
+            <DisplayInboxByDate onReadIt={readIt} />
+          </Show>
         </Show>
       </div>
     </div>
