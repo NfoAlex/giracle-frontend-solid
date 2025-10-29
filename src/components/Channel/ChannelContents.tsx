@@ -337,10 +337,10 @@ export default function ChannelContents() {
               </Show>
 
               { //返信先の表示
-                h.replyingMessageId !== null
+                h().replyingMessageId !== null
                 &&
                 <div class="ml-auto mt-1" style={"width: calc(100% - 45px);"}>
-                  <DisplayReply replyingMessageId={h.replyingMessageId} />
+                  <DisplayReply replyingMessageId={h().replyingMessageId} />
                 </div>
               }
 
@@ -348,7 +348,7 @@ export default function ChannelContents() {
                 class="flex flex-row items-start"
               >
                 { //メッセージ表示
-                  !h.isSystemMessage //システムメッセージかどうか
+                  !h().isSystemMessage //システムメッセージかどうか
                   ?
 
                     <>
@@ -357,8 +357,8 @@ export default function ChannelContents() {
                         <Show when={!sameSenderAsNext(index)}>
                           <UserinfoModalWrapper userId={h().userId} >
                             <Avatar class="mx-auto">
-                              <AvatarImage src={`/api/user/icon/${h.userId}`} />
-                              <AvatarFallback>{ h.userId.slice(0,2) }</AvatarFallback>
+                              <AvatarImage src={`/api/user/icon/${h().userId}`} />
+                              <AvatarFallback>{ h().userId.slice(0,2) }</AvatarFallback>
                             </Avatar>
                           </UserinfoModalWrapper>
                         </Show>
