@@ -6,6 +6,7 @@ import { getterUserinfo } from "~/stores/Userinfo";
 import { IconCornerUpRight } from "@tabler/icons-solidjs";
 import { storeMyUserinfo } from "~/stores/MyUserinfo";
 import { storeReplyDisplayCache } from "~/stores/ReplyDisplayCache";
+import MessageTextRender from "./MessageRender/MessageTextRender";
 
 export default function DisplayReply(props: {replyingMessageId?: string | null}) {
   if (props.replyingMessageId === null || props.replyingMessageId === undefined) {
@@ -45,14 +46,16 @@ export default function DisplayReply(props: {replyingMessageId?: string | null})
           <IconCornerUpRight class="w-5 h-5 mr-1" />
           <div class="italic text-sm text-muted-foreground">メッセージが見つかりません。</div>
         </Match>
+
         <Match when={storeReplyDisplayCache.cache[props.replyingMessageId] === undefined && !storeReplyDisplayCache.isDeleted[props.replyingMessageId]}>
           <IconCornerUpRight class="w-5 h-5 mr-1" />
           <div class="italic text-sm text-muted-foreground">読み込み中...</div>
         </Match>
+
         <Match when={storeReplyDisplayCache.cache[props.replyingMessageId] !== null}>
           <div class="text-xs flex flex-row items-center gap-1">
-            <IconCornerUpRight class="w-5 h-5" />
-            <UserinfoModalWrapper userId={storeReplyDisplayCache.cache[props.replyingMessageId]!.userId} class="flex flex-row items-center gap-1">
+            <IconCornerUpRight class="shrink-0 w-5 h-5" />
+            <UserinfoModalWrapper userId={storeReplyDisplayCache.cache[props.replyingMessageId]!.userId} class="shrink-0 flex flex-row items-center gap-1">
               <Avatar class="mx-auto w-5 h-5">
                 <AvatarImage src={`/api/user/icon/${storeReplyDisplayCache.cache[props.replyingMessageId]!.userId}`} />
                 <AvatarFallback>{ storeReplyDisplayCache.cache[props.replyingMessageId]!.userId.slice(0,2) }</AvatarFallback>
@@ -61,8 +64,8 @@ export default function DisplayReply(props: {replyingMessageId?: string | null})
                 { getterUserinfo(storeReplyDisplayCache.cache[props.replyingMessageId]!.userId).name }
               </span>
             </UserinfoModalWrapper>
-            <span class="truncate">
-              { storeReplyDisplayCache.cache[props.replyingMessageId]!.content }
+            <span class="shrink truncate line-clamp-1">
+              <MessageTextRender content={storeReplyDisplayCache.cache[props.replyingMessageId]!.content} />
             </span>
           </div>
         </Match>
