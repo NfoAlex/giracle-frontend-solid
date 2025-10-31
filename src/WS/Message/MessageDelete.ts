@@ -2,6 +2,7 @@ import {setStoreHistory, storeHistory} from "~/stores/History";
 import type {IMessage} from "~/types/Message";
 import {storeMessageReadTime} from "~/stores/Readtime";
 import {setStoreHasNewMessage, storeHasNewMessage} from "~/stores/HasNewMessage";
+import { storeReplyDisplayCache } from "~/stores/ReplyDisplayCache";
 
 export default function WSMessageDeleted(dat: { messageId: IMessage["id"], channelId: string }) {
   //console.log("WSMessageDeleted :: triggered dat->", dat);
@@ -21,6 +22,10 @@ export default function WSMessageDeleted(dat: { messageId: IMessage["id"], chann
       }
     };
   });
+
+  //返信表示のキャッシュから削除、削除フラグも立てる
+  storeReplyDisplayCache.cache[dat.messageId] && delete storeReplyDisplayCache.cache[dat.messageId];
+  storeReplyDisplayCache.isDeleted[dat.messageId] = true;
 
   // ------------------- ここから未読が削除された時用の新着削除判別👇 ------------------- //
 
