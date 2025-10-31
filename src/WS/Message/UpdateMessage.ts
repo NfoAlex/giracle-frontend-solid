@@ -1,5 +1,6 @@
 import type { IMessage } from "~/types/Message";
-import {setStoreHistory} from "~/stores/History";
+import { setStoreHistory } from "~/stores/History";
+import { storeReplyDisplayCache } from "~/stores/ReplyDisplayCache";
 
 /**
  * メッセージの更新処理
@@ -32,4 +33,9 @@ export default function WSUpdateMessage(dat: IMessage) {
       },
     };
   });
+
+  //返信表示キャッシュの更新
+  if (storeReplyDisplayCache.cache[dat.id]) {
+    storeReplyDisplayCache.cache[dat.id] = {...storeReplyDisplayCache.cache[dat.id], ...dat};
+  }
 }

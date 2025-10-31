@@ -3,7 +3,8 @@ import type { IMessage } from "~/types/Message";
 export default async function POST_MESSAGE_SEND(
   _channelId: string,
   _message: string,
-  _fileIds: string[]
+  _fileIds: string[],
+  _replyingMessageId?: string,
 ): Promise<{
   message: `Message sent`;
   data: IMessage;
@@ -17,6 +18,7 @@ export default async function POST_MESSAGE_SEND(
       channelId: _channelId,
       message: _message,
       fileIds: _fileIds,
+      replyingMessageId: _replyingMessageId,
     }),
   }).catch((err) => {
     throw new Error("MESSAGE_SEND :: err->", err);

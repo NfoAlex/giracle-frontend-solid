@@ -1,15 +1,16 @@
-import {createSignal, For, Show} from "solid-js";
-import { TextField } from "../ui/text-field";
+import { createSignal, For, Show } from "solid-js";
 import { Button } from "../ui/button";
 import { useParams } from "@solidjs/router";
 import POST_MESSAGE_SEND from "~/api/MESSAGE/MESSAGE_SEND";
-import {IconSend, IconUpload} from "@tabler/icons-solidjs";
+import { IconSend, IconUpload } from "@tabler/icons-solidjs";
 import FileUploadPreview from "~/components/Channel/ChannelTextInput/FileUploadPreview";
 import type {IUser} from "~/types/User";
 import GET_USER_SEARCH from "~/api/USER/USER_SEARCH.";
 import { Card } from "../ui/card";
 import { IChannel } from "~/types/Channel";
 import { storeClientConfig } from "~/stores/ClientConfig";
+import storeReplyingMessageId from "~/stores/ReplyingMessageId";
+import ReplyMessageDisplay from "./ChannelTextInput/ReplyMessageDisplay";
 
 export default function ChannelTextInput() {
   const params = useParams(); //URLパラメータを取得するやつ
@@ -31,7 +32,7 @@ export default function ChannelTextInput() {
   const sendMsg = () => {
     //console.log("ChannelTextInput :: sendMsg : params.id->", {...params});
 
-    POST_MESSAGE_SEND(params.channelId, text(), fileIds())
+    POST_MESSAGE_SEND(params.channelId, text(), fileIds(), storeReplyingMessageId[params.channelId] || undefined)
       .then(() => {
         //console.log("POST_MESSAGE_SEND :: r->", r);
       })
@@ -45,6 +46,7 @@ export default function ChannelTextInput() {
     setText("");
     setFileIds([]);
     setFileInput([]);
+    delete storeReplyingMessageId[params.channelId];
     //検索モードを初期化
     setSearchOptions({
       type: "user",
@@ -177,6 +179,7 @@ export default function ChannelTextInput() {
 
   return (
     <div class={"flex flex-col gap-2 pb-1"}>
+      {/* ファイルアップロードプレビュー表示部 */}
       <Show when={fileInput().length > 0}>
         <div class={"flex items-center overflow-x-auto gap-1"}>
           <For each={fileInput()}>
@@ -195,6 +198,16 @@ export default function ChannelTextInput() {
         </div>
         <hr />
       </Show>
+
+      {/* 返信先のメッセージデータ表示 */}
+      <Show when={storeReplyingMessageId[params.channelId] !== undefined}>
+        <ReplyMessageDisplay
+          messageId={storeReplyingMessageId[params.channelId]}
+          onRemove={() => delete storeReplyingMessageId[params.channelId]}
+          channelId={params.channelId}
+        />
+      </Show>
+
       <div class="w-full relative flex items-center gap-1">
         <input type={"file"} id={"fileInput"} class={"hidden"} />
 

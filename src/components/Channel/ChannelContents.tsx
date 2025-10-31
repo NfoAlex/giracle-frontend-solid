@@ -3,7 +3,7 @@ import { Show, createEffect, createSignal, onCleanup, onMount, on, Index } from 
 import { setStoreHistory, storeHistory } from "~/stores/History";
 import { setStoreMessageReadTimeBefore, storeMessageReadTime, storeMessageReadTimeBefore, updateReadTime } from "~/stores/Readtime";
 import FetchHistory from "~/utils/FethchHistory";
-import { Avatar, AvatarImage } from "../ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import MessageRender from "./ChannelContent/MessageRender";
 import NewMessageLine from "./ChannelContent/NewMessageLine";
 import POST_MESSAGE_UPDATE_READTIME from "~/api/MESSAGE/MESSAGE_UPDATE_READTIME";
@@ -18,6 +18,7 @@ import {storeMyUserinfo} from "~/stores/MyUserinfo";
 import { storeClientConfig } from "~/stores/ClientConfig";
 import { Button } from "../ui/button";
 import { IconArrowDown } from "@tabler/icons-solidjs";
+import DisplayReply from "./ChannelContent/DisplayReply";
 
 export default function ChannelContents() {
   const [isFocused, setIsFocused] = createSignal(true);
@@ -335,19 +336,29 @@ export default function ChannelContents() {
                 </div>
               </Show>
 
+              { //返信先の表示
+                h().replyingMessageId !== null
+                &&
+                <div class="ml-auto mt-1" style={"width: calc(100% - 45px);"}>
+                  <DisplayReply replyingMessageId={h().replyingMessageId} />
+                </div>
+              }
+
               <div
                 class="flex flex-row items-start"
               >
-                {
+                { //メッセージ表示
                   !h().isSystemMessage //システムメッセージかどうか
                   ?
 
                     <>
+                      {/* アイコン表示部分 */}
                       <div class="w-[40px] shrink-0">
                         <Show when={!sameSenderAsNext(index)}>
                           <UserinfoModalWrapper userId={h().userId} >
                             <Avatar class="mx-auto">
                               <AvatarImage src={`/api/user/icon/${h().userId}`} />
+                              <AvatarFallback>{ h().userId.slice(0,2) }</AvatarFallback>
                             </Avatar>
                           </UserinfoModalWrapper>
                         </Show>

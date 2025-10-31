@@ -1,17 +1,15 @@
-import {Card} from "~/components/ui/card";
-import {storeInbox} from "~/stores/Inbox";
-import {For, Show} from "solid-js";
-import MessageRender from "~/components/Channel/ChannelContent/MessageRender";
-import {Badge} from "~/components/ui/badge";
-import {directGetterChannelInfo} from "~/stores/ChannelInfo";
-import {Avatar, AvatarFallback, AvatarImage} from "~/components/ui/avatar";
-import {getterUserinfo} from "~/stores/Userinfo";
-import {IconBed, IconCheck} from "@tabler/icons-solidjs";
-import {Button} from "~/components/ui/button";
+import { Card } from "~/components/ui/card";
+import { storeInbox } from "~/stores/Inbox";
+import { createSignal, Show } from "solid-js";
+import { IconBed } from "@tabler/icons-solidjs";
 import POST_MESSAGE_INBOX_READ from "~/api/MESSAGE/MESSAGE_INBOX_READ";
 import SidebarTriggerWithDot from "~/components/unique/SidebarTriggerWithDot";
+import { Switch, SwitchControl, SwitchLabel, SwitchThumb } from "~/components/ui/switch";
+import DisplayInboxByChannel from "~/components/Inbox/DisplayInboxByChannel";
+import DisplayInboxByDate from "~/components/Inbox/DisplayInboxByDate";
 
 export default function Inbox() {
+  const [groupByChannel, setGroupByChannel] = createSignal(false);
 
   /**
    * インボックス通知を既読にする
@@ -30,7 +28,7 @@ export default function Inbox() {
         <p>通知</p>
       </Card>
 
-      <div class={"flex flex-col-reverse gap-1"}>
+      <div class={"flex flex-col gap-1"}>
         <Show when={storeInbox.length === 0}>
           <span class={"p-2 text-center flex flex-col items-center"}>
             <IconBed size={44} />
@@ -38,32 +36,28 @@ export default function Inbox() {
           </span>
         </Show>
 
-        <For each={storeInbox}>
-          {(inboxItem) =>
-            <Card class={"p-2 flex flex-col gap-2"}>
-              <span class={"flex items-center gap-1"}>
-                <p class={"font-bold text-xl"}>#</p>
-                <p>{ directGetterChannelInfo(inboxItem.Message.channelId).name }</p>
-                <Badge variant={"secondary"} class={"ml-auto"}>
-                  <p>{ new Date(inboxItem.happendAt).toLocaleString() }</p>
-                </Badge>
-              </span>
-              <hr />
-              <span class={"flex gap-4"}>
-                <Avatar>
-                  <AvatarImage src={"/api/user/icon/" + inboxItem.Message.userId} />
-                  <AvatarFallback>
-                    { getterUserinfo(inboxItem.Message.userId).name.slice(0,1) }
-                  </AvatarFallback>
-                </Avatar>
-                <span class={"grow border-e-2"}>
-                  <MessageRender message={inboxItem.Message} displayUserName={true} />
-                </span>
-                <Button onClick={()=>readIt(inboxItem.messageId)} class={"self-end w-10 h-10 shrink-0"}><IconCheck /></Button>
-              </span>
-            </Card>
-          }
-        </For>
+        <Show when={storeInbox.length !== 0}>
+          <Card class="py-3 px-5 flex items-center">
+            <p>{storeInbox.length}件のお知らせがあります。</p>
+            <Switch
+              class="flex items-center space-x-2 ml-auto"
+              checked={groupByChannel()}
+              onChange={setGroupByChannel}
+            >
+              <SwitchControl>
+                <SwitchThumb />
+              </SwitchControl>
+              <SwitchLabel>チャンネルで分ける</SwitchLabel>
+            </Switch>
+          </Card>
+
+          <Show when={groupByChannel()}>
+            <DisplayInboxByChannel onReadIt={readIt} />
+          </Show>
+          <Show when={!groupByChannel()}>
+            <DisplayInboxByDate onReadIt={readIt} />
+          </Show>
+        </Show>
       </div>
     </div>
   );
