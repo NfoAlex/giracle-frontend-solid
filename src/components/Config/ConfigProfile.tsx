@@ -99,7 +99,7 @@ export default function ConfigProfile() {
       <Card class="w-full">
         <CardHeader>
           <div class={"relative"}>
-            <img alt={"バナー画像"} src={"/api/user/banner/" + storeMyUserinfo.id} class="w-full h-36 object-cover rounded" />
+            <img alt={"バナー画像"} src={"/api/user/banner/" + storeMyUserinfo.id} class="w-full h-36 object-cover border rounded" />
             <span class={"absolute bottom-2 right-2 z-50"}>
               <ChangeBanner />
             </span>
