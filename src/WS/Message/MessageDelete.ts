@@ -22,6 +22,10 @@ export default function WSMessageDeleted(dat: { messageId: IMessage["id"], chann
       }
     };
   });
+  //Inboxから該当メッセージIdを持つものを削除
+  setStoreInbox((prev) => {
+    return prev.filter((inboxItem) => inboxItem.messageId !== dat.messageId);
+  });
 
   //返信表示のキャッシュから削除、削除フラグも立てる
   storeReplyDisplayCache.cache[dat.messageId] && delete storeReplyDisplayCache.cache[dat.messageId];
