@@ -14,9 +14,11 @@ const Avatar = <T extends ValidComponent = "span">(
   props: PolymorphicProps<T, AvatarRootProps<T>>
 ) => {
   const [local, others] = splitProps(props as AvatarRootProps, ["class"])
+
+  //デフォルトの角丸を指定しています : rounded-lg
   return (
     <ImagePrimitive.Root
-      class={cn("relative flex size-10 shrink-0 overflow-hidden rounded-full", local.class)}
+      class={cn("relative flex size-10 shrink-0 overflow-hidden rounded-lg", local.class)}
       {...others}
     />
   )
