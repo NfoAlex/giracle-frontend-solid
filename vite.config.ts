@@ -4,6 +4,8 @@ import solidPlugin from 'vite-plugin-solid';
 import pkg from './package.json' with { type: "json" };
 import 'dotenv/config';
 
+console.log("vite.config :: process.env.VITE_CORS_ORIGIN", process.env.VITE_CORS_ORIGIN);
+
 //.envの変数、説明については.env.sampleファイル参照
 const apiURI = process.env.VITE_CORS_ORIGIN || "http://localhost:3000";
 const prodPort: number = parseInt(process.env.VITE_PROD_PORT || "4173");
