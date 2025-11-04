@@ -38,11 +38,11 @@ export default function ReplyMessageDisplay(props: {messageId: string, channelId
 
   return (
     <Card class="w-full p-2 flex items-center gap-1">
+      <div class="border p-2 shrink-0 cursor-pointer hover:bg-border rounded-md">
+        <IconX onClick={props.onRemove} class="w-4 h-4" />
+      </div>
       <div class="radius p-2 rounded-md">
         <IconCornerUpLeft class="shrink-0 w-4 h-4" />
-      </div>
-      <div class="p-2 shrink-0 cursor-pointer hover:bg-border rounded">
-        <IconX onClick={props.onRemove} class="w-4 h-4" />
       </div>
 
       <div class="ml-2 grow flex items-center gap-2 truncate">
