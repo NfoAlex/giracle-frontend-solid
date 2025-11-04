@@ -9,10 +9,9 @@ export default function WSInboxAdded(dat: { type: IInbox["type"], message: IMess
   //Giracleにフォーカスされているかどうか
   const hasFocus = document.hasFocus();
   //履歴Storeにメンションされているメッセージが既にフェッチされているかどうか
-  const alreadyHasMessage = storeHistory[dat.message.channelId].history.some((msg) => msg.id === dat.message.id);
+  const alreadyHasMessage = storeHistory[dat.message.channelId]?.history.some((msg) => msg.id === dat.message.id) ?? false;
   //メンションされたチャンネルに今いるかどうか
   const onSameChannel = location.pathname.endsWith("/channel/" + dat.message.channelId);
-
   //フォーカスされていないなら通知する
   if (!hasFocus && storeClientConfig.notification.notifyInbox && !storeClientConfig.notification.notifyAll) {
     notifyIt(dat.message.userId, dat.message.content);

@@ -3,6 +3,7 @@ import type {IMessage} from "~/types/Message";
 import {storeMessageReadTime} from "~/stores/Readtime";
 import {setStoreHasNewMessage, storeHasNewMessage} from "~/stores/HasNewMessage";
 import { storeReplyDisplayCache } from "~/stores/ReplyDisplayCache";
+import { setStoreInbox } from "~/stores/Inbox";
 
 export default function WSMessageDeleted(dat: { messageId: IMessage["id"], channelId: string }) {
   //console.log("WSMessageDeleted :: triggered dat->", dat);
@@ -11,16 +12,24 @@ export default function WSMessageDeleted(dat: { messageId: IMessage["id"], chann
   setStoreHistory((prev) => {
     //console.log("WSMessageDeleted :: setStoreHistory : 削除するメッセ->", prev[dat.channelId].history.find((m) => m.id === dat.messageId));
 
-    // 新しいオブジェクトを作成して返す
-    const newHistory = prev[dat.channelId].history.filter((m) => m.id !== dat.messageId);
+    try {
+      // 新しいオブジェクトを作成して返す
+      const newHistory = prev[dat.channelId].history.filter((m) => m.id !== dat.messageId);
 
-    return {
-      ...prev,
-      [dat.channelId]: {
-        ...prev[dat.channelId],
-        history: newHistory
-      }
-    };
+      return {
+        ...prev,
+        [dat.channelId]: {
+          ...prev[dat.channelId],
+          history: newHistory
+        }
+      };
+    } catch(e) {
+      return prev;
+    }
+  });
+  //Inboxから該当メッセージIdを持つものを削除
+  setStoreInbox((prev) => {
+    return prev.filter((inboxItem) => inboxItem.messageId !== dat.messageId);
   });
 
   //返信表示のキャッシュから削除、削除フラグも立てる
@@ -31,7 +40,7 @@ export default function WSMessageDeleted(dat: { messageId: IMessage["id"], chann
 
   //新着が無い、履歴が最後まで無い、あるいはそもそも新着データが無いなら停止
   const isHereNew = storeHasNewMessage[dat.channelId];
-  if (isHereNew === undefined || !isHereNew || !storeHistory[dat.channelId].atEnd) return;
+  if (isHereNew === undefined || !isHereNew || !storeHistory[dat.channelId]?.atEnd) return;
 
   //比較に使う既読時間を取得する
   const readTimeHere = storeMessageReadTime.find((m) => m.channelId === dat.channelId)?.readTime;
