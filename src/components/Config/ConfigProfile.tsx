@@ -15,7 +15,6 @@ import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { Badge } from "../ui/badge";
 import POST_ROLE_LINK from "~/api/ROLE/ROLE_LINK";
 import { storeRoleInfo } from "~/stores/RoleInfo";
-import type { IRole } from "~/types/Role";
 import ChangePasswordModal from "./ConfigProfile/ChangePasswordModal";
 
 export default function ConfigProfile() {
@@ -28,7 +27,6 @@ export default function ConfigProfile() {
 
   //ロール管理用
   const [, setOpenRoleList] = createSignal(false);
-  const roles: IRole[] = Object.values(storeRoleInfo);
 
   /**
    * 名前の変更
@@ -101,7 +99,7 @@ export default function ConfigProfile() {
       <Card class="w-full">
         <CardHeader>
           <div class={"relative"}>
-            <img alt={"バナー画像"} src={"/api/user/banner/" + storeMyUserinfo.id} class="w-full rounded" />
+            <img alt={"バナー画像"} src={"/api/user/banner/" + storeMyUserinfo.id} class="w-full h-36 object-cover rounded" />
             <span class={"absolute bottom-2 right-2 z-50"}>
               <ChangeBanner />
             </span>
