@@ -20,7 +20,7 @@ export default function Search() {
     }
 
     return storeUserOnline.filter(userId => {
-      const userInfo = getterUserinfo(userId);      
+      const userInfo = getterUserinfo(userId);
       return userInfo.name.includes(q);
     });
   });
@@ -30,7 +30,7 @@ export default function Search() {
       <Card class="w-full py-3 px-5 flex items-center gap-2">
         <SidebarTriggerWithDot />
         <p>オンラインユーザー</p>
-        <Badge class={"ml-auto"}>{storeUserOnline.length}</Badge>
+        <Badge class={"ml-auto"} >{storeUserOnline.length}人がオンライン</Badge>
       </Card>
       
       <span class="mx-auto w-full flex items-center gap-2 mt-2">
@@ -44,9 +44,9 @@ export default function Search() {
         </TextField>
       </span>
 
-      <hr class=" mt-2" />
+      <hr class="mt-4" />
 
-      <div class={"max-h-96 overflow-y-auto flex flex-col"}>
+      <div class={"h-full py-4 overflow-y-auto flex flex-col"}>
         <For each={searchResults()}>
           {(userId) => (
             <UserinfoModalWrapper userId={userId} class={"p-2 rounded-md flex items-center gap-2 hover:bg-accent"}>
