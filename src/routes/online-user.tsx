@@ -1,6 +1,4 @@
-import { IconSearch } from "@tabler/icons-solidjs";
 import { Badge } from "~/components/ui/badge";
-import { Button } from "~/components/ui/button";
 import { Card } from "~/components/ui/card";
 import { TextField, TextFieldInput } from "~/components/ui/text-field";
 import {Avatar, AvatarImage} from "~/components/ui/avatar";
