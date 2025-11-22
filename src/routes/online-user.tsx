@@ -1,0 +1,63 @@
+import { Badge } from "~/components/ui/badge";
+import { Card } from "~/components/ui/card";
+import { TextField, TextFieldInput } from "~/components/ui/text-field";
+import {Avatar, AvatarImage} from "~/components/ui/avatar";
+import SidebarTriggerWithDot from "~/components/unique/SidebarTriggerWithDot";
+import {getterUserinfo, storeUserOnline} from "~/stores/Userinfo";
+import {For, createSignal, createMemo} from "solid-js";
+import UserinfoModalWrapper from "~/components/unique/UserinfoModalWrapper";
+
+export default function Search() {
+  const [query, setQuery] = createSignal("");
+  
+  const searchResults = createMemo(() => {
+    const q = query().trim();
+
+    if (!q) {
+      return storeUserOnline;
+    }
+
+    return storeUserOnline.filter(userId => {
+      const userInfo = getterUserinfo(userId);
+      return userInfo.name.includes(q);
+    });
+  });
+  
+  return (
+    <div class="h-svh pt-2 px-2 overflow-y-hidden flex flex-col">
+      <Card class="w-full py-3 px-5 flex items-center gap-2">
+        <SidebarTriggerWithDot />
+        <p>オンラインユーザー</p>
+        <Badge class={"ml-auto"} >{storeUserOnline.length}人がオンライン</Badge>
+      </Card>
+      
+      <span class="mx-auto w-full flex items-center gap-2 mt-2">
+        <TextField class="grow">
+          <TextFieldInput
+            placeholder="ユーザーを検索"
+            class="h-12 md:h-10"
+            value={query()}
+            onInput={(e) => setQuery(e.currentTarget.value)} 
+          />
+        </TextField>
+      </span>
+
+      <hr class="mt-4" />
+
+      <div class={"h-full py-4 overflow-y-auto flex flex-col"}>
+        <For each={searchResults()}>
+          {(userId) => (
+            <UserinfoModalWrapper userId={userId} class={"p-2 rounded-md flex items-center gap-2 hover:bg-accent"}>
+              <Avatar class={"w-8 h-auto"}>
+                <AvatarImage src={`/api/user/icon/${userId}`}/>
+              </Avatar>
+              <p class={"truncate"}>
+                {getterUserinfo(userId).name}
+              </p>
+            </UserinfoModalWrapper>
+          )}
+        </For>
+      </div>
+    </div>
+  );
+}
