@@ -53,6 +53,21 @@ export default function FilePreview(props: { file: IMessageFileAttached }) {
     )
   }
 
+  //画像のDimensionデータが無いなら画像をそのまま表示
+  if (storeImageDimensions[props.file.id] === undefined) {
+    return (
+      <div class={"py-2 overflow-hidden"}>
+        <ImageWithModal
+          src={`/api/message/file/${props.file.id}`}
+          class="rounded max-w-full max-h-52 md:max-h-64"
+        />
+      </div>
+    );
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  // ↓ここからDimensionデータを使った画像表示のサイズ計算
+
   //画像の縦幅、横幅
   const imageHeight = storeImageDimensions[props.file.id]?.height ?? 256;
   const imageWidth = storeImageDimensions[props.file.id]?.width ?? 256;
