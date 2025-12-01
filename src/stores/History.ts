@@ -104,7 +104,8 @@ export const addMessage = (message: IMessage) => {
     userId: "",
     MessageUrlPreview: [],
     MessageFileAttached: [],
-    reactionSummary: []
+    reactionSummary: [],
+    replyingMessageId: null
   };
   
   if (message === undefined) console.error("History :: addMessage : message is undefined");
