@@ -122,7 +122,7 @@ export default function ChannelBrowser() {
                       <Button onclick={()=>joinChannel(channel.id)}>参加</Button>
                   }
 
-                  { getRolePower("manageChannel") && <DeleteChannel channel={channel} /> }
+                  { getRolePower("manageChannel") && <DeleteChannel fetchChannels={fetchChannels} channel={channel} /> }
                 </div>
               </Card>
             </Show>

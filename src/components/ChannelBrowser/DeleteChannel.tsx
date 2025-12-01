@@ -6,7 +6,7 @@ import DELETE_CHANNEL_DELETE from "~/api/CHANNEL/CHANNEL_DELETE";
 import type { IChannel } from "~/types/Channel";
 import {Label} from "~/components/ui/label";
 
-export default function DeleteChannel(props: {channel: IChannel}) {
+export default function DeleteChannel(props: {fetchChannels: () => void, channel: IChannel}) {
   const [open, setOpen] = createSignal(false); //ダイアログの開閉
 
   /**
@@ -14,9 +14,10 @@ export default function DeleteChannel(props: {channel: IChannel}) {
    */
   const deleteChannel = () => {
     DELETE_CHANNEL_DELETE(props.channel.id)
-      .then((r) => {
+      .then((_) => {
         //console.log("DeleteChannel :: deleteChannel :: r ->", r);
         setOpen(false); //ダイアログを閉じる
+        props.fetchChannels(); //チャンネル一覧を再取得
       })
       .catch((err) => {
         console.error("DeleteChannel :: deleteChannel :: err ->", err);
