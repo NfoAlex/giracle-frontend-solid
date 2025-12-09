@@ -53,18 +53,7 @@ export default defineConfig({
     proxy: {
       "/api": {
         target: apiURI,
-        rewrite: (path) => path.replace(/^\/api/, ""),
-        configure: (proxy) => {
-          proxy.on('error', (err, _req, _res) => {
-            console.log('[Proxy Error]', err.message);
-          });
-          proxy.on('proxyReq', (proxyReq, req) => {
-            console.log('[Proxy Request]', req.method, req.url, '⇒', apiURI);
-          });
-          proxy.on('proxyRes', (proxyRes, req) => {
-            console.log('[Proxy Response]', proxyRes.statusCode, req.url);
-          });
-        }
+        rewrite: (path) => path.replace(/^\/api/, "")
       },
       "/ws": {
         target: apiURI,
