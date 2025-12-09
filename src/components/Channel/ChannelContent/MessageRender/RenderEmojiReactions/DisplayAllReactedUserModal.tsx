@@ -16,7 +16,7 @@ export default function DisplayAllReactedUserModal(props: { messageId: string, e
     () => props.emojiCode,
     (emojiCode) => {
       if (props.emojiCode === "") return;
-      GET_MESSAGE_WHO_REACTED(props.messageId, emojiCode, 100)
+      GET_MESSAGE_WHO_REACTED(props.messageId, emojiCode)
         .then((res) => {
           setReactedUserArrs(res.data);
         })
