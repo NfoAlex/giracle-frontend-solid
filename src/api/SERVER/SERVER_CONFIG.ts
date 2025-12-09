@@ -16,6 +16,7 @@ export default async function GET_SERVER_CONFIG(): Promise<{
 }> {
   let FLAG_RECEIVED = false;
   const CONTROLLER = new AbortController();
+  
   const res = await fetch("/api/server/config", {
     method: "GET",
     headers: {
