@@ -2,7 +2,7 @@ import type {IMessage} from "~/types/Message";
 
 export default async function POST_MESSAGE_EDIT(
   _messageId: string,
-  _content: string
+  _message: string
 ): Promise<{
   message: `Message edited`;
   data: IMessage;
@@ -14,7 +14,7 @@ export default async function POST_MESSAGE_EDIT(
     },
     body: JSON.stringify({
       messageId: _messageId,
-      content: _content,
+      message: _message,
     }),
   }).catch((err) => {
     throw new Error("MESSAGE_EDIT :: err->", err);
