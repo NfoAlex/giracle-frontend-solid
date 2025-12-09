@@ -1,7 +1,7 @@
 import { useParams } from "@solidjs/router";
 import { IconEye, IconMail } from "@tabler/icons-solidjs";
 import POST_CHANNEL_JOIN from "~/api/CHANNEL/CHANNEL_JOIN";
-import ChannelContents from "~/components/Channel/ChannelContents";
+import ExpChannelContents from "~/components/Channel/_ChannelContents";
 import ChannelHeader from "~/components/Channel/ChannelHeader";
 import ChannelTextInput from "~/components/Channel/ChannelTextInput";
 import { Button } from "~/components/ui/button";
@@ -30,7 +30,7 @@ export default function Channel() {
 
       {
         storeAppStatus.loggedIn ? (
-          <ChannelContents />
+          <ExpChannelContents />
         ) : (
           <p class={"text-center mt-5"}>Loading...</p>
         )
