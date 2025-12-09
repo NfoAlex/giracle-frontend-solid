@@ -1,5 +1,6 @@
 import { useLocation, useNavigate } from "@solidjs/router";
-import { Show, onMount } from "solid-js";
+import { Show, createSignal, onMount } from "solid-js";
+import GET_SERVER_CONFIG from "~/api/SERVER/SERVER_CONFIG";
 import GET_USER_VERIFY_TOKEN from "~/api/USER/USER_VERIFY_TOKEN";
 import Login from "~/components/Auth/Login";
 import Register from "~/components/Auth/Register";
@@ -13,6 +14,9 @@ import InitLoad from "~/utils/InitLoad";
 export default function Auth() {
   const navi = useNavigate();
   const loc = useLocation();
+  const [tempServerinfoLoaded, setTempServerinfoLoaded] = createSignal(false);
+  const [tempServerinfo, setTempServerinfo] = createSignal(storeServerinfo);
+  const [errorFetchingServerinfo, setErrorFetchingServerinfo] = createSignal(false);
 
   onMount(async () => {
     //クッキーにTokenがあれば初期処理をして移動
@@ -28,21 +32,46 @@ export default function Auth() {
         }
       });
     }
+
+    //サーバー情報を取得
+    await new Promise(async (resolve) => {
+      setTimeout(() => {
+        resolve(true);
+        if (!tempServerinfoLoaded()) {
+          setErrorFetchingServerinfo(true);
+          throw new Error("timeout");
+        }
+      }, 3500);
+      await GET_SERVER_CONFIG().then((r) => {
+        setTempServerinfo({...tempServerinfo(), ...r.data});
+        setTempServerinfoLoaded(true);
+        resolve(true);
+      }).catch((e) => {
+        console.error("Auth :: onMount(promise) : e->", e);
+        setErrorFetchingServerinfo(true);
+      })
+    });
   });
 
   return (
     <div class="py-5 px-2 max-w-[500px] w-full h-screen mx-auto flex flex-col gap-4 md:justify-center">
-      <p class="text-2xl">{storeServerinfo.name || "Giracle"}</p>
+      <p class="text-2xl">{tempServerinfo().name || "Giracle"}</p>
       <Card class="w-full mx-auto py-4">
         <CardContent class="grid- gap-3">
           <Tabs defaultValue="login">
             <TabsList class="grid w-full grid-cols-2">
               <TabsTrigger value="login">ログイン</TabsTrigger>
-              <TabsTrigger value="register" disabled={!storeServerinfo.RegisterAvailable}>新規登録</TabsTrigger>
+              <TabsTrigger value="register" disabled={!tempServerinfo().RegisterAvailable}>新規登録</TabsTrigger>
             </TabsList>
 
             <Show
-              when={storeAppStatus.hasServerinfo}
+              when={errorFetchingServerinfo()}
+            >
+              <div>エラーです</div>
+            </Show>
+            { errorFetchingServerinfo().toString() }
+            <Show
+              when={tempServerinfoLoaded()}
               fallback={<p class={"text-center"}>loading...</p>}
             >
               <TabsContent value="login">
