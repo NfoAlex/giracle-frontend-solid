@@ -1,6 +1,6 @@
 import { createStore } from "solid-js/store";
-import { GET_ROLE } from "~/api/ROLE/ROLE_INFO";
-import type { IRole } from "~/types/Role";
+import { GET_ROLE } from "~/api/ROLE/ROLE_INFO.ts";
+import type { IRole } from "~/types/Role.ts";
 
 export const [storeRoleInfo, setStoreRoleInfo] = createStore<{
   [key: string]: IRole;

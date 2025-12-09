@@ -1,12 +1,12 @@
 import { Match, onMount, Switch } from "solid-js";
-import GET_MESSAGE_GET from "~/api/MESSAGE/MESSAGE_GET";
-import { Avatar, AvatarImage, AvatarFallback } from "~/components/ui/avatar";
-import UserinfoModalWrapper from "~/components/unique/UserinfoModalWrapper";
-import { getterUserinfo } from "~/stores/Userinfo";
+import GET_MESSAGE_GET from "~/api/MESSAGE/MESSAGE_GET.ts";
+import { Avatar, AvatarImage, AvatarFallback } from "~/components/ui/avatar.tsx";
+import UserinfoModalWrapper from "~/components/unique/UserinfoModalWrapper.tsx";
+import { getterUserinfo } from "~/stores/Userinfo.ts";
 import { IconCornerUpRight } from "@tabler/icons-solidjs";
-import { storeMyUserinfo } from "~/stores/MyUserinfo";
-import { storeReplyDisplayCache } from "~/stores/ReplyDisplayCache";
-import MessageTextRender from "./MessageRender/MessageTextRender";
+import { storeMyUserinfo } from "~/stores/MyUserinfo.ts";
+import { storeReplyDisplayCache } from "~/stores/ReplyDisplayCache.ts";
+import MessageTextRender from "./MessageRender/MessageTextRender.tsx";
 
 export default function DisplayReply(props: {replyingMessageId?: string | null}) {
   if (props.replyingMessageId === null || props.replyingMessageId === undefined) {

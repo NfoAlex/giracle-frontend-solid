@@ -1,11 +1,11 @@
 import type { ColumnDef } from "@tanstack/solid-table";
 import { createSignal, onMount } from "solid-js";
 import GET_SERVER_GET_INVITE from "~/api/SERVER/SERVER_GET_INVITE";
-import type { IInvite } from "~/types/Server";
+import type { IInvite } from "~/types/Server.ts";
 import { InviteTable } from "./ManageInvite/InviteTable";
 import { Checkbox } from "../ui/checkbox";
 import CreateInvite from "./ManageInvite/CreateInvite";
-import { Button } from "../ui/button";
+import { Button } from "../ui/button.tsx";
 import { IconRefresh } from "@tabler/icons-solidjs";
 
 export default function ManageInvite() {

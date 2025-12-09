@@ -5,7 +5,7 @@ import type { PolymorphicProps } from "@kobalte/core/polymorphic"
 import * as SliderPrimitive from "@kobalte/core/slider"
 
 import { cn } from "~/lib/utils"
-import { Label } from "~/components/ui/label"
+import { Label } from "~/components/ui/label.tsx"
 
 type SliderRootProps<T extends ValidComponent = "div"> = SliderPrimitive.SliderRootProps<T> & {
   class?: string | undefined

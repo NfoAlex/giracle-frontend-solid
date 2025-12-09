@@ -1,14 +1,14 @@
 import { createSignal, onMount } from "solid-js";
 import POST_SERVER_CHANGE_CONFIG from "~/api/SERVER/SERVER_CHANGE_CONFIG";
 import POST_SERVER_CHANGE_INFO from "~/api/SERVER/SERVER_CHANGE_INFO";
-import { Button } from "~/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
-import { Label } from "~/components/ui/label";
+import { Button } from "~/components/ui/button.tsx";
+import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card.tsx";
+import { Label } from "~/components/ui/label.tsx";
 import { NumberField, NumberFieldDecrementTrigger, NumberFieldErrorMessage, NumberFieldGroup, NumberFieldIncrementTrigger, NumberFieldInput } from "~/components/ui/number-field";
 import { Switch, SwitchControl, SwitchLabel, SwitchThumb } from "~/components/ui/switch";
-import { TextFieldInput, TextField } from "~/components/ui/text-field";
-import { setStoreServerinfo, storeServerinfo } from "~/stores/Serverinfo";
-import type { IServer } from "~/types/Server";
+import { TextFieldInput, TextField } from "~/components/ui/text-field.tsx";
+import { setStoreServerinfo, storeServerinfo } from "~/stores/Serverinfo.ts";
+import type { IServer } from "~/types/Server.ts";
 
 export default function ManageCommunity() {
   const [serverConfig, setServerConfig] = createSignal<IServer>({

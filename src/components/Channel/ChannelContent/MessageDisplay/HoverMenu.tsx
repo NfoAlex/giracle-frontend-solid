@@ -1,12 +1,12 @@
-import {Card} from "~/components/ui/card";
+import {Card} from "~/components/ui/card.tsx";
 import {IconMoodHappy, IconPencil, IconTrash, IconCornerUpLeft} from "@tabler/icons-solidjs";
-import DELETE_MESSAGE_DELETE from "~/api/MESSAGE/MESSAGE_DELETE";
-import {getRolePower, storeMyUserinfo} from "~/stores/MyUserinfo";
-import type {IMessage} from "~/types/Message";
-import {Button} from "~/components/ui/button";
-import EmojiPicker from "~/components/Channel/ChannelContent/HoverMenu/EmojiPicker";
+import DELETE_MESSAGE_DELETE from "~/api/MESSAGE/MESSAGE_DELETE.ts";
+import {getRolePower, storeMyUserinfo} from "~/stores/MyUserinfo.ts";
+import type {IMessage} from "~/types/Message.ts";
+import {Button} from "~/components/ui/button.tsx";
 import {createSignal} from "solid-js";
-import storeReplyingMessageId from "~/stores/ReplyingMessageId";
+import storeReplyingMessageId from "~/stores/ReplyingMessageId.ts";
+import EmojiPicker from "./HoverMenu/EmojiPicker.tsx";
 
 export default function HoverMenu(props: {
   message: IMessage,

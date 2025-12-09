@@ -1,4 +1,4 @@
-import type { IRole } from "~/types/Role";
+import type { IRole } from "~/types/Role.ts";
 
 export default async function POST_ROLE_UPDATE(
   _roleId: string,

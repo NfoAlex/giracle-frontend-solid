@@ -1,9 +1,10 @@
 {
   "compilerOptions": {
+    "allowImportingTsExtensions": true,
     "strict": true,
     "target": "ESNext",
-    "module": "ESNext",
-    "moduleResolution": "node",
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "jsx": "preserve",
@@ -15,6 +16,6 @@
     "paths": {
       "~/*": ["./src/*"]
     },
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
   }
 }

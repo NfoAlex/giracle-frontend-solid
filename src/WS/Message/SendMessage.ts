@@ -1,9 +1,9 @@
-import { storeClientConfig } from "~/stores/ClientConfig";
-import { setStoreHasNewMessage } from "~/stores/HasNewMessage";
-import { addMessage } from "~/stores/History";
-import { storeMyUserinfo } from "~/stores/MyUserinfo";
-import { setStoreMessageReadTimeBefore } from "~/stores/Readtime";
-import type { IMessage } from "~/types/Message";
+import { storeClientConfig } from "~/stores/ClientConfig.ts";
+import { setStoreHasNewMessage } from "~/stores/HasNewMessage.ts";
+import { addMessage } from "~/stores/History.ts";
+import { storeMyUserinfo } from "~/stores/MyUserinfo.ts";
+import { setStoreMessageReadTimeBefore } from "~/stores/Readtime.ts";
+import type { IMessage } from "~/types/Message.ts";
 import { notifyIt } from "~/utils/Notify";
 
 export default function WSSendMessage(dat: IMessage) {

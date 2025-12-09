@@ -2,11 +2,11 @@ import { createSignal } from "solid-js";
 import ManageCommunity from "~/components/ManageServer/manage-community";
 import ManageInvite from "~/components/ManageServer/manage-invite";
 import ManageRole from "~/components/ManageServer/manage-role";
-import { Button } from "~/components/ui/button";
-import { Card } from "~/components/ui/card";
+import { Button } from "~/components/ui/button.tsx";
+import { Card } from "~/components/ui/card.tsx";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~/components/ui/select";
-import { getRolePower } from "~/stores/MyUserinfo";
-import SidebarTriggerWithDot from "~/components/unique/SidebarTriggerWithDot";
+import { getRolePower } from "~/stores/MyUserinfo.ts";
+import SidebarTriggerWithDot from "~/components/unique/SidebarTriggerWithDot.tsx";
 import ManageEmoji from "~/components/ManageServer/manage-emoji";
 
 export default function ManageServer() {

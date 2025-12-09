@@ -1,6 +1,6 @@
-import {setStoreMessageReadTime} from "~/stores/Readtime";
+import {setStoreMessageReadTime} from "~/stores/Readtime.ts";
 import {produce} from "solid-js/store";
-import {setStoreHasNewMessage} from "~/stores/HasNewMessage";
+import {setStoreHasNewMessage} from "~/stores/HasNewMessage.ts";
 
 /**
  * 既読時間と新着を更新する

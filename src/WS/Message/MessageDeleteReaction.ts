@@ -1,7 +1,7 @@
-import type {IReaciton} from "~/types/Message"
-import {setStoreHistory} from "~/stores/History";
+import type {IReaciton} from "~/types/Message.ts"
+import {setStoreHistory} from "~/stores/History.ts";
 import {produce} from "solid-js/store";
-import {storeMyUserinfo} from "~/stores/MyUserinfo";
+import {storeMyUserinfo} from "~/stores/MyUserinfo.ts";
 
 export default function WSMessageDeleteReaction(dat: IReaciton) {
   //console.log("WSMessageDeleteReaction :: triggered dat->", dat);

@@ -1,10 +1,10 @@
-import {Card} from "~/components/ui/card";
-import {createSignal, onCleanup, onMount, Show} from "solid-js";
+import {createSignal, onCleanup, onMount} from "solid-js";
 import {useParams} from "@solidjs/router";
-import { Button } from "~/components/ui/button";
 import { IconSquareRoundedX, IconFileFilled } from '@tabler/icons-solidjs';
-import { HoverCard, HoverCardContent, HoverCardTrigger } from "~/components/ui/hover-card";
-import { ProgressCircle } from "~/components/ui/progress-circle";
+import { Card } from "~/components/ui/card.tsx";
+import { ProgressCircle } from "~/components/ui/progress-circle.tsx";
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "~/components/ui/hover-card.tsx";
+import { Button } from "~/components/ui/button.tsx";
 
 export default function FileUploadPreview(
   props: {

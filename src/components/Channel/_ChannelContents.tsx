@@ -1,13 +1,13 @@
 import { useParams } from "@solidjs/router";
 import { Show, createEffect, createSignal, onCleanup, onMount, on, Index } from "solid-js";
-import { setStoreHistory, storeHistory } from "~/stores/History";
-import FetchHistory from "~/utils/FethchHistory";
-import {IMessage} from "~/types/Message";
-import {storeMyUserinfo} from "~/stores/MyUserinfo";
-import { storeClientConfig } from "~/stores/ClientConfig";
-import { Button } from "../ui/button";
+import { setStoreHistory, storeHistory } from "~/stores/History.ts";
+import FetchHistory from "~/utils/FethchHistory.ts";
+import {IMessage} from "~/types/Message.tsx";
+import {storeMyUserinfo} from "~/stores/MyUserinfo.ts";
+import { storeClientConfig } from "~/stores/ClientConfig.ts";
+import { Button } from "../ui/button.tsx";
 import { IconArrowDown } from "@tabler/icons-solidjs";
-import MessageDisplay from "./ChannelContent/MessageDisplay";
+import MessageDisplay from "./ChannelContent/MessageDisplay.tsx";
 
 export default function ExpChannelContents() {
   const [isFocused, setIsFocused] = createSignal(true);

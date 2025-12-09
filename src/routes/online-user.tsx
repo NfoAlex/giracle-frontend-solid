@@ -1,11 +1,11 @@
-import { Badge } from "~/components/ui/badge";
-import { Card } from "~/components/ui/card";
-import { TextField, TextFieldInput } from "~/components/ui/text-field";
-import {Avatar, AvatarImage} from "~/components/ui/avatar";
-import SidebarTriggerWithDot from "~/components/unique/SidebarTriggerWithDot";
-import {getterUserinfo, storeUserOnline} from "~/stores/Userinfo";
+import { Badge } from "~/components/ui/badge.tsx";
+import { Card } from "~/components/ui/card.tsx";
+import { TextField, TextFieldInput } from "~/components/ui/text-field.tsx";
+import {Avatar, AvatarImage} from "~/components/ui/avatar.tsx";
+import SidebarTriggerWithDot from "~/components/unique/SidebarTriggerWithDot.tsx";
+import {getterUserinfo, storeUserOnline} from "~/stores/Userinfo.ts";
 import {For, createSignal, createMemo} from "solid-js";
-import UserinfoModalWrapper from "~/components/unique/UserinfoModalWrapper";
+import UserinfoModalWrapper from "~/components/unique/UserinfoModalWrapper.tsx";
 
 export default function Search() {
   const [query, setQuery] = createSignal("");

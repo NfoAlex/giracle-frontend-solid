@@ -1,5 +1,5 @@
-import { storeMyUserinfo } from "~/stores/MyUserinfo";
-import {setStoreUserOnline} from "~/stores/Userinfo";
+import { storeMyUserinfo } from "~/stores/MyUserinfo.ts";
+import {setStoreUserOnline} from "~/stores/Userinfo.ts";
 
 export default function WSUserDisconnected(dat: string) {
   console.log("WSUserDisconnected :: triggered dat->", dat);

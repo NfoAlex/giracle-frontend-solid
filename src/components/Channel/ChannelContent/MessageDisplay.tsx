@@ -1,17 +1,17 @@
 import { createSignal, Show } from "solid-js";
-import { storeHistory } from "~/stores/History";
-import { IMessage } from "~/types/Message";
-import { Badge } from "../../ui/badge";
-import UserinfoModalWrapper from "../../unique/UserinfoModalWrapper";
-import { Avatar, AvatarFallback, AvatarImage } from "../../ui/avatar";
-import { storeMyUserinfo } from "~/stores/MyUserinfo";
-import { storeMessageReadTimeBefore } from "~/stores/Readtime";
-import DisplayReply from "./MessageDisplay/DisplayReply";
-import EditMessage from "./MessageDisplay/EditMessage";
-import MentionReadWrapper from "./MessageDisplay/MentionReadWrapper";
-import MessageRender from "./MessageDisplay/MessageRender";
-import HoverMenu from "./MessageDisplay/HoverMenu";
-import NewMessageLine from "./MessageDisplay/NewMessageLine";
+import { storeHistory } from "~/stores/History.ts";
+import { IMessage } from "~/types/Message.ts";
+import { Badge } from "../../ui/badge.tsx";
+import UserinfoModalWrapper from "../../unique/UserinfoModalWrapper.tsx";
+import { Avatar, AvatarFallback, AvatarImage } from "../../ui/avatar.tsx";
+import { storeMyUserinfo } from "~/stores/MyUserinfo.ts";
+import { storeMessageReadTimeBefore } from "~/stores/Readtime.ts";
+import DisplayReply from "./MessageDisplay/DisplayReply.tsx";
+import EditMessage from "./MessageDisplay/EditMessage.tsx";
+import MentionReadWrapper from "./MessageDisplay/MentionReadWrapper.tsx";
+import MessageRender from "./MessageDisplay/MessageRender.tsx";
+import HoverMenu from "./MessageDisplay/HoverMenu.tsx";
+import NewMessageLine from "./MessageDisplay/NewMessageLine.tsx";
 
 export default function MessageDisplay(props: {
   messageArrayIndex: number,

@@ -4,10 +4,10 @@ import POST_CHANNEL_JOIN from "~/api/CHANNEL/CHANNEL_JOIN";
 import ExpChannelContents from "~/components/Channel/_ChannelContents";
 import ChannelHeader from "~/components/Channel/ChannelHeader";
 import ChannelTextInput from "~/components/Channel/ChannelTextInput";
-import { Button } from "~/components/ui/button";
-import { Card } from "~/components/ui/card";
-import {storeAppStatus} from "~/stores/AppStatus";
-import { storeMyUserinfo } from "~/stores/MyUserinfo";
+import { Button } from "~/components/ui/button.tsx";
+import { Card } from "~/components/ui/card.tsx";
+import {storeAppStatus} from "~/stores/AppStatus.ts";
+import { storeMyUserinfo } from "~/stores/MyUserinfo.ts";
 
 export default function Channel() {
   const params = useParams();

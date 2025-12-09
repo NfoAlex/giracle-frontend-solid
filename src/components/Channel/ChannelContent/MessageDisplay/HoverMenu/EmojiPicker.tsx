@@ -1,11 +1,11 @@
 import {createSignal, onCleanup, onMount} from "solid-js";
 import {Picker} from "emoji-picker-element";
-import type {EmojiClickEvent} from "emoji-picker-element/shared";
-import ja from 'emoji-picker-element/i18n/ja';
-import POST_MESSAGE_EMOJI_REACTION from "~/api/MESSAGE/MESSAGE_EMOJI_REACTION";
-import type {IMessage} from "~/types/Message";
-import {getEmojiDatasetWithCustomEmoji} from "~/stores/CustomEmoji";
-import DELETE_MESSAGE_DELETE_EMOJI_REACTION from "~/api/MESSAGE/MESSAGE_DELETE_EMOJI_REACTION";
+import type {EmojiClickEvent} from "emoji-picker-element/shared.ts";
+import ja from 'emoji-picker-element/i18n/ja.js';
+import POST_MESSAGE_EMOJI_REACTION from "~/api/MESSAGE/MESSAGE_EMOJI_REACTION.ts";
+import type {IMessage} from "~/types/Message.ts";
+import {getEmojiDatasetWithCustomEmoji} from "~/stores/CustomEmoji.ts";
+import DELETE_MESSAGE_DELETE_EMOJI_REACTION from "~/api/MESSAGE/MESSAGE_DELETE_EMOJI_REACTION.ts";
 
 export default function EmojiPicker(props: {message: IMessage, onClicked: () => void}) {
   let elementRef: HTMLDivElement | undefined;

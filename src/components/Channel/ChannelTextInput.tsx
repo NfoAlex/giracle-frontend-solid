@@ -1,16 +1,16 @@
 import { createSignal, For, Show } from "solid-js";
-import { Button } from "../ui/button";
 import { useParams } from "@solidjs/router";
-import POST_MESSAGE_SEND from "~/api/MESSAGE/MESSAGE_SEND";
 import { IconSend, IconUpload } from "@tabler/icons-solidjs";
-import FileUploadPreview from "~/components/Channel/ChannelTextInput/FileUploadPreview";
-import type {IUser} from "~/types/User";
-import GET_USER_SEARCH from "~/api/USER/USER_SEARCH.";
-import { Card } from "../ui/card";
-import { IChannel } from "~/types/Channel";
-import { storeClientConfig } from "~/stores/ClientConfig";
-import storeReplyingMessageId from "~/stores/ReplyingMessageId";
-import ReplyMessageDisplay from "./ChannelTextInput/ReplyMessageDisplay";
+import POST_MESSAGE_SEND from "~/api/MESSAGE/MESSAGE_SEND.ts";
+import storeReplyingMessageId from "~/stores/ReplyingMessageId.ts";
+import GET_USER_SEARCH from "~/api/USER/USER_SEARCH.ts";
+import ReplyMessageDisplay from "./ChannelTextInput/ReplyMessageDisplay.tsx";
+import FileUploadPreview from "./ChannelTextInput/FileUploadPreview.tsx";
+import { Button } from "../ui/button.tsx";
+import { storeClientConfig } from "~/stores/ClientConfig.ts";
+import { Card } from "../ui/card.tsx";
+import { IChannel } from "~/types/Channel.ts";
+import { IUser } from "~/types/User.ts";
 
 export default function ChannelTextInput() {
   const params = useParams(); //URLパラメータを取得するやつ

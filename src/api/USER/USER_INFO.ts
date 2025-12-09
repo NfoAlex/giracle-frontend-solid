@@ -1,4 +1,4 @@
-import type { IUser } from "~/types/User";
+import type { IUser } from "~/types/User.ts";
 
 export default async function GET_USER_INFO(_userId: string): Promise<{
   message: "User info";

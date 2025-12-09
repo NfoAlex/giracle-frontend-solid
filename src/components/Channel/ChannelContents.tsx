@@ -1,24 +1,16 @@
 import { useParams } from "@solidjs/router";
 import { Show, createEffect, createSignal, onCleanup, onMount, on, Index } from "solid-js";
-import { setStoreHistory, storeHistory } from "~/stores/History";
-import { setStoreMessageReadTimeBefore, storeMessageReadTime, storeMessageReadTimeBefore, updateReadTime } from "~/stores/Readtime";
-import FetchHistory from "~/utils/FethchHistory";
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
-import MessageRender from "./ChannelContent/MessageRender";
-import NewMessageLine from "./ChannelContent/NewMessageLine";
-import POST_MESSAGE_UPDATE_READTIME from "~/api/MESSAGE/MESSAGE_UPDATE_READTIME";
-import { setStoreHasNewMessage } from "~/stores/HasNewMessage";
-import HoverMenu from "~/components/Channel/ChannelContent/HoverMenu";
-import MentionReadWrapper from "~/components/Channel/ChannelContent/MentionReadWrapper";
-import {Badge} from "~/components/ui/badge";
-import {IMessage} from "~/types/Message";
-import UserinfoModalWrapper from "~/components/unique/UserinfoModalWrapper";
-import EditMessage from "~/components/Channel/ChannelContent/EditMessage";
-import {storeMyUserinfo} from "~/stores/MyUserinfo";
-import { storeClientConfig } from "~/stores/ClientConfig";
-import { Button } from "../ui/button";
+import FetchHistory from "~/utils/FethchHistory.tsx";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar.tsx";
+import {Badge} from "~/components/ui/badge.tsx";
+import UserinfoModalWrapper from "~/components/unique/UserinfoModalWrapper.tsx";
+import { Button } from "../ui/button.tsx";
 import { IconArrowDown } from "@tabler/icons-solidjs";
-import DisplayReply from "./ChannelContent/DisplayReply";
+import { storeHistory } from "~/stores/History.ts";
+import { storeMessageReadTime, updateReadTime } from "~/stores/Readtime.ts";
+import POST_MESSAGE_UPDATE_READTIME from "~/api/MESSAGE/MESSAGE_UPDATE_READTIME.ts";
+import { setStoreHasNewMessage } from "~/stores/HasNewMessage.ts";
+import { IMessage } from "~/types/Message.ts";
 
 export default function ChannelContents() {
   const [isFocused, setIsFocused] = createSignal(true);

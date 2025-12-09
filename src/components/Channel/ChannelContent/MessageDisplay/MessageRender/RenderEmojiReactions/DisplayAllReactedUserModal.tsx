@@ -1,9 +1,9 @@
 import { createEffect, createSignal, For, on } from "solid-js";
-import GET_MESSAGE_WHO_REACTED from "~/api/MESSAGE/MESSAGE_WHO_REACTED";
-import { Avatar, AvatarImage } from "~/components/ui/avatar";
-import { Dialog, DialogContent, DialogHeader } from "~/components/ui/dialog";
-import RenderEmoji from "~/components/unique/RenderEmoji";
-import { getterUserinfo } from "~/stores/Userinfo";
+import GET_MESSAGE_WHO_REACTED from "~/api/MESSAGE/MESSAGE_WHO_REACTED.ts";
+import { Avatar, AvatarImage } from "~/components/ui/avatar.tsx";
+import { Dialog, DialogContent, DialogHeader } from "~/components/ui/dialog.tsx";
+import RenderEmoji from "~/components/unique/RenderEmoji.tsx";
+import { getterUserinfo } from "~/stores/Userinfo.ts";
 
 // ToDo :: 指定した人数しかとれない
 export default function DisplayAllReactedUserModal(props: { messageId: string, emojiCode: string, onOpen: boolean, onOpenChange: (open: boolean) => void }) {

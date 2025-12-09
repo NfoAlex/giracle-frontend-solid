@@ -1,4 +1,4 @@
-import type { IMessage } from "~/types/Message";
+import type { IMessage } from "~/types/Message.ts";
 
 export default async function GET_MESSAGE_GET(_messageId: string): Promise<{
   message: "Fetched message",

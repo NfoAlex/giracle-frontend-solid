@@ -1,5 +1,5 @@
 import { createStore, produce } from "solid-js/store";
-import type { IMessage } from "~/types/Message";
+import type { IMessage } from "~/types/Message.ts";
 
 export const [storeHistory, setStoreHistory] = createStore<{
   [key: string]: {

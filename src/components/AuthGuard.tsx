@@ -1,7 +1,7 @@
 import {createEffect, JSX, on, onMount} from "solid-js";
 import {useNavigate} from "@solidjs/router";
-import {storeAppStatus} from "~/stores/AppStatus";
-import {HasAnythingNew} from "~/stores/HasNewMessage";
+import {storeAppStatus} from "~/stores/AppStatus.ts";
+import {HasAnythingNew} from "~/stores/HasNewMessage.ts";
 
 export default function AuthGuard(props: {children?: JSX.Element}) {
   const navi = useNavigate();

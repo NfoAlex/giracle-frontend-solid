@@ -1,5 +1,5 @@
-import type {ICustomEmoji} from "~/types/Message";
-import {deleteCustomEmojiData} from "~/stores/CustomEmoji";
+import type {ICustomEmoji} from "~/types/Message.ts";
+import {deleteCustomEmojiData} from "~/stores/CustomEmoji.ts";
 
 export default function WSCustomEmojiDeleted(dat: ICustomEmoji) {
   //console.log("WSCustomEmojiDeleted :: dat->", dat);

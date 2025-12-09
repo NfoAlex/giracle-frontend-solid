@@ -1,14 +1,14 @@
 import { createMemo, For } from "solid-js";
-import { Card } from "../ui/card";
-import { directGetterChannelInfo } from "~/stores/ChannelInfo";
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
-import { getterUserinfo } from "~/stores/Userinfo";
-import MessageRender from "../Channel/ChannelContent/MessageRender";
-import { Button } from "../ui/button";
+import { Card } from "../ui/card.tsx";
+import { directGetterChannelInfo } from "~/stores/ChannelInfo.ts";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar.tsx";
+import { getterUserinfo } from "~/stores/Userinfo.ts";
+import { Button } from "../ui/button.tsx";
 import { IconCheck } from "@tabler/icons-solidjs";
-import { storeInbox } from "~/stores/Inbox";
-import type { IInbox } from "~/types/Message";
-import DisplayReply from "../Channel/ChannelContent/DisplayReply";
+import { storeInbox } from "~/stores/Inbox.ts";
+import type { IInbox } from "~/types/Message.ts";
+import MessageRender from "../Channel/ChannelContent/MessageDisplay/MessageRender.tsx";
+import DisplayReply from "../Channel/ChannelContent/MessageDisplay/DisplayReply.tsx";
 
 export default function DisplayInboxByChannel(props: { onReadIt: (messageId: string) => void }) {
   //チャンネルごとに通知データをグループ化

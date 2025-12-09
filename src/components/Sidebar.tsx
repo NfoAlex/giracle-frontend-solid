@@ -8,15 +8,15 @@ import {
   SidebarGroupLabel,
   SidebarHeader,
   SidebarMenuButton,
-} from "~/components/ui/sidebar";
-import { getRolePower, storeMyUserinfo } from "~/stores/MyUserinfo";
-import { storeUserOnline } from "~/stores/Userinfo";
-import { storeServerinfo } from "~/stores/Serverinfo";
-import { Avatar, AvatarImage } from "./ui/avatar";
-import { storeAppStatus } from "~/stores/AppStatus";
+} from "~/components/ui/sidebar.tsx";
+import { getRolePower, storeMyUserinfo } from "~/stores/MyUserinfo.ts";
+import { storeUserOnline } from "~/stores/Userinfo.ts";
+import { storeServerinfo } from "~/stores/Serverinfo.ts";
+import { Avatar, AvatarImage } from "./ui/avatar.tsx";
+import { storeAppStatus } from "~/stores/AppStatus.ts";
 import {IconBell, IconCircleFilled, IconDatabaseCog, IconList, IconSearch, IconSettings} from "@tabler/icons-solidjs";
-import {storeInbox} from "~/stores/Inbox";
-import {Badge} from "~/components/ui/badge";
+import {storeInbox} from "~/stores/Inbox.ts";
+import {Badge} from "~/components/ui/badge.tsx";
 import ChannelButtons from "./Sidebar/ChannelButtons";
 
 export function AppSidebar() {

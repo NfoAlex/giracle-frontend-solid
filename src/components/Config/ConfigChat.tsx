@@ -1,5 +1,5 @@
-import { storeClientConfig } from "~/stores/ClientConfig";
-import { Card } from "../ui/card";
+import { storeClientConfig } from "~/stores/ClientConfig.ts";
+import { Card } from "../ui/card.tsx";
 import { IconKeyboard } from "@tabler/icons-solidjs";
 import { Switch, SwitchControl, SwitchThumb } from "../ui/switch";
 

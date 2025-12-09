@@ -1,5 +1,5 @@
 import { createMutable } from "solid-js/store";
-import type { IMessage } from "~/types/Message";
+import type { IMessage } from "~/types/Message.ts";
 
 //返信表示用のキャッシュ
 export const storeReplyDisplayCache = createMutable<

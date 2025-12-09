@@ -1,14 +1,14 @@
 import { useLocation, useNavigate } from "@solidjs/router";
 import { Show, onMount } from "solid-js";
-import GET_USER_VERIFY_TOKEN from "~/api/USER/USER_VERIFY_TOKEN";
-import Login from "~/components/Auth/Login";
-import Register from "~/components/Auth/Register";
-import { Card, CardContent } from "~/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
-import { storeAppStatus } from "~/stores/AppStatus";
-import { storeServerinfo } from "~/stores/Serverinfo";
-import GetCookie from "~/utils/GetCookie";
-import InitLoad from "~/utils/InitLoad";
+import GET_USER_VERIFY_TOKEN from "~/api/USER/USER_VERIFY_TOKEN.ts";
+import Login from "~/components/Auth/Login.tsx";
+import Register from "~/components/Auth/Register.tsx";
+import { Card, CardContent } from "~/components/ui/card.tsx";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs.tsx";
+import { storeAppStatus } from "~/stores/AppStatus.ts";
+import { storeServerinfo } from "~/stores/Serverinfo.ts";
+import GetCookie from "~/utils/GetCookie.ts";
+import InitLoad from "~/utils/InitLoad.ts";
 
 export default function Auth() {
   const navi = useNavigate();

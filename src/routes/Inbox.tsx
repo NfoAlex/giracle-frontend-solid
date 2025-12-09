@@ -1,9 +1,9 @@
-import { Card } from "~/components/ui/card";
-import { storeInbox } from "~/stores/Inbox";
+import { Card } from "~/components/ui/card.tsx";
+import { storeInbox } from "~/stores/Inbox.ts";
 import { createSignal, Show } from "solid-js";
 import { IconBed } from "@tabler/icons-solidjs";
 import POST_MESSAGE_INBOX_READ from "~/api/MESSAGE/MESSAGE_INBOX_READ";
-import SidebarTriggerWithDot from "~/components/unique/SidebarTriggerWithDot";
+import SidebarTriggerWithDot from "~/components/unique/SidebarTriggerWithDot.tsx";
 import { Switch, SwitchControl, SwitchLabel, SwitchThumb } from "~/components/ui/switch";
 import DisplayInboxByChannel from "~/components/Inbox/DisplayInboxByChannel";
 import DisplayInboxByDate from "~/components/Inbox/DisplayInboxByDate";

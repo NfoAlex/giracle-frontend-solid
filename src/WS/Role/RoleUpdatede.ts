@@ -1,5 +1,5 @@
-import type { IRole } from "~/types/Role";
-import {setStoreRoleInfo} from "~/stores/RoleInfo";
+import type { IRole } from "~/types/Role.ts";
+import {setStoreRoleInfo} from "~/stores/RoleInfo.ts";
 
 export default function WSRoleUpdated(dat: IRole) {
   //console.log("WSRoleUpdated :: triggered dat->", dat);

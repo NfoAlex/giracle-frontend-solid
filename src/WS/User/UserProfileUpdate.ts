@@ -1,6 +1,6 @@
-import type {IUser} from "~/types/User";
-import {updateUserinfo} from "~/stores/Userinfo";
-import { setStoreMyUserinfo, storeMyUserinfo } from "~/stores/MyUserinfo";
+import type {IUser} from "~/types/User.ts";
+import {updateUserinfo} from "~/stores/Userinfo.ts";
+import { setStoreMyUserinfo, storeMyUserinfo } from "~/stores/MyUserinfo.ts";
 
 export default function WSUserProfileUpdate(dat: IUser) {
   //console.log("WSProfileUpdate :: triggered dat->", dat);

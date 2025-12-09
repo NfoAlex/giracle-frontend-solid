@@ -19,12 +19,12 @@ import type { VariantProps } from "class-variance-authority"
 import { cva } from "class-variance-authority"
 
 import { cn } from "~/lib/utils"
-import type { ButtonProps } from "~/components/ui/button"
-import { Button } from "~/components/ui/button"
+import type { ButtonProps } from "~/components/ui/button.tsx"
+import { Button } from "~/components/ui/button.tsx"
 import { Separator } from "~/components/ui/separator"
 import { Sheet, SheetContent } from "~/components/ui/sheet"
 import { Skeleton } from "~/components/ui/skeleton"
-import { TextField, TextFieldInput } from "~/components/ui/text-field"
+import { TextField, TextFieldInput } from "~/components/ui/text-field.tsx"
 import { Tooltip, TooltipContent, TooltipTrigger } from "~/components/ui/tooltip"
 
 const MOBILE_BREAKPOINT = 768
