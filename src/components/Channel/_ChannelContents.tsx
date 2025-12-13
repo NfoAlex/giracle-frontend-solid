@@ -159,6 +159,8 @@ export default function ExpChannelContents() {
   const checkAndUpdateReadTime = async () => {
     //チャンネルの末端に到達していなければ更新しない
     if (storeHistory[currentChannelId()]?.atEnd === false) return;
+    //フォーカスしているか
+    if (!isFocused()) return;
     //下にスクロールできているかどうか
     const el = getHistoryElement();
     if (!el) return;
@@ -290,6 +292,7 @@ export default function ExpChannelContents() {
   createEffect(
     on(() => `${storeHistory[currentChannelId()]?.history[0]?.id}:${storeHistory[currentChannelId()]?.history.at(-1)?.id}`, () => {
       console.log("ChannelContents :: createEffect : 履歴更新された");
+      checkAndUpdateReadTime();
     })
   );
 
