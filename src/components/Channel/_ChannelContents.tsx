@@ -8,6 +8,7 @@ import { storeClientConfig } from "~/stores/ClientConfig.ts";
 import { Button } from "../ui/button.tsx";
 import { IconArrowDown } from "@tabler/icons-solidjs";
 import MessageDisplay from "./ChannelContent/MessageDisplay.tsx";
+import { storeMessageReadTime } from "~/stores/Readtime.ts";
 
 export default function ExpChannelContents() {
   const [isFocused, setIsFocused] = createSignal(true);
@@ -15,12 +16,132 @@ export default function ExpChannelContents() {
   const param = useParams();
   const [currentChannelId, setCurrentChannelId] = createSignal<string>(param.channelId ?? "");
   let stateFetchingHistory = false;
+  let scrollRafId = 0;
+  let lastFetchAt = 0;
+
+  const historyElementId = "history";
+  const getHistoryElement = () => document.getElementById(historyElementId) as HTMLElement | null;
+
+  const waitForDomToSettle = async () => {
+    await new Promise((r) => setTimeout(r, 0));
+    await new Promise((r) => requestAnimationFrame(() => r(null)));
+    await new Promise((r) => requestAnimationFrame(() => r(null)));
+  };
+
+  const captureScrollAnchor = (container: HTMLElement): { id: string; offsetTopInContainer: number } | null => {
+    const containerRect = container.getBoundingClientRect();
+    const candidates = container.querySelectorAll<HTMLElement>("[id^='messageId::']");
+    if (candidates.length === 0) return null;
+
+    let bestEl: HTMLElement | null = null;
+    let bestDistance = Number.POSITIVE_INFINITY;
+
+    for (const el of candidates) {
+      const rect = el.getBoundingClientRect();
+      const intersects = rect.bottom > containerRect.top && rect.top < containerRect.bottom;
+      if (!intersects) continue;
+
+      const distance = Math.abs(rect.top - containerRect.top);
+      if (distance < bestDistance) {
+        bestDistance = distance;
+        bestEl = el;
+      }
+    }
+
+    if (!bestEl) return null;
+    const bestRect = bestEl.getBoundingClientRect();
+    return { id: bestEl.id, offsetTopInContainer: bestRect.top - containerRect.top };
+  };
+
+  const restoreScrollFromAnchor = async (
+    container: HTMLElement,
+    anchor: { id: string; offsetTopInContainer: number } | null,
+  ) => {
+    if (!anchor) return;
+    await waitForDomToSettle();
+
+    const anchorEl = document.getElementById(anchor.id) as HTMLElement | null;
+    if (!anchorEl) return;
+
+    const containerRect = container.getBoundingClientRect();
+    const anchorRect = anchorEl.getBoundingClientRect();
+    const newOffset = anchorRect.top - containerRect.top;
+    const delta = newOffset - anchor.offsetTopInContainer;
+    container.scrollTop += delta;
+  };
+
+  const isNearVisualTop = (container: HTMLElement, thresholdPx: number) => {
+    // flex-col-reverse 前提: scrollTop=0 が「下（最新側）」、最大が「上（古い側）」
+    const maxScrollTop = container.scrollHeight - container.clientHeight;
+    const distanceToVisualTop = maxScrollTop - Math.abs(container.scrollTop);
+    return distanceToVisualTop <= thresholdPx;
+  };
+
+  const isNearVisualBottom = (container: HTMLElement, thresholdPx: number) => {
+    // flex-col-reverse 前提: scrollTop=0 が「下（最新側）」
+    const distanceToVisualBottom = Math.abs(container.scrollTop);
+    return distanceToVisualBottom <= thresholdPx;
+  };
 
   /**
    * 現在のスクロール位置を確認してから該当する履歴取得をする
    */
   const checkScrollPosAndFetchHistory = async () => {
-    // todo
+    if (!isFocused()) return;
+    if (stateFetchingHistory) return;
+
+    const channelId = currentChannelId();
+    if (!channelId) return;
+    const historyState = storeHistory[channelId];
+    if (!historyState) return;
+
+    const el = getHistoryElement();
+    if (!el) return;
+
+    // 連打防止（スクロール監視・createEffectの両方から呼ばれるため）
+    const now = Date.now();
+    if (now - lastFetchAt < 350) return;
+
+    const thresholdPx = 40;
+
+    // 「上（古い側）」に到達 → older を追加取得
+    if (!historyState.atTop && isNearVisualTop(el, thresholdPx)) {
+      lastFetchAt = now;
+      stateFetchingHistory = true;
+
+      const anchor = captureScrollAnchor(el);
+      const oldest = historyState.history.at(-1);
+      await FetchHistory(
+        channelId,
+        {
+          messageIdFrom: oldest?.id,
+          messageTimeFrom: oldest?.createdAt,
+        },
+        "older",
+      );
+      await restoreScrollFromAnchor(el, anchor);
+      stateFetchingHistory = false;
+      return;
+    }
+
+    // 「下（新しい側）」に到達 → newer を追加取得（必要な場合）
+    if (!historyState.atEnd && isNearVisualBottom(el, thresholdPx)) {
+      lastFetchAt = now;
+      stateFetchingHistory = true;
+
+      const anchor = captureScrollAnchor(el);
+      const newest = historyState.history[0];
+      await FetchHistory(
+        channelId,
+        {
+          messageIdFrom: newest?.id,
+          messageTimeFrom: newest?.createdAt,
+        },
+        "newer",
+      );
+      await restoreScrollFromAnchor(el, anchor);
+      stateFetchingHistory = false;
+    }
   };
 
   /**
@@ -60,6 +181,13 @@ export default function ExpChannelContents() {
     //取得して格納
     await FetchHistory(currentChannelId(), { messageTimeFrom: "" }, "older");
 
+    //スクロールを一番下に移動
+    const el = getHistoryElement();
+    if (el) {
+      await waitForDomToSettle();
+      el.scrollTop = 0;
+    }
+
     //履歴取得状態解除
     stateFetchingHistory = false;
   }
@@ -70,10 +198,14 @@ export default function ExpChannelContents() {
    */
   const handleScroll = (event: Event) => {
     //HTMLのものであることをTSに示すため
-    if (event.target instanceof HTMLElement)
-      //console.log("ChannelContents :: handleScroll : event->", event.target.scrollTop, event.target.scrollHeight - event.target.offsetHeight);
+    if (!(event.target instanceof HTMLElement)) return;
 
+    //console.log("ChannelContents :: handleScroll : event->", event.target.scrollTop, event.target.scrollHeight - event.target.offsetHeight);
+    if (scrollRafId) cancelAnimationFrame(scrollRafId);
+    scrollRafId = requestAnimationFrame(() => {
+      scrollRafId = 0;
       checkScrollPosAndFetchHistory();
+    });
   };
 
   //ウィンドウのフォーカス状態の切り替え用
@@ -115,8 +247,6 @@ export default function ExpChannelContents() {
   createEffect(
     on(() => `${storeHistory[currentChannelId()]?.history[0]?.id}:${storeHistory[currentChannelId()]?.history.at(-1)?.id}`, () => {
       console.log("ChannelContents :: createEffect : 履歴更新された");
-      //setCurrentChannelId(currentChannelId());
-      checkScrollPosAndFetchHistory();
     })
   );
 
@@ -126,6 +256,16 @@ export default function ExpChannelContents() {
       if (param.channelId === undefined) return;
       setCurrentChannelId(param.channelId);
       console.log("ChannelContents :: createEffect : チャンネル切り替え検知", currentChannelId());
+      const latestReadTime = storeMessageReadTime.find((mrt) => {
+        return mrt.channelId === currentChannelId();
+      });
+      //履歴を取得する必要があるかどうか確認
+      const noHistory = storeHistory[currentChannelId()] === undefined ||
+        storeHistory[currentChannelId()]?.history === undefined ||
+        storeHistory[currentChannelId()]?.history.length === 0;
+      if (!noHistory) return;
+      //履歴を取得して格納
+      FetchHistory(currentChannelId(), { messageTimeFrom: latestReadTime?.readTime ?? "" }, "older");
     }
   ))
 
@@ -141,7 +281,8 @@ export default function ExpChannelContents() {
   });
 
   onCleanup(() => {
-    document.removeEventListener("scroll", handleScroll);
+    const el = getHistoryElement();
+    if (el) el.removeEventListener("scroll", handleScroll);
 
     window.removeEventListener("focus", setWindowFocused);
     window.removeEventListener("blur", unSetWindowFocused);
@@ -170,8 +311,8 @@ export default function ExpChannelContents() {
       </div>
 
       { !storeHistory[currentChannelId()]?.atEnd &&
-        <div class="absolute bottom-10 right-10">
-          <Button onClick={moveToNewest} class="w-16 h-16 z-50"><IconArrowDown style="height:28px; width:28px;" /></Button>
+        <div class="absolute bottom-10 right-10 z-10">
+          <Button onClick={moveToNewest} class="w-16 h-16"><IconArrowDown style="height:28px; width:28px;" /></Button>
         </div>
       }
     </div>
