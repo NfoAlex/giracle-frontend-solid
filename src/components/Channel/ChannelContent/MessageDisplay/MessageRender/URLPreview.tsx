@@ -35,7 +35,7 @@ export default function URLPreview(props: { MessageUrlPreview: IMessageUrlPrevie
                 {
                   urlPreview.faviconLink
                   ?
-                  <img class={"w-5 h-fit shrink-0"} src={urlPreview.faviconLink} alt="favicon" />
+                  <img class={"w-5 h-fit shrink-0 truncate"} src={urlPreview.faviconLink} alt="favicon" />
                   :
                   <IconLink />
                 }
