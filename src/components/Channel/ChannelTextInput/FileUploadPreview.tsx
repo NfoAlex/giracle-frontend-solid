@@ -56,14 +56,14 @@ export default function FileUploadPreview(
     xhr.addEventListener("load", () => {
       if (xhr.status === 200) {
         //console.log("FileUploadPreview :: uploadFile : 成功!->", xhr.responseText);
-        const result: { result: string; data: { fileId: string } } = JSON.parse(
+        const result: { result: string; data: { fileId: { id: string } } } = JSON.parse(
           xhr.responseText,
         );
         //結果がちゃんと取れているなら親コンポにファイルIdを渡す
         if (result.data !== undefined) {
-          props.dataSetter(result.data.fileId);
+          props.dataSetter(result.data.fileId.id);
           //手元の変数にも保存（親コンポーネントのonRemove関数用）
-          fileIdBinded = result.data.fileId;
+          fileIdBinded = result.data.fileId.id;
           setResult("SUCCESS");
         } else {
           //エラーとして設定
