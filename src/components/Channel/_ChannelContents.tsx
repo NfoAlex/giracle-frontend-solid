@@ -103,7 +103,7 @@ export default function ExpChannelContents() {
 
     // 連打防止（スクロール監視・createEffectの両方から呼ばれるため）
     const now = Date.now();
-    if (now - lastFetchAt < 350) return;
+    if (now - lastFetchAt < 100) return;
 
     const thresholdPx = 40;
 
