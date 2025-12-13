@@ -32,6 +32,9 @@ export default function ChannelTextInput() {
   const sendMsg = () => {
     //console.log("ChannelTextInput :: sendMsg : params.id->", {...params});
 
+    //空メッセージは送信しない
+    if (text().trim() === "" && fileIds().length === 0) return;
+
     POST_MESSAGE_SEND(params.channelId, text(), fileIds(), storeReplyingMessageId[params.channelId] || undefined)
       .then(() => {
         //console.log("POST_MESSAGE_SEND :: r->", r);
@@ -242,6 +245,7 @@ export default function ChannelTextInput() {
                 }
 
                 e.preventDefault();
+                //メッセージ送信
                 sendMsg();
                 break;
               }

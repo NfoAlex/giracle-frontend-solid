@@ -15,7 +15,7 @@ importers:
         specifier: ^0.13.11
         version: 0.13.11(solid-js@1.9.10)
       '@solidjs/router':
-        specifier: ^0.15.3
+        specifier: ^0.15.4
         version: 0.15.4(solid-js@1.9.10)
       '@tabler/icons-solidjs':
         specifier: ^3.35.0
@@ -36,10 +36,10 @@ importers:
         specifier: ^16.6.1
         version: 16.6.1
       emoji-picker-element:
-        specifier: ^1.27.0
+        specifier: ^1.28.0
         version: 1.28.0
       solid-js:
-        specifier: ^1.9.9
+        specifier: ^1.9.10
         version: 1.9.10
       sortablejs:
         specifier: ^1.15.6
@@ -49,32 +49,32 @@ importers:
         version: 2.6.0
       tailwindcss-animate:
         specifier: ^1.0.7
-        version: 1.0.7(tailwindcss@3.4.18)
-      vite-plugin-pwa:
-        specifier: ^0.21.2
-        version: 0.21.2(vite@6.4.1(@types/node@22.19.1)(jiti@1.21.7)(terser@5.44.1))(workbox-build@7.4.0(@types/babel__core@7.20.5))(workbox-window@7.4.0)
+        version: 1.0.7(tailwindcss@3.4.19)
     devDependencies:
       '@types/node':
-        specifier: ^22.18.12
-        version: 22.19.1
+        specifier: ^22.19.2
+        version: 22.19.2
       autoprefixer:
-        specifier: ^10.4.21
+        specifier: ^10.4.22
         version: 10.4.22(postcss@8.5.6)
       postcss:
         specifier: ^8.5.6
         version: 8.5.6
       tailwindcss:
-        specifier: ^3.4.18
-        version: 3.4.18
+        specifier: ^3.4.19
+        version: 3.4.19
       typescript:
         specifier: ^5.9.3
         version: 5.9.3
       vite:
-        specifier: ^6.4.1
-        version: 6.4.1(@types/node@22.19.1)(jiti@1.21.7)(terser@5.44.1)
+        specifier: ^7.2.7
+        version: 7.2.7(@types/node@22.19.2)(jiti@1.21.7)(terser@5.44.1)
+      vite-plugin-pwa:
+        specifier: ^1.2.0
+        version: 1.2.0(vite@7.2.7(@types/node@22.19.2)(jiti@1.21.7)(terser@5.44.1))(workbox-build@7.4.0(@types/babel__core@7.20.5))(workbox-window@7.4.0)
       vite-plugin-solid:
         specifier: ^2.11.10
-        version: 2.11.10(solid-js@1.9.10)(vite@6.4.1(@types/node@22.19.1)(jiti@1.21.7)(terser@5.44.1))
+        version: 2.11.10(solid-js@1.9.10)(vite@7.2.7(@types/node@22.19.2)(jiti@1.21.7)(terser@5.44.1))
 
 packages:
 
@@ -1086,8 +1086,8 @@ packages:
   '@types/estree@1.0.8':
     resolution: {integrity: sha512-dWHzHa2WqEXI/O1E9OjrocMTKJl2mSrEolh1Iomrv6U+JuNwaHXsXx9bLu5gG7BUWFIN0skIQJQ/L1rIex4X6w==}
 
-  '@types/node@22.19.1':
-    resolution: {integrity: sha512-LCCV0HdSZZZb34qifBsyWlUmok6W7ouER+oQIGBScS8EsZsQbrtFTUrDX4hOl+CS6p7cnNC4td+qrSVGSCTUfQ==}
+  '@types/node@22.19.2':
+    resolution: {integrity: sha512-LPM2G3Syo1GLzXLGJAKdqoU35XvrWzGJ21/7sgZTUpbkBaOasTj8tjwn6w+hCkqaa1TfJ/w67rJSwYItlJ2mYw==}
 
   '@types/resolve@1.20.2':
     resolution: {integrity: sha512-60BCwRFOZCQhDncwQdxxeOEEkbc5dIMccYLwbxsS4TUNeVECQ/pBJ0j09mrHOl/JJvpRPGwO9SvE4nR2Nb/a4Q==}
@@ -1194,8 +1194,8 @@ packages:
   balanced-match@1.0.2:
     resolution: {integrity: sha512-3oSeUO0TMV67hN1AmbXsK4yaqU7tjiHlbxRDZOpH0KW9+CeX4bRAaX0Anxt0tx2MrpRpWwQaPwIlISEJhYU5Pw==}
 
-  baseline-browser-mapping@2.8.32:
-    resolution: {integrity: sha512-OPz5aBThlyLFgxyhdwf/s2+8ab3OvT7AdTNvKHBwpXomIYeXqpUUuT8LrdtxZSsWJ4R4CU1un4XGh5Ez3nlTpw==}
+  baseline-browser-mapping@2.9.7:
+    resolution: {integrity: sha512-k9xFKplee6KIio3IDbwj+uaCLpqzOwakOgmqzPezM0sFJlFKcg30vk2wOiAJtkTSfx0SSQDSe8q+mWA/fSH5Zg==}
     hasBin: true
 
   binary-extensions@2.3.0:
@@ -1209,8 +1209,8 @@ packages:
     resolution: {integrity: sha512-yQbXgO/OSZVD2IsiLlro+7Hf6Q18EJrKSEsdoMzKePKXct3gvD8oLcOQdIzGupr5Fj+EDe8gO/lxc1BzfMpxvA==}
     engines: {node: '>=8'}
 
-  browserslist@4.28.0:
-    resolution: {integrity: sha512-tbydkR/CxfMwelN0vwdP/pLkDwyAASZ+VfWm4EOwlB6SWhx1sYnWLqo8N5j0rAzPfzfRaxt0mM/4wPU/Su84RQ==}
+  browserslist@4.28.1:
+    resolution: {integrity: sha512-ZC5Bd0LgJXgwGqUknZY/vkUQ04r8NXnJZ3yYi4vDmSiZmC/pdSN0NbNRPxZpbtO4uAfDUAFffO8IZoM3Gj8IkA==}
     engines: {node: ^6 || ^7 || ^8 || ^9 || ^10 || ^11 || ^12 || >=13.7}
     hasBin: true
 
@@ -1233,8 +1233,8 @@ packages:
     resolution: {integrity: sha512-QOSvevhslijgYwRx6Rv7zKdMF8lbRmx+uQGx2+vDc+KI/eBnsy9kit5aj23AgGu3pa4t9AgwbnXWqS+iOY+2aA==}
     engines: {node: '>= 6'}
 
-  caniuse-lite@1.0.30001757:
-    resolution: {integrity: sha512-r0nnL/I28Zi/yjk1el6ilj27tKcdjLsNqAOZr0yVjWPrSQyHgKI2INaEWw21bAQSv2LXRt1XuCS/GomNpWOxsQ==}
+  caniuse-lite@1.0.30001760:
+    resolution: {integrity: sha512-7AAMPcueWELt1p3mi13HR/LHH0TJLT11cnwDJEs3xA4+CK/PLKeO9Kl1oru24htkyUKtkGCvAx4ohB0Ttry8Dw==}
 
   chokidar@3.6.0:
     resolution: {integrity: sha512-7VT13fmjotKpGipCW9JEQAusEPE+Ei8nl6/g4FBAmIm0GOOLMua9NDDo/DWp0ZAxCr3cPq5ZpBqmPAQgDda2Pw==}
@@ -1342,8 +1342,8 @@ packages:
     engines: {node: '>=0.10.0'}
     hasBin: true
 
-  electron-to-chromium@1.5.263:
-    resolution: {integrity: sha512-DrqJ11Knd+lo+dv+lltvfMDLU27g14LMdH2b0O3Pio4uk0x+z7OR+JrmyacTPN2M8w3BrZ7/RTwG3R9B7irPlg==}
+  electron-to-chromium@1.5.267:
+    resolution: {integrity: sha512-0Drusm6MVRXSOJpGbaSVgcQsuB4hEkMpHXaVstcPmhu5LIedxs1xNK/nIxmQIU/RPC0+1/o0AVZfBTkTNJOdUw==}
 
   emoji-picker-element@1.28.0:
     resolution: {integrity: sha512-gzRyaxUQKfnEt7xURdbyEGd+ifRy9FiIgU6I9ovABDOW6n4YrUZBAnYjP00BmVBiH1uxCkaUOrutbzTswCXSkw==}
@@ -1358,8 +1358,8 @@ packages:
     resolution: {integrity: sha512-aN97NXWF6AWBTahfVOIrB/NShkzi5H7F9r1s9mD3cDj4Ko5f2qhhVoYMibXF7GlLveb/D2ioWay8lxI97Ven3g==}
     engines: {node: '>=0.12'}
 
-  es-abstract@1.24.0:
-    resolution: {integrity: sha512-WSzPgsdLtTcQwm4CROfS5ju2Wa1QQcVeT37jFjYzdFz1r9ahadC8B8/a4qxJxM+09F18iumCdRmlr96ZYkQvEg==}
+  es-abstract@1.24.1:
+    resolution: {integrity: sha512-zHXBLhP+QehSSbsS9Pt23Gg964240DPd6QCf8WpkqEXxQ7fhdZzYsocOr5u7apWonsS5EjZDmTF+/slGMyasvw==}
     engines: {node: '>= 0.4'}
 
   es-define-property@1.0.1:
@@ -2160,8 +2160,8 @@ packages:
     peerDependencies:
       tailwindcss: '>=3.0.0 || insiders'
 
-  tailwindcss@3.4.18:
-    resolution: {integrity: sha512-6A2rnmW5xZMdw11LYjhcI5846rt9pbLSabY5XPxo+XWdxwZaFEn47Go4NzFiHu9sNNmr/kXivP1vStfvMaK1GQ==}
+  tailwindcss@3.4.19:
+    resolution: {integrity: sha512-3ofp+LL8E+pK/JuPLPggVAIaEuhvIz4qNcf3nA1Xn2o/7fb7s/TYpHhwGDv1ZU3PkBluUVaF8PyCHcm48cKLWQ==}
     engines: {node: '>=14.0.0'}
     hasBin: true
 
@@ -2262,8 +2262,8 @@ packages:
     resolution: {integrity: sha512-aZwGpamFO61g3OlfT7OQCHqhGnW43ieH9WZeP7QxN/G/jS4jfqUkZxoryvJgVPEcrl5NL/ggHsSmLMHuH64Lhg==}
     engines: {node: '>=4'}
 
-  update-browserslist-db@1.1.4:
-    resolution: {integrity: sha512-q0SPT4xyU84saUX+tomz1WLkxUbuaJnR1xWt17M7fJtEJigJeWUNGUqrauFXsHnqev9y9JTRGwk13tFBuKby4A==}
+  update-browserslist-db@1.2.2:
+    resolution: {integrity: sha512-E85pfNzMQ9jpKkA7+TJAi4TJN+tBCuWh5rUcS/sv6cFi+1q9LYDwDI5dpUL0u/73EElyQ8d3TEaeW4sPedBqYA==}
     hasBin: true
     peerDependencies:
       browserslist: '>= 4.21.0'
@@ -2271,14 +2271,14 @@ packages:
   util-deprecate@1.0.2:
     resolution: {integrity: sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw==}
 
-  vite-plugin-pwa@0.21.2:
-    resolution: {integrity: sha512-vFhH6Waw8itNu37hWUJxL50q+CBbNcMVzsKaYHQVrfxTt3ihk3PeLO22SbiP1UNWzcEPaTQv+YVxe4G0KOjAkg==}
+  vite-plugin-pwa@1.2.0:
+    resolution: {integrity: sha512-a2xld+SJshT9Lgcv8Ji4+srFJL4k/1bVbd1x06JIkvecpQkwkvCncD1+gSzcdm3s+owWLpMJerG3aN5jupJEVw==}
     engines: {node: '>=16.0.0'}
     peerDependencies:
-      '@vite-pwa/assets-generator': ^0.2.6
-      vite: ^3.1.0 || ^4.0.0 || ^5.0.0 || ^6.0.0
-      workbox-build: ^7.3.0
-      workbox-window: ^7.3.0
+      '@vite-pwa/assets-generator': ^1.0.0
+      vite: ^3.1.0 || ^4.0.0 || ^5.0.0 || ^6.0.0 || ^7.0.0
+      workbox-build: ^7.4.0
+      workbox-window: ^7.4.0
     peerDependenciesMeta:
       '@vite-pwa/assets-generator':
         optional: true
@@ -2293,19 +2293,19 @@ packages:
       '@testing-library/jest-dom':
         optional: true
 
-  vite@6.4.1:
-    resolution: {integrity: sha512-+Oxm7q9hDoLMyJOYfUYBuHQo+dkAloi33apOPP56pzj+vsdJDzr+j1NISE5pyaAuKL4A3UD34qd0lx5+kfKp2g==}
-    engines: {node: ^18.0.0 || ^20.0.0 || >=22.0.0}
+  vite@7.2.7:
+    resolution: {integrity: sha512-ITcnkFeR3+fI8P1wMgItjGrR10170d8auB4EpMLPqmx6uxElH3a/hHGQabSHKdqd4FXWO1nFIp9rRn7JQ34ACQ==}
+    engines: {node: ^20.19.0 || >=22.12.0}
     hasBin: true
     peerDependencies:
-      '@types/node': ^18.0.0 || ^20.0.0 || >=22.0.0
+      '@types/node': ^20.19.0 || >=22.12.0
       jiti: '>=1.21.0'
-      less: '*'
+      less: ^4.0.0
       lightningcss: ^1.21.0
-      sass: '*'
-      sass-embedded: '*'
-      stylus: '*'
-      sugarss: '*'
+      sass: ^1.70.0
+      sass-embedded: ^1.70.0
+      stylus: '>=0.54.8'
+      sugarss: ^5.0.0
       terser: ^5.16.0
       tsx: ^4.8.1
       yaml: ^2.4.2
@@ -2483,7 +2483,7 @@ snapshots:
     dependencies:
       '@babel/compat-data': 7.28.5
       '@babel/helper-validator-option': 7.27.1
-      browserslist: 4.28.0
+      browserslist: 4.28.1
       lru-cache: 5.1.1
       semver: 6.3.1
 
@@ -3509,7 +3509,7 @@ snapshots:
 
   '@types/estree@1.0.8': {}
 
-  '@types/node@22.19.1':
+  '@types/node@22.19.2':
     dependencies:
       undici-types: 6.21.0
 
@@ -3557,7 +3557,7 @@ snapshots:
       array-buffer-byte-length: 1.0.2
       call-bind: 1.0.8
       define-properties: 1.2.1
-      es-abstract: 1.24.0
+      es-abstract: 1.24.1
       es-errors: 1.3.0
       get-intrinsic: 1.3.0
       is-array-buffer: 3.0.5
@@ -3570,8 +3570,8 @@ snapshots:
 
   autoprefixer@10.4.22(postcss@8.5.6):
     dependencies:
-      browserslist: 4.28.0
-      caniuse-lite: 1.0.30001757
+      browserslist: 4.28.1
+      caniuse-lite: 1.0.30001760
       fraction.js: 5.3.4
       normalize-range: 0.1.2
       picocolors: 1.1.1
@@ -3624,7 +3624,7 @@ snapshots:
 
   balanced-match@1.0.2: {}
 
-  baseline-browser-mapping@2.8.32: {}
+  baseline-browser-mapping@2.9.7: {}
 
   binary-extensions@2.3.0: {}
 
@@ -3636,13 +3636,13 @@ snapshots:
     dependencies:
       fill-range: 7.1.1
 
-  browserslist@4.28.0:
+  browserslist@4.28.1:
     dependencies:
-      baseline-browser-mapping: 2.8.32
-      caniuse-lite: 1.0.30001757
-      electron-to-chromium: 1.5.263
+      baseline-browser-mapping: 2.9.7
+      caniuse-lite: 1.0.30001760
+      electron-to-chromium: 1.5.267
       node-releases: 2.0.27
-      update-browserslist-db: 1.1.4(browserslist@4.28.0)
+      update-browserslist-db: 1.2.2(browserslist@4.28.1)
 
   buffer-from@1.1.2: {}
 
@@ -3665,7 +3665,7 @@ snapshots:
 
   camelcase-css@2.0.1: {}
 
-  caniuse-lite@1.0.30001757: {}
+  caniuse-lite@1.0.30001760: {}
 
   chokidar@3.6.0:
     dependencies:
@@ -3701,7 +3701,7 @@ snapshots:
 
   core-js-compat@3.47.0:
     dependencies:
-      browserslist: 4.28.0
+      browserslist: 4.28.1
 
   cross-spawn@7.0.6:
     dependencies:
@@ -3769,7 +3769,7 @@ snapshots:
     dependencies:
       jake: 10.9.4
 
-  electron-to-chromium@1.5.263: {}
+  electron-to-chromium@1.5.267: {}
 
   emoji-picker-element@1.28.0: {}
 
@@ -3779,7 +3779,7 @@ snapshots:
 
   entities@6.0.1: {}
 
-  es-abstract@1.24.0:
+  es-abstract@1.24.1:
     dependencies:
       array-buffer-byte-length: 1.0.2
       arraybuffer.prototype.slice: 1.0.4
@@ -4374,7 +4374,7 @@ snapshots:
     dependencies:
       call-bind: 1.0.8
       define-properties: 1.2.1
-      es-abstract: 1.24.0
+      es-abstract: 1.24.1
       es-errors: 1.3.0
       es-object-atoms: 1.1.1
       get-intrinsic: 1.3.0
@@ -4614,7 +4614,7 @@ snapshots:
       call-bind: 1.0.8
       call-bound: 1.0.4
       define-properties: 1.2.1
-      es-abstract: 1.24.0
+      es-abstract: 1.24.1
       es-errors: 1.3.0
       es-object-atoms: 1.1.1
       get-intrinsic: 1.3.0
@@ -4631,7 +4631,7 @@ snapshots:
       call-bound: 1.0.4
       define-data-property: 1.1.4
       define-properties: 1.2.1
-      es-abstract: 1.24.0
+      es-abstract: 1.24.1
       es-object-atoms: 1.1.1
       has-property-descriptors: 1.0.2
 
@@ -4678,11 +4678,11 @@ snapshots:
 
   tailwind-merge@2.6.0: {}
 
-  tailwindcss-animate@1.0.7(tailwindcss@3.4.18):
+  tailwindcss-animate@1.0.7(tailwindcss@3.4.19):
     dependencies:
-      tailwindcss: 3.4.18
+      tailwindcss: 3.4.19
 
-  tailwindcss@3.4.18:
+  tailwindcss@3.4.19:
     dependencies:
       '@alloc/quick-lru': 5.2.0
       arg: 5.0.2
@@ -4816,26 +4816,26 @@ snapshots:
 
   upath@1.2.0: {}
 
-  update-browserslist-db@1.1.4(browserslist@4.28.0):
+  update-browserslist-db@1.2.2(browserslist@4.28.1):
     dependencies:
-      browserslist: 4.28.0
+      browserslist: 4.28.1
       escalade: 3.2.0
       picocolors: 1.1.1
 
   util-deprecate@1.0.2: {}
 
-  vite-plugin-pwa@0.21.2(vite@6.4.1(@types/node@22.19.1)(jiti@1.21.7)(terser@5.44.1))(workbox-build@7.4.0(@types/babel__core@7.20.5))(workbox-window@7.4.0):
+  vite-plugin-pwa@1.2.0(vite@7.2.7(@types/node@22.19.2)(jiti@1.21.7)(terser@5.44.1))(workbox-build@7.4.0(@types/babel__core@7.20.5))(workbox-window@7.4.0):
     dependencies:
       debug: 4.4.3
       pretty-bytes: 6.1.1
       tinyglobby: 0.2.15
-      vite: 6.4.1(@types/node@22.19.1)(jiti@1.21.7)(terser@5.44.1)
+      vite: 7.2.7(@types/node@22.19.2)(jiti@1.21.7)(terser@5.44.1)
       workbox-build: 7.4.0(@types/babel__core@7.20.5)
       workbox-window: 7.4.0
     transitivePeerDependencies:
       - supports-color
 
-  vite-plugin-solid@2.11.10(solid-js@1.9.10)(vite@6.4.1(@types/node@22.19.1)(jiti@1.21.7)(terser@5.44.1)):
+  vite-plugin-solid@2.11.10(solid-js@1.9.10)(vite@7.2.7(@types/node@22.19.2)(jiti@1.21.7)(terser@5.44.1)):
     dependencies:
       '@babel/core': 7.28.5
       '@types/babel__core': 7.20.5
@@ -4843,12 +4843,12 @@ snapshots:
       merge-anything: 5.1.7
       solid-js: 1.9.10
       solid-refresh: 0.6.3(solid-js@1.9.10)
-      vite: 6.4.1(@types/node@22.19.1)(jiti@1.21.7)(terser@5.44.1)
-      vitefu: 1.1.1(vite@6.4.1(@types/node@22.19.1)(jiti@1.21.7)(terser@5.44.1))
+      vite: 7.2.7(@types/node@22.19.2)(jiti@1.21.7)(terser@5.44.1)
+      vitefu: 1.1.1(vite@7.2.7(@types/node@22.19.2)(jiti@1.21.7)(terser@5.44.1))
     transitivePeerDependencies:
       - supports-color
 
-  vite@6.4.1(@types/node@22.19.1)(jiti@1.21.7)(terser@5.44.1):
+  vite@7.2.7(@types/node@22.19.2)(jiti@1.21.7)(terser@5.44.1):
     dependencies:
       esbuild: 0.25.12
       fdir: 6.5.0(picomatch@4.0.3)
@@ -4857,14 +4857,14 @@ snapshots:
       rollup: 4.53.3
       tinyglobby: 0.2.15
     optionalDependencies:
-      '@types/node': 22.19.1
+      '@types/node': 22.19.2
       fsevents: 2.3.3
       jiti: 1.21.7
       terser: 5.44.1
 
-  vitefu@1.1.1(vite@6.4.1(@types/node@22.19.1)(jiti@1.21.7)(terser@5.44.1)):
+  vitefu@1.1.1(vite@7.2.7(@types/node@22.19.2)(jiti@1.21.7)(terser@5.44.1)):
     optionalDependencies:
-      vite: 6.4.1(@types/node@22.19.1)(jiti@1.21.7)(terser@5.44.1)
+      vite: 7.2.7(@types/node@22.19.2)(jiti@1.21.7)(terser@5.44.1)
 
   webidl-conversions@4.0.2: {}
 
