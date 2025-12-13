@@ -23,24 +23,21 @@ export default function MessageDisplay(props: {
   const [reacting, setReacting] = createSignal(false);
   const [editing, setEditing] = createSignal(false);
 
+  const displayDateLine = () => {
+    if (props.messageArrayIndex === 0) return false;
+
+    const previousMessage = storeHistory[staticChannelId]?.history[props.messageArrayIndex + 1];
+    if (!previousMessage) return true;
+
+    const prevDate = new Date(previousMessage.createdAt);
+    const currDate = new Date(props.message.createdAt);
+    return prevDate.getDate() !== currDate.getDate() || prevDate.getDay() !== currDate.getDay();
+  };
+
   return (
     <div data-index={props.message.id} id={`messageId::${props.message.id}`} class={"w-full"}>
       {/* 日付線 */}
-      <Show when={
-        props.messageArrayIndex !== 0
-        &&
-        (
-          new Date(props.message.createdAt).getDay()
-            !==
-          new Date(storeHistory[staticChannelId]?.history[props.messageArrayIndex + 1]?.createdAt).getDay()
-        )
-        ||
-        (
-          new Date(props.message.createdAt).getDate()
-            !==
-          new Date(storeHistory[staticChannelId]?.history[props.messageArrayIndex + 1]?.createdAt).getDate()
-        )
-      }>
+      <Show when={displayDateLine()}>
         <div class="flex justify-center items-center gap-3 py-1">
           <hr class={"grow"} />
           <Badge class={"shrink-0"} variant={"secondary"}>{ new Date(props.message.createdAt).toLocaleDateString() }</Badge>
