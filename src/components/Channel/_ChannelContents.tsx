@@ -302,8 +302,9 @@ export default function ExpChannelContents() {
   };
 
   //履歴の更新監視
-  createEffect(
-    on(() => `${storeHistory[currentChannelId()]?.history[0]?.id}:${storeHistory[currentChannelId()]?.history.at(-1)?.id}`, () => {
+  createEffect(on(
+    () => `${storeHistory[currentChannelId()]?.history.at(-1)?.id}`,
+    () => {
       console.log("ChannelContents :: createEffect : 履歴更新された");
       checkAndUpdateReadTime();
     })
@@ -319,6 +320,7 @@ export default function ExpChannelContents() {
         const currentReadTimeForPrevChannel = storeMessageReadTime.find((mrt) => {
           return mrt.channelId === prevChannelId;
         })?.readTime;
+
         if (currentReadTimeForPrevChannel === undefined) return;
         updateReadTime(prevChannelId, currentReadTimeForPrevChannel);
       }
@@ -327,16 +329,19 @@ export default function ExpChannelContents() {
       const latestReadTime = storeMessageReadTime.find((mrt) => {
         return mrt.channelId === currentChannelId();
       });
+
       //履歴を取得する必要があるかどうか確認
       const noHistory = storeHistory[currentChannelId()] === undefined ||
         storeHistory[currentChannelId()]?.history === undefined ||
         storeHistory[currentChannelId()]?.history.length === 0;
+
       //必要無し :: その場で履歴取得条件確認
       if (!noHistory) {
         await scrollToLatestRead();
         checkScrollPosAndFetchHistory();
         return;
-      };
+      }
+
       //必要あり :: 履歴を取得して格納、その後履歴取得条件確認
       FetchHistory(currentChannelId(), { messageTimeFrom: latestReadTime?.readTime ?? "", fetchLength: 1 }, "older")
         .then(() => checkScrollPosAndFetchHistory());
