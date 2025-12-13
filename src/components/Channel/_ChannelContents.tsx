@@ -8,7 +8,7 @@ import { storeClientConfig } from "~/stores/ClientConfig.ts";
 import { Button } from "../ui/button.tsx";
 import { IconArrowDown } from "@tabler/icons-solidjs";
 import MessageDisplay from "./ChannelContent/MessageDisplay.tsx";
-import { storeMessageReadTime } from "~/stores/Readtime.ts";
+import { storeMessageReadTime, updateReadTime } from "~/stores/Readtime.ts";
 import POST_MESSAGE_UPDATE_READTIME from "~/api/MESSAGE/MESSAGE_UPDATE_READTIME.ts";
 
 export default function ExpChannelContents() {
@@ -123,7 +123,9 @@ export default function ExpChannelContents() {
         "older",
       );
       await restoreScrollFromAnchor(el, anchor);
+      await waitForDomToSettle();
       stateFetchingHistory = false;
+      checkScrollPosAndFetchHistory();
       return;
     }
 
@@ -142,7 +144,9 @@ export default function ExpChannelContents() {
         "newer",
       );
       await restoreScrollFromAnchor(el, anchor);
+      await waitForDomToSettle();
       stateFetchingHistory = false;
+      checkScrollPosAndFetchHistory();
     }
 
     // 「下（新しい側）」に到達していて、かつ既読時間が最新メッセージ以降であれば、既読時間を更新する
@@ -150,7 +154,7 @@ export default function ExpChannelContents() {
   };
 
   /**
-   * 既読時間をサーバーに同期する
+   * 更新条件を確認して既読時間をサーバーに同期する
    */
   const checkAndUpdateReadTime = async () => {
     //チャンネルの末端に到達していなければ更新しない
@@ -291,10 +295,19 @@ export default function ExpChannelContents() {
 
   createEffect(on(
     () => param.channelId,
-    () => {
+    (_, prevChannelId) => {
       if (param.channelId === undefined) return;
       setCurrentChannelId(param.channelId);
-      console.log("ChannelContents :: createEffect : チャンネル切り替え検知", currentChannelId());
+      //移動前チャンネルの新着線用比較時間を更新
+      if (prevChannelId !== undefined) {
+        const currentReadTimeForPrevChannel = storeMessageReadTime.find((mrt) => {
+          return mrt.channelId === prevChannelId;
+        })?.readTime;
+        if (currentReadTimeForPrevChannel === undefined) return;
+        updateReadTime(prevChannelId, currentReadTimeForPrevChannel);
+      }
+      
+      //既読時間取得
       const latestReadTime = storeMessageReadTime.find((mrt) => {
         return mrt.channelId === currentChannelId();
       });
@@ -302,13 +315,14 @@ export default function ExpChannelContents() {
       const noHistory = storeHistory[currentChannelId()] === undefined ||
         storeHistory[currentChannelId()]?.history === undefined ||
         storeHistory[currentChannelId()]?.history.length === 0;
+      //必要無し :: その場で履歴取得条件確認
       if (!noHistory) {
-        checkAndUpdateReadTime();
+        checkScrollPosAndFetchHistory();
         return;
       };
-      //履歴を取得して格納
-      FetchHistory(currentChannelId(), { messageTimeFrom: latestReadTime?.readTime ?? "" }, "older")
-        .then(() => checkAndUpdateReadTime);
+      //必要あり :: 履歴を取得して格納、その後履歴取得条件確認
+      FetchHistory(currentChannelId(), { messageTimeFrom: latestReadTime?.readTime ?? "", fetchLength: 1 }, "older")
+        .then(() => checkScrollPosAndFetchHistory());
     }
   ))
 
