@@ -180,9 +180,6 @@ export default function ExpChannelContents() {
       currentChannelId(),
       latestMessageTime,
     )
-      .then((res) => {
-        console.log("ChannelContents :: updateReadTime : res->", res);
-      })
       .catch((err) => {
         console.error("ChannelContents :: updateReadTime : err->", err);
       });
@@ -234,7 +231,32 @@ export default function ExpChannelContents() {
 
     //履歴取得状態解除
     stateFetchingHistory = false;
-  }
+  };
+
+  /**
+   * 最新の既読時間にあたるメッセージへスクロールする
+   * @returns 
+   */
+  const scrollToLatestRead = () => new Promise((resolve) => {
+    const el = getHistoryElement();
+    if (!el) return;
+    const readTime = storeMessageReadTime.find((mrt) => {
+      return mrt.channelId === currentChannelId();
+    })?.readTime;
+    if (readTime === undefined) return;
+    const readTimeValueOf = new Date(readTime).valueOf();
+
+    const targetMessage = storeHistory[currentChannelId()]?.history.find((msg) => {
+      return new Date(msg.createdAt).valueOf() === readTimeValueOf;
+    });
+    if (targetMessage === undefined) return;
+
+    const targetEl = document.getElementById(`messageId::${targetMessage.id}`);
+    if (targetEl === null) return;
+
+    targetEl.scrollIntoView({ block: "center" });
+    resolve(void 0);
+  });
 
   /**
    * スクロールの監視用
@@ -263,11 +285,11 @@ export default function ExpChannelContents() {
     //console.log("ChannelContents :: toggleWindowFocus : isFocused->", isFocused());
 
     if (flagWasFocused) checkScrollPosAndFetchHistory();
-  }
+  };
   const unSetWindowFocused = () => {
     setIsFocused(false);
     //console.log("ChannelContents :: toggleWindowFocus : isFocused->", isFocused());
-  }
+  };
   //上矢印キーハンドラ(編集モードに入るための処理)
   const handleKeyUp = (event: KeyboardEvent) => {
     if (event.key === "ArrowUp" && editingMsgId() === "") {
@@ -298,7 +320,7 @@ export default function ExpChannelContents() {
 
   createEffect(on(
     () => param.channelId,
-    (_, prevChannelId) => {
+    async (_, prevChannelId) => {
       if (param.channelId === undefined) return;
       setCurrentChannelId(param.channelId);
       //移動前チャンネルの新着線用比較時間を更新
@@ -320,6 +342,7 @@ export default function ExpChannelContents() {
         storeHistory[currentChannelId()]?.history.length === 0;
       //必要無し :: その場で履歴取得条件確認
       if (!noHistory) {
+        await scrollToLatestRead();
         checkScrollPosAndFetchHistory();
         return;
       };
@@ -327,7 +350,7 @@ export default function ExpChannelContents() {
       FetchHistory(currentChannelId(), { messageTimeFrom: latestReadTime?.readTime ?? "", fetchLength: 1 }, "older")
         .then(() => checkScrollPosAndFetchHistory());
     }
-  ))
+  ));
 
   onMount(() => {
     //fetchHistory();
