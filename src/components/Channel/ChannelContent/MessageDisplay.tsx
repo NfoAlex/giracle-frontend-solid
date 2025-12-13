@@ -18,7 +18,6 @@ export default function MessageDisplay(props: {
   message: IMessage,
   displayAvatar: boolean,
 }) {
-  const staticChannelId = props.message.channelId;
   const [hovered, setHovered] = createSignal(false);
   const [reacting, setReacting] = createSignal(false);
   const [editing, setEditing] = createSignal(false);
@@ -26,12 +25,12 @@ export default function MessageDisplay(props: {
   const displayDateLine = () => {
     if (props.messageArrayIndex === 0) return false;
 
-    const previousMessage = storeHistory[staticChannelId]?.history[props.messageArrayIndex + 1];
-    if (!previousMessage) return true;
+    const previousMessage = storeHistory[props.message.channelId]?.history[props.messageArrayIndex + 1];
+    if (previousMessage === undefined) return true;
 
     const prevDate = new Date(previousMessage.createdAt);
     const currDate = new Date(props.message.createdAt);
-    return prevDate.getDate() !== currDate.getDate() || prevDate.getDay() !== currDate.getDay();
+    return prevDate.getDate() !== currDate.getDate() && prevDate.getDay() !== currDate.getDay();
   };
 
   return (
@@ -126,7 +125,7 @@ export default function MessageDisplay(props: {
       { (
           (
             storeMessageReadTimeBefore.find(
-              (c) => c.channelId === staticChannelId
+              (c) => c.channelId === props.message.channelId
             )?.readTime.valueOf() //一つ古い既読時間
               ===
             props.message.createdAt.valueOf() //メッセージの時間
