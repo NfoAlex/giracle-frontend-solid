@@ -109,7 +109,7 @@ export default function MessageDisplay(props: {
                     <HoverMenu
                       message={props.message}
                       onEditMode={()=>{ setEditing(true); setHovered(false); }}
-                      onReacting={() => { setReacting(true); }}
+                      onReacting={(mode) => { setReacting(mode); }}
                     />
                   </div>
                 }
