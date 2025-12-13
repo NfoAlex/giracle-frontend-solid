@@ -138,7 +138,6 @@ export default function ExpChannelContents() {
         channelId,
         {
           messageIdFrom: newest?.id,
-          messageTimeFrom: newest?.createdAt,
         },
         "newer",
       );
