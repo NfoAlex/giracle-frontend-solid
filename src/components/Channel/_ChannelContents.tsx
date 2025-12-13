@@ -9,6 +9,7 @@ import { Button } from "../ui/button.tsx";
 import { IconArrowDown } from "@tabler/icons-solidjs";
 import MessageDisplay from "./ChannelContent/MessageDisplay.tsx";
 import { storeMessageReadTime } from "~/stores/Readtime.ts";
+import POST_MESSAGE_UPDATE_READTIME from "~/api/MESSAGE/MESSAGE_UPDATE_READTIME.ts";
 
 export default function ExpChannelContents() {
   const [isFocused, setIsFocused] = createSignal(true);
@@ -28,6 +29,7 @@ export default function ExpChannelContents() {
     await new Promise((r) => requestAnimationFrame(() => r(null)));
   };
 
+  //スクロール位置のアンカーを取得する
   const captureScrollAnchor = (container: HTMLElement): { id: string; offsetTopInContainer: number } | null => {
     const containerRect = container.getBoundingClientRect();
     const candidates = container.querySelectorAll<HTMLElement>("[id^='messageId::']");
@@ -53,6 +55,7 @@ export default function ExpChannelContents() {
     return { id: bestEl.id, offsetTopInContainer: bestRect.top - containerRect.top };
   };
 
+  //スクロール位置をアンカーから復元する
   const restoreScrollFromAnchor = async (
     container: HTMLElement,
     anchor: { id: string; offsetTopInContainer: number } | null,
@@ -142,6 +145,42 @@ export default function ExpChannelContents() {
       await restoreScrollFromAnchor(el, anchor);
       stateFetchingHistory = false;
     }
+
+    // 「下（新しい側）」に到達していて、かつ既読時間が最新メッセージ以降であれば、既読時間を更新する
+    checkAndUpdateReadTime();
+  };
+
+  /**
+   * 既読時間をサーバーに同期する
+   */
+  const checkAndUpdateReadTime = async () => {
+    //チャンネルの末端に到達していなければ更新しない
+    if (storeHistory[currentChannelId()]?.atEnd === false) return;
+    //下にスクロールできているかどうか
+    const el = getHistoryElement();
+    if (!el) return;
+    if (isNearVisualBottom(el, 40) === false) return;
+
+    //最新メッセージの時間
+    const latestMessageTime = storeHistory[currentChannelId()]?.history[0]?.createdAt;
+    //現在の既読時間
+    const currentReadTime = storeMessageReadTime.find((mrt) => {
+      return mrt.channelId === currentChannelId();
+    })?.readTime;
+    //更新の条件確認
+    if (latestMessageTime === undefined || currentReadTime === undefined) return;
+    if (new Date(currentReadTime).valueOf() >= new Date(latestMessageTime).valueOf()) return;
+
+    await POST_MESSAGE_UPDATE_READTIME(
+      currentChannelId(),
+      latestMessageTime,
+    )
+      .then((res) => {
+        console.log("ChannelContents :: updateReadTime : res->", res);
+      })
+      .catch((err) => {
+        console.error("ChannelContents :: updateReadTime : err->", err);
+      });
   };
 
   /**
@@ -202,6 +241,7 @@ export default function ExpChannelContents() {
 
     //console.log("ChannelContents :: handleScroll : event->", event.target.scrollTop, event.target.scrollHeight - event.target.offsetHeight);
     if (scrollRafId) cancelAnimationFrame(scrollRafId);
+    checkAndUpdateReadTime();
     scrollRafId = requestAnimationFrame(() => {
       scrollRafId = 0;
       checkScrollPosAndFetchHistory();
@@ -263,9 +303,13 @@ export default function ExpChannelContents() {
       const noHistory = storeHistory[currentChannelId()] === undefined ||
         storeHistory[currentChannelId()]?.history === undefined ||
         storeHistory[currentChannelId()]?.history.length === 0;
-      if (!noHistory) return;
+      if (!noHistory) {
+        checkAndUpdateReadTime();
+        return;
+      };
       //履歴を取得して格納
-      FetchHistory(currentChannelId(), { messageTimeFrom: latestReadTime?.readTime ?? "" }, "older");
+      FetchHistory(currentChannelId(), { messageTimeFrom: latestReadTime?.readTime ?? "" }, "older")
+        .then(() => checkAndUpdateReadTime);
     }
   ))
 
