@@ -239,10 +239,14 @@ export default function ExpChannelContents() {
    */
   const scrollToLatestRead = () => new Promise((resolve) => {
     const targetEl = document.getElementById("NEW_LINE");
-    if (targetEl === null) return;
+    if (targetEl === null) {
+      resolve(void 0);
+      return;
+    };
 
     targetEl.scrollIntoView({ block: "center" });
     resolve(void 0);
+    return;
   });
 
   /**
