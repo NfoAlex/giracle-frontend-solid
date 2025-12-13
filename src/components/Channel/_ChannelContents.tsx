@@ -238,20 +238,7 @@ export default function ExpChannelContents() {
    * @returns 
    */
   const scrollToLatestRead = () => new Promise((resolve) => {
-    const el = getHistoryElement();
-    if (!el) return;
-    const readTime = storeMessageReadTime.find((mrt) => {
-      return mrt.channelId === currentChannelId();
-    })?.readTime;
-    if (readTime === undefined) return;
-    const readTimeValueOf = new Date(readTime).valueOf();
-
-    const targetMessage = storeHistory[currentChannelId()]?.history.find((msg) => {
-      return new Date(msg.createdAt).valueOf() === readTimeValueOf;
-    });
-    if (targetMessage === undefined) return;
-
-    const targetEl = document.getElementById(`messageId::${targetMessage.id}`);
+    const targetEl = document.getElementById("NEW_LINE");
     if (targetEl === null) return;
 
     targetEl.scrollIntoView({ block: "center" });
