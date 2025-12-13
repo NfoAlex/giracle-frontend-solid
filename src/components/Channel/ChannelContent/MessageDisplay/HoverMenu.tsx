@@ -11,7 +11,7 @@ import EmojiPicker from "./HoverMenu/EmojiPicker.tsx";
 export default function HoverMenu(props: {
   message: IMessage,
   onEditMode: (id: string) => void,
-  onReacting: (id: string) => void
+  onReacting: (mode: boolean) => void
 }) {
   const [openEmoji, setOpenEmoji] = createSignal(false);
 
@@ -41,10 +41,10 @@ export default function HoverMenu(props: {
   const toggleOpenEmoji = () => {
     if (openEmoji()) {
       setOpenEmoji(false);
-      props.onReacting("");
+      props.onReacting(false);
     } else {
       setOpenEmoji(true);
-      props.onReacting(props.message.id);
+      props.onReacting(true);
     }
   }
 
@@ -59,7 +59,7 @@ export default function HoverMenu(props: {
           &&
           <EmojiPicker
             message={props.message}
-            onClicked={()=> { setOpenEmoji(false); props.onReacting(""); } }
+            onClicked={()=> { setOpenEmoji(false); props.onReacting(false); } }
           />
         }
       </div>
