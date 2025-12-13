@@ -1,4 +1,4 @@
-import { createSignal, Show } from "solid-js";
+import { createSignal, onMount, Show } from "solid-js";
 import { storeHistory } from "~/stores/History.ts";
 import { IMessage } from "~/types/Message.ts";
 import { Badge } from "../../ui/badge.tsx";
@@ -21,6 +21,11 @@ export default function MessageDisplay(props: {
   const [hovered, setHovered] = createSignal(false);
   const [reacting, setReacting] = createSignal(false);
   const [editing, setEditing] = createSignal(false);
+
+  //新着線表示用の既読時間取得
+  const targetMessageReadTimeBefore = storeMessageReadTimeBefore.find(
+    (c) => c.channelId === props.message.channelId
+  )?.readTime.valueOf();
 
   const displayDateLine = () => {
     if (props.messageArrayIndex === 0) return false;
@@ -124,9 +129,7 @@ export default function MessageDisplay(props: {
       {/* 新着線の表示 */}
       { (
           (
-            storeMessageReadTimeBefore.find(
-              (c) => c.channelId === props.message.channelId
-            )?.readTime.valueOf() //一つ古い既読時間
+            targetMessageReadTimeBefore //一つ古い既読時間
               ===
             props.message.createdAt.valueOf() //メッセージの時間
           )
