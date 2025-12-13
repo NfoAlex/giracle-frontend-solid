@@ -18,7 +18,6 @@ export default function ChannelTextInput() {
   const [fileIds, setFileIds] = createSignal<string[]>([]); //送信に使うファイルIDの配列
   const pushFileIds = (fileId: string) => { //ファイルIDを追加するようの関数
     setFileIds([...fileIds(), fileId]);
-    console.log("ChannelTextInput :: pushFileIds : fileId->", fileId, fileIds());
   }
   const [fileInput, setFileInput] = createSignal<File[]>([]); //ファイル選択ダイアログからのファイル入力受け取り用配列
   const [userSearchResult, setUserSearchResult] = createSignal<IUser[]>([]); //ユーザー検索結果
