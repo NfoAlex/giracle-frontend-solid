@@ -88,10 +88,14 @@ export default function ExpChannelContents() {
 
   /**
    * 現在のスクロール位置を確認してから該当する履歴取得をする
+   * @param optionalRetry 再試行状態での実行するかどうか。基本的に履歴取得時に最新あるいは最古のメッセージIdが参照できなかったときのリトライに使う。
    */
-  const checkScrollPosAndFetchHistory = async () => {
+  const checkScrollPosAndFetchHistory = async (optionalRetry = false) => {
+    //console.log("_ChannelContents :: checkScrollPosAndFetchHistory : ", { stateFetchingHistory, isFocused: isFocused() });
+    //focusされてないなら停止
     if (!isFocused()) return;
-    if (stateFetchingHistory) return;
+    //履歴の取得処理中、または再試行状態でないなら停止
+    if (stateFetchingHistory && !optionalRetry) return;
 
     const channelId = currentChannelId();
     if (!channelId) return;
@@ -102,54 +106,68 @@ export default function ExpChannelContents() {
     if (!el) return;
 
     // 連打防止（スクロール監視・createEffectの両方から呼ばれるため）
-    const now = Date.now();
-    if (now - lastFetchAt < 100) return;
+    //const now = Date.now();
+    //console.log("_ChannelContents :: checkScrollPosAndFetchHistory : now - lastFetchAt", now - lastFetchAt);
+    //if (now - lastFetchAt < 100) return;
 
     const thresholdPx = 40;
 
+    //console.log("_ChannelContents :: checkScrollPosAndFetchHistory : history->", { atTop: historyState.atTop, atEnd: historyState.atEnd })
+
     // 「上（古い側）」に到達 → older を追加取得
     if (!historyState.atTop && isNearVisualTop(el, thresholdPx)) {
-      lastFetchAt = now;
+      //lastFetchAt = now;
       stateFetchingHistory = true;
 
       const anchor = captureScrollAnchor(el);
       const oldest = historyState.history.at(-1);
+      //console.log("_ChannelContents :: checkScrollPosAndFetchHistory : oldest", oldest);
+      if (oldest === undefined) {
+        stateFetchingHistory = false;
+        //もし再試行での実行「でない」なら再試行状態で実行
+        if (!optionalRetry) setTimeout(() => checkScrollPosAndFetchHistory(true), 0);
+        return;
+      }
       await FetchHistory(
         channelId,
         {
-          messageIdFrom: oldest?.id,
-          messageTimeFrom: oldest?.createdAt,
+          messageIdFrom: oldest.id,
         },
         "older",
       );
       await restoreScrollFromAnchor(el, anchor);
       await waitForDomToSettle();
       stateFetchingHistory = false;
-      checkScrollPosAndFetchHistory();
       return;
     }
 
     // 「下（新しい側）」に到達 → newer を追加取得（必要な場合）
     if (!historyState.atEnd && isNearVisualBottom(el, thresholdPx)) {
-      lastFetchAt = now;
+      //lastFetchAt = now;
       stateFetchingHistory = true;
 
       const anchor = captureScrollAnchor(el);
       const newest = historyState.history[0];
+      //console.log("_ChannelContents :: checkScrollPosAndFetchHistory : newest", newest);
+      if (newest === undefined) {
+        stateFetchingHistory = false;
+        //もし再試行での実行「でない」なら再試行状態で実行
+        if (!optionalRetry) setTimeout(() => checkScrollPosAndFetchHistory(true), 0);
+        return;
+      }
       await FetchHistory(
         channelId,
         {
-          messageIdFrom: newest?.id,
+          messageIdFrom: newest.id,
         },
         "newer",
       );
       await restoreScrollFromAnchor(el, anchor);
       await waitForDomToSettle();
       stateFetchingHistory = false;
-      checkScrollPosAndFetchHistory();
     }
 
-    // 「下（新しい側）」に到達していて、かつ既読時間が最新メッセージ以降であれば、既読時間を更新する
+    // 既読時間更新確認処理へ
     checkAndUpdateReadTime();
   };
 
@@ -212,7 +230,7 @@ export default function ExpChannelContents() {
   const moveToNewest = async () => {
     //履歴取得状態を設定
     stateFetchingHistory = true;
-    
+
     //履歴をStoreから削除
     setStoreHistory((prev) => {
       const newStore = { ...prev };
@@ -235,7 +253,7 @@ export default function ExpChannelContents() {
 
   /**
    * 最新の既読時間にあたるメッセージへスクロールする
-   * @returns 
+   * @returns
    */
   const scrollToLatestRead = () => new Promise((resolve) => {
     const targetEl = document.getElementById("NEW_LINE");
@@ -321,10 +339,11 @@ export default function ExpChannelContents() {
           return mrt.channelId === prevChannelId;
         })?.readTime;
 
-        if (currentReadTimeForPrevChannel === undefined) return;
-        updateReadTime(prevChannelId, currentReadTimeForPrevChannel);
+        if (currentReadTimeForPrevChannel !== undefined) {
+          updateReadTime(prevChannelId, currentReadTimeForPrevChannel);
+        }
       }
-      
+
       //既読時間取得
       const latestReadTime = storeMessageReadTime.find((mrt) => {
         return mrt.channelId === currentChannelId();
@@ -343,8 +362,8 @@ export default function ExpChannelContents() {
       }
 
       //必要あり :: 履歴を取得して格納、その後履歴取得条件確認
-      FetchHistory(currentChannelId(), { messageTimeFrom: latestReadTime?.readTime ?? "", fetchLength: 1 }, "older")
-        .then(() => checkScrollPosAndFetchHistory());
+      await FetchHistory(currentChannelId(), { messageTimeFrom: latestReadTime?.readTime, fetchLength: 3 }, "older");
+      checkScrollPosAndFetchHistory();
     }
   ));
 
