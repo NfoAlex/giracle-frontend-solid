@@ -13,7 +13,7 @@ import POST_MESSAGE_UPDATE_READTIME from "~/api/MESSAGE/MESSAGE_UPDATE_READTIME.
 
 export default function ExpChannelContents() {
   const [isFocused, setIsFocused] = createSignal(true);
-  const [editingMsgId, setEditingMsgId] = createSignal("");
+  //const [editingMsgId, setEditingMsgId] = createSignal("");
   const param = useParams();
   const [currentChannelId, setCurrentChannelId] = createSignal<string>(param.channelId ?? "");
   let stateFetchingHistory = false;
@@ -282,24 +282,24 @@ export default function ExpChannelContents() {
     //console.log("ChannelContents :: toggleWindowFocus : isFocused->", isFocused());
   };
   //上矢印キーハンドラ(編集モードに入るための処理)
-  const handleKeyUp = (event: KeyboardEvent) => {
-    if (event.key === "ArrowUp" && editingMsgId() === "") {
-      //履歴要素が取得できないなら停止
-      const el = document.getElementById("history");
-      if (el === null) return;
-      //もしテキストが入力された状態なら停止
-      const inputEl = document.getElementById("messageInput") as HTMLInputElement;
-      if (inputEl.value !== "") return;
+  // const handleKeyUp = (event: KeyboardEvent) => {
+  //   if (event.key === "ArrowUp" && editingMsgId() === "") {
+  //     //履歴要素が取得できないなら停止
+  //     const el = document.getElementById("history");
+  //     if (el === null) return;
+  //     //もしテキストが入力された状態なら停止
+  //     const inputEl = document.getElementById("messageInput") as HTMLInputElement;
+  //     if (inputEl.value !== "") return;
 
-      //一番近い自分のメッセージを探して編集モードにする
-      for (let i = 0; i < storeHistory[currentChannelId()]?.history.length; i++) {
-        if (storeHistory[currentChannelId()]?.history[i].userId === storeMyUserinfo.id) {
-          setEditingMsgId(storeHistory[currentChannelId()]?.history[i].id);
-          return;
-        }
-      }
-    }
-  };
+  //     //一番近い自分のメッセージを探して編集モードにする
+  //     for (let i = 0; i < storeHistory[currentChannelId()]?.history.length; i++) {
+  //       if (storeHistory[currentChannelId()]?.history[i].userId === storeMyUserinfo.id) {
+  //         setEditingMsgId(storeHistory[currentChannelId()]?.history[i].id);
+  //         return;
+  //       }
+  //     }
+  //   }
+  // };
 
   //履歴の更新監視
   createEffect(on(
@@ -356,7 +356,7 @@ export default function ExpChannelContents() {
 
     window.addEventListener("focus", setWindowFocused);
     window.addEventListener("blur", unSetWindowFocused);
-    window.addEventListener("keyup", handleKeyUp);
+    //window.addEventListener("keyup", handleKeyUp);
   });
 
   onCleanup(() => {
@@ -365,7 +365,7 @@ export default function ExpChannelContents() {
 
     window.removeEventListener("focus", setWindowFocused);
     window.removeEventListener("blur", unSetWindowFocused);
-    window.removeEventListener("keyup", handleKeyUp);
+    //window.removeEventListener("keyup", handleKeyUp);
   });
 
   return (
