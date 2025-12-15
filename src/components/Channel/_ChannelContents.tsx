@@ -7,7 +7,7 @@ import { storeClientConfig } from "~/stores/ClientConfig.ts";
 import { Button } from "../ui/button.tsx";
 import { IconArrowDown } from "@tabler/icons-solidjs";
 import MessageDisplay from "./ChannelContent/MessageDisplay.tsx";
-import { setStoreMessageReadTimeBefore, storeMessageReadTime, updateReadTime } from "~/stores/Readtime.ts";
+import { storeMessageReadTime, updateReadTime } from "~/stores/Readtime.ts";
 import POST_MESSAGE_UPDATE_READTIME from "~/api/MESSAGE/MESSAGE_UPDATE_READTIME.ts";
 
 export default function ExpChannelContents() {
