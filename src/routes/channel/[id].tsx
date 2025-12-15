@@ -1,9 +1,9 @@
 import { useParams } from "@solidjs/router";
 import { IconEye, IconMail } from "@tabler/icons-solidjs";
-import POST_CHANNEL_JOIN from "~/api/CHANNEL/CHANNEL_JOIN";
-import ExpChannelContents from "~/components/Channel/_ChannelContents";
-import ChannelHeader from "~/components/Channel/ChannelHeader";
-import ChannelTextInput from "~/components/Channel/ChannelTextInput";
+import POST_CHANNEL_JOIN from "~/api/CHANNEL/CHANNEL_JOIN.ts";
+import ExpChannelContents from "~/components/Channel/_ChannelContents.tsx";
+import ChannelHeader from "~/components/Channel/ChannelHeader.tsx";
+import ChannelTextInput from "~/components/Channel/ChannelTextInput.tsx";
 import { Button } from "~/components/ui/button.tsx";
 import { Card } from "~/components/ui/card.tsx";
 import {storeAppStatus} from "~/stores/AppStatus.ts";

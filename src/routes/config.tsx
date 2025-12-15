@@ -5,7 +5,7 @@ import ConfigDisplay from "~/components/Config/ConfigDisplay";
 import ConfigNotification from "~/components/Config/ConfigNotification";
 import ConfigProfile from "~/components/Config/ConfigProfile";
 import { Card } from "~/components/ui/card.tsx";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~/components/ui/select.tsx";
 import { SidebarMenuButton } from "~/components/ui/sidebar.tsx";
 import SidebarTriggerWithDot from "~/components/unique/SidebarTriggerWithDot.tsx";
 import { storeAppStatus } from "~/stores/AppStatus.ts";

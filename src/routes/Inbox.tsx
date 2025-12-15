@@ -4,7 +4,7 @@ import { createSignal, Show } from "solid-js";
 import { IconBed } from "@tabler/icons-solidjs";
 import POST_MESSAGE_INBOX_READ from "~/api/MESSAGE/MESSAGE_INBOX_READ";
 import SidebarTriggerWithDot from "~/components/unique/SidebarTriggerWithDot.tsx";
-import { Switch, SwitchControl, SwitchLabel, SwitchThumb } from "~/components/ui/switch";
+import { Switch, SwitchControl, SwitchLabel, SwitchThumb } from "~/components/ui/switch.tsx";
 import DisplayInboxByChannel from "~/components/Inbox/DisplayInboxByChannel";
 import DisplayInboxByDate from "~/components/Inbox/DisplayInboxByDate";
 
