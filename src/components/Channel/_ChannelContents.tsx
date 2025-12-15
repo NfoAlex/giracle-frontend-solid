@@ -17,7 +17,6 @@ export default function ExpChannelContents() {
   const [currentChannelId, setCurrentChannelId] = createSignal<string>(param.channelId ?? "");
   let stateFetchingHistory = false;
   let scrollRafId = 0;
-  //let lastFetchAt = 0;
 
   const historyElementId = "history";
   const getHistoryElement = () => document.getElementById(historyElementId) as HTMLElement | null;
@@ -91,8 +90,6 @@ export default function ExpChannelContents() {
    */
   const checkScrollPosAndFetchHistory = async (optionalRetry = false) => {
     //console.log("_ChannelContents :: checkScrollPosAndFetchHistory : ", { stateFetchingHistory, isFocused: isFocused(), optionalRetry });
-    //focusされてないなら停止
-    if (!isFocused()) return;
     //履歴の取得処理中、または再試行状態でないなら停止
     if (stateFetchingHistory && !optionalRetry) return;
 
