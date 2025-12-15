@@ -177,16 +177,19 @@ export default function ChannelContents() {
     if (!el) return;
     if (isNearVisualBottom(el, 40) === false) return;
 
-    
     //最新メッセージの時間
     const latestMessageTime = storeHistory[currentChannelId()]?.history[0]?.createdAt;
     //現在の既読時間
     const currentReadTime = storeMessageReadTime.find((mrt) => {
       return mrt.channelId === currentChannelId();
     })?.readTime;
+    //console.log("ChannelContents :: checkAndUpdateReadTime : latestMessageTime, currentReadTime->", latestMessageTime, currentReadTime);
     //更新の条件確認
-    if (latestMessageTime === undefined || currentReadTime === undefined) return;
-    if (new Date(currentReadTime).valueOf() >= new Date(latestMessageTime).valueOf()) return;
+    if (latestMessageTime === undefined) return;
+    //現在の既読時間があるなら、最新メッセージ時間と比較して更新の必要があるかどうか調べる
+    if (currentReadTime !== undefined) {
+      if (new Date(currentReadTime).valueOf() >= new Date(latestMessageTime).valueOf()) return;
+    }
     
     //既読時間更新中フラグを立てる
     statusUpdatingReadTime = true;
@@ -201,9 +204,7 @@ export default function ChannelContents() {
       .catch((err) => {
         console.error("ChannelContents :: updateReadTime : err->", err);
       })
-      .finally(() => {
-        statusUpdatingReadTime = false;
-      });
+    statusUpdatingReadTime = false;
   };
 
   /**
