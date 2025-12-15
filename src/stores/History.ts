@@ -110,6 +110,7 @@ export const addMessage = (message: IMessage) => {
   
   if (message === undefined) console.error("History :: addMessage : message is undefined");
   if (storeHistory[message.channelId] === undefined) return;
+  if (storeHistory[message.channelId].atEnd === false) return;
 
   //格納(//メッセージひな形にマージする形で格納する)
   setStoreHistory(produce((history) => {
