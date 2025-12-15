@@ -164,7 +164,7 @@ export default function ExpChannelContents() {
   /**
    * 更新条件を確認して既読時間をサーバーに同期する
    */
-  const checkAndUpdateReadTime = async (option: { updateReadtimeBeforeToo: boolean } = { updateReadtimeBeforeToo: false }) => {
+  const checkAndUpdateReadTime = async () => {
     //もし既読時間更新中なら停止
     if (statusUpdatingReadTime) return;
 
@@ -187,16 +187,6 @@ export default function ExpChannelContents() {
     //更新の条件確認
     if (latestMessageTime === undefined || currentReadTime === undefined) return;
     if (new Date(currentReadTime).valueOf() >= new Date(latestMessageTime).valueOf()) return;
-
-    //比較用既読時間も最新メッセージ時間に更新
-    if (option.updateReadtimeBeforeToo) {
-      setStoreMessageReadTimeBefore((prev) => {
-        const newReadTime = { channelId: currentChannelId(), readTime: latestMessageTime };
-        const newStore = prev.filter((c) => c.channelId !== currentChannelId());
-        newStore.push({ ...newReadTime });
-        return newStore;
-      });
-    }
     
     //既読時間更新中フラグを立てる
     statusUpdatingReadTime = true;
@@ -344,8 +334,8 @@ export default function ExpChannelContents() {
     () => `${storeHistory[currentChannelId()]?.history.at(-1)?.id}`,
     () => {
       //console.log("ChannelContents :: createEffect : 履歴更新された", storeHistory[currentChannelId()]?.history);
-      //既読時間を更新、フォーカスしているなら比較用も更新させる
-      checkAndUpdateReadTime({ updateReadtimeBeforeToo: isFocused() });
+      //既読時間を更新
+      checkAndUpdateReadTime();
     })
   );
 
