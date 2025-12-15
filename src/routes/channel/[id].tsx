@@ -17,6 +17,7 @@ export default function Channel() {
    * @param channelId 参加するチャンネルId
    */
     const joinChannel = () => {
+      if (params.channelId === undefined) return;
       POST_CHANNEL_JOIN(params.channelId)
         .then((r) => {
           //console.log("/channel/[id] :: joinChannel :: r ->", r);
