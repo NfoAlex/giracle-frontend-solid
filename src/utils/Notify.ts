@@ -1,5 +1,5 @@
 import {asyncGetterUserinfo} from "~/stores/Userinfo.ts";
-import FormatMessageContent from "~/utils/FormatMessageContent";
+import FormatMessageContent from "~/utils/FormatMessageContent.ts";
 
 let notify: null | Notification = null;
 

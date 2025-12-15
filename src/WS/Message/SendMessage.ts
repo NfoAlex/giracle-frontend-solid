@@ -4,7 +4,7 @@ import { addMessage } from "~/stores/History.ts";
 import { storeMyUserinfo } from "~/stores/MyUserinfo.ts";
 import { setStoreMessageReadTimeBefore } from "~/stores/Readtime.ts";
 import type { IMessage } from "~/types/Message.ts";
-import { notifyIt } from "~/utils/Notify";
+import { notifyIt } from "~/utils/Notify.ts";
 
 export default function WSSendMessage(dat: IMessage) {
   //console.log("WSSendMessage :: triggered dat->", dat);
