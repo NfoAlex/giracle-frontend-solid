@@ -110,7 +110,6 @@ export default function ExpChannelContents() {
 
     // 「上（古い側）」に到達 → older を追加取得
     if (!historyState.atTop && isNearVisualTop(el, thresholdPx)) {
-      //lastFetchAt = now;
       stateFetchingHistory = true;
 
       const anchor = captureScrollAnchor(el);
@@ -136,7 +135,6 @@ export default function ExpChannelContents() {
 
     // 「下（新しい側）」に到達 → newer を追加取得（必要な場合）
     if (!historyState.atEnd && isNearVisualBottom(el, thresholdPx)) {
-      //lastFetchAt = now;
       stateFetchingHistory = true;
 
       const anchor = captureScrollAnchor(el);
