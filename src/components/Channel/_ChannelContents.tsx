@@ -170,10 +170,15 @@ export default function ExpChannelContents() {
     checkAndUpdateReadTime();
   };
 
+  let statusUpdatingReadTime = false;
+
   /**
    * 更新条件を確認して既読時間をサーバーに同期する
    */
   const checkAndUpdateReadTime = async () => {
+    //もし既読時間更新中なら停止
+    if (statusUpdatingReadTime) return;
+
     //チャンネルの末端に到達していなければ更新しない
     if (storeHistory[currentChannelId()]?.atEnd === false) return;
     //フォーカスしているか
@@ -182,6 +187,7 @@ export default function ExpChannelContents() {
     const el = getHistoryElement();
     if (!el) return;
     if (isNearVisualBottom(el, 40) === false) return;
+
 
     //最新メッセージの時間
     const latestMessageTime = storeHistory[currentChannelId()]?.history[0]?.createdAt;
@@ -192,6 +198,9 @@ export default function ExpChannelContents() {
     //更新の条件確認
     if (latestMessageTime === undefined || currentReadTime === undefined) return;
     if (new Date(currentReadTime).valueOf() >= new Date(latestMessageTime).valueOf()) return;
+    
+    //既読時間更新中フラグを立てる
+    statusUpdatingReadTime = true;
 
     await POST_MESSAGE_UPDATE_READTIME(
       currentChannelId(),
@@ -199,6 +208,9 @@ export default function ExpChannelContents() {
     )
       .catch((err) => {
         console.error("ChannelContents :: updateReadTime : err->", err);
+      })
+      .finally(() => {
+        statusUpdatingReadTime = false;
       });
   };
 
