@@ -1,5 +1,5 @@
 import { useParams } from "@solidjs/router";
-import { Show, createEffect, createSignal, onCleanup, onMount, on, Index } from "solid-js";
+import { Show, createEffect, createSignal, onCleanup, onMount, on, Index, For } from "solid-js";
 import { setStoreHistory, storeHistory } from "~/stores/History.ts";
 import FetchHistory from "~/utils/FethchHistory.ts";
 import {IMessage} from "~/types/Message.tsx";
@@ -17,7 +17,7 @@ export default function ExpChannelContents() {
   const [currentChannelId, setCurrentChannelId] = createSignal<string>(param.channelId ?? "");
   let stateFetchingHistory = false;
   let scrollRafId = 0;
-  let lastFetchAt = 0;
+  //let lastFetchAt = 0;
 
   const historyElementId = "history";
   const getHistoryElement = () => document.getElementById(historyElementId) as HTMLElement | null;
@@ -90,7 +90,7 @@ export default function ExpChannelContents() {
    * @param optionalRetry 再試行状態での実行するかどうか。基本的に履歴取得時に最新あるいは最古のメッセージIdが参照できなかったときのリトライに使う。
    */
   const checkScrollPosAndFetchHistory = async (optionalRetry = false) => {
-    //console.log("_ChannelContents :: checkScrollPosAndFetchHistory : ", { stateFetchingHistory, isFocused: isFocused() });
+    //console.log("_ChannelContents :: checkScrollPosAndFetchHistory : ", { stateFetchingHistory, isFocused: isFocused(), optionalRetry });
     //focusされてないなら停止
     if (!isFocused()) return;
     //履歴の取得処理中、または再試行状態でないなら停止
@@ -98,8 +98,10 @@ export default function ExpChannelContents() {
 
     const channelId = currentChannelId();
     if (!channelId) return;
-    const historyState = storeHistory[channelId];
+    const historyState = { ...storeHistory[channelId] };
     if (!historyState) return;
+
+    //console.log("_ChannelContents :: checkScrollPosAndFetchHistory : historyState->", { atTop: historyState.atTop, atEnd: historyState.atEnd, history: historyState.history });
 
     const el = getHistoryElement();
     if (!el) return;
@@ -188,7 +190,7 @@ export default function ExpChannelContents() {
     if (!el) return;
     if (isNearVisualBottom(el, 40) === false) return;
 
-
+    
     //最新メッセージの時間
     const latestMessageTime = storeHistory[currentChannelId()]?.history[0]?.createdAt;
     //現在の既読時間
@@ -201,7 +203,7 @@ export default function ExpChannelContents() {
     
     //既読時間更新中フラグを立てる
     statusUpdatingReadTime = true;
-
+    
     await POST_MESSAGE_UPDATE_READTIME(
       currentChannelId(),
       latestMessageTime,
@@ -245,21 +247,28 @@ export default function ExpChannelContents() {
     //履歴をStoreから削除
     setStoreHistory((prev) => {
       const newStore = { ...prev };
-      newStore[currentChannelId()].history = [];
+      newStore[currentChannelId()] = {
+        atEnd: false,
+        atTop: false,
+        history: [],
+      };
       return newStore;
     });
+    await waitForDomToSettle();
     //取得して格納
-    await FetchHistory(currentChannelId(), { messageTimeFrom: "" }, "older");
+    await FetchHistory(currentChannelId(), { messageTimeFrom: "", fetchLength: 15 }, "older");
 
     //スクロールを一番下に移動
     const el = getHistoryElement();
     if (el) {
-      await waitForDomToSettle();
       el.scrollTop = 0;
     }
+    await waitForDomToSettle();
 
     //履歴取得状態解除
     stateFetchingHistory = false;
+    //履歴取得処理
+    checkScrollPosAndFetchHistory();
   };
 
   /**
@@ -334,7 +343,7 @@ export default function ExpChannelContents() {
   createEffect(on(
     () => `${storeHistory[currentChannelId()]?.history.at(-1)?.id}`,
     () => {
-      console.log("ChannelContents :: createEffect : 履歴更新された");
+      console.log("ChannelContents :: createEffect : 履歴更新された", storeHistory[currentChannelId()]?.history);
       checkAndUpdateReadTime();
     })
   );
@@ -373,7 +382,11 @@ export default function ExpChannelContents() {
       }
 
       //必要あり :: 履歴を取得して格納、その後履歴取得条件確認
-      await FetchHistory(currentChannelId(), { messageTimeFrom: latestReadTime?.readTime, fetchLength: 3 }, "older");
+      stateFetchingHistory = true;
+      //await FetchHistory(currentChannelId(), { messageTimeFrom: latestReadTime?.readTime, fetchLength: 3 }, "older");
+      await FetchHistory(currentChannelId(), { messageTimeFrom: latestReadTime?.readTime, fetchLength: 15 }, "older");
+      await scrollToLatestRead();
+      stateFetchingHistory = false;
       checkScrollPosAndFetchHistory();
     }
   ));
