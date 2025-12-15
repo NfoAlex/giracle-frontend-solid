@@ -106,14 +106,7 @@ export default function ExpChannelContents() {
     const el = getHistoryElement();
     if (!el) return;
 
-    // 連打防止（スクロール監視・createEffectの両方から呼ばれるため）
-    //const now = Date.now();
-    //console.log("_ChannelContents :: checkScrollPosAndFetchHistory : now - lastFetchAt", now - lastFetchAt);
-    //if (now - lastFetchAt < 100) return;
-
     const thresholdPx = 40;
-
-    //console.log("_ChannelContents :: checkScrollPosAndFetchHistory : history->", { atTop: historyState.atTop, atEnd: historyState.atEnd })
 
     // 「上（古い側）」に到達 → older を追加取得
     if (!historyState.atTop && isNearVisualTop(el, thresholdPx)) {
