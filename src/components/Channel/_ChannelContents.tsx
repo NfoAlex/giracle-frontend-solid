@@ -357,12 +357,12 @@ export default function ExpChannelContents() {
       });
 
       //履歴を取得する必要があるかどうか確認
-      const noHistory = storeHistory[currentChannelId()] === undefined ||
+      const historyNeeded = storeHistory[currentChannelId()] === undefined ||
         storeHistory[currentChannelId()]?.history === undefined ||
         storeHistory[currentChannelId()]?.history.length === 0;
 
       //必要無し :: その場で履歴取得条件確認
-      if (!noHistory) {
+      if (!historyNeeded) {
         await scrollToLatestRead();
         checkScrollPosAndFetchHistory();
         return;
