@@ -196,7 +196,7 @@ export default function ExpChannelContents() {
     
     //既読時間更新中フラグを立てる
     statusUpdatingReadTime = true;
-    
+
     await POST_MESSAGE_UPDATE_READTIME(
       currentChannelId(),
       latestMessageTime,
@@ -376,8 +376,7 @@ export default function ExpChannelContents() {
 
       //必要あり :: 履歴を取得して格納、その後履歴取得条件確認
       stateFetchingHistory = true;
-      //await FetchHistory(currentChannelId(), { messageTimeFrom: latestReadTime?.readTime, fetchLength: 3 }, "older");
-      await FetchHistory(currentChannelId(), { messageTimeFrom: latestReadTime?.readTime, fetchLength: 15 }, "older");
+      await FetchHistory(currentChannelId(), { messageTimeFrom: latestReadTime?.readTime, fetchLength: 3 }, "newer");
       await scrollToLatestRead();
       stateFetchingHistory = false;
       checkScrollPosAndFetchHistory();
