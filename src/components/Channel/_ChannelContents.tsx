@@ -1,5 +1,5 @@
 import { useParams } from "@solidjs/router";
-import { Show, createEffect, createSignal, onCleanup, onMount, on, Index, For } from "solid-js";
+import { Show, createEffect, createSignal, onCleanup, onMount, on, For } from "solid-js";
 import { setStoreHistory, storeHistory } from "~/stores/History.ts";
 import FetchHistory from "~/utils/FethchHistory.ts";
 import {IMessage} from "~/types/Message.tsx";
@@ -7,7 +7,7 @@ import { storeClientConfig } from "~/stores/ClientConfig.ts";
 import { Button } from "../ui/button.tsx";
 import { IconArrowDown } from "@tabler/icons-solidjs";
 import MessageDisplay from "./ChannelContent/MessageDisplay.tsx";
-import { storeMessageReadTime, updateReadTime } from "~/stores/Readtime.ts";
+import { setStoreMessageReadTimeBefore, storeMessageReadTime, updateReadTime } from "~/stores/Readtime.ts";
 import POST_MESSAGE_UPDATE_READTIME from "~/api/MESSAGE/MESSAGE_UPDATE_READTIME.ts";
 
 export default function ExpChannelContents() {
@@ -164,7 +164,7 @@ export default function ExpChannelContents() {
   /**
    * 更新条件を確認して既読時間をサーバーに同期する
    */
-  const checkAndUpdateReadTime = async () => {
+  const checkAndUpdateReadTime = async (option: { updateReadtimeBeforeToo: boolean } = { updateReadtimeBeforeToo: false }) => {
     //もし既読時間更新中なら停止
     if (statusUpdatingReadTime) return;
 
@@ -187,10 +187,23 @@ export default function ExpChannelContents() {
     //更新の条件確認
     if (latestMessageTime === undefined || currentReadTime === undefined) return;
     if (new Date(currentReadTime).valueOf() >= new Date(latestMessageTime).valueOf()) return;
+
+    //比較用既読時間も最新メッセージ時間に更新
+    if (option.updateReadtimeBeforeToo) {
+      setStoreMessageReadTimeBefore((prev) => {
+        const newReadTime = { channelId: currentChannelId(), readTime: latestMessageTime };
+        const newStore = prev.filter((c) => c.channelId !== currentChannelId());
+        newStore.push({ ...newReadTime });
+        return newStore;
+      });
+    }
     
     //既読時間更新中フラグを立てる
     statusUpdatingReadTime = true;
-
+    
+    //Storeでの既読時間を先に更新
+    updateReadTime(currentChannelId(), latestMessageTime);
+    //サーバーに同期
     await POST_MESSAGE_UPDATE_READTIME(
       currentChannelId(),
       latestMessageTime,
@@ -330,8 +343,9 @@ export default function ExpChannelContents() {
   createEffect(on(
     () => `${storeHistory[currentChannelId()]?.history.at(-1)?.id}`,
     () => {
-      console.log("ChannelContents :: createEffect : 履歴更新された", storeHistory[currentChannelId()]?.history);
-      checkAndUpdateReadTime();
+      //console.log("ChannelContents :: createEffect : 履歴更新された", storeHistory[currentChannelId()]?.history);
+      //既読時間を更新、フォーカスしているなら比較用も更新させる
+      checkAndUpdateReadTime({ updateReadtimeBeforeToo: isFocused() });
     })
   );
 
