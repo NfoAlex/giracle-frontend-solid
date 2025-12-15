@@ -132,7 +132,6 @@ export default function ExpChannelContents() {
       await restoreScrollFromAnchor(el, anchor);
       await waitForDomToSettle();
       stateFetchingHistory = false;
-      return;
     }
 
     // 「下（新しい側）」に到達 → newer を追加取得（必要な場合）
