@@ -404,15 +404,15 @@ export default function ExpChannelContents() {
         id="history"
         class={`h-full w-full overflow-y-auto flex flex-col-reverse gap-${storeClientConfig.display.messageGapLevel}`}
       >
-        <Index each={storeHistory[currentChannelId()]?.history}>
+        <For each={storeHistory[currentChannelId()]?.history}>
           {(h, index) => (
             <MessageDisplay
-              message={h()}
-              messageArrayIndex={index}
-              displayAvatar={!sameSenderAsNext(index)}
+              message={h}
+              messageArrayIndex={index()}
+              displayAvatar={!sameSenderAsNext(index())}
             />
           )}
-        </Index>
+        </For>
 
         <Show when={storeHistory[currentChannelId()]?.atTop}>
           <p>履歴の末端まで到達しました。</p>
