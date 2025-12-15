@@ -1,11 +1,11 @@
 import {createSignal, For, Show} from "solid-js";
 import {IconPlus} from "@tabler/icons-solidjs";
 import {Popover, PopoverContent, PopoverTrigger} from "~/components/ui/popover";
-import {Badge} from "~/components/ui/badge";
+import {Badge} from "~/components/ui/badge.tsx";
 import RoleChip from "~/components/unique/RoleChip";
-import {storeRoleInfo} from "~/stores/RoleInfo";
-import {Card} from "~/components/ui/card";
-import { getRolePower } from "~/stores/MyUserinfo";
+import {storeRoleInfo} from "~/stores/RoleInfo.ts";
+import {Card} from "~/components/ui/card.tsx";
+import { getRolePower } from "~/stores/MyUserinfo.ts";
 
 export default function RoleLinker(props: { roles: string[], onUpdate?: (roles: string[])=>void }) {
   const [newRoles, setNewRoles] = createSignal(props.roles);

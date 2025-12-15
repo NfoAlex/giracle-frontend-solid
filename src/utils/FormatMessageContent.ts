@@ -1,5 +1,5 @@
-import {asyncGetterUserinfo} from "~/stores/Userinfo";
-import {directGetterChannelInfo} from "~/stores/ChannelInfo";
+import {asyncGetterUserinfo} from "~/stores/Userinfo.ts";
+import {directGetterChannelInfo} from "~/stores/ChannelInfo.ts";
 
 export default async function FormatMessageContent(content: string) {
   const mentionPattern = /@<([a-f0-9-]+)>/g;

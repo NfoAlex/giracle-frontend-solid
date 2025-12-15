@@ -4,12 +4,12 @@ import ConfigChat from "~/components/Config/ConfigChat";
 import ConfigDisplay from "~/components/Config/ConfigDisplay";
 import ConfigNotification from "~/components/Config/ConfigNotification";
 import ConfigProfile from "~/components/Config/ConfigProfile";
-import { Card } from "~/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~/components/ui/select";
-import { SidebarMenuButton } from "~/components/ui/sidebar";
-import SidebarTriggerWithDot from "~/components/unique/SidebarTriggerWithDot";
-import { storeAppStatus } from "~/stores/AppStatus";
-import { storeClientConfig } from "~/stores/ClientConfig";
+import { Card } from "~/components/ui/card.tsx";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~/components/ui/select.tsx";
+import { SidebarMenuButton } from "~/components/ui/sidebar.tsx";
+import SidebarTriggerWithDot from "~/components/unique/SidebarTriggerWithDot.tsx";
+import { storeAppStatus } from "~/stores/AppStatus.ts";
+import { storeClientConfig } from "~/stores/ClientConfig.ts";
 
 export default function Config() {
   const [displayMode, setDisplayMode] = createSignal<"profile" | "chat" | "notification" | "display">("profile");

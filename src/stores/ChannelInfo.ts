@@ -1,6 +1,6 @@
 import { createStore } from "solid-js/store";
-import GET_CHANNEL_GET_INFO from "~/api/CHANNEL/CHANNEL_GET_INFO";
-import type { IChannel } from "~/types/Channel";
+import GET_CHANNEL_GET_INFO from "~/api/CHANNEL/CHANNEL_GET_INFO.ts";
+import { IChannel } from "~/types/Channel.ts";
 
 export const [storeChannelInfo, setStoreChannelInfo] = createStore<{
   [key: string]: IChannel;

@@ -1,8 +1,8 @@
-import type {IMessageUrlPreview} from "~/types/Message";
-import {Card, CardContent, CardHeader, CardTitle} from "~/components/ui/card";
+import type {IMessageUrlPreview} from "~/types/Message.ts";
+import {Card, CardContent, CardHeader, CardTitle} from "~/components/ui/card.tsx";
 import {For, Show} from "solid-js";
-import ImageWithModal from "~/components/unique/ImageWithModal";
-import VideoPlayerModal from "./URLPreview/VideoPlayerModal";
+import ImageWithModal from "~/components/unique/ImageWithModal.tsx";
+import VideoPlayerModal from "./URLPreview/VideoPlayerModal.tsx";
 import { IconLink } from "@tabler/icons-solidjs";
 
 export default function URLPreview(props: { MessageUrlPreview: IMessageUrlPreview[] }) {
@@ -35,7 +35,7 @@ export default function URLPreview(props: { MessageUrlPreview: IMessageUrlPrevie
                 {
                   urlPreview.faviconLink
                   ?
-                  <img class={"w-5 h-fit shrink-0"} src={urlPreview.faviconLink} alt="favicon" />
+                  <img class={"w-5 h-fit shrink-0 truncate"} src={urlPreview.faviconLink} alt="favicon" />
                   :
                   <IconLink />
                 }

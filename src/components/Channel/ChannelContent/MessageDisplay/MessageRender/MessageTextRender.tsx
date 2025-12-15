@@ -1,11 +1,10 @@
 import { createMemo, For, type JSX } from "solid-js";
 // Dynamic は不要になったので削除
 // onMount も不要になったので削除
-import { directGetterChannelInfo } from "~/stores/ChannelInfo";
-import { getterUserinfo } from "~/stores/Userinfo";
-import { Badge } from "~/components/ui/badge";
-import { storeMyUserinfo } from "~/stores/MyUserinfo";
-import UserinfoModalWrapper from "~/components/unique/UserinfoModalWrapper";
+import { directGetterChannelInfo } from "~/stores/ChannelInfo.ts";
+import { getterUserinfo } from "~/stores/Userinfo.ts";
+import { storeMyUserinfo } from "~/stores/MyUserinfo.ts";
+import UserinfoModalWrapper from "~/components/unique/UserinfoModalWrapper.tsx";
 
 export default function MessageTextRender(props: { content: string }) {
   // props.content や依存するストアの値が変わった時だけ再計算されるメモを作成

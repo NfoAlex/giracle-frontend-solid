@@ -1,4 +1,4 @@
-import { setStoreMyUserinfo, storeMyUserinfo } from "~/stores/MyUserinfo";
+import { setStoreMyUserinfo, storeMyUserinfo } from "~/stores/MyUserinfo.ts";
 
 export default function WSChannelDeleted(dat: { channelId: string }) {
   //console.log("WSChannelDeleted :: triggered dat->", dat);

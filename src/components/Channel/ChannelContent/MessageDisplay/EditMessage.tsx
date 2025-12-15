@@ -1,10 +1,10 @@
-import {Card} from "~/components/ui/card";
-import {Button} from "~/components/ui/button";
+import {Card} from "~/components/ui/card.tsx";
+import {Button} from "~/components/ui/button.tsx";
 import {IconCancel, IconCheck} from "@tabler/icons-solidjs";
 import {createSignal, onMount} from "solid-js";
-import {TextField, TextFieldTextArea} from "~/components/ui/text-field";
+import {TextField, TextFieldTextArea} from "~/components/ui/text-field.tsx";
 import POST_MESSAGE_EDIT from "~/api/MESSAGE/MESSAGE_EDIT";
-import { storeClientConfig } from "~/stores/ClientConfig";
+import { storeClientConfig } from "~/stores/ClientConfig.ts";
 
 export default function EditMessage(props: { messageId: string, content: string, onCancelEdit: () => void }) {
   const [messageContent, setMessageContent] = createSignal(props.content);

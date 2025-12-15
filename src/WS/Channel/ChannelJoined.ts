@@ -1,4 +1,4 @@
-import { setStoreMyUserinfo, storeMyUserinfo } from "~/stores/MyUserinfo";
+import { setStoreMyUserinfo, storeMyUserinfo } from "~/stores/MyUserinfo.ts";
 
 export default function WSChannelJoined(dat: { channelId: string }) {
   //console.log("WSChannelJoined :: triggered dat->", dat);

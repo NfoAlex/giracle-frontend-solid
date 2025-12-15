@@ -1,10 +1,10 @@
 import {IconTrash} from "@tabler/icons-solidjs";
-import { Button } from "../ui/button";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogTitle, DialogTrigger } from "../ui/dialog";
+import { Button } from "../ui/button.tsx";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogTitle, DialogTrigger } from "../ui/dialog.tsx";
 import { createSignal } from "solid-js";
-import DELETE_CHANNEL_DELETE from "~/api/CHANNEL/CHANNEL_DELETE";
-import type { IChannel } from "~/types/Channel";
-import {Label} from "~/components/ui/label";
+import DELETE_CHANNEL_DELETE from "~/api/CHANNEL/CHANNEL_DELETE.ts";
+import type { IChannel } from "~/types/Channel.ts";
+import {Label} from "~/components/ui/label.tsx";
 
 export default function DeleteChannel(props: {fetchChannels: () => void, channel: IChannel}) {
   const [open, setOpen] = createSignal(false); //ダイアログの開閉

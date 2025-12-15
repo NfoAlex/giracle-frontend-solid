@@ -1,13 +1,13 @@
 import { useParams } from "@solidjs/router";
 import { IconEye, IconMail } from "@tabler/icons-solidjs";
-import POST_CHANNEL_JOIN from "~/api/CHANNEL/CHANNEL_JOIN";
-import ChannelContents from "~/components/Channel/ChannelContents";
-import ChannelHeader from "~/components/Channel/ChannelHeader";
-import ChannelTextInput from "~/components/Channel/ChannelTextInput";
-import { Button } from "~/components/ui/button";
-import { Card } from "~/components/ui/card";
-import {storeAppStatus} from "~/stores/AppStatus";
-import { storeMyUserinfo } from "~/stores/MyUserinfo";
+import POST_CHANNEL_JOIN from "~/api/CHANNEL/CHANNEL_JOIN.ts";
+import ChannelContents from "~/components/Channel/ChannelContents.tsx";
+import ChannelHeader from "~/components/Channel/ChannelHeader.tsx";
+import ChannelTextInput from "~/components/Channel/ChannelTextInput.tsx";
+import { Button } from "~/components/ui/button.tsx";
+import { Card } from "~/components/ui/card.tsx";
+import {storeAppStatus} from "~/stores/AppStatus.ts";
+import { storeMyUserinfo } from "~/stores/MyUserinfo.ts";
 
 export default function Channel() {
   const params = useParams();
@@ -17,6 +17,7 @@ export default function Channel() {
    * @param channelId 参加するチャンネルId
    */
     const joinChannel = () => {
+      if (params.channelId === undefined) return;
       POST_CHANNEL_JOIN(params.channelId)
         .then((r) => {
           //console.log("/channel/[id] :: joinChannel :: r ->", r);

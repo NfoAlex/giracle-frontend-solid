@@ -1,13 +1,13 @@
 import { createSignal } from "solid-js";
-import ManageCommunity from "~/components/ManageServer/manage-community";
-import ManageInvite from "~/components/ManageServer/manage-invite";
-import ManageRole from "~/components/ManageServer/manage-role";
-import { Button } from "~/components/ui/button";
-import { Card } from "~/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~/components/ui/select";
-import { getRolePower } from "~/stores/MyUserinfo";
-import SidebarTriggerWithDot from "~/components/unique/SidebarTriggerWithDot";
-import ManageEmoji from "~/components/ManageServer/manage-emoji";
+import ManageCommunity from "~/components/ManageServer/manage-community.tsx";
+import ManageInvite from "~/components/ManageServer/manage-invite.tsx";
+import ManageRole from "~/components/ManageServer/manage-role.tsx";
+import { Button } from "~/components/ui/button.tsx";
+import { Card } from "~/components/ui/card.tsx";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~/components/ui/select.tsx";
+import { getRolePower } from "~/stores/MyUserinfo.ts";
+import SidebarTriggerWithDot from "~/components/unique/SidebarTriggerWithDot.tsx";
+import ManageEmoji from "~/components/ManageServer/manage-emoji.tsx";
 
 export default function ManageServer() {
   const [displayMode, setDisplayMode] = createSignal<"community" | "role" | "invite" | "customEmoji">("community");

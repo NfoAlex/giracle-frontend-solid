@@ -1,12 +1,12 @@
 import { createMemo } from "solid-js";
-import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { IconCornerUpLeft, IconX } from "@tabler/icons-solidjs";
-import { Badge } from "~/components/ui/badge";
-import { Card } from "~/components/ui/card";
-import { storeHistory } from "~/stores/History";
-import storeReplyingMessageId from "~/stores/ReplyingMessageId";
-import { getterUserinfo } from "~/stores/Userinfo";
-import type { IMessage } from "~/types/Message";
+import { IMessage } from "~/types/Message.ts";
+import { storeHistory } from "~/stores/History.ts";
+import storeReplyingMessageId from "~/stores/ReplyingMessageId.ts";
+import { Card } from "~/components/ui/card.tsx";
+import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar.tsx";
+import { getterUserinfo } from "~/stores/Userinfo.ts";
+import { Badge } from "~/components/ui/badge.tsx";
 
 export default function ReplyMessageDisplay(props: {messageId: string, channelId: string, onRemove: () => void}) {
 

@@ -1,12 +1,12 @@
-import {IMessageFileAttached} from "~/types/Message";
-import {Card} from "~/components/ui/card";
+import {IMessageFileAttached} from "~/types/Message.ts";
+import {Card} from "~/components/ui/card.tsx";
 import {IconDownload} from "@tabler/icons-solidjs";
-import ConvertSizeToHumanSize from "~/utils/ConvertSizeToHumanSize";
-import {Button} from "~/components/ui/button";
-import ImageWithModal from "~/components/unique/ImageWithModal";
-import { storeImageDimensions } from "~/stores/History";
+import ConvertSizeToHumanSize from "~/utils/ConvertSizeToHumanSize.ts";
+import {Button} from "~/components/ui/button.tsx";
+import ImageWithModal from "~/components/unique/ImageWithModal.tsx";
+import { storeImageDimensions } from "~/stores/History.ts";
 import { createSignal, onCleanup, onMount } from "solid-js";
-import { HoverCard, HoverCardContent, HoverCardTrigger } from "~/components/ui/hover-card";
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "~/components/ui/hover-card.tsx";
 
 export default function FilePreview(props: { file: IMessageFileAttached }) {
   const [openFileNameCard, setOpenFileNameCard] = createSignal(false); //ファイル名表示のHoverCardの開閉状態

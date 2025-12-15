@@ -1,5 +1,5 @@
 import { createStore } from "solid-js/store";
-import type { IChannel } from "~/types/Channel";
+import type { IChannel } from "~/types/Channel.ts";
 
 export const [storeHasNewMessage, setStoreHasNewMessage] = createStore<{[key: IChannel["id"]]: boolean}>({});
 

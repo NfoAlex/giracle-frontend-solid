@@ -1,7 +1,7 @@
 import {createStore} from "solid-js/store";
-import {ICustomEmoji} from "~/types/Message";
 import {Database} from "emoji-picker-element";
-import type {CustomEmoji} from "emoji-picker-element/shared";
+import { CustomEmoji } from "emoji-picker-element/shared.js";
+import { ICustomEmoji } from "~/types/Message.ts";
 
 export const [storeCustomEmoji, setStoreCustomEmoji] = createStore<ICustomEmoji[]>([]);
 export let emojiDB = new Database();

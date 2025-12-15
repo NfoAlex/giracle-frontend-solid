@@ -1,6 +1,6 @@
-import type { IMessage } from "~/types/Message";
-import { setStoreHistory } from "~/stores/History";
-import { storeReplyDisplayCache } from "~/stores/ReplyDisplayCache";
+import type { IMessage } from "~/types/Message.ts";
+import { setStoreHistory } from "~/stores/History.ts";
+import { storeReplyDisplayCache } from "~/stores/ReplyDisplayCache.ts";
 
 /**
  * メッセージの更新処理

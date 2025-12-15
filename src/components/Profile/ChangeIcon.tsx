@@ -1,8 +1,8 @@
 import { IconCheck, IconUserCircle } from "@tabler/icons-solidjs";
 import { Show, createSignal } from "solid-js";
 import POST_USER_CHANGE_ICON from "~/api/USER/USER_CHANGE_ICON";
-import { Button } from "../ui/button";
-import { Callout, CalloutContent, CalloutTitle } from "../ui/callout";
+import { Button } from "../ui/button.tsx";
+import { Callout, CalloutContent, CalloutTitle } from "../ui/callout.tsx";
 import {
   Dialog,
   DialogContent,
@@ -11,8 +11,8 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "../ui/dialog";
-import {TextField, TextFieldInput} from "~/components/ui/text-field";
+} from "../ui/dialog.tsx";
+import {TextField, TextFieldInput} from "~/components/ui/text-field.tsx";
 
 export default function ChangeIcon() {
   const [file, setFile] = createSignal<File | null>(null);

@@ -1,6 +1,6 @@
 import { A } from "@solidjs/router";
 import {IconFileBroken} from "@tabler/icons-solidjs";
-import {Button} from "~/components/ui/button";
+import {Button} from "~/components/ui/button.tsx";
 
 export default function NotFound() {
   return (

@@ -1,12 +1,12 @@
 import { createEffect, createSignal, For, on, onMount } from "solid-js";
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "../ui/sidebar";
-import { storeMyUserinfo } from "~/stores/MyUserinfo";
+import { storeMyUserinfo } from "~/stores/MyUserinfo.ts";
 import { A, useLocation } from "@solidjs/router";
 import { IconLock, IconHash } from "@tabler/icons-solidjs";
-import { directGetterChannelInfo } from "~/stores/ChannelInfo";
-import { storeHasNewMessage } from "~/stores/HasNewMessage";
+import { directGetterChannelInfo } from "~/stores/ChannelInfo.ts";
+import { storeHasNewMessage } from "~/stores/HasNewMessage.ts";
 import Sortable from 'sortablejs';
-import { storeInbox } from "~/stores/Inbox";
+import { storeInbox } from "~/stores/Inbox.ts";
 
 export default function ChannelButtons() {
   const loc = useLocation();

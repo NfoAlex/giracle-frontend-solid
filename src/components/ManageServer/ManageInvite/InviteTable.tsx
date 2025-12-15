@@ -8,10 +8,10 @@ import {
   TableHeader,
   TableRow
 } from "~/components/ui/table"
-import { Button } from "~/components/ui/button"
-import { Card } from "~/components/ui/card"
+import { Button } from "~/components/ui/button.tsx"
+import { Card } from "~/components/ui/card.tsx"
 import DELETE_SERVER_DELETE_INVITE from "~/api/SERVER/SERVER_DELETE_INVITE"
-import type { IInvite } from "~/types/Server"
+import type { IInvite } from "~/types/Server.ts"
  
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]

@@ -1,7 +1,7 @@
 import { IconCheck, IconUserCircle } from "@tabler/icons-solidjs";
 import { Show, createSignal } from "solid-js";
-import { Button } from "../ui/button";
-import { Callout, CalloutContent, CalloutTitle } from "../ui/callout";
+import { Button } from "../ui/button.tsx";
+import { Callout, CalloutContent, CalloutTitle } from "../ui/callout.tsx";
 import {
   Dialog,
   DialogContent,
@@ -10,9 +10,9 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "../ui/dialog";
+} from "../ui/dialog.tsx";
 import POST_USER_CHANGE_BANNER from "~/api/USER/USER_CHANGE_BANNER";
-import {TextField, TextFieldInput} from "~/components/ui/text-field";
+import {TextField, TextFieldInput} from "~/components/ui/text-field.tsx";
 
 export default function ChangeBanner() {
   const [file, setFile] = createSignal<File | null>(null);

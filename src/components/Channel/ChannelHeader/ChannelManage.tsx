@@ -1,10 +1,10 @@
-import {Dialog, DialogContent, DialogDescription, DialogHeader, DialogTrigger} from "~/components/ui/dialog";
 import {IconInfoCircle, IconPencil} from "@tabler/icons-solidjs";
-import {Button} from "~/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
-import ChannelInfo from "./ChannelManage/ChannelInfos";
-import ChannelMembers from "./ChannelManage/ChannelMembers";
-import { getRolePower } from "~/stores/MyUserinfo";
+import { Button } from "~/components/ui/button.tsx";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTrigger } from "~/components/ui/dialog.tsx";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs.tsx";
+import { getRolePower } from "~/stores/MyUserinfo.ts";
+import ChannelInfo from "./ChannelManage/ChannelInfos.tsx";
+import ChannelMembers from "./ChannelManage/ChannelMembers.tsx";
 
 export default function ChannelManage(props: {channelId: string}) {
 

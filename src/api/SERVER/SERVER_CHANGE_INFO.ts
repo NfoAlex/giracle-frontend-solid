@@ -1,4 +1,4 @@
-import type { IServer } from "~/types/Server";
+import type { IServer } from "~/types/Server.ts";
 
 export default async function POST_SERVER_CHANGE_INFO(
   _name: string,

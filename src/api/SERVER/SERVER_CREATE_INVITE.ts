@@ -1,4 +1,4 @@
-import type { IInvite } from "~/types/Server";
+import type { IInvite } from "~/types/Server.ts";
 
 export default async function PUT_SERVER_CREATE_INVITE(
   _inviteCode: string,

@@ -1,10 +1,10 @@
 import { createSignal, For, onMount } from "solid-js";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "../ui/card"
-import type { IRole } from "~/types/Role";
-import { GET_ROLE_LIST } from "~/api/ROLE/ROLE_LIST";
-import { Button } from "../ui/button";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "../ui/card.tsx"
+import type { IRole } from "~/types/Role.ts";
+import { GET_ROLE_LIST } from "~/api/ROLE/ROLE_LIST.ts";
+import { Button } from "../ui/button.tsx";
 import { SidebarMenuButton } from "../ui/sidebar";
-import { TextField, TextFieldInput, TextFieldLabel } from "../ui/text-field";
+import { TextField, TextFieldInput, TextFieldLabel } from "../ui/text-field.tsx";
 import { IconCircle, IconList, IconPlus } from "@tabler/icons-solidjs";
 import { Switch, SwitchControl, SwitchLabel, SwitchThumb } from "../ui/switch";
 import POST_ROLE_UPDATE from "~/api/ROLE/ROLE_UPDATE";

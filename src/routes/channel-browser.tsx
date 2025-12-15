@@ -1,16 +1,16 @@
 import { IconArchiveFilled, IconReload } from "@tabler/icons-solidjs";
 import { createSignal, For, onMount, Show } from "solid-js";
-import POST_CHANNEL_JOIN from "~/api/CHANNEL/CHANNEL_JOIN";
-import POST_CHANNEL_LEAVE from "~/api/CHANNEL/CHANNEL_LEAVE";
-import { GET_CHANNEL_LIST } from "~/api/CHANNEL/CHANNEL_LIST";
-import CreateChannel from "~/components/ChannelBrowser/CreateChannel";
-import { Button } from "~/components/ui/button";
-import { Card } from "~/components/ui/card";
-import { Switch, SwitchControl, SwitchLabel, SwitchThumb } from "~/components/ui/switch";
-import { getRolePower, setStoreMyUserinfo, storeMyUserinfo } from "~/stores/MyUserinfo";
-import type { IChannel } from "~/types/Channel";
-import DeleteChannel from "~/components/ChannelBrowser/DeleteChannel";
-import SidebarTriggerWithDot from "~/components/unique/SidebarTriggerWithDot";
+import POST_CHANNEL_JOIN from "~/api/CHANNEL/CHANNEL_JOIN.ts";
+import POST_CHANNEL_LEAVE from "~/api/CHANNEL/CHANNEL_LEAVE.ts";
+import { GET_CHANNEL_LIST } from "~/api/CHANNEL/CHANNEL_LIST.ts";
+import CreateChannel from "~/components/ChannelBrowser/CreateChannel.tsx";
+import { Button } from "~/components/ui/button.tsx";
+import { Card } from "~/components/ui/card.tsx";
+import { Switch, SwitchControl, SwitchLabel, SwitchThumb } from "~/components/ui/switch.tsx";
+import { getRolePower, setStoreMyUserinfo, storeMyUserinfo } from "~/stores/MyUserinfo.ts";
+import type { IChannel } from "~/types/Channel.ts";
+import DeleteChannel from "~/components/ChannelBrowser/DeleteChannel.tsx";
+import SidebarTriggerWithDot from "~/components/unique/SidebarTriggerWithDot.tsx";
 import { A } from "@solidjs/router";
 
 export default function ChannelBrowser() {

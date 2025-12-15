@@ -1,4 +1,4 @@
-import type { IInvite } from "~/types/Server";
+import type { IInvite } from "~/types/Server.ts";
 
 export default async function DELETE_SERVER_DELETE_INVITE(
   _inviteId: number,

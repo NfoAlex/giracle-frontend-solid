@@ -2,19 +2,19 @@ import {IconCheck, IconCircleX, IconPencil, IconPlus} from "@tabler/icons-solidj
 import { For, Show, createSignal } from "solid-js";
 import POST_USER_PROFILE_UPDATE from "~/api/USER/USER_PROFILE_UPDATE";
 import ChangeIcon from "~/components/Profile/ChangeIcon";
-import { Avatar, AvatarImage } from "~/components/ui/avatar";
-import { Button } from "~/components/ui/button";
-import { Card, CardContent, CardHeader } from "~/components/ui/card";
-import { Label } from "~/components/ui/label";
-import { TextField, TextFieldInput } from "~/components/ui/text-field";
-import { getRolePower, setStoreMyUserinfo, storeMyUserinfo } from "~/stores/MyUserinfo";
+import { Avatar, AvatarImage } from "~/components/ui/avatar.tsx";
+import { Button } from "~/components/ui/button.tsx";
+import { Card, CardContent, CardHeader } from "~/components/ui/card.tsx";
+import { Label } from "~/components/ui/label.tsx";
+import { TextField, TextFieldInput } from "~/components/ui/text-field.tsx";
+import { getRolePower, setStoreMyUserinfo, storeMyUserinfo } from "~/stores/MyUserinfo.ts";
 import ChangeBanner from "~/components/Profile/ChangeBanner";
 import RoleChip from "../unique/RoleChip";
 import POST_ROLE_UNLINK from "~/api/ROLE/ROLE_UNLINK";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
-import { Badge } from "../ui/badge";
+import { Badge } from "../ui/badge.tsx";
 import POST_ROLE_LINK from "~/api/ROLE/ROLE_LINK";
-import { storeRoleInfo } from "~/stores/RoleInfo";
+import { storeRoleInfo } from "~/stores/RoleInfo.ts";
 import ChangePasswordModal from "./ConfigProfile/ChangePasswordModal";
 
 export default function ConfigProfile() {

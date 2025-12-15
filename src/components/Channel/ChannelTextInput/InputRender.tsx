@@ -1,8 +1,8 @@
 import {createSignal, For, Match, Show, Switch as SolidSwitch} from "solid-js";
-import {Card} from "~/components/ui/card";
-import type {IUser} from "~/types/User";
-import GET_USER_SEARCH from "~/api/USER/USER_SEARCH.";
 import {useParams} from "@solidjs/router";
+import { IUser } from "~/types/User.ts";
+import GET_USER_SEARCH from "~/api/USER/USER_SEARCH.ts";
+import { Card } from "~/components/ui/card.tsx";
 
 interface IMessageInput {
   type: "text"|"mention"|"channel",

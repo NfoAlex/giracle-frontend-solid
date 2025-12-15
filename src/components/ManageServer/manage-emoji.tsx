@@ -1,12 +1,12 @@
-import {Card} from "~/components/ui/card";
+import {Card} from "~/components/ui/card.tsx";
 import {For, Show} from "solid-js";
-import {storeCustomEmoji} from "~/stores/CustomEmoji";
+import {storeCustomEmoji} from "~/stores/CustomEmoji.ts";
 import CreateCustomEmoji from "~/components/ManageServer/ManageEmoji/CreateCustomEmoji";
-import {getterUserinfo} from "~/stores/Userinfo";
+import {getterUserinfo} from "~/stores/Userinfo.ts";
 import DELETE_SERVER_CUSTOM_EMOJI_DELETE from "~/api/SERVER/SERVER_CUSTOM_EMOJI_DELETE";
 import {Table, TableBody, TableHead, TableHeader, TableRow} from "~/components/ui/table";
 import {IconTrash} from "@tabler/icons-solidjs";
-import {Button} from "~/components/ui/button";
+import {Button} from "~/components/ui/button.tsx";
 
 export default function ManageEmoji() {
 

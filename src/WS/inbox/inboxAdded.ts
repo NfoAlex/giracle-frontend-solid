@@ -1,9 +1,9 @@
-import POST_MESSAGE_INBOX_READ from "~/api/MESSAGE/MESSAGE_INBOX_READ";
-import { storeClientConfig } from "~/stores/ClientConfig";
-import { storeHistory } from "~/stores/History";
-import {setStoreInbox} from "~/stores/Inbox";
-import type {IInbox, IMessage} from "~/types/Message";
-import { notifyIt } from "~/utils/Notify";
+import POST_MESSAGE_INBOX_READ from "~/api/MESSAGE/MESSAGE_INBOX_READ.ts";
+import { storeClientConfig } from "~/stores/ClientConfig.ts";
+import { storeHistory } from "~/stores/History.ts";
+import {setStoreInbox} from "~/stores/Inbox.ts";
+import type {IInbox, IMessage} from "~/types/Message.ts";
+import { notifyIt } from "~/utils/Notify.ts";
 
 export default function WSInboxAdded(dat: { type: IInbox["type"], message: IMessage }) {
   //Giracleにフォーカスされているかどうか

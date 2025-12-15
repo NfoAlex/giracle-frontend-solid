@@ -6,15 +6,15 @@ import '@fontsource-variable/noto-sans-jp';
 import './index.css';
 
 import { lazy, Show, Suspense } from 'solid-js';
-import { storeAppStatus } from './stores/AppStatus';
-import { SidebarProvider } from './components/ui/sidebar';
-import { AppSidebar } from './components/Sidebar';
-import Channel from './routes/channel/[id]';
-import GET_SERVER_CONFIG from './api/SERVER/SERVER_CONFIG';
-import { setStoreServerinfo, storeServerinfo } from './stores/Serverinfo';
+import { storeAppStatus } from './stores/AppStatus.ts';
+import { SidebarProvider } from './components/ui/sidebar.tsx';
+import { AppSidebar } from './components/Sidebar.tsx';
+import Channel from './routes/channel/[id].tsx';
+import GET_SERVER_CONFIG from './api/SERVER/SERVER_CONFIG.ts';
+import { setStoreServerinfo, storeServerinfo } from './stores/Serverinfo.ts';
 import {ColorModeProvider, ColorModeScript, createLocalStorageManager} from "@kobalte/core";
-import AuthGuard from "~/components/AuthGuard";
-import SwipeToOpenSidebarWrapper from "~/components/unique/SwipeToOpenSidebarWrapper";
+import AuthGuard from "~/components/AuthGuard.tsx";
+import SwipeToOpenSidebarWrapper from "~/components/unique/SwipeToOpenSidebarWrapper.tsx";
 
 const root = document.getElementById('root');
 
@@ -66,21 +66,21 @@ render(() =>
     </>
   )}>
     <Route path="/" component={TopForMoving} />
-    <Route path="/auth" component={lazy(() => import("./routes/auth"))} />
-    <Route path="*paramName" component={lazy(() => import("./routes/[...404]"))} />
+    <Route path="/auth" component={lazy(() => import("./routes/auth.tsx"))} />
+    <Route path="*paramName" component={lazy(() => import("./routes/[...404].tsx"))} />
     <Route path="/app" component={AuthGuard}>
       <SwipeToOpenSidebarWrapper>
-        <Route path="/" component={lazy(() => import("./routes/index"))} />
+        <Route path="/" component={lazy(() => import("./routes/index.tsx"))} />
         <Route path="/channel">
           <Route path="/:channelId" component={Channel} />
         </Route>
-        <Route path="/online-user" component={lazy(() => import("./routes/online-user"))} />
-        <Route path="/config" component={lazy(() => import("./routes/config"))} />
-        <Route path="/inbox" component={lazy(() => import("./routes/Inbox"))} />
-        <Route path="/channel-browser" component={lazy(() => import("./routes/channel-browser"))} />
-        <Route path="/search" component={lazy(() => import("./routes/search"))} />
-        <Route path="/manage-server" component={lazy(() => import("./routes/manage-server"))} />
-        <Route path="*paramName" component={lazy(() => import("./routes/[...404]"))} />
+        <Route path="/online-user" component={lazy(() => import("./routes/online-user.tsx"))} />
+        <Route path="/config" component={lazy(() => import("./routes/config.tsx"))} />
+        <Route path="/inbox" component={lazy(() => import("./routes/Inbox.tsx"))} />
+        <Route path="/channel-browser" component={lazy(() => import("./routes/channel-browser.tsx"))} />
+        <Route path="/search" component={lazy(() => import("./routes/search.tsx"))} />
+        <Route path="/manage-server" component={lazy(() => import("./routes/manage-server.tsx"))} />
+        <Route path="*paramName" component={lazy(() => import("./routes/[...404].tsx"))} />
       </SwipeToOpenSidebarWrapper>
     </Route>
   </Router>,

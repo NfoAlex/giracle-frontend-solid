@@ -1,6 +1,6 @@
 import { produce } from "solid-js/store";
-import POST_CHANNEL_GET_HISTORY from "~/api/CHANNEL/CHANNEL_GET_HISTORY";
-import { insertHistory, setStoreImageDimensions, storeImageDimensions, updateHistoryPosition } from "~/stores/History";
+import POST_CHANNEL_GET_HISTORY from "~/api/CHANNEL/CHANNEL_GET_HISTORY.ts";
+import { insertHistory, setStoreImageDimensions, updateHistoryPosition } from "~/stores/History.ts";
 
 let fetching = false;
 

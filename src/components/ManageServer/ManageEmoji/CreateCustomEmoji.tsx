@@ -1,9 +1,9 @@
-import {Dialog, DialogContent, DialogFooter, DialogHeader, DialogTrigger} from "~/components/ui/dialog";
+import {Dialog, DialogContent, DialogFooter, DialogHeader, DialogTrigger} from "~/components/ui/dialog.tsx";
 import {IconPlus} from "@tabler/icons-solidjs";
-import {Button} from "~/components/ui/button";
-import {TextField, TextFieldInput} from "~/components/ui/text-field";
-import {Label} from "~/components/ui/label";
-import {Card} from "~/components/ui/card";
+import {Button} from "~/components/ui/button.tsx";
+import {TextField, TextFieldInput} from "~/components/ui/text-field.tsx";
+import {Label} from "~/components/ui/label.tsx";
+import {Card} from "~/components/ui/card.tsx";
 import {createSignal, Show} from "solid-js";
 import type { DOMElement } from "solid-js/jsx-runtime";
 import PUT_SERVER_CUSTOM_EMOJI_UPLOAD from "~/api/SERVER/SERVER_CUSTOM_EMOJI_UPLOAD";

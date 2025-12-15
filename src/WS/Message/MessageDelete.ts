@@ -1,9 +1,9 @@
-import {setStoreHistory, storeHistory} from "~/stores/History";
-import type {IMessage} from "~/types/Message";
-import {storeMessageReadTime} from "~/stores/Readtime";
-import {setStoreHasNewMessage, storeHasNewMessage} from "~/stores/HasNewMessage";
-import { storeReplyDisplayCache } from "~/stores/ReplyDisplayCache";
-import { setStoreInbox } from "~/stores/Inbox";
+import {setStoreHistory, storeHistory} from "~/stores/History.ts";
+import type {IMessage} from "~/types/Message.ts";
+import {storeMessageReadTime} from "~/stores/Readtime.ts";
+import {setStoreHasNewMessage, storeHasNewMessage} from "~/stores/HasNewMessage.ts";
+import { storeReplyDisplayCache } from "~/stores/ReplyDisplayCache.ts";
+import { setStoreInbox } from "~/stores/Inbox.ts";
 
 export default function WSMessageDeleted(dat: { messageId: IMessage["id"], channelId: string }) {
   //console.log("WSMessageDeleted :: triggered dat->", dat);
