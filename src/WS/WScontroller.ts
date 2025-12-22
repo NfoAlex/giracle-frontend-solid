@@ -1,30 +1,32 @@
-import GET_USER_GET_ONLINE from "~/api/USER/USER_GET_ONLINE";
+import GET_USER_GET_ONLINE from "~/api/USER/USER_GET_ONLINE.ts";
 import { storeAppStatus } from "~/stores/AppStatus.ts";
-import WSSendMessage from "./Message/SendMessage";
-import WSUpdateChannel from "./Channel/UpdateChannel";
-import WSRoleUpdated from "./Role/RoleUpdatede";
-import WSRoleLinked from "./Role/RoleLinked";
-import WSRoleUnlinked from "./Role/RoleUnlinked";
-import WSChannelDeleted from "./Channel/ChannelDeleted";
-import WSMessageDeleted from "./Message/MessageDelete";
-import WSUpdateMessage from "~/WS/Message/UpdateMessage";
+import WSSendMessage from "./Message/SendMessage.ts";
+import WSUpdateChannel from "./Channel/UpdateChannel.ts";
+import WSRoleUpdated from "./Role/RoleUpdatede.ts";
+import WSRoleLinked from "./Role/RoleLinked.ts";
+import WSRoleUnlinked from "./Role/RoleUnlinked.ts";
+import WSChannelDeleted from "./Channel/ChannelDeleted.ts";
+import WSMessageDeleted from "./Message/MessageDelete.ts";
+import WSUpdateMessage from "~/WS/Message/UpdateMessage.ts";
 import {setStoreUserOnline} from "~/stores/Userinfo.ts";
-import WSUserConnected from "~/WS/User/UserConnected";
-import WSUserDisconnected from "~/WS/User/UserDisconnected";
-import WSInboxDelete from "~/WS/inbox/inboxDeleted";
-import WSInboxAdded from "~/WS/inbox/inboxAdded";
+import WSUserConnected from "~/WS/User/UserConnected.ts";
+import WSUserDisconnected from "~/WS/User/UserDisconnected.ts";
+import WSInboxDelete from "~/WS/inbox/inboxDeleted.ts";
+import WSInboxAdded from "~/WS/inbox/inboxAdded.ts";
 import InitLoad from "~/utils/InitLoad.ts";
 import {storeMyUserinfo} from "~/stores/MyUserinfo.ts";
-import WSUserProfileUpdate from "~/WS/User/UserProfileUpdate";
-import WSReadTimeUpdate from "~/WS/Message/ReadTimeUpdate";
+import WSUserProfileUpdate from "~/WS/User/UserProfileUpdate.ts";
+import WSReadTimeUpdate from "~/WS/Message/ReadTimeUpdate.ts";
 import {setStoreHistory} from "~/stores/History.ts";
 import {produce} from "solid-js/store";
-import WSMessageAddReaction from "~/WS/Message/MessageAddReaction";
-import WSMessageDeleteReaction from "~/WS/Message/MessageDeleteReaction";
-import WSCustomEmojiUploaded from "~/WS/Server/CustomEmojiUploaded";
-import WSCustomEmojiDeleted from "~/WS/Server/CustomEmojiDeleted";
-import WSChannelLeft from "./Channel/ChannelLeft";
-import WSChannelJoined from "./Channel/ChannelJoined";
+import WSMessageAddReaction from "~/WS/Message/MessageAddReaction.ts";
+import WSMessageDeleteReaction from "~/WS/Message/MessageDeleteReaction.ts";
+import WSCustomEmojiUploaded from "~/WS/Server/CustomEmojiUploaded.ts";
+import WSCustomEmojiDeleted from "~/WS/Server/CustomEmojiDeleted.ts";
+import WSChannelLeft from "./Channel/ChannelLeft.ts";
+import WSChannelJoined from "./Channel/ChannelJoined.ts";
+import FetchHistory from "~/utils/FethchHistory.ts";
+import { storeMessageReadTime } from "~/stores/Readtime.ts";
 
 //WSインスタンス
 export let ws: WebSocket | undefined = undefined;
@@ -184,6 +186,23 @@ export const initWS = async () => {
         }
         return prev;
       }));
+
+      //チャンネルIdをlocationから取得
+      const path = document.location.pathname;
+      const paramMatch = path.match(/^\/app\/channel\/([a-zA-Z0-9_-]+)$/);
+      const channelId = paramMatch ? paramMatch[1] : null;
+      //もしチャンネルページにいるならその履歴を既読時間から取得取得する
+      if (channelId) {
+        const latestReadTime = storeMessageReadTime.find((mrt) => mrt.channelId === channelId)?.readTime;
+        FetchHistory(
+          channelId,
+          {
+            messageTimeFrom: latestReadTime ? latestReadTime : undefined,
+            fetchLength: 10
+          },
+          "newer",
+        );
+      }
     }
 
     //PING

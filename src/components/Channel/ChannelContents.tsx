@@ -11,10 +11,10 @@ import { storeMessageReadTime, updateReadTime } from "~/stores/Readtime.ts";
 import POST_MESSAGE_UPDATE_READTIME from "~/api/MESSAGE/MESSAGE_UPDATE_READTIME.ts";
 
 export default function ChannelContents() {
-  const [isFocused, setIsFocused] = createSignal(true);
-  //const [editingMsgId, setEditingMsgId] = createSignal("");
   const param = useParams();
+  const [isFocused, setIsFocused] = createSignal(true);
   const [currentChannelId, setCurrentChannelId] = createSignal<string>(param.channelId ?? "");
+  //const [editingMsgId, setEditingMsgId] = createSignal("");
   let stateFetchingHistory = false;
   let scrollRafId = 0;
 
@@ -110,7 +110,7 @@ export default function ChannelContents() {
       stateFetchingHistory = true;
 
       const anchor = captureScrollAnchor(el);
-      const oldest = historyState.history.at(-1);
+      const oldest = historyState?.history.at(-1);
       //console.log("_ChannelContents :: checkScrollPosAndFetchHistory : oldest", oldest);
       if (oldest === undefined) {
         stateFetchingHistory = false;
@@ -135,7 +135,7 @@ export default function ChannelContents() {
       stateFetchingHistory = true;
 
       const anchor = captureScrollAnchor(el);
-      const newest = historyState.history[0];
+      const newest = historyState?.history[0];
       //console.log("_ChannelContents :: checkScrollPosAndFetchHistory : newest", newest);
       if (newest === undefined) {
         stateFetchingHistory = false;
@@ -156,7 +156,7 @@ export default function ChannelContents() {
     }
 
     // 既読時間更新確認処理へ
-    checkAndUpdateReadTime();
+    await checkAndUpdateReadTime();
   };
 
   let statusUpdatingReadTime = false;
@@ -337,6 +337,11 @@ export default function ChannelContents() {
       //console.log("ChannelContents :: createEffect : 履歴更新された", storeHistory[currentChannelId()]?.history);
       //既読時間を更新
       checkAndUpdateReadTime();
+
+      //もしチャンネルの先端あるいは末端に到達していないならもう一度調べる
+      if (!storeHistory[currentChannelId()]?.atEnd || !storeHistory[currentChannelId()]?.atTop) {
+        checkScrollPosAndFetchHistory();
+      }
     })
   );
 
