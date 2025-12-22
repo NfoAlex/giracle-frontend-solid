@@ -25,7 +25,6 @@ import WSCustomEmojiUploaded from "~/WS/Server/CustomEmojiUploaded.ts";
 import WSCustomEmojiDeleted from "~/WS/Server/CustomEmojiDeleted.ts";
 import WSChannelLeft from "./Channel/ChannelLeft.ts";
 import WSChannelJoined from "./Channel/ChannelJoined.ts";
-import { useParams } from "@solidjs/router";
 import FetchHistory from "~/utils/FethchHistory.ts";
 import { storeMessageReadTime } from "~/stores/Readtime.ts";
 
@@ -187,6 +186,23 @@ export const initWS = async () => {
         }
         return prev;
       }));
+
+      //チャンネルIdをlocationから取得
+      const path = document.location.pathname;
+      const paramMatch = path.match(/^\/app\/channel\/([a-zA-Z0-9_-]+)$/);
+      const channelId = paramMatch ? paramMatch[1] : null;
+      //もしチャンネルページにいるならその履歴を既読時間から取得取得する
+      if (channelId) {
+        const latestReadTime = storeMessageReadTime.find((mrt) => mrt.channelId === channelId)?.readTime;
+        FetchHistory(
+          channelId,
+          {
+            messageTimeFrom: latestReadTime ? latestReadTime : undefined,
+            fetchLength: 10
+          },
+          "newer",
+        );
+      }
     }
 
     //PING
