@@ -11,10 +11,10 @@ import { storeMessageReadTime, updateReadTime } from "~/stores/Readtime.ts";
 import POST_MESSAGE_UPDATE_READTIME from "~/api/MESSAGE/MESSAGE_UPDATE_READTIME.ts";
 
 export default function ChannelContents() {
-  const [isFocused, setIsFocused] = createSignal(true);
-  //const [editingMsgId, setEditingMsgId] = createSignal("");
   const param = useParams();
+  const [isFocused, setIsFocused] = createSignal(true);
   const [currentChannelId, setCurrentChannelId] = createSignal<string>(param.channelId ?? "");
+  //const [editingMsgId, setEditingMsgId] = createSignal("");
   let stateFetchingHistory = false;
   let scrollRafId = 0;
 
