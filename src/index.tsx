@@ -5,7 +5,7 @@ import { Route, Router, useLocation, useNavigate } from "@solidjs/router";
 import '@fontsource-variable/noto-sans-jp';
 import './index.css';
 
-import { lazy, Show, Suspense } from 'solid-js';
+import { lazy, onCleanup, onMount, Show, Suspense } from 'solid-js';
 import { storeAppStatus } from './stores/AppStatus.ts';
 import { SidebarProvider } from './components/ui/sidebar.tsx';
 import { AppSidebar } from './components/Sidebar.tsx';
@@ -15,6 +15,7 @@ import { setStoreServerinfo, storeServerinfo } from './stores/Serverinfo.ts';
 import {ColorModeProvider, ColorModeScript, createLocalStorageManager} from "@kobalte/core";
 import AuthGuard from "~/components/AuthGuard.tsx";
 import SwipeToOpenSidebarWrapper from "~/components/unique/SwipeToOpenSidebarWrapper.tsx";
+import { ExternalNavigater } from './utils/ExternalNavigater.ts';
 
 const root = document.getElementById('root');
 
@@ -49,22 +50,37 @@ const TopForMoving = () => {
 
 const storageManager = createLocalStorageManager("vite-ui-theme")
 render(() => 
-  <Router root={(props) => (
-    <>
-      <ColorModeScript storageType={storageManager.type} />
-      <ColorModeProvider storageManager={storageManager}>
-        <SidebarProvider>
-          <Show when={useLocation().pathname.startsWith("/app")}>
-            <AppSidebar />
-          </Show>
-          <Suspense>
-            {/* サイドバーを考慮した幅指定をしてメッセージレンダー部分の変なオーバーフローを無くす */}
-            <div class={"md:w-[calc(100%-16rem)] w-screen mx-auto"}>{props.children}</div>
-          </Suspense>
-        </SidebarProvider>
-      </ColorModeProvider>
-    </>
-  )}>
+  <Router root={
+    (props) => {
+      const navi = useNavigate();
+
+      onMount(() => {
+        ExternalNavigater.bind(({ to, options }) => {
+          navi(to, options);
+        });
+      });
+      onCleanup(() => {
+        ExternalNavigater.unbind();
+      });
+
+      return (
+        <>
+          <ColorModeScript storageType={storageManager.type} />
+          <ColorModeProvider storageManager={storageManager}>
+            <SidebarProvider>
+              <Show when={useLocation().pathname.startsWith("/app")}>
+                <AppSidebar />
+              </Show>
+              <Suspense>
+                {/* サイドバーを考慮した幅指定をしてメッセージレンダー部分の変なオーバーフローを無くす */}
+                <div class={"md:w-[calc(100%-16rem)] w-screen mx-auto"}>{props.children}</div>
+              </Suspense>
+            </SidebarProvider>
+          </ColorModeProvider>
+        </>
+      )
+    }
+  }>
     <Route path="/" component={TopForMoving} />
     <Route path="/auth" component={lazy(() => import("./routes/auth.tsx"))} />
     <Route path="*paramName" component={lazy(() => import("./routes/[...404].tsx"))} />
