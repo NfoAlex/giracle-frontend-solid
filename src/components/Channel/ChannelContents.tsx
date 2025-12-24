@@ -428,7 +428,9 @@ export default function ChannelContents() {
         </Show>
       </div>
 
-      { !storeHistory[currentChannelId()]?.atEnd &&
+      {
+        !storeHistory[currentChannelId()]?.atEnd
+        &&
         <div class="absolute bottom-10 right-10 z-10">
           <Button onClick={moveToNewest} class="w-16 h-16"><IconArrowDown style="height:28px; width:28px;" /></Button>
         </div>
