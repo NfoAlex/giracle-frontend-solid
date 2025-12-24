@@ -1,11 +1,11 @@
 /* @refresh reload */
 import { render } from 'solid-js/web';
-import { Route, Router, useLocation, useNavigate } from "@solidjs/router";
+import { type NavigateOptions, Route, Router, useLocation, useNavigate } from "@solidjs/router";
 
 import '@fontsource-variable/noto-sans-jp';
 import './index.css';
 
-import { lazy, Show, Suspense } from 'solid-js';
+import { lazy, onCleanup, onMount, Show, Suspense } from 'solid-js';
 import { storeAppStatus } from './stores/AppStatus.ts';
 import { SidebarProvider } from './components/ui/sidebar.tsx';
 import { AppSidebar } from './components/Sidebar.tsx';
@@ -47,24 +47,63 @@ const TopForMoving = () => {
   )
 }
 
+//ページ遷移関数をRouter外でも使えるようにする
+type NavigateEvent = {
+  to: string;
+  options?: Partial<NavigateOptions>;
+};
+export type NavigateFunc = (event: NavigateEvent) => void;
+
+// useNavigateの関数リンク
+export const ExternalNavigate: {
+  receiver: undefined | NavigateFunc;
+  bind: (sink: NavigateFunc) => void;
+  unbind: () => void;
+  navi: NavigateFunc;
+} = {
+  receiver: undefined,
+  bind: (func: (event: NavigateEvent) => void) => {
+    ExternalNavigate.receiver = func;
+  },
+  unbind: () => {
+    ExternalNavigate.receiver = undefined;
+  },
+  navi: (event: NavigateEvent) => ExternalNavigate.receiver?.(event),
+};
+
 const storageManager = createLocalStorageManager("vite-ui-theme")
 render(() => 
-  <Router root={(props) => (
-    <>
-      <ColorModeScript storageType={storageManager.type} />
-      <ColorModeProvider storageManager={storageManager}>
-        <SidebarProvider>
-          <Show when={useLocation().pathname.startsWith("/app")}>
-            <AppSidebar />
-          </Show>
-          <Suspense>
-            {/* サイドバーを考慮した幅指定をしてメッセージレンダー部分の変なオーバーフローを無くす */}
-            <div class={"md:w-[calc(100%-16rem)] w-screen mx-auto"}>{props.children}</div>
-          </Suspense>
-        </SidebarProvider>
-      </ColorModeProvider>
-    </>
-  )}>
+  <Router root={
+    (props) => {
+      const navi = useNavigate();
+
+      onMount(() => {
+        ExternalNavigate.bind(({ to, options }) => {
+          navi(to, options);
+        });
+      });
+      onCleanup(() => {
+        ExternalNavigate.unbind();
+      });
+
+      return (
+        <>
+          <ColorModeScript storageType={storageManager.type} />
+          <ColorModeProvider storageManager={storageManager}>
+            <SidebarProvider>
+              <Show when={useLocation().pathname.startsWith("/app")}>
+                <AppSidebar />
+              </Show>
+              <Suspense>
+                {/* サイドバーを考慮した幅指定をしてメッセージレンダー部分の変なオーバーフローを無くす */}
+                <div class={"md:w-[calc(100%-16rem)] w-screen mx-auto"}>{props.children}</div>
+              </Suspense>
+            </SidebarProvider>
+          </ColorModeProvider>
+        </>
+      )
+    }
+  }>
     <Route path="/" component={TopForMoving} />
     <Route path="/auth" component={lazy(() => import("./routes/auth.tsx"))} />
     <Route path="*paramName" component={lazy(() => import("./routes/[...404].tsx"))} />
