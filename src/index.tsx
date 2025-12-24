@@ -1,6 +1,6 @@
 /* @refresh reload */
 import { render } from 'solid-js/web';
-import { type NavigateOptions, Route, Router, useLocation, useNavigate } from "@solidjs/router";
+import { Route, Router, useLocation, useNavigate } from "@solidjs/router";
 
 import '@fontsource-variable/noto-sans-jp';
 import './index.css';
@@ -15,6 +15,7 @@ import { setStoreServerinfo, storeServerinfo } from './stores/Serverinfo.ts';
 import {ColorModeProvider, ColorModeScript, createLocalStorageManager} from "@kobalte/core";
 import AuthGuard from "~/components/AuthGuard.tsx";
 import SwipeToOpenSidebarWrapper from "~/components/unique/SwipeToOpenSidebarWrapper.tsx";
+import { ExternalNavigater } from './utils/ExternalNavigater.ts';
 
 const root = document.getElementById('root');
 
@@ -47,30 +48,6 @@ const TopForMoving = () => {
   )
 }
 
-//ページ遷移関数をRouter外でも使えるようにする
-type NavigateEvent = {
-  to: string;
-  options?: Partial<NavigateOptions>;
-};
-export type NavigateFunc = (event: NavigateEvent) => void;
-
-// useNavigateの関数リンク
-export const ExternalNavigate: {
-  receiver: undefined | NavigateFunc;
-  bind: (sink: NavigateFunc) => void;
-  unbind: () => void;
-  navi: NavigateFunc;
-} = {
-  receiver: undefined,
-  bind: (func: (event: NavigateEvent) => void) => {
-    ExternalNavigate.receiver = func;
-  },
-  unbind: () => {
-    ExternalNavigate.receiver = undefined;
-  },
-  navi: (event: NavigateEvent) => ExternalNavigate.receiver?.(event),
-};
-
 const storageManager = createLocalStorageManager("vite-ui-theme")
 render(() => 
   <Router root={
@@ -78,12 +55,12 @@ render(() =>
       const navi = useNavigate();
 
       onMount(() => {
-        ExternalNavigate.bind(({ to, options }) => {
+        ExternalNavigater.bind(({ to, options }) => {
           navi(to, options);
         });
       });
       onCleanup(() => {
-        ExternalNavigate.unbind();
+        ExternalNavigater.unbind();
       });
 
       return (
