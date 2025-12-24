@@ -1,4 +1,4 @@
-import { createSignal, Show } from "solid-js";
+import { createEffect, createSignal, on, onCleanup, onMount, Show } from "solid-js";
 import { storeHistory } from "~/stores/History.ts";
 import { IMessage } from "~/types/Message.ts";
 import { Badge } from "../../ui/badge.tsx";
@@ -18,6 +18,7 @@ export default function MessageDisplay(props: {
   message: IMessage,
   displayAvatar: boolean,
 }) {
+  let messageRef: HTMLDivElement | undefined;
   const [hovered, setHovered] = createSignal(false);
   const [reacting, setReacting] = createSignal(false);
   const [editing, setEditing] = createSignal(false);
@@ -40,8 +41,32 @@ export default function MessageDisplay(props: {
     return prevDate.getDate() !== currDate.getDate() && prevDate.getDay() !== currDate.getDay();
   };
 
+  //要素の外クリック処理、ホバーを解除する
+  const handleClickOutside = (e: MouseEvent) => {
+    if (messageRef && !messageRef.contains(e.target as Node)) {
+      setHovered(false);
+      document.removeEventListener("click", handleClickOutside);
+    }
+  };
+
+  //ホバー状態で外クリック検知を有効化
+  createEffect(on(
+    () => hovered(),
+    () => {
+      if (hovered()) {
+        document.addEventListener("click", handleClickOutside);
+        onCleanup(() => document.removeEventListener("click", handleClickOutside));
+      }
+    }
+  ));
+
   return (
-    <div data-index={props.message.id} id={`messageId::${props.message.id}`} class={"w-full"}>
+    <div
+      ref={messageRef}
+      data-index={props.message.id}
+      id={`messageId::${props.message.id}`}
+      class={"w-full"}
+    >
       {/* 日付線 */}
       <Show when={displayDateLine()}>
         <div class="flex justify-center items-center gap-3 py-1">
