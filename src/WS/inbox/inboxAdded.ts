@@ -27,7 +27,7 @@ export default function WSInboxAdded(dat: { type: IInbox["type"], message: IMess
     setStoreInbox((prev) => {
       const newItem: IInbox = {
         messageId: dat.message.id,
-        type: "mention",
+        type: dat.type,
         userId: "",
         Message: dat.message,
         happendAt: dat.message.createdAt
