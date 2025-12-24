@@ -14,7 +14,13 @@ export default function WSInboxAdded(dat: { type: IInbox["type"], message: IMess
   const onSameChannel = location.pathname.endsWith("/channel/" + dat.message.channelId);
   //フォーカスされていないなら通知する
   if (!hasFocus && storeClientConfig.notification.notifyInbox && !storeClientConfig.notification.notifyAll) {
-    notifyIt(dat.message.userId, dat.message.content);
+    //通知内容
+    let notifyingContent = dat.message.content;
+    //返信なら特別表示に装飾
+    if (dat.type === "reply") {
+      notifyingContent = "あなたへの返信 : \n" + dat.message.content;
+    }
+    notifyIt(dat.message.userId, notifyingContent);
   }
 
   //今メンションされたチャンネルにいてかつ履歴にあるのなら既読処理、違うならInbox格納
