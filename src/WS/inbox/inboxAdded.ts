@@ -20,7 +20,7 @@ export default function WSInboxAdded(dat: { type: IInbox["type"], message: IMess
     if (dat.type === "reply") {
       notifyingContent = "あなたへの返信 : \n" + dat.message.content;
     }
-    notifyIt(dat.message.userId, notifyingContent);
+    notifyIt(dat.message.userId, notifyingContent, { channelId: dat.message.channelId });
   }
 
   //今メンションされたチャンネルにいてかつ履歴にあるのなら既読処理、違うならInbox格納
