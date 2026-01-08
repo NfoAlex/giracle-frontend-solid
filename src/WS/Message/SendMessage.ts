@@ -24,7 +24,7 @@ export default function WSSendMessage(dat: IMessage) {
     //設定で有効になっているなら通知する
     if (storeClientConfig.notification.notifyAll) {
       //console.log("WSSendMessage :: notifyIt ->", dat.userId, dat.content);
-      notifyIt(dat.userId, dat.content);
+      notifyIt(dat.userId, dat.content, { channelId: dat.channelId });
     }
   } else { //普通にアクティブなら時差表示用既読時間を更新
     setStoreMessageReadTimeBefore((prev) => {
