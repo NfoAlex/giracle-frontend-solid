@@ -128,7 +128,7 @@ export default function ChannelContents() {
       stateFetchingHistory = true;
 
       const anchor = captureScrollAnchor(el);
-      const newest = historyState?.history?.[0];
+      const newest = historyState?.history !== undefined ? historyState?.history[0] : undefined;
       //console.log("_ChannelContents :: checkScrollPosAndFetchHistory : newest", newest);
       if (newest === undefined) {
         stateFetchingHistory = false;
@@ -139,7 +139,7 @@ export default function ChannelContents() {
       await FetchHistory(
         channelId,
         {
-          messageIdFrom: newest?.id,
+          messageIdFrom: newest.id,
         },
         "newer",
       );
