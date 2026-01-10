@@ -18,8 +18,8 @@ importers:
         specifier: ^0.15.4
         version: 0.15.4(solid-js@1.9.10)
       '@tabler/icons-solidjs':
-        specifier: ^3.36.0
-        version: 3.36.0(solid-js@1.9.10)
+        specifier: ^3.36.1
+        version: 3.36.1(solid-js@1.9.10)
       '@tanstack/solid-table':
         specifier: ^8.21.3
         version: 8.21.3(solid-js@1.9.10)
@@ -52,8 +52,8 @@ importers:
         version: 1.0.7(tailwindcss@3.4.19)
     devDependencies:
       '@types/node':
-        specifier: ^22.19.3
-        version: 22.19.3
+        specifier: ^22.19.5
+        version: 22.19.5
       autoprefixer:
         specifier: ^10.4.23
         version: 10.4.23(postcss@8.5.6)
@@ -67,14 +67,14 @@ importers:
         specifier: ^5.9.3
         version: 5.9.3
       vite:
-        specifier: npm:rolldown-vite@^7.3.0
-        version: rolldown-vite@7.3.0(@types/node@22.19.3)(esbuild@0.27.2)(jiti@1.21.7)(terser@5.44.1)
+        specifier: npm:rolldown-vite@^7.3.1
+        version: rolldown-vite@7.3.1(@types/node@22.19.5)(esbuild@0.27.2)(jiti@1.21.7)(terser@5.44.1)
       vite-plugin-pwa:
         specifier: ^1.2.0
-        version: 1.2.0(rolldown-vite@7.3.0(@types/node@22.19.3)(esbuild@0.27.2)(jiti@1.21.7)(terser@5.44.1))(workbox-build@7.4.0(@types/babel__core@7.20.5))(workbox-window@7.4.0)
+        version: 1.2.0(rolldown-vite@7.3.1(@types/node@22.19.5)(esbuild@0.27.2)(jiti@1.21.7)(terser@5.44.1))(workbox-build@7.4.0(@types/babel__core@7.20.5))(workbox-window@7.4.0)
       vite-plugin-solid:
         specifier: ^2.11.10
-        version: 2.11.10(rolldown-vite@7.3.0(@types/node@22.19.3)(esbuild@0.27.2)(jiti@1.21.7)(terser@5.44.1))(solid-js@1.9.10)
+        version: 2.11.10(rolldown-vite@7.3.1(@types/node@22.19.5)(esbuild@0.27.2)(jiti@1.21.7)(terser@5.44.1))(solid-js@1.9.10)
 
 packages:
 
@@ -598,11 +598,11 @@ packages:
     peerDependencies:
       solid-js: ^1.8
 
-  '@emnapi/core@1.7.1':
-    resolution: {integrity: sha512-o1uhUASyo921r2XtHYOHy7gdkGLge8ghBEQHMWmyJFoXlpU58kIrhhN3w26lpQb6dspetweapMn2CSNwQ8I4wg==}
+  '@emnapi/core@1.8.1':
+    resolution: {integrity: sha512-AvT9QFpxK0Zd8J0jopedNm+w/2fIzvtPKPjqyw9jwvBaReTTqPBk9Hixaz7KbjimP+QNz605/XnjFcDAL2pqBg==}
 
-  '@emnapi/runtime@1.7.1':
-    resolution: {integrity: sha512-PVtJr5CmLwYAU9PZDMITZoR5iAOShYREoR45EyyLrbntV50mdePTgUn4AmOw90Ifcj+x2kRjdzr1HP3RrNiHGA==}
+  '@emnapi/runtime@1.8.1':
+    resolution: {integrity: sha512-mehfKSMWjjNol8659Z8KxEMrdSJDDot5SXMq00dM8BN4o+CLNXQ0xH2V7EchNHV4RmbZLmmPdEaXZc5H2FXmDg==}
 
   '@emnapi/wasi-threads@1.1.0':
     resolution: {integrity: sha512-WI0DdZ8xFSbgMjR1sFsKABJ/C5OnRrjT06JXbZKexJGrDuPTzZdDYfFlsgcCXCyf+suG5QU2e/y1Wo2V/OapLQ==}
@@ -822,8 +822,8 @@ packages:
     peerDependencies:
       solid-js: ^1.8.8
 
-  '@napi-rs/wasm-runtime@1.1.0':
-    resolution: {integrity: sha512-Fq6DJW+Bb5jaWE69/qOE0D1TUN9+6uWhCeZpdnSBk14pjLcCWR7Q8n49PTSPHazM37JqrsdpEthXy2xn6jWWiA==}
+  '@napi-rs/wasm-runtime@1.1.1':
+    resolution: {integrity: sha512-p64ah1M1ld8xjWv3qbvFwHiFVWrq1yFvV4f7w+mzaqiR4IlSgkqhcRdHwsGgomwzBH51sRY4NEowLxnaBjcW/A==}
 
   '@nodelib/fs.scandir@2.1.5':
     resolution: {integrity: sha512-vq24Bq3ym5HEQm2NKCr3yXDwjc7vTsEThRDnkp2DK9p1uqLR+DHurm/NOTo0KG7HYHU7eppKZj3MyqYuMBf62g==}
@@ -1036,16 +1036,16 @@ packages:
   '@surma/rollup-plugin-off-main-thread@2.2.3':
     resolution: {integrity: sha512-lR8q/9W7hZpMWweNiAKU7NQerBnzQQLvi8qnTDU/fxItPhtZVMbPV3lbCwjhIlNBe9Bbr5V+KHshvWmVSG9cxQ==}
 
-  '@swc/helpers@0.5.17':
-    resolution: {integrity: sha512-5IKx/Y13RsYd+sauPb2x+U/xZikHjolzfuDgTAl/Tdf3Q8rslRvC19NKDLgAJQ6wsqADk10ntlv08nPFw/gO/A==}
+  '@swc/helpers@0.5.18':
+    resolution: {integrity: sha512-TXTnIcNJQEKwThMMqBXsZ4VGAza6bvN4pa41Rkqoio6QBKMvo+5lexeTMScGCIxtzgQJzElcvIltani+adC5PQ==}
 
-  '@tabler/icons-solidjs@3.36.0':
-    resolution: {integrity: sha512-1Unjtc4Gvs4JiZNaK15IgdhxrbNF7zVLXf/HbWL6htECF8yzyFo/+VWXMlnZIR4Rl60z/BQJNXj77RinQqyz7Q==}
+  '@tabler/icons-solidjs@3.36.1':
+    resolution: {integrity: sha512-lf1oJ0+S8xDVX4AojJXQk4LmHHidzrrhaxtbfsaKLaDuHHuXytJ8qBLfg3k/FceRWLJbh0HQH+vr9evLbC1lpA==}
     peerDependencies:
       solid-js: ^1.4.7
 
-  '@tabler/icons@3.36.0':
-    resolution: {integrity: sha512-z9OfTEG6QbaQWM9KBOxxUdpgvMUn0atageXyiaSc2gmYm51ORO8Ua7eUcjlks+Dc0YMK4rrodAFdK9SfjJ4ZcA==}
+  '@tabler/icons@3.36.1':
+    resolution: {integrity: sha512-f4Jg3Fof/Vru5ioix/UO4GX+sdDsF9wQo47FbtvG+utIYYVQ/QVAC0QYgcBbAjQGfbdOh2CCf0BgiFOF9Ixtjw==}
 
   '@tanstack/solid-table@8.21.3':
     resolution: {integrity: sha512-PmhfSLBxVKiFs01LtYOYrCRhCyTUjxmb4KlxRQiqcALtip8+DOJeeezQM4RSX/GUS0SMVHyH/dNboCpcO++k2A==}
@@ -1078,8 +1078,8 @@ packages:
   '@types/estree@1.0.8':
     resolution: {integrity: sha512-dWHzHa2WqEXI/O1E9OjrocMTKJl2mSrEolh1Iomrv6U+JuNwaHXsXx9bLu5gG7BUWFIN0skIQJQ/L1rIex4X6w==}
 
-  '@types/node@22.19.3':
-    resolution: {integrity: sha512-1N9SBnWYOJTrNZCdh/yJE+t910Y128BoyY+zBLWhL3r0TYzlTmFdXrPwHL9DyFZmlEXNQQolTZh3KHV31QDhyA==}
+  '@types/node@22.19.5':
+    resolution: {integrity: sha512-HfF8+mYcHPcPypui3w3mvzuIErlNOh2OAG+BCeBZCEwyiD5ls2SiCwEyT47OELtf7M3nHxBdu0FsmzdKxkN52Q==}
 
   '@types/resolve@1.20.2':
     resolution: {integrity: sha512-60BCwRFOZCQhDncwQdxxeOEEkbc5dIMccYLwbxsS4TUNeVECQ/pBJ0j09mrHOl/JJvpRPGwO9SvE4nR2Nb/a4Q==}
@@ -1186,8 +1186,8 @@ packages:
   balanced-match@1.0.2:
     resolution: {integrity: sha512-3oSeUO0TMV67hN1AmbXsK4yaqU7tjiHlbxRDZOpH0KW9+CeX4bRAaX0Anxt0tx2MrpRpWwQaPwIlISEJhYU5Pw==}
 
-  baseline-browser-mapping@2.9.11:
-    resolution: {integrity: sha512-Sg0xJUNDU1sJNGdfGWhVHX0kkZ+HWcvmVymJbj6NSgZZmW/8S9Y2HQ5euytnIgakgxN6papOAWiwDo1ctFDcoQ==}
+  baseline-browser-mapping@2.9.14:
+    resolution: {integrity: sha512-B0xUquLkiGLgHhpPBqvl7GWegWBUNuujQ6kXd/r1U38ElPT6Ok8KZ8e+FpUGEc2ZoRQUzq/aUnaKFc/svWUGSg==}
     hasBin: true
 
   binary-extensions@2.3.0:
@@ -1225,8 +1225,8 @@ packages:
     resolution: {integrity: sha512-QOSvevhslijgYwRx6Rv7zKdMF8lbRmx+uQGx2+vDc+KI/eBnsy9kit5aj23AgGu3pa4t9AgwbnXWqS+iOY+2aA==}
     engines: {node: '>= 6'}
 
-  caniuse-lite@1.0.30001761:
-    resolution: {integrity: sha512-JF9ptu1vP2coz98+5051jZ4PwQgd2ni8A+gYSN7EA7dPKIMf0pDlSUxhdmVOaV3/fYK5uWBkgSXJaRLr4+3A6g==}
+  caniuse-lite@1.0.30001763:
+    resolution: {integrity: sha512-mh/dGtq56uN98LlNX9qdbKnzINhX0QzhiWBFEkFfsFO4QyCvL8YegrJAazCwXIeqkIob8BlZPGM3xdnY+sgmvQ==}
 
   chokidar@3.6.0:
     resolution: {integrity: sha512-7VT13fmjotKpGipCW9JEQAusEPE+Ei8nl6/g4FBAmIm0GOOLMua9NDDo/DWp0ZAxCr3cPq5ZpBqmPAQgDda2Pw==}
@@ -2032,8 +2032,8 @@ packages:
     resolution: {integrity: sha512-g6QUff04oZpHs0eG5p83rFLhHeV00ug/Yf9nZM6fLeUrPguBTkTQOdpAWWspMh55TZfVQDPaN3NQJfbVRAxdIw==}
     engines: {iojs: '>=1.0.0', node: '>=0.10.0'}
 
-  rolldown-vite@7.3.0:
-    resolution: {integrity: sha512-5hI5NCJwKBGtzWtdKB3c2fOEpI77Iaa0z4mSzZPU1cJ/OqrGbFafm90edVCd7T9Snz+Sh09TMAv4EQqyVLzuEg==}
+  rolldown-vite@7.3.1:
+    resolution: {integrity: sha512-LYzdNAjRHhF2yA4JUQm/QyARyi216N2rpJ0lJZb8E9FU2y5v6Vk+xq/U4XBOxMefpWixT5H3TslmAHm1rqIq2w==}
     engines: {node: ^20.19.0 || >=22.12.0}
     hasBin: true
     peerDependencies:
@@ -3169,13 +3169,13 @@ snapshots:
       '@floating-ui/dom': 1.7.4
       solid-js: 1.9.10
 
-  '@emnapi/core@1.7.1':
+  '@emnapi/core@1.8.1':
     dependencies:
       '@emnapi/wasi-threads': 1.1.0
       tslib: 2.8.1
     optional: true
 
-  '@emnapi/runtime@1.7.1':
+  '@emnapi/runtime@1.8.1':
     dependencies:
       tslib: 2.8.1
     optional: true
@@ -3278,11 +3278,11 @@ snapshots:
 
   '@internationalized/date@3.10.1':
     dependencies:
-      '@swc/helpers': 0.5.17
+      '@swc/helpers': 0.5.18
 
   '@internationalized/number@3.6.5':
     dependencies:
-      '@swc/helpers': 0.5.17
+      '@swc/helpers': 0.5.18
 
   '@isaacs/balanced-match@4.0.1': {}
 
@@ -3346,10 +3346,10 @@ snapshots:
       '@solid-primitives/utils': 6.3.2(solid-js@1.9.10)
       solid-js: 1.9.10
 
-  '@napi-rs/wasm-runtime@1.1.0':
+  '@napi-rs/wasm-runtime@1.1.1':
     dependencies:
-      '@emnapi/core': 1.7.1
-      '@emnapi/runtime': 1.7.1
+      '@emnapi/core': 1.8.1
+      '@emnapi/runtime': 1.8.1
       '@tybys/wasm-util': 0.10.1
     optional: true
 
@@ -3401,7 +3401,7 @@ snapshots:
 
   '@rolldown/binding-wasm32-wasi@1.0.0-beta.53':
     dependencies:
-      '@napi-rs/wasm-runtime': 1.1.0
+      '@napi-rs/wasm-runtime': 1.1.1
     optional: true
 
   '@rolldown/binding-win32-arm64-msvc@1.0.0-beta.53':
@@ -3532,16 +3532,16 @@ snapshots:
       magic-string: 0.25.9
       string.prototype.matchall: 4.0.12
 
-  '@swc/helpers@0.5.17':
+  '@swc/helpers@0.5.18':
     dependencies:
       tslib: 2.8.1
 
-  '@tabler/icons-solidjs@3.36.0(solid-js@1.9.10)':
+  '@tabler/icons-solidjs@3.36.1(solid-js@1.9.10)':
     dependencies:
-      '@tabler/icons': 3.36.0
+      '@tabler/icons': 3.36.1
       solid-js: 1.9.10
 
-  '@tabler/icons@3.36.0': {}
+  '@tabler/icons@3.36.1': {}
 
   '@tanstack/solid-table@8.21.3(solid-js@1.9.10)':
     dependencies:
@@ -3580,7 +3580,7 @@ snapshots:
 
   '@types/estree@1.0.8': {}
 
-  '@types/node@22.19.3':
+  '@types/node@22.19.5':
     dependencies:
       undici-types: 6.21.0
 
@@ -3642,7 +3642,7 @@ snapshots:
   autoprefixer@10.4.23(postcss@8.5.6):
     dependencies:
       browserslist: 4.28.1
-      caniuse-lite: 1.0.30001761
+      caniuse-lite: 1.0.30001763
       fraction.js: 5.3.4
       picocolors: 1.1.1
       postcss: 8.5.6
@@ -3694,7 +3694,7 @@ snapshots:
 
   balanced-match@1.0.2: {}
 
-  baseline-browser-mapping@2.9.11: {}
+  baseline-browser-mapping@2.9.14: {}
 
   binary-extensions@2.3.0: {}
 
@@ -3708,8 +3708,8 @@ snapshots:
 
   browserslist@4.28.1:
     dependencies:
-      baseline-browser-mapping: 2.9.11
-      caniuse-lite: 1.0.30001761
+      baseline-browser-mapping: 2.9.14
+      caniuse-lite: 1.0.30001763
       electron-to-chromium: 1.5.267
       node-releases: 2.0.27
       update-browserslist-db: 1.2.3(browserslist@4.28.1)
@@ -3735,7 +3735,7 @@ snapshots:
 
   camelcase-css@2.0.1: {}
 
-  caniuse-lite@1.0.30001761: {}
+  caniuse-lite@1.0.30001763: {}
 
   chokidar@3.6.0:
     dependencies:
@@ -4541,7 +4541,7 @@ snapshots:
 
   reusify@1.1.0: {}
 
-  rolldown-vite@7.3.0(@types/node@22.19.3)(esbuild@0.27.2)(jiti@1.21.7)(terser@5.44.1):
+  rolldown-vite@7.3.1(@types/node@22.19.5)(esbuild@0.27.2)(jiti@1.21.7)(terser@5.44.1):
     dependencies:
       '@oxc-project/runtime': 0.101.0
       fdir: 6.5.0(picomatch@4.0.3)
@@ -4551,7 +4551,7 @@ snapshots:
       rolldown: 1.0.0-beta.53
       tinyglobby: 0.2.15
     optionalDependencies:
-      '@types/node': 22.19.3
+      '@types/node': 22.19.5
       esbuild: 0.27.2
       fsevents: 2.3.3
       jiti: 1.21.7
@@ -4951,18 +4951,18 @@ snapshots:
 
   util-deprecate@1.0.2: {}
 
-  vite-plugin-pwa@1.2.0(rolldown-vite@7.3.0(@types/node@22.19.3)(esbuild@0.27.2)(jiti@1.21.7)(terser@5.44.1))(workbox-build@7.4.0(@types/babel__core@7.20.5))(workbox-window@7.4.0):
+  vite-plugin-pwa@1.2.0(rolldown-vite@7.3.1(@types/node@22.19.5)(esbuild@0.27.2)(jiti@1.21.7)(terser@5.44.1))(workbox-build@7.4.0(@types/babel__core@7.20.5))(workbox-window@7.4.0):
     dependencies:
       debug: 4.4.3
       pretty-bytes: 6.1.1
       tinyglobby: 0.2.15
-      vite: rolldown-vite@7.3.0(@types/node@22.19.3)(esbuild@0.27.2)(jiti@1.21.7)(terser@5.44.1)
+      vite: rolldown-vite@7.3.1(@types/node@22.19.5)(esbuild@0.27.2)(jiti@1.21.7)(terser@5.44.1)
       workbox-build: 7.4.0(@types/babel__core@7.20.5)
       workbox-window: 7.4.0
     transitivePeerDependencies:
       - supports-color
 
-  vite-plugin-solid@2.11.10(rolldown-vite@7.3.0(@types/node@22.19.3)(esbuild@0.27.2)(jiti@1.21.7)(terser@5.44.1))(solid-js@1.9.10):
+  vite-plugin-solid@2.11.10(rolldown-vite@7.3.1(@types/node@22.19.5)(esbuild@0.27.2)(jiti@1.21.7)(terser@5.44.1))(solid-js@1.9.10):
     dependencies:
       '@babel/core': 7.28.5
       '@types/babel__core': 7.20.5
@@ -4970,14 +4970,14 @@ snapshots:
       merge-anything: 5.1.7
       solid-js: 1.9.10
       solid-refresh: 0.6.3(solid-js@1.9.10)
-      vite: rolldown-vite@7.3.0(@types/node@22.19.3)(esbuild@0.27.2)(jiti@1.21.7)(terser@5.44.1)
-      vitefu: 1.1.1(rolldown-vite@7.3.0(@types/node@22.19.3)(esbuild@0.27.2)(jiti@1.21.7)(terser@5.44.1))
+      vite: rolldown-vite@7.3.1(@types/node@22.19.5)(esbuild@0.27.2)(jiti@1.21.7)(terser@5.44.1)
+      vitefu: 1.1.1(rolldown-vite@7.3.1(@types/node@22.19.5)(esbuild@0.27.2)(jiti@1.21.7)(terser@5.44.1))
     transitivePeerDependencies:
       - supports-color
 
-  vitefu@1.1.1(rolldown-vite@7.3.0(@types/node@22.19.3)(esbuild@0.27.2)(jiti@1.21.7)(terser@5.44.1)):
+  vitefu@1.1.1(rolldown-vite@7.3.1(@types/node@22.19.5)(esbuild@0.27.2)(jiti@1.21.7)(terser@5.44.1)):
     optionalDependencies:
-      vite: rolldown-vite@7.3.0(@types/node@22.19.3)(esbuild@0.27.2)(jiti@1.21.7)(terser@5.44.1)
+      vite: rolldown-vite@7.3.1(@types/node@22.19.5)(esbuild@0.27.2)(jiti@1.21.7)(terser@5.44.1)
 
   webidl-conversions@4.0.2: {}
 
