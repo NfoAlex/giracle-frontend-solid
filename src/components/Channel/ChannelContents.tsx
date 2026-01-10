@@ -111,17 +111,10 @@ export default function ChannelContents() {
 
       const anchor = captureScrollAnchor(el);
       const oldest = historyState?.history?.at(-1);
-      //console.log("_ChannelContents :: checkScrollPosAndFetchHistory : oldest", oldest);
-      if (oldest === undefined) {
-        stateFetchingHistory = false;
-        //もし再試行での実行「でない」なら再試行状態で実行
-        if (!optionalRetry) setTimeout(() => checkScrollPosAndFetchHistory(true), 0);
-        return;
-      }
       await FetchHistory(
         channelId,
         {
-          messageIdFrom: oldest.id,
+          messageIdFrom: oldest?.id,
         },
         "older",
       );
@@ -139,7 +132,7 @@ export default function ChannelContents() {
       //console.log("_ChannelContents :: checkScrollPosAndFetchHistory : newest", newest);
       if (newest === undefined) {
         stateFetchingHistory = false;
-        //もし再試行での実行「でない」なら再試行状態で実行
+        //もし再試行での実行「でない」なら再試行状態で実行、これは遅延を置いた履歴取得トリガーのための措置（未来方向のみ）
         if (!optionalRetry) setTimeout(() => checkScrollPosAndFetchHistory(true), 0);
         return;
       }
