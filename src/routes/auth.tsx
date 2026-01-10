@@ -5,10 +5,11 @@ import Login from "~/components/Auth/Login.tsx";
 import Register from "~/components/Auth/Register.tsx";
 import { Card, CardContent } from "~/components/ui/card.tsx";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs.tsx";
-import { storeAppStatus } from "~/stores/AppStatus.ts";
 import { storeServerinfo } from "~/stores/Serverinfo.ts";
 import GetCookie from "~/utils/GetCookie.ts";
 import InitLoad from "~/utils/InitLoad.ts";
+import { createSignal } from "solid-js";
+import GET_SERVER_CONFIG from "~/api/SERVER/SERVER_CONFIG.ts";
 
 export default function Auth() {
   const navi = useNavigate();
