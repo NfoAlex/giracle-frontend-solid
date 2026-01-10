@@ -10,6 +10,8 @@ import MessageDisplay from "./ChannelContent/MessageDisplay.tsx";
 import { storeMessageReadTime, updateReadTime } from "~/stores/Readtime.ts";
 import POST_MESSAGE_UPDATE_READTIME from "~/api/MESSAGE/MESSAGE_UPDATE_READTIME.ts";
 
+const channelScrollPos: Map<string, number> = new Map();
+
 export default function ChannelContents() {
   const param = useParams();
   const [isFocused, setIsFocused] = createSignal(true);
@@ -278,6 +280,8 @@ export default function ChannelContents() {
   const handleScroll = (event: Event) => {
     //HTMLのものであることをTSに示すため
     if (!(event.target instanceof HTMLElement)) return;
+    //スクロール位置を保存
+    channelScrollPos.set(currentChannelId(), event.target.scrollTop);
 
     //console.log("ChannelContents :: handleScroll : event->", event.target.scrollTop, event.target.scrollHeight - event.target.offsetHeight);
     if (scrollRafId) cancelAnimationFrame(scrollRafId);
@@ -366,7 +370,14 @@ export default function ChannelContents() {
 
       //必要無し :: その場で履歴取得条件確認
       if (!historyNeeded) {
-        await scrollToLatestRead();
+        const el = getHistoryElement();
+        //スクロール位置復元、無いなら最新既読位置へ
+        if (channelScrollPos.has(currentChannelId()) && el !== null) {
+          await waitForDomToSettle();
+          el.scrollTop = channelScrollPos.get(currentChannelId()) ?? 0;
+        } else {
+          await scrollToLatestRead();
+        }
         checkScrollPosAndFetchHistory();
         return;
       }
@@ -374,7 +385,14 @@ export default function ChannelContents() {
       //必要あり :: 履歴を取得して格納、その後履歴取得条件確認
       stateFetchingHistory = true;
       await FetchHistory(currentChannelId(), { messageTimeFrom: latestReadTime?.readTime, fetchLength: 3 }, "newer");
-      await scrollToLatestRead();
+      const el = getHistoryElement();
+      //スクロール位置復元、無いなら最新既読位置へ
+      if (channelScrollPos.has(currentChannelId()) && el !== null) {
+        await waitForDomToSettle();
+        el.scrollTop = channelScrollPos.get(currentChannelId()) ?? 0;
+      } else {
+        await scrollToLatestRead();
+      }
       stateFetchingHistory = false;
       checkScrollPosAndFetchHistory();
     }
