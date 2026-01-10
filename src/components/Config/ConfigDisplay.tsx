@@ -1,5 +1,5 @@
-import { storeClientConfig } from "~/stores/ClientConfig";
-import { Card } from "../ui/card";
+import { storeClientConfig } from "~/stores/ClientConfig.ts";
+import { Card } from "../ui/card.tsx";
 import { Slider, SliderFill, SliderThumb, SliderTrack } from "../ui/slider";
 import { useColorMode } from "@kobalte/core/color-mode";
 import { IconBrush, IconMoonFilled, IconSpacingVertical, IconSunFilled } from "@tabler/icons-solidjs";

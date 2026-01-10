@@ -1,4 +1,4 @@
-import type { IChannel } from "~/types/Channel";
+import type { IChannel } from "~/types/Channel.ts";
 
 export default async function GET_CHANNEL_GET_INFO(
   _channelId: string,

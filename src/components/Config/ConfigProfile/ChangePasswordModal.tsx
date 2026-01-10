@@ -1,10 +1,10 @@
 import { createSignal, Show } from "solid-js";
 import POST_USER_CHANGE_PASSWORD from "~/api/USER/USER_CHANGE_PASSWORD";
 import { Alert, AlertTitle } from "~/components/ui/alert";
-import { Button } from "~/components/ui/button";
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTrigger } from "~/components/ui/dialog";
-import { Label } from "~/components/ui/label";
-import { TextField, TextFieldInput } from "~/components/ui/text-field";
+import { Button } from "~/components/ui/button.tsx";
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTrigger } from "~/components/ui/dialog.tsx";
+import { Label } from "~/components/ui/label.tsx";
+import { TextField, TextFieldInput } from "~/components/ui/text-field.tsx";
 import { IconExclamationCircle, IconLockCode, IconKeyFilled, IconKey } from '@tabler/icons-solidjs';
 
 export default function ChangePasswordModal() {

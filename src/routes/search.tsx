@@ -1,15 +1,15 @@
 import { IconSearch } from "@tabler/icons-solidjs";
 import { createSignal, For } from "solid-js";
-import GET_MESSAGE_SEARCH from "~/api/MESSAGE/MESSAGE_SEARCH";
-import MessageRender from "~/components/Channel/ChannelContent/MessageRender";
-import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
-import { Button } from "~/components/ui/button";
-import { Card } from "~/components/ui/card";
-import { TextField, TextFieldInput } from "~/components/ui/text-field";
-import SidebarTriggerWithDot from "~/components/unique/SidebarTriggerWithDot";
-import UserinfoModalWrapper from "~/components/unique/UserinfoModalWrapper";
-import { getterUserinfo } from "~/stores/Userinfo";
-import type { IMessage } from "~/types/Message";
+import GET_MESSAGE_SEARCH from "~/api/MESSAGE/MESSAGE_SEARCH.ts";
+import MessageRender from "~/components/Channel/ChannelContent/MessageDisplay/MessageRender.tsx";
+import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar.tsx";
+import { Button } from "~/components/ui/button.tsx";
+import { Card } from "~/components/ui/card.tsx";
+import { TextField, TextFieldInput } from "~/components/ui/text-field.tsx";
+import SidebarTriggerWithDot from "~/components/unique/SidebarTriggerWithDot.tsx";
+import UserinfoModalWrapper from "~/components/unique/UserinfoModalWrapper.tsx";
+import { getterUserinfo } from "~/stores/Userinfo.ts";
+import type { IMessage } from "~/types/Message.ts";
 
 export default function Search() {
   const [query, setQuery] = createSignal("");

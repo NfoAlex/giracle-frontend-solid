@@ -1,10 +1,10 @@
 import { useNavigate } from "@solidjs/router";
 import { Show, createSignal } from "solid-js";
-import POST_USER_LOGIN from "~/api/USER/USER_LOGIN";
-import InitLoad from "~/utils/InitLoad";
-import { Button } from "../ui/button";
-import { TextField, TextFieldInput, TextFieldLabel } from "../ui/text-field";
-import { Callout, CalloutContent } from "../ui/callout";
+import POST_USER_LOGIN from "~/api/USER/USER_LOGIN.ts";
+import InitLoad from "~/utils/InitLoad.ts";
+import { Button } from "../ui/button.tsx";
+import { TextField, TextFieldInput, TextFieldLabel } from "../ui/text-field.tsx";
+import { Callout, CalloutContent } from "../ui/callout.tsx";
 
 export default function Login() {
   const [username, setUsername] = createSignal("");

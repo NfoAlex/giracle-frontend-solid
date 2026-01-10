@@ -1,4 +1,4 @@
-import type {IUser} from "~/types/User";
+import type {IUser} from "~/types/User.ts";
 
 export default async function GET_USER_SEARCH(
   _username: string,

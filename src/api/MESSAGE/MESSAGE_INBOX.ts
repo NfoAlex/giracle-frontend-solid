@@ -1,4 +1,4 @@
-import type {IInbox} from "~/types/Message";
+import type {IInbox} from "~/types/Message.ts";
 
 export default async function GET_MESSAGE_INBOX(): Promise<{
   message: "Fetched inbox",

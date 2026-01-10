@@ -1,9 +1,9 @@
 import { IconBell, IconBellX, IconMessage2Exclamation } from "@tabler/icons-solidjs";
-import { Card } from "../ui/card";
+import { Card } from "../ui/card.tsx";
 import { Switch, SwitchControl, SwitchThumb } from "../ui/switch";
-import { storeClientConfig } from "~/stores/ClientConfig";
+import { storeClientConfig } from "~/stores/ClientConfig.ts";
 import { createSignal } from "solid-js";
-import { Button } from "../ui/button";
+import { Button } from "../ui/button.tsx";
 
 export default function ConfigNotification() {
   const [notifyOk, setNotifyOk] = createSignal(false);

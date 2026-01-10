@@ -1,15 +1,15 @@
-import type {IMessage} from "~/types/Message";
+import type {IMessage} from "~/types/Message.ts";
 import {createEffect, createSignal, For, on, Show} from "solid-js";
-import {Card} from "~/components/ui/card";
-import DELETE_MESSAGE_DELETE_EMOJI_REACTION from "~/api/MESSAGE/MESSAGE_DELETE_EMOJI_REACTION";
-import POST_MESSAGE_EMOJI_REACTION from "~/api/MESSAGE/MESSAGE_EMOJI_REACTION";
-import GET_MESSAGE_WHO_REACTED from "~/api/MESSAGE/MESSAGE_WHO_REACTED";
-import RenderEmoji from "~/components/unique/RenderEmoji";
+import {Card} from "~/components/ui/card.tsx";
+import DELETE_MESSAGE_DELETE_EMOJI_REACTION from "~/api/MESSAGE/MESSAGE_DELETE_EMOJI_REACTION.ts";
+import POST_MESSAGE_EMOJI_REACTION from "~/api/MESSAGE/MESSAGE_EMOJI_REACTION.ts";
+import GET_MESSAGE_WHO_REACTED from "~/api/MESSAGE/MESSAGE_WHO_REACTED.ts";
+import RenderEmoji from "~/components/unique/RenderEmoji.tsx";
 import { createMutable } from "solid-js/store";
-import { getterUserinfo } from "~/stores/Userinfo";
-import DisplayAllReactedUserModal from "./RenderEmojiReactions/DisplayAllReactedUserModal";
-import { Button } from "~/components/ui/button";
-import { Badge } from "~/components/ui/badge";
+import { getterUserinfo } from "~/stores/Userinfo.ts";
+import DisplayAllReactedUserModal from "./RenderEmojiReactions/DisplayAllReactedUserModal.tsx";
+import { Button } from "~/components/ui/button.tsx";
+import { Badge } from "~/components/ui/badge.tsx";
 
 export default function RenderEmojiReactions(props: {reaction: IMessage["reactionSummary"], messageId: string, channelId: string}) {
   //リアクションをしているユーザー取得のためのデータJSONと取得状態用JSON

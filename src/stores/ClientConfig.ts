@@ -18,13 +18,10 @@ export const storeClientConfig = createMutable({
  * @param newConfig 
  */
 export const bindClientConfig = (newConfig: Partial<typeof storeClientConfig>) => {
-  Object.keys(newConfig).forEach((key) => {
-    if (key in storeClientConfig) {
-      // @ts-ignore
-      storeClientConfig[key] = {
-        ...storeClientConfig[key],
-        ...newConfig[key]
-      };
+  const configRootKeys = ["chat", "notification", "display"] as const;
+  for (const rootKey of configRootKeys) {
+    if (newConfig[rootKey]) {
+      Object.assign(storeClientConfig[rootKey], newConfig[rootKey]);
     }
-  });
+  }
 }

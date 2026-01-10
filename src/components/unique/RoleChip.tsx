@@ -1,6 +1,6 @@
 import { IconCircleFilled, IconX } from "@tabler/icons-solidjs";
-import { Badge } from "../ui/badge";
-import { getterRoleInfo } from "~/stores/RoleInfo";
+import { Badge } from "../ui/badge.tsx";
+import { getterRoleInfo } from "~/stores/RoleInfo.ts";
 import { createSignal, Show } from "solid-js";
 
 export default function RoleChip(props: {

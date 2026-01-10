@@ -1,5 +1,5 @@
 import { createStore, produce } from "solid-js/store";
-import type { IMessage } from "~/types/Message";
+import type { IMessage } from "~/types/Message.ts";
 
 export const [storeHistory, setStoreHistory] = createStore<{
   [key: string]: {
@@ -110,6 +110,7 @@ export const addMessage = (message: IMessage) => {
   
   if (message === undefined) console.error("History :: addMessage : message is undefined");
   if (storeHistory[message.channelId] === undefined) return;
+  if (storeHistory[message.channelId].atEnd === false) return;
 
   //格納(//メッセージひな形にマージする形で格納する)
   setStoreHistory(produce((history) => {

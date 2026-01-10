@@ -1,9 +1,9 @@
 import { Show, createSignal } from "solid-js";
 import POST_USER_REGISTER from "~/api/USER/USER_REGISTER";
 import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
-import { Button } from "../ui/button";
-import { TextField, TextFieldInput, TextFieldLabel } from "../ui/text-field";
-import {storeServerinfo} from "~/stores/Serverinfo";
+import { Button } from "../ui/button.tsx";
+import { TextField, TextFieldInput, TextFieldLabel } from "../ui/text-field.tsx";
+import {storeServerinfo} from "~/stores/Serverinfo.ts";
 
 export default function Register() {
   const [inviteCode, setInviteCode] = createSignal("");

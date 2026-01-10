@@ -1,13 +1,13 @@
 import {For, Show} from "solid-js";
-import type { IMessage } from "~/types/Message";
-import MessageTextRender from "./MessageRender/MessageTextRender";
-import URLPreview from "~/components/Channel/ChannelContent/MessageRender/URLPreview";
-import SystemMessageRender from "~/components/Channel/ChannelContent/MessageRender/SystemMessageRender";
-import FilePreview from "~/components/Channel/ChannelContent/MessageRender/FilePreview";
-import {getterUserinfo} from "~/stores/Userinfo";
-import UserinfoModalWrapper from "~/components/unique/UserinfoModalWrapper";
-import LongTextDisplay from "~/components/Channel/ChannelContent/MessageRender/LongTextDisplay";
-import RenderEmojiReactions from "~/components/Channel/ChannelContent/MessageRender/RenderEmojiReactions";
+import type { IMessage } from "~/types/Message.ts";
+import MessageTextRender from "./MessageRender/MessageTextRender.tsx";
+import {getterUserinfo} from "~/stores/Userinfo.ts";
+import UserinfoModalWrapper from "~/components/unique/UserinfoModalWrapper.tsx";
+import SystemMessageRender from "./MessageRender/SystemMessageRender.tsx";
+import FilePreview from "./MessageRender/FilePreview.tsx";
+import URLPreview from "./MessageRender/URLPreview.tsx";
+import LongTextDisplay from "./MessageRender/LongTextDisplay.tsx";
+import RenderEmojiReactions from "./MessageRender/RenderEmojiReactions.tsx";
 
 export default function MessageRender(props: {
   message: IMessage;

@@ -1,10 +1,10 @@
 import { IconPlus } from "@tabler/icons-solidjs";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogTitle, DialogTrigger } from "../../ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogTitle, DialogTrigger } from "../../ui/dialog.tsx";
 import { createSignal } from "solid-js";
 import { TextField, TextFieldInput, TextFieldLabel } from "../../ui/text-field";
-import { Button } from "~/components/ui/button";
+import { Button } from "~/components/ui/button.tsx";
 import PUT_SERVER_CREATE_INVITE from "~/api/SERVER/SERVER_CREATE_INVITE";
-import type { IInvite } from "~/types/Server";
+import type { IInvite } from "~/types/Server.ts";
 
 export default function CreateInvite(props: { inviteActionTaken: (dat: IInvite) => void }) {
   const [code, setCode] = createSignal<string>("");

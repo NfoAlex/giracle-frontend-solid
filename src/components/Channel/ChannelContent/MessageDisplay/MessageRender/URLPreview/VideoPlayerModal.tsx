@@ -1,7 +1,7 @@
 import { IconLink, IconPlayerPlayFilled } from "@tabler/icons-solidjs";
-import { Button } from "~/components/ui/button";
-import { Dialog, DialogContent, DialogTrigger } from "~/components/ui/dialog";
-import type { IMessageUrlPreview } from "~/types/Message";
+import { Button } from "~/components/ui/button.tsx";
+import { Dialog, DialogContent, DialogTrigger } from "~/components/ui/dialog.tsx";
+import type { IMessageUrlPreview } from "~/types/Message.ts";
 
 export default function VideoPlayerModal(props: { urlPreview: IMessageUrlPreview }) {
 

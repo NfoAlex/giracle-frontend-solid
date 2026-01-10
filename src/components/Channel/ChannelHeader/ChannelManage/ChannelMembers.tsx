@@ -1,16 +1,16 @@
 import { IconKarate, IconSearch } from "@tabler/icons-solidjs";
 import { createSignal, For, onMount, Show } from "solid-js";
-import GET_USER_SEARCH from "~/api/USER/USER_SEARCH.";
-import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
-import { Button } from "~/components/ui/button";
-import { Card } from "~/components/ui/card";
-import { TextField, TextFieldInput, TextFieldLabel } from "~/components/ui/text-field";
-import UserinfoModalWrapper from "~/components/unique/UserinfoModalWrapper";
-import { getterUserinfo } from "~/stores/Userinfo";
-import type { IUser } from "~/types/User";
-import InviteUserModal from "./ChannelMembers/InviteUserModal";
-import POST_CHANNEL_KICK from "~/api/CHANNEL/CHANNEL_KICK";
-import { getRolePower, storeMyUserinfo } from "~/stores/MyUserinfo";
+import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar.tsx";
+import { Button } from "~/components/ui/button.tsx";
+import { Card } from "~/components/ui/card.tsx";
+import { TextField, TextFieldInput, TextFieldLabel } from "~/components/ui/text-field.tsx";
+import UserinfoModalWrapper from "~/components/unique/UserinfoModalWrapper.tsx";
+import { getterUserinfo } from "~/stores/Userinfo.ts";
+import type { IUser } from "~/types/User.ts";
+import InviteUserModal from "./ChannelMembers/InviteUserModal.tsx";
+import POST_CHANNEL_KICK from "~/api/CHANNEL/CHANNEL_KICK.ts";
+import { getRolePower, storeMyUserinfo } from "~/stores/MyUserinfo.ts";
+import GET_USER_SEARCH from "~/api/USER/USER_SEARCH.ts";
 
 export default function ChannelMembers(props: {channelId: string}) {
   const [users, setUsers] = createSignal<IUser[]>([]);

@@ -1,4 +1,4 @@
-import type { IRole } from "~/types/Role";
+import type { IRole } from "~/types/Role.ts";
 
 export async function GET_ROLE_LIST(): Promise<{
   message: "Role list",

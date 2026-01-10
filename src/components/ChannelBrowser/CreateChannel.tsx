@@ -1,9 +1,9 @@
 import { IconPlus } from "@tabler/icons-solidjs";
-import { Button } from "../ui/button";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogTitle, DialogTrigger } from "../ui/dialog";
+import { Button } from "../ui/button.tsx";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogTitle, DialogTrigger } from "../ui/dialog.tsx";
 import { createSignal } from "solid-js";
-import { TextField, TextFieldInput, TextFieldLabel, TextFieldTextArea } from "../ui/text-field";
-import PUT_CHANNEL_CREATE from "~/api/CHANNEL/CHANNEL_CREATE";
+import { TextField, TextFieldInput, TextFieldLabel, TextFieldTextArea } from "../ui/text-field.tsx";
+import PUT_CHANNEL_CREATE from "~/api/CHANNEL/CHANNEL_CREATE.ts";
 
 export default function CreateChannel(props: { fetchChannels: () => void }) {
   const [channelName, setChannelName] = createSignal<string>("");

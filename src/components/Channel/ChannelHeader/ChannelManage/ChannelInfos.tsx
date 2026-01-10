@@ -1,13 +1,13 @@
 import { IconCheck, IconX, IconPencil } from "@tabler/icons-solidjs";
 import { createEffect, createSignal, on } from "solid-js";
-import POST_CHANNEL_UPDATE from "~/api/CHANNEL/CHANNEL_UPDATE";
-import { Button } from "~/components/ui/button";
-import { Card } from "~/components/ui/card";
-import { Label } from "~/components/ui/label";
-import { TextField, TextFieldInput, TextFieldTextArea } from "~/components/ui/text-field";
-import RoleLinker from "~/components/unique/RoleLinker";
-import { directGetterChannelInfo } from "~/stores/ChannelInfo";
-import { getRolePower } from "~/stores/MyUserinfo";
+import POST_CHANNEL_UPDATE from "~/api/CHANNEL/CHANNEL_UPDATE.ts";
+import { Button } from "~/components/ui/button.tsx";
+import { Card } from "~/components/ui/card.tsx";
+import { Label } from "~/components/ui/label.tsx";
+import { TextField, TextFieldInput, TextFieldTextArea } from "~/components/ui/text-field.tsx";
+import RoleLinker from "~/components/unique/RoleLinker.tsx";
+import { directGetterChannelInfo } from "~/stores/ChannelInfo.ts";
+import { getRolePower } from "~/stores/MyUserinfo.ts";
 
 export default function ChannelInfo(props: {channelId: string}) {
   const [editName, setEditName] = createSignal(false);

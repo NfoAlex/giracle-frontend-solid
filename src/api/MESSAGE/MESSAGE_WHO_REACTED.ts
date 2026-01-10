@@ -3,18 +3,18 @@
  * 対象のメッセージIdに対して、指定された絵文字をリアクションしているユーザーを取得する
  * @param _messageId 調べたいメッセージId
  * @param _emojiCode リアクションしたユーザーを調べる絵文字コード
- * @param _length 取得するユーザー数、デフォルトは5人
+ * @param _cursor 取得する開始位置、３０人ごとに区切られている
  * @returns 
  */
 export default async function GET_MESSAGE_WHO_REACTED(
   _messageId: string,
   _emojiCode: string,
-  _length: number = 5
+  _cursor: number = 1
 ): Promise<{
   message: "Fetched reactions",
   data: string[]
 }> {
-  const res = await fetch(`/api/message/who-reacted?messageId=${_messageId}&emojiCode=${_emojiCode}&length=${_length}`, {
+  const res = await fetch(`/api/message/who-reacted?messageId=${_messageId}&emojiCode=${_emojiCode}&cursor=${_cursor}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",

@@ -1,4 +1,4 @@
-import type { IMessage } from "~/types/Message";
+import type { IMessage } from "~/types/Message.ts";
 
 export default async function POST_MESSAGE_SEND(
   _channelId: string,

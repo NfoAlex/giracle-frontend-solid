@@ -1,18 +1,20 @@
 import { useParams } from "@solidjs/router";
 import {createEffect, createSignal, Show} from "solid-js";
-import {directGetterChannelInfo} from "~/stores/ChannelInfo";
-import { Card } from "../ui/card";
-import ChannelManage from "~/components/Channel/ChannelHeader/ChannelManage";
-import SidebarTriggerWithDot from "~/components/unique/SidebarTriggerWithDot";
 import {IconLock} from "@tabler/icons-solidjs";
-import {HoverCard, HoverCardContent, HoverCardTrigger} from "~/components/ui/hover-card";
+import SidebarTriggerWithDot from "../unique/SidebarTriggerWithDot.tsx";
+import { Card } from "../ui/card.tsx";
+import { directGetterChannelInfo } from "~/stores/ChannelInfo.ts";
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "../ui/hover-card.tsx";
+import ChannelManage from "./ChannelHeader/ChannelManage.tsx";
 
 export default function ChannelHeader() {
   const params = useParams();
-  const [currentChannelId, setCurrentChannelId] = createSignal(params.id);
+  const [currentChannelId, setCurrentChannelId] = createSignal<string>(params.id ?? "");
 
   createEffect(() => {
-    setCurrentChannelId(params.channelId);
+    if (params.channelId !== undefined) {
+      setCurrentChannelId(params.channelId);
+    }
   });
 
   return (
@@ -20,7 +22,7 @@ export default function ChannelHeader() {
       <SidebarTriggerWithDot />
 
       {/* チャンネルの閲覧権限がある時の錠前アイコン */}
-      <Show when={directGetterChannelInfo(params.channelId).ChannelViewableRole.length !== 0}>
+      <Show when={directGetterChannelInfo(currentChannelId()).ChannelViewableRole.length !== 0}>
         <HoverCard>
           <HoverCardTrigger>
             <IconLock class={"shrink-0 cursor-help"} size={"18"} />
@@ -32,11 +34,11 @@ export default function ChannelHeader() {
       </Show>
 
       <span class={"shrink line-clamp-1"}>
-        <p>{ directGetterChannelInfo(params.channelId).name }</p>
+        <p>{ directGetterChannelInfo(currentChannelId()).name }</p>
       </span>
       <p class="text-gray-400 mx-1"> | </p>
       <span class={"shrink-[2] grow-0 line-clamp-1 max-w-[50%] md:max-w-full"}>
-        <p>{ directGetterChannelInfo(params.channelId).description }</p>
+        <p>{ directGetterChannelInfo(currentChannelId()).description }</p>
       </span>
 
       <span class={"ml-auto"}>

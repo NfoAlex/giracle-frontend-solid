@@ -1,17 +1,17 @@
-import {Card} from "~/components/ui/card";
+import {Card} from "~/components/ui/card.tsx";
 import {IconMoodHappy, IconPencil, IconTrash, IconCornerUpLeft} from "@tabler/icons-solidjs";
-import DELETE_MESSAGE_DELETE from "~/api/MESSAGE/MESSAGE_DELETE";
-import {getRolePower, storeMyUserinfo} from "~/stores/MyUserinfo";
-import type {IMessage} from "~/types/Message";
-import {Button} from "~/components/ui/button";
-import EmojiPicker from "~/components/Channel/ChannelContent/HoverMenu/EmojiPicker";
+import DELETE_MESSAGE_DELETE from "~/api/MESSAGE/MESSAGE_DELETE.ts";
+import {getRolePower, storeMyUserinfo} from "~/stores/MyUserinfo.ts";
+import type {IMessage} from "~/types/Message.ts";
+import {Button} from "~/components/ui/button.tsx";
 import {createSignal} from "solid-js";
-import storeReplyingMessageId from "~/stores/ReplyingMessageId";
+import storeReplyingMessageId from "~/stores/ReplyingMessageId.ts";
+import EmojiPicker from "./HoverMenu/EmojiPicker.tsx";
 
 export default function HoverMenu(props: {
   message: IMessage,
   onEditMode: (id: string) => void,
-  onReacting: (id: string) => void
+  onReacting: (mode: boolean) => void
 }) {
   const [openEmoji, setOpenEmoji] = createSignal(false);
 
@@ -41,10 +41,10 @@ export default function HoverMenu(props: {
   const toggleOpenEmoji = () => {
     if (openEmoji()) {
       setOpenEmoji(false);
-      props.onReacting("");
+      props.onReacting(false);
     } else {
       setOpenEmoji(true);
-      props.onReacting(props.message.id);
+      props.onReacting(true);
     }
   }
 
@@ -59,7 +59,7 @@ export default function HoverMenu(props: {
           &&
           <EmojiPicker
             message={props.message}
-            onClicked={()=> { setOpenEmoji(false); props.onReacting(""); } }
+            onClicked={()=> { setOpenEmoji(false); props.onReacting(false); } }
           />
         }
       </div>

@@ -1,21 +1,21 @@
-import GET_MESSAGE_GET_NEW from "~/api/MESSAGE/MESSAGE_GET_NEW";
-import GET_MESSAGE_GET_READTIME from "~/api/MESSAGE/MESSAGE_GET_READTIME";
-import { GET_ROLE_LIST } from "~/api/ROLE/ROLE_LIST";
-import GET_USER_INFO from "~/api/USER/USER_INFO";
-import { storeAppStatus } from "~/stores/AppStatus";
-import { setStoreHasNewMessage } from "~/stores/HasNewMessage";
-import { setStoreMyUserinfo } from "~/stores/MyUserinfo";
-import { setStoreMessageReadTime, setStoreMessageReadTimeBefore } from "~/stores/Readtime";
-import { setStoreRoleInfo } from "~/stores/RoleInfo";
-import type { IRole } from "~/types/Role";
-import { initWS } from "~/WS/WScontroller";
-import GET_MESSAGE_INBOX from "~/api/MESSAGE/MESSAGE_INBOX";
-import {setStoreInbox} from "~/stores/Inbox";
-import GET_SERVER_CUSTOM_EMOJI from "~/api/SERVER/SERVER_CUSTOM_EMOJI";
-import {bindCustomEmoji} from "~/stores/CustomEmoji";
-import { bindClientConfig } from "~/stores/ClientConfig";
-import GET_SERVER_CONFIG from "~/api/SERVER/SERVER_CONFIG";
-import { bindServerinfo } from "~/stores/Serverinfo";
+import GET_MESSAGE_GET_NEW from "~/api/MESSAGE/MESSAGE_GET_NEW.ts";
+import GET_MESSAGE_GET_READTIME from "~/api/MESSAGE/MESSAGE_GET_READTIME.ts";
+import { GET_ROLE_LIST } from "~/api/ROLE/ROLE_LIST.ts";
+import GET_USER_INFO from "~/api/USER/USER_INFO.ts";
+import { storeAppStatus } from "~/stores/AppStatus.ts";
+import { setStoreHasNewMessage } from "~/stores/HasNewMessage.ts";
+import { setStoreMyUserinfo } from "~/stores/MyUserinfo.ts";
+import { setStoreMessageReadTime, setStoreMessageReadTimeBefore } from "~/stores/Readtime.ts";
+import { setStoreRoleInfo } from "~/stores/RoleInfo.ts";
+import type { IRole } from "~/types/Role.ts";
+import { initWS } from "~/WS/WScontroller.ts";
+import GET_MESSAGE_INBOX from "~/api/MESSAGE/MESSAGE_INBOX.ts";
+import {setStoreInbox} from "~/stores/Inbox.ts";
+import GET_SERVER_CUSTOM_EMOJI from "~/api/SERVER/SERVER_CUSTOM_EMOJI.ts";
+import {bindCustomEmoji} from "~/stores/CustomEmoji.ts";
+import { bindClientConfig } from "~/stores/ClientConfig.ts";
+import GET_SERVER_CONFIG from "~/api/SERVER/SERVER_CONFIG.ts";
+import { bindServerinfo } from "~/stores/Serverinfo.ts";
 
 export default function InitLoad(_userId: string, initWsToo = false) {
   //クライアント設定を呼び出して適用

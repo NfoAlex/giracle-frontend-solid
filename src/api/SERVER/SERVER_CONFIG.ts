@@ -1,4 +1,4 @@
-import type { IChannel } from "~/types/Channel";
+import type { IChannel } from "~/types/Channel.ts";
 
 export default async function GET_SERVER_CONFIG(): Promise<{
   message: string;

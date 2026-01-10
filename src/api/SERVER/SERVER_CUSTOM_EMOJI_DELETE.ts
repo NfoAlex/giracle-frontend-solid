@@ -1,4 +1,4 @@
-import {ICustomEmoji} from "~/types/Message";
+import {ICustomEmoji} from "~/types/Message.ts";
 
 export default async function DELETE_SERVER_CUSTOM_EMOJI_DELETE(
   _emojiCode: string,

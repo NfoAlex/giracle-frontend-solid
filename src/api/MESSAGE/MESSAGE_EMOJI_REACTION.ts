@@ -1,4 +1,4 @@
-import type {IReaciton} from "~/types/Message";
+import type {IReaciton} from "~/types/Message.ts";
 
 export default async function POST_MESSAGE_EMOJI_REACTION(
   _messageId: string,

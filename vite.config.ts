@@ -53,7 +53,7 @@ export default defineConfig({
     proxy: {
       "/api": {
         target: apiURI,
-        rewrite: (path) => path.replace(/^\/api/, ""),
+        rewrite: (path) => path.replace(/^\/api/, "")
       },
       "/ws": {
         target: apiURI,

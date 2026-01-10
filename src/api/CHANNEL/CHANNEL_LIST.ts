@@ -1,4 +1,4 @@
-import type { IChannel } from "~/types/Channel";
+import type { IChannel } from "~/types/Channel.ts";
 
 export async function GET_CHANNEL_LIST(): Promise<{
   message: "Channel list ready",

@@ -1,6 +1,6 @@
 import { createStore } from "solid-js/store";
-import type { IUser } from "~/types/User";
-import { getterRoleInfo } from "./RoleInfo";
+import type { IUser } from "~/types/User.ts";
+import { getterRoleInfo } from "./RoleInfo.ts";
 
 export const [storeMyUserinfo, setStoreMyUserinfo] = createStore<IUser>({
   id: "",

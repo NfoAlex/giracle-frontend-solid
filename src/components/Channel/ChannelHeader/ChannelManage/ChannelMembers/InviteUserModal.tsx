@@ -1,15 +1,15 @@
 import { IconCheck, IconExternalLink, IconPlus, IconSearch } from "@tabler/icons-solidjs";
 import { createSignal, For, Show } from "solid-js";
 import { createMutable } from "solid-js/store";
-import POST_CHANNEL_INVITE from "~/api/CHANNEL/CHANNEL_INVITE";
-import GET_USER_SEARCH from "~/api/USER/USER_SEARCH.";
-import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
-import { Button } from "~/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTrigger } from "~/components/ui/dialog";
-import { TextField, TextFieldInput } from "~/components/ui/text-field";
-import UserinfoModalWrapper from "~/components/unique/UserinfoModalWrapper";
-import { getterUserinfo } from "~/stores/Userinfo";
-import type { IUser } from "~/types/User";
+import POST_CHANNEL_INVITE from "~/api/CHANNEL/CHANNEL_INVITE.ts";
+import GET_USER_SEARCH from "~/api/USER/USER_SEARCH.ts";
+import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar.tsx";
+import { Button } from "~/components/ui/button.tsx";
+import { Dialog, DialogContent, DialogHeader, DialogTrigger } from "~/components/ui/dialog.tsx";
+import { TextField, TextFieldInput } from "~/components/ui/text-field.tsx";
+import UserinfoModalWrapper from "~/components/unique/UserinfoModalWrapper.tsx";
+import { getterUserinfo } from "~/stores/Userinfo.ts";
+import { IUser } from "~/types/User.ts";
 
 export default function InviteUserModal(props: { channelId: string, onInvite?: (user: IUser) => void }) {
   const [searchQuery, setSearchQuery] = createSignal("");

@@ -1,16 +1,16 @@
 import { createSignal, For, Show } from "solid-js";
-import { Button } from "../ui/button";
 import { useParams } from "@solidjs/router";
-import POST_MESSAGE_SEND from "~/api/MESSAGE/MESSAGE_SEND";
 import { IconSend, IconUpload } from "@tabler/icons-solidjs";
-import FileUploadPreview from "~/components/Channel/ChannelTextInput/FileUploadPreview";
-import type {IUser} from "~/types/User";
-import GET_USER_SEARCH from "~/api/USER/USER_SEARCH.";
-import { Card } from "../ui/card";
-import { IChannel } from "~/types/Channel";
-import { storeClientConfig } from "~/stores/ClientConfig";
-import storeReplyingMessageId from "~/stores/ReplyingMessageId";
-import ReplyMessageDisplay from "./ChannelTextInput/ReplyMessageDisplay";
+import POST_MESSAGE_SEND from "~/api/MESSAGE/MESSAGE_SEND.ts";
+import storeReplyingMessageId from "~/stores/ReplyingMessageId.ts";
+import GET_USER_SEARCH from "~/api/USER/USER_SEARCH.ts";
+import ReplyMessageDisplay from "./ChannelTextInput/ReplyMessageDisplay.tsx";
+import FileUploadPreview from "./ChannelTextInput/FileUploadPreview.tsx";
+import { Button } from "../ui/button.tsx";
+import { storeClientConfig } from "~/stores/ClientConfig.ts";
+import { Card } from "../ui/card.tsx";
+import { IChannel } from "~/types/Channel.ts";
+import { IUser } from "~/types/User.ts";
 
 export default function ChannelTextInput() {
   const params = useParams(); //URLパラメータを取得するやつ
@@ -18,6 +18,7 @@ export default function ChannelTextInput() {
   const [fileIds, setFileIds] = createSignal<string[]>([]); //送信に使うファイルIDの配列
   const pushFileIds = (fileId: string) => { //ファイルIDを追加するようの関数
     setFileIds([...fileIds(), fileId]);
+    console.log("ChannelTextInput :: pushFileIds : fileId->", fileId, fileIds());
   }
   const [fileInput, setFileInput] = createSignal<File[]>([]); //ファイル選択ダイアログからのファイル入力受け取り用配列
   const [userSearchResult, setUserSearchResult] = createSignal<IUser[]>([]); //ユーザー検索結果
@@ -31,6 +32,9 @@ export default function ChannelTextInput() {
 
   const sendMsg = () => {
     //console.log("ChannelTextInput :: sendMsg : params.id->", {...params});
+
+    //空メッセージは送信しない
+    if (text().trim() === "" && fileIds().length === 0) return;
 
     POST_MESSAGE_SEND(params.channelId, text(), fileIds(), storeReplyingMessageId[params.channelId] || undefined)
       .then(() => {
@@ -141,6 +145,7 @@ export default function ChannelTextInput() {
     fileInputEl.onchange = (e) => {
       const files = (e.target as HTMLInputElement).files;
       if (files) {
+        console.log("ChannelTextInput :: bindFiles : files->", files);
         setFileInput([...fileInput(), ...files]);
         //console.log("ChannelTextInput :: bindFiles : fileInput->", fileInput());
       }
@@ -242,6 +247,7 @@ export default function ChannelTextInput() {
                 }
 
                 e.preventDefault();
+                //メッセージ送信
                 sendMsg();
                 break;
               }

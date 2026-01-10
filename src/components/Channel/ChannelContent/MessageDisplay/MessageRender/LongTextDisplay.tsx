@@ -1,18 +1,18 @@
-import {Dialog, DialogContent} from "~/components/ui/dialog";
-import {Card} from "~/components/ui/card";
-import type {IMessage} from "~/types/Message";
-import MessageTextRender from "~/components/Channel/ChannelContent/MessageRender/MessageTextRender";
+import {Card} from "~/components/ui/card.tsx";
+import type {IMessage} from "~/types/Message.ts";
 import {createSignal, For, Show} from "solid-js";
-import {Button} from "~/components/ui/button";
-import {Badge} from "~/components/ui/badge";
-import URLPreview from "~/components/Channel/ChannelContent/MessageRender/URLPreview";
-import FilePreview from "~/components/Channel/ChannelContent/MessageRender/FilePreview";
-import UserinfoModalWrapper from "~/components/unique/UserinfoModalWrapper";
-import {Avatar, AvatarImage} from "~/components/ui/avatar";
-import {getterUserinfo} from "~/stores/Userinfo";
+import {Button} from "~/components/ui/button.tsx";
+import {Badge} from "~/components/ui/badge.tsx";
+import UserinfoModalWrapper from "~/components/unique/UserinfoModalWrapper.tsx";
+import {Avatar, AvatarImage} from "~/components/ui/avatar.tsx";
+import {getterUserinfo} from "~/stores/Userinfo.ts";
 import {IconBrowserMaximize} from "@tabler/icons-solidjs";
-import {storeMyUserinfo} from "~/stores/MyUserinfo";
-import RenderEmojiReactions from "~/components/Channel/ChannelContent/MessageRender/RenderEmojiReactions";
+import {storeMyUserinfo} from "~/stores/MyUserinfo.ts";
+import MessageTextRender from "./MessageTextRender.tsx";
+import URLPreview from "./URLPreview.tsx";
+import { Dialog, DialogContent } from "~/components/ui/dialog.tsx";
+import FilePreview from "./FilePreview.tsx";
+import RenderEmojiReactions from "./RenderEmojiReactions.tsx";
 
 export default function LongTextDisplay(props: { message: IMessage }) {
   const [open, setOpen] = createSignal(false);

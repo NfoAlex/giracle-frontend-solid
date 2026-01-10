@@ -1,4 +1,4 @@
-import type {IReaciton} from "~/types/Message";
+import type {IReaciton} from "~/types/Message.ts";
 
 export default async function DELETE_MESSAGE_DELETE_EMOJI_REACTION(
   _messageId: string,

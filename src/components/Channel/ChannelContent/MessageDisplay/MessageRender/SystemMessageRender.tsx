@@ -1,7 +1,7 @@
-import {Card} from "~/components/ui/card";
-import type {ISystemMessage} from "~/types/Message";
-import {getterUserinfo} from "~/stores/Userinfo";
-import UserinfoModalWrapper from "~/components/unique/UserinfoModalWrapper";
+import {Card} from "~/components/ui/card.tsx";
+import type {ISystemMessage} from "~/types/Message.ts";
+import {getterUserinfo} from "~/stores/Userinfo.ts";
+import UserinfoModalWrapper from "~/components/unique/UserinfoModalWrapper.tsx";
 
 export default function SystemMessageRender(props: { content: string }) {
   const systemMsg: ISystemMessage = JSON.parse(props.content);

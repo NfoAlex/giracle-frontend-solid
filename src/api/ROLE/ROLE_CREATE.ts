@@ -1,4 +1,4 @@
-import type { IRole } from "~/types/Role";
+import type { IRole } from "~/types/Role.ts";
 
 export default async function PUT_ROLE_CREATE(
   _roleName: string
