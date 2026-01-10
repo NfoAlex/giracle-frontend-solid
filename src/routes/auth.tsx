@@ -14,6 +14,7 @@ import GET_SERVER_CONFIG from "~/api/SERVER/SERVER_CONFIG.ts";
 export default function Auth() {
   const navi = useNavigate();
   const loc = useLocation();
+  //サーバー情報の取得状態管理用変数群
   const [tempServerinfoLoaded, setTempServerinfoLoaded] = createSignal(false);
   const [tempServerinfo, setTempServerinfo] = createSignal(storeServerinfo);
   const [errorFetchingServerinfo, setErrorFetchingServerinfo] = createSignal(false);
@@ -33,7 +34,7 @@ export default function Auth() {
       });
     }
 
-    //サーバー情報を取得
+    //サーバー情報を取得、再試行もする
     await new Promise(async (resolve) => {
       setTimeout(() => {
         resolve(true);
