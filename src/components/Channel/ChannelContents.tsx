@@ -110,7 +110,7 @@ export default function ChannelContents() {
       stateFetchingHistory = true;
 
       const anchor = captureScrollAnchor(el);
-      const oldest = historyState?.history.at(-1);
+      const oldest = historyState?.history?.at(-1);
       //console.log("_ChannelContents :: checkScrollPosAndFetchHistory : oldest", oldest);
       if (oldest === undefined) {
         stateFetchingHistory = false;
