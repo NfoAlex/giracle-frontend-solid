@@ -5,6 +5,7 @@ import { Card } from "~/components/ui/card.tsx";
 import { ProgressCircle } from "~/components/ui/progress-circle.tsx";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "~/components/ui/hover-card.tsx";
 import { Button } from "~/components/ui/button.tsx";
+import { Tooltip,TooltipContent,TooltipTrigger } from "~/components/ui/tooltip.tsx";
 
 export default function FileUploadPreview(
   props: {
@@ -68,11 +69,15 @@ export default function FileUploadPreview(
         } else {
           //エラーとして設定
           console.error("FileUploadPreview :: uploadFile : 結果が取れていない->", result);
-          setResult("内部エラー");
+          setResult(`error::${xhr.responseText}`);
         }
       } else {
-        console.error("FileUploadPreview :: uploadFile : 失敗...->", xhr.statusText);
-        setResult(`error::${xhr.statusText}`);
+        console.error("FileUploadPreview :: uploadFile : 失敗...->", xhr.statusText, xhr.responseText);
+        if (xhr.responseText === "File size is too large") {
+          setResult("error::ファイルサイズが大きすぎます");
+          return;
+        }
+        setResult(`error::エラー:${xhr.responseText}`);
       }
     });
 
@@ -114,8 +119,14 @@ export default function FileUploadPreview(
           <span class="shrink-0 grow-0 text-sm w-4 h-4 text-center" style="font-family: 'consolas'">
             {result() === "" && <ProgressCircle value={progress()} class="w-4 h-4 mx-auto" /> }
             {result() === "SUCCESS" && "✅" }
-            {result() === "内部エラー" && "!" }
-            {result().startsWith("error::") && result() }
+            { //エラー表示
+              result().startsWith("error::")
+              &&
+              <Tooltip placement="top">
+                <TooltipTrigger>⛔</TooltipTrigger>
+                <TooltipContent>{ result().substring("error::".length) }</TooltipContent>
+              </Tooltip>
+            }
           </span>
 
           {/* ファイル名表示 */}
