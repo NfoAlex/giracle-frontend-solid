@@ -1,6 +1,6 @@
 import { createSignal, onMount } from "solid-js";
-import POST_SERVER_CHANGE_CONFIG from "~/api/SERVER/SERVER_CHANGE_CONFIG";
-import POST_SERVER_CHANGE_INFO from "~/api/SERVER/SERVER_CHANGE_INFO";
+import POST_SERVER_CHANGE_CONFIG from "~/api/SERVER/SERVER_CHANGE_CONFIG.ts";
+import POST_SERVER_CHANGE_INFO from "~/api/SERVER/SERVER_CHANGE_INFO.ts";
 import { Button } from "~/components/ui/button.tsx";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card.tsx";
 import { Label } from "~/components/ui/label.tsx";
@@ -18,7 +18,8 @@ export default function ManageCommunity() {
     RegisterInviteOnly: false,
     RegisterAnnounceChannelId: "",
     MessageMaxLength: 0,
-    defaultJoinChannel: []
+    defaultJoinChannel: [],
+    MessageMaxFileSize: 0,
   });
   const configChanged = () => {
     return JSON.stringify(serverConfig()) !== JSON.stringify(storeServerinfo);
@@ -142,6 +143,23 @@ export default function ManageCommunity() {
                   <NumberFieldDecrementTrigger />
                 </NumberFieldGroup>
                 <NumberFieldErrorMessage>発言できません。</NumberFieldErrorMessage>
+              </NumberField>
+            </span>
+            <span class="flex flex-col gap-2">
+              <p>ファイルのアップロードサイズ制限</p>
+              <NumberField
+                class="w-36"
+                value={serverConfig().MessageMaxFileSize}
+                defaultValue={512 * 1024 * 1024} // 512MB
+                onRawValueChange={(e) => setServerConfig({...serverConfig(), MessageMaxFileSize: e})}
+                validationState={serverConfig().MessageMaxFileSize <= 0 ? "invalid" : "valid"}
+              >
+                <NumberFieldGroup>
+                  <NumberFieldInput />
+                  <NumberFieldIncrementTrigger />
+                  <NumberFieldDecrementTrigger />
+                </NumberFieldGroup>
+                <NumberFieldErrorMessage>無効な数値です。</NumberFieldErrorMessage>
               </NumberField>
             </span>
 
