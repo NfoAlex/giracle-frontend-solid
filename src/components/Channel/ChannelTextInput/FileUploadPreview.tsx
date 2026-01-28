@@ -1,10 +1,15 @@
-import {createSignal, onCleanup, onMount} from "solid-js";
-import {useParams} from "@solidjs/router";
-import { IconSquareRoundedX, IconFileFilled } from '@tabler/icons-solidjs';
+import { createSignal, onCleanup, onMount,Show } from "solid-js";
+import { useParams } from "@solidjs/router";
+import { IconSquareRoundedX, IconFileFilled,IconInfoCircle } from '@tabler/icons-solidjs';
 import { Card } from "~/components/ui/card.tsx";
 import { ProgressCircle } from "~/components/ui/progress-circle.tsx";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "~/components/ui/hover-card.tsx";
 import { Button } from "~/components/ui/button.tsx";
+import { Tooltip,TooltipContent,TooltipTrigger } from "~/components/ui/tooltip.tsx";
+import { Dialog,DialogDescription,DialogHeader,DialogContent,DialogTitle } from "~/components/ui/dialog.tsx";
+import { storeServerinfo } from "~/stores/Serverinfo.ts";
+import ConvertSizeToHumanSize from "~/utils/ConvertSizeToHumanSize.ts";
+import { Alert,AlertDescription,AlertTitle } from "~/components/ui/alert.tsx";
 
 export default function FileUploadPreview(
   props: {
@@ -18,6 +23,7 @@ export default function FileUploadPreview(
   const [result, setResult] = createSignal<"" | "SUCCESS" | "内部エラー" | `error::${string}`>("");
   const [openFileNameCard, setOpenFileNameCard] = createSignal(false);
   const [previewUrl, setPreviewUrl] = createSignal<string>("");
+  const [open, setOpen] = createSignal(false); //エラー表示ダイアログ用
   let fileIdBinded = "";
 
   /**
@@ -25,6 +31,13 @@ export default function FileUploadPreview(
    */
   const uploadFile = async () => {
     //console.log("FileUploadPreview :: uploadFile : props.file->", props.file, " : params.channelId->", params.channelId);
+
+    //ファイルサイズが大きすぎる場合はモーダルを表示して終了
+    if (props.file.size >= storeServerinfo.MessageMaxFileSize) {
+      setResult("error::ファイルサイズが大きすぎます");
+      setOpen(true);
+      return;
+    }
 
     //画像ファイルならプレビュー用のURLを生成
     if (props.file.type.startsWith('image/')) {
@@ -68,11 +81,15 @@ export default function FileUploadPreview(
         } else {
           //エラーとして設定
           console.error("FileUploadPreview :: uploadFile : 結果が取れていない->", result);
-          setResult("内部エラー");
+          setResult(`error::${xhr.responseText}`);
         }
       } else {
-        console.error("FileUploadPreview :: uploadFile : 失敗...->", xhr.statusText);
-        setResult(`error::${xhr.statusText}`);
+        console.error("FileUploadPreview :: uploadFile : 失敗...->", xhr.statusText, xhr.responseText);
+        if (xhr.responseText === "File size is too large") {
+          setResult("error::ファイルサイズが大きすぎます");
+          return;
+        }
+        setResult(`error::エラー:${xhr.responseText}`);
       }
     });
 
@@ -91,6 +108,28 @@ export default function FileUploadPreview(
 
   return (
     <div class="w-48 h-48 overflow-hidden">
+      {/* エラー表示用ダイアログ */}
+      <Dialog open={open()} onOpenChange={setOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>ファイルアップロードに失敗</DialogTitle>
+            <DialogDescription class="pt-2">
+              <p>{ result().startsWith("error::") ? result().substring("error::".length) : "不明なエラーが発生しました。" }</p>
+              <Show when={result() === "error::ファイルサイズが大きすぎます"}>
+                <br />
+                <Alert>
+                  <IconInfoCircle />
+                  <AlertTitle>ファイルサイズ制限について</AlertTitle>
+                  <AlertDescription>
+                    このコミュニティではファイルサイズの制限は{ConvertSizeToHumanSize(storeServerinfo.MessageMaxFileSize)}と設定されています。
+                  </AlertDescription>
+                </Alert>
+              </Show>
+            </DialogDescription>
+          </DialogHeader>
+        </DialogContent>
+      </Dialog>
+
       <Card class={"py-2 h-full w-full flex flex-col gap-1"}>
         {/* 画像のプレビューかファイルアイコンの表示 */}
         <div class="px-2 grow flex justify-center items-center">
@@ -114,8 +153,16 @@ export default function FileUploadPreview(
           <span class="shrink-0 grow-0 text-sm w-4 h-4 text-center" style="font-family: 'consolas'">
             {result() === "" && <ProgressCircle value={progress()} class="w-4 h-4 mx-auto" /> }
             {result() === "SUCCESS" && "✅" }
-            {result() === "内部エラー" && "!" }
-            {result().startsWith("error::") && result() }
+            { //エラー表示
+              result().startsWith("error::")
+              &&
+              <Tooltip placement="top">
+                <TooltipTrigger>
+                  <span onClick={()=>setOpen(true)}>⛔</span>
+                </TooltipTrigger>
+                <TooltipContent>{ result().substring("error::".length) }</TooltipContent>
+              </Tooltip>
+            }
           </span>
 
           {/* ファイル名表示 */}

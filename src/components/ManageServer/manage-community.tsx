@@ -1,14 +1,15 @@
 import { createSignal, onMount } from "solid-js";
-import POST_SERVER_CHANGE_CONFIG from "~/api/SERVER/SERVER_CHANGE_CONFIG";
-import POST_SERVER_CHANGE_INFO from "~/api/SERVER/SERVER_CHANGE_INFO";
+import POST_SERVER_CHANGE_CONFIG from "~/api/SERVER/SERVER_CHANGE_CONFIG.ts";
+import POST_SERVER_CHANGE_INFO from "~/api/SERVER/SERVER_CHANGE_INFO.ts";
 import { Button } from "~/components/ui/button.tsx";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card.tsx";
 import { Label } from "~/components/ui/label.tsx";
-import { NumberField, NumberFieldDecrementTrigger, NumberFieldErrorMessage, NumberFieldGroup, NumberFieldIncrementTrigger, NumberFieldInput } from "~/components/ui/number-field";
+import { NumberField, NumberFieldDecrementTrigger, NumberFieldErrorMessage, NumberFieldGroup, NumberFieldIncrementTrigger, NumberFieldInput } from "~/components/ui/number-field.tsx";
 import { Switch, SwitchControl, SwitchLabel, SwitchThumb } from "~/components/ui/switch.tsx";
 import { TextFieldInput, TextField } from "~/components/ui/text-field.tsx";
 import { setStoreServerinfo, storeServerinfo } from "~/stores/Serverinfo.ts";
 import type { IServer } from "~/types/Server.ts";
+import ConvertSizeToHumanSize from "~/utils/ConvertSizeToHumanSize.ts";
 
 export default function ManageCommunity() {
   const [serverConfig, setServerConfig] = createSignal<IServer>({
@@ -18,7 +19,8 @@ export default function ManageCommunity() {
     RegisterInviteOnly: false,
     RegisterAnnounceChannelId: "",
     MessageMaxLength: 0,
-    defaultJoinChannel: []
+    defaultJoinChannel: [],
+    MessageMaxFileSize: 0,
   });
   const configChanged = () => {
     return JSON.stringify(serverConfig()) !== JSON.stringify(storeServerinfo);
@@ -128,21 +130,43 @@ export default function ManageCommunity() {
 
             <p class="font-bold mb-2">メッセージ</p>
             <span class="flex flex-col gap-2">
-              <p>メッセージの文字数制限</p>
-              <NumberField
-                class="w-36"
-                value={serverConfig().MessageMaxLength}
-                defaultValue={3000}
-                onRawValueChange={(e) => setServerConfig({...serverConfig(), MessageMaxLength: e})}
-                validationState={serverConfig().MessageMaxLength <= 0 ? "invalid" : "valid"}
-              >
-                <NumberFieldGroup>
-                  <NumberFieldInput />
-                  <NumberFieldIncrementTrigger />
-                  <NumberFieldDecrementTrigger />
-                </NumberFieldGroup>
-                <NumberFieldErrorMessage>発言できません。</NumberFieldErrorMessage>
-              </NumberField>
+              <span>
+                <p>メッセージの文字数制限</p>
+                <NumberField
+                  class="w-1/2 flex items-center gap-2"
+                  value={serverConfig().MessageMaxLength}
+                  defaultValue={3000}
+                  onRawValueChange={(e) => setServerConfig({...serverConfig(), MessageMaxLength: e})}
+                  validationState={serverConfig().MessageMaxLength <= 0 ? "invalid" : "valid"}
+                >
+                  <NumberFieldGroup class="w-36">
+                    <NumberFieldInput />
+                    <NumberFieldIncrementTrigger />
+                    <NumberFieldDecrementTrigger />
+                  </NumberFieldGroup>
+                  <span class="grow shrink-0">文字</span>
+                  <NumberFieldErrorMessage>発言できません。</NumberFieldErrorMessage>
+                </NumberField>
+              </span>
+
+              <span>
+                <p>ファイルのアップロードサイズ制限</p>
+                <NumberField
+                  class="w-1/2 flex items-center gap-2"
+                  value={serverConfig().MessageMaxFileSize}
+                  defaultValue={512 * 1024 * 1024} // 512MB
+                  onRawValueChange={(e) => setServerConfig({...serverConfig(), MessageMaxFileSize: e})}
+                  validationState={serverConfig().MessageMaxFileSize <= 0 ? "invalid" : "valid"}
+                >
+                  <NumberFieldGroup class="w-36">
+                    <NumberFieldInput />
+                    <NumberFieldIncrementTrigger />
+                    <NumberFieldDecrementTrigger />
+                  </NumberFieldGroup>
+                  <span class="grow shrink-0"> Byte  =  約{ ConvertSizeToHumanSize(serverConfig().MessageMaxFileSize) }</span>
+                  <NumberFieldErrorMessage>無効な数値です。</NumberFieldErrorMessage>
+                </NumberField>
+              </span>
             </span>
 
             <hr class="my-6" />
