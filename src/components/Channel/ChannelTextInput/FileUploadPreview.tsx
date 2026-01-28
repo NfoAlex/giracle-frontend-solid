@@ -32,6 +32,13 @@ export default function FileUploadPreview(
   const uploadFile = async () => {
     //console.log("FileUploadPreview :: uploadFile : props.file->", props.file, " : params.channelId->", params.channelId);
 
+    //ファイルサイズが大きすぎる場合はモーダルを表示して終了
+    if (props.file.size >= storeServerinfo.MessageMaxFileSize) {
+      setResult("error::ファイルサイズが大きすぎます");
+      setOpen(true);
+      return;
+    }
+
     //画像ファイルならプレビュー用のURLを生成
     if (props.file.type.startsWith('image/')) {
       setPreviewUrl(URL.createObjectURL(props.file));
@@ -101,7 +108,6 @@ export default function FileUploadPreview(
 
   return (
     <div class="w-48 h-48 overflow-hidden">
-
       {/* エラー表示用ダイアログ */}
       <Dialog open={open()} onOpenChange={setOpen}>
         <DialogContent>
