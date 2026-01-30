@@ -38,9 +38,6 @@ export default function ReplyMessageDisplay(props: {messageId: string, channelId
 
   return (
     <Card class="w-full p-2 flex items-center gap-1">
-      <div onClick={props.onRemove} class="border p-2 shrink-0 cursor-pointer hover:bg-border rounded-md">
-        <IconX class="w-4 h-4" />
-      </div>
       <div class="radius p-2 rounded-md">
         <IconCornerUpLeft class="shrink-0 w-4 h-4" />
       </div>
@@ -62,6 +59,10 @@ export default function ReplyMessageDisplay(props: {messageId: string, channelId
         <p class="truncate grow shrink-0 text-left">
           { getReplyingMessage().content }
         </p>
+      </div>
+
+      <div onClick={props.onRemove} class="ml-auto border p-2 shrink-0 cursor-pointer hover:bg-border rounded-md">
+        <IconX class="w-4 h-4" />
       </div>
     </Card>
   )
