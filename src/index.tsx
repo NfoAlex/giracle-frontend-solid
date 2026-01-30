@@ -91,6 +91,7 @@ render(() =>
           <Route path="/:channelId" component={Channel} />
         </Route>
         <Route path="/online-user" component={lazy(() => import("./routes/online-user.tsx"))} />
+        <Route path="/members" component={lazy(() => import("./routes/members.tsx"))} />
         <Route path="/config" component={lazy(() => import("./routes/config.tsx"))} />
         <Route path="/inbox" component={lazy(() => import("./routes/Inbox.tsx"))} />
         <Route path="/channel-browser" component={lazy(() => import("./routes/channel-browser.tsx"))} />
