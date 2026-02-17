@@ -1,4 +1,4 @@
-import type { IChannel } from "./Channel";
+import type { IChannel } from "./Channel.ts";
 
 export interface IServer {
   name: string;
@@ -7,6 +7,7 @@ export interface IServer {
   RegisterInviteOnly: boolean;
   RegisterAnnounceChannelId: string;
   MessageMaxLength: number;
+  MessageMaxFileSize: number;
   defaultJoinChannel: IChannel[];
 }
 
