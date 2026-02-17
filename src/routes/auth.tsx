@@ -58,31 +58,35 @@ export default function Auth() {
     <div class="py-5 px-2 max-w-[500px] w-full h-screen mx-auto flex flex-col gap-4 md:justify-center">
       <p class="text-2xl">{tempServerinfo().name || "Giracle"}</p>
       <Card class="w-full mx-auto py-4">
-        <CardContent class="grid- gap-3">
-          <Tabs defaultValue="login">
-            <TabsList class="grid w-full grid-cols-2">
-              <TabsTrigger value="login">ログイン</TabsTrigger>
-              <TabsTrigger value="register" disabled={!tempServerinfo().RegisterAvailable}>新規登録</TabsTrigger>
-            </TabsList>
-
-            <Show
-              when={errorFetchingServerinfo()}
-            >
-              <div>エラーです</div>
-            </Show>
-            { errorFetchingServerinfo().toString() }
-            <Show
-              when={tempServerinfoLoaded()}
-              fallback={<p class={"text-center"}>loading...</p>}
-            >
-              <TabsContent value="login">
-                <Login />
-              </TabsContent>
-              <TabsContent value="register">
-                <Register />
-              </TabsContent>
-            </Show>
-          </Tabs>
+        <CardContent class="gap-3 p-6">
+          { //情報取得エラー時の表示
+            errorFetchingServerinfo()
+            ?
+            <div>
+              <p>
+                インスタンス情報を取得できませんでした。
+                しばらくしてからもう一度お試しください。
+              </p>
+            </div>
+            :
+            <Tabs defaultValue="login">
+              <TabsList class="grid w-full grid-cols-2">
+                <TabsTrigger value="login">ログイン</TabsTrigger>
+                <TabsTrigger value="register" disabled={!tempServerinfo().RegisterAvailable}>新規登録</TabsTrigger>
+              </TabsList>
+              <Show
+                when={tempServerinfoLoaded()}
+                fallback={<p class={"text-center"}>loading...</p>}
+              >
+                <TabsContent value="login">
+                  <Login />
+                </TabsContent>
+                <TabsContent value="register">
+                  <Register />
+                </TabsContent>
+              </Show>
+            </Tabs>
+          }
         </CardContent>
       </Card>
 
