@@ -9,15 +9,21 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs.t
 import { storeServerinfo } from "~/stores/Serverinfo.ts";
 import GetCookie from "~/utils/GetCookie.ts";
 import InitLoad from "~/utils/InitLoad.ts";
+import { Button } from "~/components/ui/button.tsx";
 
 export default function Auth() {
   const navi = useNavigate();
   const loc = useLocation();
+  //サーバー情報の取得状態管理用変数群
   const [tempServerinfoLoaded, setTempServerinfoLoaded] = createSignal(false);
   const [tempServerinfo, setTempServerinfo] = createSignal(storeServerinfo);
   const [errorFetchingServerinfo, setErrorFetchingServerinfo] = createSignal(false);
 
-  onMount(async () => {
+  //Cookie認証トライとサーバー情報取得
+  const firstTrigger = async () => {
+    setErrorFetchingServerinfo(false);
+    setTempServerinfoLoaded(false);
+
     //クッキーにTokenがあれば初期処理をして移動
     const token = GetCookie("token");
     if (token !== undefined) {
@@ -32,7 +38,7 @@ export default function Auth() {
       });
     }
 
-    //サーバー情報を取得
+    //サーバー情報を取得、再試行もする
     await new Promise(async (resolve) => {
       setTimeout(() => {
         resolve(true);
@@ -44,43 +50,54 @@ export default function Auth() {
       await GET_SERVER_CONFIG().then((r) => {
         setTempServerinfo({...tempServerinfo(), ...r.data});
         setTempServerinfoLoaded(true);
+        setErrorFetchingServerinfo(false);
         resolve(true);
       }).catch((e) => {
         console.error("Auth :: onMount(promise) : e->", e);
         setErrorFetchingServerinfo(true);
       })
     });
-  });
+  };
+
+  onMount(firstTrigger);
 
   return (
     <div class="py-5 px-2 max-w-[500px] w-full h-screen mx-auto flex flex-col gap-4 md:justify-center">
       <p class="text-2xl">{tempServerinfo().name || "Giracle"}</p>
       <Card class="w-full mx-auto py-4">
-        <CardContent class="grid- gap-3">
-          <Tabs defaultValue="login">
-            <TabsList class="grid w-full grid-cols-2">
-              <TabsTrigger value="login">ログイン</TabsTrigger>
-              <TabsTrigger value="register" disabled={!tempServerinfo().RegisterAvailable}>新規登録</TabsTrigger>
-            </TabsList>
-
-            <Show
-              when={errorFetchingServerinfo()}
-            >
-              <div>エラーです</div>
-            </Show>
-            { errorFetchingServerinfo().toString() }
-            <Show
-              when={tempServerinfoLoaded()}
-              fallback={<p class={"text-center"}>loading...</p>}
-            >
-              <TabsContent value="login">
-                <Login />
-              </TabsContent>
-              <TabsContent value="register">
-                <Register />
-              </TabsContent>
-            </Show>
-          </Tabs>
+        <CardContent class="gap-3 p-6">
+          { //情報取得エラー時の表示
+            errorFetchingServerinfo()
+            ?
+            <div class="flex flex-col gap-4">
+              <p>
+                インスタンス情報を取得できませんでした。
+                しばらくしてからもう一度お試しください。
+              </p>
+              <Button
+                onClick={firstTrigger}
+                class="w-full"
+              >再取得する</Button>
+            </div>
+            :
+            <Tabs defaultValue="login">
+              <TabsList class="grid w-full grid-cols-2">
+                <TabsTrigger value="login">ログイン</TabsTrigger>
+                <TabsTrigger value="register" disabled={!tempServerinfo().RegisterAvailable}>新規登録</TabsTrigger>
+              </TabsList>
+              <Show
+                when={tempServerinfoLoaded()}
+                fallback={<p class={"text-center"}>loading...</p>}
+              >
+                <TabsContent value="login">
+                  <Login />
+                </TabsContent>
+                <TabsContent value="register">
+                  <Register />
+                </TabsContent>
+              </Show>
+            </Tabs>
+          }
         </CardContent>
       </Card>
 
