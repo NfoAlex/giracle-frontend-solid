@@ -54,7 +54,7 @@ export default function ManageCommunity() {
 
   return (
     <div class="flex flex-col h-full">
-      
+
       <Card class="fixed py-3 px-5 bottom-3 left-1/2 transform -translate-x-1/2 flex items-center gap-2 z-50">
         <Button onClick={changeServerConfig} disabled={!configChanged()}>変更を適用</Button>
         <Button onClick={()=>setServerConfig({...storeServerinfo})} disabled={!configChanged()} variant={"outline"}>復元</Button>
