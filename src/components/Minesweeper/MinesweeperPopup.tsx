@@ -1,5 +1,5 @@
 import { IconMoodSmileFilled, IconMoodWrrrFilled, IconRocket, IconX } from "@tabler/icons-solidjs"
-import { For, Match, Show, Switch, createMemo, createSignal, type JSX } from "solid-js"
+import { For, Match, Show, Switch, createMemo, createSignal, onCleanup, type JSX } from "solid-js"
 import { Badge } from "~/components/ui/badge.tsx"
 import { Button } from "~/components/ui/button.tsx"
 import { Popover, PopoverContent, PopoverTrigger } from "~/components/ui/popover.tsx"
@@ -183,6 +183,18 @@ export default function MinesweeperPopup(props: MinesweeperPopupProps) {
   const [isOpen, setIsOpen] = createSignal(false)
   const isMobile = useIsMobile()
   const controller = createMinesweeperController("easy")
+  const [dragOffset, setDragOffset] = createSignal({ x: 0, y: 0 })
+  const [isDraggingPopup, setIsDraggingPopup] = createSignal(false)
+
+  let activeDragPointerId: number | null = null
+  let dragStartX = 0
+  let dragStartY = 0
+  let dragBaseX = 0
+  let dragBaseY = 0
+  let dragMinDeltaX = 0
+  let dragMaxDeltaX = 0
+  let dragMinDeltaY = 0
+  let dragMaxDeltaY = 0
 
   const gameState = createMemo(() => controller.gameState())
   const canRestart = createMemo(() => gameState().status === "won" || gameState().status === "lost")
@@ -194,6 +206,73 @@ export default function MinesweeperPopup(props: MinesweeperPopupProps) {
     return cols * CELL_SIZE_PX + (cols - 1) * CELL_GAP_PX
   })
   const popupWidth = createMemo(() => `min(${POPUP_MAX_WIDTH}, ${boardWidthPx() + CONTENT_HORIZONTAL_PADDING_PX}px)`)
+
+  const stopPopupDrag = () => {
+    if (!isDraggingPopup()) return
+    setIsDraggingPopup(false)
+    activeDragPointerId = null
+    window.removeEventListener("pointermove", onPopupDragMove)
+    window.removeEventListener("pointerup", stopPopupDrag)
+    window.removeEventListener("pointercancel", stopPopupDrag)
+  }
+
+  const clamp = (value: number, min: number, max: number): number => {
+    if (value < min) return min
+    if (value > max) return max
+    return value
+  }
+
+  const onPopupDragMove = (event: PointerEvent) => {
+    if (!isDraggingPopup()) return
+    if (activeDragPointerId !== null && event.pointerId !== activeDragPointerId) return
+
+    const rawDeltaX = event.clientX - dragStartX
+    const rawDeltaY = event.clientY - dragStartY
+    const clampedDeltaX = clamp(rawDeltaX, dragMinDeltaX, dragMaxDeltaX)
+    const clampedDeltaY = clamp(rawDeltaY, dragMinDeltaY, dragMaxDeltaY)
+
+    setDragOffset({
+      x: dragBaseX + clampedDeltaX,
+      y: dragBaseY + clampedDeltaY
+    })
+  }
+
+  const startPopupDrag: JSX.EventHandlerUnion<HTMLDivElement, PointerEvent> = (event) => {
+    if (event.button !== 0 && event.pointerType !== "touch") return
+
+    const targetEl = event.target as HTMLElement | null
+    const interactiveParent = targetEl?.closest(
+      "button, a, input, textarea, select, [role='button'], [contenteditable='true'], [data-no-drag]"
+    )
+    if (interactiveParent) return
+
+    activeDragPointerId = event.pointerId
+    dragStartX = event.clientX
+    dragStartY = event.clientY
+    dragBaseX = dragOffset().x
+    dragBaseY = dragOffset().y
+
+    const rect = event.currentTarget.getBoundingClientRect()
+    const minDeltaX = -rect.left
+    const maxDeltaX = window.innerWidth - rect.right
+    const minDeltaY = -rect.top
+    const maxDeltaY = window.innerHeight - rect.bottom
+
+    dragMinDeltaX = Math.min(minDeltaX, maxDeltaX)
+    dragMaxDeltaX = Math.max(minDeltaX, maxDeltaX)
+    dragMinDeltaY = Math.min(minDeltaY, maxDeltaY)
+    dragMaxDeltaY = Math.max(minDeltaY, maxDeltaY)
+
+    event.preventDefault()
+    setIsDraggingPopup(true)
+    window.addEventListener("pointermove", onPopupDragMove)
+    window.addEventListener("pointerup", stopPopupDrag)
+    window.addEventListener("pointercancel", stopPopupDrag)
+  }
+
+  onCleanup(() => {
+    stopPopupDrag()
+  })
 
   return (
     <Popover open={isOpen()} onOpenChange={setIsOpen}>
@@ -210,10 +289,12 @@ export default function MinesweeperPopup(props: MinesweeperPopupProps) {
         class="border-sidebar-border bg-sidebar p-3 text-sidebar-foreground"
         style={{
           width: popupWidth(),
-          "max-width": POPUP_MAX_WIDTH
+          "max-width": POPUP_MAX_WIDTH,
+          translate: `${dragOffset().x}px ${dragOffset().y}px`
         }}
+        onPointerDown={startPopupDrag}
       >
-        <div class="flex flex-wrap items-center gap-2">
+        <div class={cn("flex flex-wrap items-center gap-2", isDraggingPopup() ? "cursor-grabbing" : "cursor-auto")}>
           <Button
             type="button"
             size="sm"
@@ -279,7 +360,10 @@ export default function MinesweeperPopup(props: MinesweeperPopupProps) {
             </div>
           }
         >
-          <div class="mt-3 max-h-[min(60vh,36rem)] overflow-auto rounded-md border border-sidebar-border bg-background/80 p-2">
+          <div
+            class="mt-3 max-h-[min(60vh,36rem)] overflow-auto rounded-md border border-sidebar-border bg-background/80 p-2"
+            data-no-drag
+          >
             <div
               class="inline-grid gap-[2px]"
               style={{
