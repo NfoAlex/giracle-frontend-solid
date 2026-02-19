@@ -1,4 +1,4 @@
-import { IconMoodSmileFilled, IconMoodWrrrFilled, IconRocket, IconX } from "@tabler/icons-solidjs"
+import { IconMoodSmileFilled, IconMoodWrrrFilled, IconRocket } from "@tabler/icons-solidjs"
 import { For, Match, Show, Switch, createMemo, createSignal, onCleanup, type JSX } from "solid-js"
 import { Badge } from "~/components/ui/badge.tsx"
 import { Button } from "~/components/ui/button.tsx"
@@ -294,23 +294,30 @@ export default function MinesweeperPopup(props: MinesweeperPopupProps) {
         }}
         onPointerDown={startPopupDrag}
       >
-        <div class={cn("flex flex-wrap items-center gap-2", isDraggingPopup() ? "cursor-grabbing" : "cursor-auto")}>
-          <Button
-            type="button"
-            size="sm"
-            variant="outline"
-            class="h-7 px-3 text-xs"
-            onClick={() => controller.changeDifficulty(nextDifficulty())}
-            title="クリックで難易度を切り替え"
-            aria-label="難易度切り替え"
-          >
-            {DIFFICULTY_CONFIG[controller.difficulty()].label}
-          </Button>
+        <div
+          class={cn(
+            "grid grid-cols-[1fr_auto_1fr] items-center gap-2",
+            isDraggingPopup() ? "cursor-grabbing" : "cursor-auto"
+          )}
+        >
+          <div class="justify-self-start">
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              class="h-7 px-3 text-xs"
+              onClick={() => controller.changeDifficulty(nextDifficulty())}
+              title="クリックで難易度を切り替え"
+              aria-label="難易度切り替え"
+            >
+              {DIFFICULTY_CONFIG[controller.difficulty()].label}
+            </Button>
+          </div>
 
           <button
             type="button"
             class={cn(
-              "inline-flex items-center rounded-md border p-1.5",
+              "inline-flex items-center rounded-md border p-1.5 justify-self-center",
               canRestart() ? "cursor-pointer hover:bg-accent/70" : "cursor-default",
               statusTextColor(gameState().status)
             )}
@@ -322,22 +329,9 @@ export default function MinesweeperPopup(props: MinesweeperPopupProps) {
             <StatusIcon status={gameState().status} />
           </button>
 
-          <Badge variant="secondary">
+          <Badge variant="secondary" class="justify-self-end">
             残り: {gameState().remainingMines}
           </Badge>
-
-          <div class="ml-auto">
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              class="size-8"
-              onClick={() => setIsOpen(false)}
-              aria-label="Close minesweeper popup"
-            >
-              <IconX size={16} />
-            </Button>
-          </div>
         </div>
 
         <Show when={isMobile()}>
