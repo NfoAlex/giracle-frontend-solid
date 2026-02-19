@@ -231,10 +231,6 @@ export default function MinesweeperPopup(props: MinesweeperPopupProps) {
     const cols = gameState().cols
     return cols * CELL_SIZE_PX + (cols - 1) * CELL_GAP_PX
   })
-  const boardHeightPx = createMemo(() => {
-    const rows = gameState().rows
-    return rows * CELL_SIZE_PX + (rows - 1) * CELL_GAP_PX
-  })
   const popupWidth = createMemo(() => `min(${POPUP_MAX_WIDTH}, ${boardWidthPx() + CONTENT_HORIZONTAL_PADDING_PX}px)`)
 
   const stopPopupDrag = () => {
@@ -312,8 +308,6 @@ export default function MinesweeperPopup(props: MinesweeperPopupProps) {
 
   createEffect((previousBoardKey?: string) => {
     const boardKey = `${gameState().rows}x${gameState().cols}`
-    boardWidthPx()
-    boardHeightPx()
     if (!props.isOpen) return boardKey
     if (previousBoardKey !== undefined && previousBoardKey !== boardKey) {
       schedulePopupLayout("clamp")
