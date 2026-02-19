@@ -1,5 +1,5 @@
 import { IconMoodSmileFilled, IconMoodWrrrFilled, IconRocket } from "@tabler/icons-solidjs"
-import { For, Match, Show, Switch, createMemo, createSignal, onCleanup, type JSX } from "solid-js"
+import { For, Match, Show, Switch, createEffect, createMemo, createSignal, onCleanup, type JSX } from "solid-js"
 import { Badge } from "~/components/ui/badge.tsx"
 import { Button } from "~/components/ui/button.tsx"
 import { Popover, PopoverContent, PopoverTrigger } from "~/components/ui/popover.tsx"
@@ -19,6 +19,10 @@ const CELL_SIZE_PX = 24
 const CELL_GAP_PX = 2
 const CONTENT_HORIZONTAL_PADDING_PX = 24
 const POPUP_MAX_WIDTH = "92vw"
+type PopupOffset = { x: number; y: number }
+const INITIAL_POPUP_OFFSET: PopupOffset = { x: 0, y: 0 }
+let persistedPopupOffset: PopupOffset = { ...INITIAL_POPUP_OFFSET }
+let persistedPopupHasMoved = false
 
 const numberColorMap: Record<number, string> = {
   1: "text-blue-600 dark:text-blue-300",
@@ -207,9 +211,12 @@ export default function MinesweeperPopup(props: MinesweeperPopupProps) {
   const [isOpen, setIsOpen] = createSignal(false)
   const isMobile = useIsMobile()
   const controller = createMinesweeperController("easy")
-  const [dragOffset, setDragOffset] = createSignal({ x: 0, y: 0 })
+  const [dragOffset, setDragOffsetSignal] = createSignal<PopupOffset>({ ...persistedPopupOffset })
   const [isDraggingPopup, setIsDraggingPopup] = createSignal(false)
+  const [hasMovedPopup, setHasMovedPopupSignal] = createSignal(persistedPopupHasMoved)
 
+  let popupContentRef: HTMLDivElement | undefined
+  let centerPositionRafId: number | null = null
   let activeDragPointerId: number | null = null
   let dragStartX = 0
   let dragStartY = 0
@@ -220,6 +227,16 @@ export default function MinesweeperPopup(props: MinesweeperPopupProps) {
   let dragMinDeltaY = 0
   let dragMaxDeltaY = 0
 
+  const setDragOffset = (nextOffset: PopupOffset) => {
+    persistedPopupOffset = { x: nextOffset.x, y: nextOffset.y }
+    setDragOffsetSignal(persistedPopupOffset)
+  }
+
+  const setHasMovedPopup = (nextValue: boolean) => {
+    persistedPopupHasMoved = nextValue
+    setHasMovedPopupSignal(nextValue)
+  }
+
   const gameState = createMemo(() => controller.gameState())
   const canRestart = createMemo(() => gameState().status === "won" || gameState().status === "lost")
   const nextDifficulty = createMemo<Difficulty>(() =>
@@ -228,6 +245,10 @@ export default function MinesweeperPopup(props: MinesweeperPopupProps) {
   const boardWidthPx = createMemo(() => {
     const cols = gameState().cols
     return cols * CELL_SIZE_PX + (cols - 1) * CELL_GAP_PX
+  })
+  const boardHeightPx = createMemo(() => {
+    const rows = gameState().rows
+    return rows * CELL_SIZE_PX + (rows - 1) * CELL_GAP_PX
   })
   const popupWidth = createMemo(() => `min(${POPUP_MAX_WIDTH}, ${boardWidthPx() + CONTENT_HORIZONTAL_PADDING_PX}px)`)
 
@@ -240,11 +261,97 @@ export default function MinesweeperPopup(props: MinesweeperPopupProps) {
     window.removeEventListener("pointercancel", stopPopupDrag)
   }
 
+  const stopContextMenuInsidePopup: JSX.EventHandlerUnion<HTMLDivElement, MouseEvent> = (event) => {
+    event.preventDefault()
+  }
+
   const clamp = (value: number, min: number, max: number): number => {
     if (value < min) return min
     if (value > max) return max
     return value
   }
+
+  const getOffsetBounds = (rect: DOMRect, currentOffset: PopupOffset) => {
+    const baseLeft = rect.left - currentOffset.x
+    const baseTop = rect.top - currentOffset.y
+    const baseRight = baseLeft + rect.width
+    const baseBottom = baseTop + rect.height
+    const minX = Math.min(-baseLeft, window.innerWidth - baseRight)
+    const maxX = Math.max(-baseLeft, window.innerWidth - baseRight)
+    const minY = Math.min(-baseTop, window.innerHeight - baseBottom)
+    const maxY = Math.max(-baseTop, window.innerHeight - baseBottom)
+    return { baseLeft, baseTop, minX, maxX, minY, maxY }
+  }
+
+  const centerPopup = () => {
+    if (!popupContentRef) return
+    const currentOffset = dragOffset()
+    const rect = popupContentRef.getBoundingClientRect()
+    const bounds = getOffsetBounds(rect, currentOffset)
+
+    const targetDeltaX = window.innerWidth / 2 - (bounds.baseLeft + rect.width / 2)
+    const targetDeltaY = window.innerHeight / 2 - (bounds.baseTop + rect.height / 2)
+
+    setDragOffset({
+      x: clamp(targetDeltaX, bounds.minX, bounds.maxX),
+      y: clamp(targetDeltaY, bounds.minY, bounds.maxY)
+    })
+  }
+
+  const clampPopupToViewport = () => {
+    if (!popupContentRef) return
+    const currentOffset = dragOffset()
+    const rect = popupContentRef.getBoundingClientRect()
+    const bounds = getOffsetBounds(rect, currentOffset)
+    const clampedOffset: PopupOffset = {
+      x: clamp(currentOffset.x, bounds.minX, bounds.maxX),
+      y: clamp(currentOffset.y, bounds.minY, bounds.maxY)
+    }
+    if (clampedOffset.x === currentOffset.x && clampedOffset.y === currentOffset.y) return
+    setDragOffset(clampedOffset)
+  }
+
+  const schedulePopupLayout = (layout: "center" | "clamp") => {
+    if (centerPositionRafId !== null) {
+      window.cancelAnimationFrame(centerPositionRafId)
+    }
+    centerPositionRafId = window.requestAnimationFrame(() => {
+      if (layout === "center") {
+        centerPopup()
+      } else {
+        clampPopupToViewport()
+      }
+      centerPositionRafId = null
+    })
+  }
+
+  createEffect((previousBoardKey?: string) => {
+    const boardKey = `${gameState().rows}x${gameState().cols}`
+    boardWidthPx()
+    boardHeightPx()
+    if (!isOpen()) return boardKey
+    if (previousBoardKey !== undefined && previousBoardKey !== boardKey) {
+      schedulePopupLayout("clamp")
+    }
+    return boardKey
+  })
+
+  createEffect(() => {
+    if (!isOpen()) return
+
+    const blockPopupContextMenu = (event: MouseEvent) => {
+      if (!popupContentRef) return
+      const target = event.target
+      if (!(target instanceof Node)) return
+      if (!popupContentRef.contains(target)) return
+      event.preventDefault()
+    }
+
+    window.addEventListener("contextmenu", blockPopupContextMenu, true)
+    onCleanup(() => {
+      window.removeEventListener("contextmenu", blockPopupContextMenu, true)
+    })
+  })
 
   const onPopupDragMove = (event: PointerEvent) => {
     if (!isDraggingPopup()) return
@@ -259,6 +366,10 @@ export default function MinesweeperPopup(props: MinesweeperPopupProps) {
       x: dragBaseX + clampedDeltaX,
       y: dragBaseY + clampedDeltaY
     })
+
+    if (!hasMovedPopup() && (clampedDeltaX !== 0 || clampedDeltaY !== 0)) {
+      setHasMovedPopup(true)
+    }
   }
 
   const startPopupDrag: JSX.EventHandlerUnion<HTMLDivElement, PointerEvent> = (event) => {
@@ -295,11 +406,22 @@ export default function MinesweeperPopup(props: MinesweeperPopupProps) {
   }
 
   onCleanup(() => {
+    if (centerPositionRafId !== null) {
+      window.cancelAnimationFrame(centerPositionRafId)
+      centerPositionRafId = null
+    }
     stopPopupDrag()
   })
 
   return (
-    <Popover open={isOpen()} onOpenChange={setIsOpen}>
+    <Popover
+      open={isOpen()}
+      onOpenChange={(nextOpen) => {
+        setIsOpen(nextOpen)
+        if (!nextOpen) return
+        schedulePopupLayout(hasMovedPopup() ? "clamp" : "center")
+      }}
+    >
       <PopoverTrigger
         class={
           props.triggerClass ??
@@ -310,13 +432,19 @@ export default function MinesweeperPopup(props: MinesweeperPopupProps) {
       </PopoverTrigger>
 
       <PopoverContent
-        class={cn("bg-sidebar p-3 text-sidebar-foreground transition-colors", popupFrameColorClass(gameState().status))}
+        ref={popupContentRef}
+        class={cn(
+          "bg-sidebar p-3 text-sidebar-foreground select-none transition-colors",
+          popupFrameColorClass(gameState().status)
+        )}
         style={{
           width: popupWidth(),
           "max-width": POPUP_MAX_WIDTH,
           translate: `${dragOffset().x}px ${dragOffset().y}px`
         }}
         onPointerDown={startPopupDrag}
+        onContextMenu={stopContextMenuInsidePopup}
+        onContextMenuCapture={stopContextMenuInsidePopup}
       >
         <div
           class={cn(
