@@ -11,13 +11,13 @@ import {
 } from "~/components/ui/sidebar.tsx";
 import { getRolePower, storeMyUserinfo } from "~/stores/MyUserinfo.ts";
 import { storeUserOnline } from "~/stores/Userinfo.ts";
-import { storeServerinfo } from "~/stores/Serverinfo.ts";
 import { Avatar, AvatarImage } from "./ui/avatar.tsx";
 import { storeAppStatus } from "~/stores/AppStatus.ts";
 import {IconBell, IconCircleFilled, IconDatabaseCog, IconList, IconSearch, IconSettings} from "@tabler/icons-solidjs";
 import {storeInbox} from "~/stores/Inbox.ts";
 import {Badge} from "~/components/ui/badge.tsx";
-import ChannelButtons from "./Sidebar/ChannelButtons";
+import ChannelButtons from "./Sidebar/ChannelButtons.tsx";
+import MinesweeperPopup from "./Minesweeper/MinesweeperPopup.tsx";
 
 export function AppSidebar() {
   const loc = useLocation();
@@ -25,7 +25,7 @@ export function AppSidebar() {
   return (
     <Sidebar class={"h-screen"}>
       <SidebarHeader>
-        <p class=" text-xl">{storeServerinfo.name}</p>
+        <MinesweeperPopup />
       </SidebarHeader>
 
       <SidebarContent id={"sidebar-content flex flex-col"}>

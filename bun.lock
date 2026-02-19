@@ -6,6 +6,7 @@
       "dependencies": {
         "@fontsource-variable/noto-sans-jp": "^5.2.10",
         "@kobalte/core": "^0.13.11",
+        "@maxxam0n/minesweeper-engine": "^0.2.0",
         "@solidjs/router": "^0.15.4",
         "@tabler/icons-solidjs": "^3.36.1",
         "@tanstack/solid-table": "^8.21.3",
@@ -256,6 +257,8 @@
     "@kobalte/core": ["@kobalte/core@0.13.11", "", { "dependencies": { "@floating-ui/dom": "^1.5.1", "@internationalized/date": "^3.4.0", "@internationalized/number": "^3.2.1", "@kobalte/utils": "^0.9.1", "@solid-primitives/props": "^3.1.8", "@solid-primitives/resize-observer": "^2.0.26", "solid-presence": "^0.1.8", "solid-prevent-scroll": "^0.1.4" }, "peerDependencies": { "solid-js": "^1.8.15" } }, "sha512-hK7TYpdib/XDb/r/4XDBFaO9O+3ZHz4ZWryV4/3BfES+tSQVgg2IJupDnztKXB0BqbSRy/aWlHKw1SPtNPYCFQ=="],
 
     "@kobalte/utils": ["@kobalte/utils@0.9.1", "", { "dependencies": { "@solid-primitives/event-listener": "^2.2.14", "@solid-primitives/keyed": "^1.2.0", "@solid-primitives/map": "^0.4.7", "@solid-primitives/media": "^2.2.4", "@solid-primitives/props": "^3.1.8", "@solid-primitives/refs": "^1.0.5", "@solid-primitives/utils": "^6.2.1" }, "peerDependencies": { "solid-js": "^1.8.8" } }, ""],
+
+    "@maxxam0n/minesweeper-engine": ["@maxxam0n/minesweeper-engine@0.2.0", "", {}, "sha512-1Pn1MtUN4dBG5YCpAPwzhtoHYOKYCv8c0Fd3TY80z4Yq3X6GM6FL1s9esAMglD8J0n4ltuteVkWAdlJ5ZS5MWw=="],
 
     "@napi-rs/wasm-runtime": ["@napi-rs/wasm-runtime@1.1.1", "", { "dependencies": { "@emnapi/core": "^1.7.1", "@emnapi/runtime": "^1.7.1", "@tybys/wasm-util": "^0.10.1" } }, "sha512-p64ah1M1ld8xjWv3qbvFwHiFVWrq1yFvV4f7w+mzaqiR4IlSgkqhcRdHwsGgomwzBH51sRY4NEowLxnaBjcW/A=="],
 
