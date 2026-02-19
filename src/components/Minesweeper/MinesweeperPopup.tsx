@@ -31,10 +31,34 @@ const numberColorMap: Record<number, string> = {
   8: "text-stone-700 dark:text-stone-300"
 }
 
-const statusTextColor = (status: GameStatus): string => {
-  if (status === "won") return "text-green-700 dark:text-green-300"
-  if (status === "lost") return "text-red-700 dark:text-red-300"
-  return "text-muted-foreground"
+const statusButtonColorClass = (status: GameStatus): string => {
+  if (status === "won") {
+    return "border-green-500 bg-green-100 text-green-700 dark:border-green-400 dark:bg-green-900/40 dark:text-green-200"
+  }
+  if (status === "lost") {
+    return "border-red-500 bg-red-100 text-red-700 dark:border-red-400 dark:bg-red-900/40 dark:text-red-200"
+  }
+  return "border-border bg-background text-muted-foreground"
+}
+
+const boardFrameColorClass = (status: GameStatus): string => {
+  if (status === "won") {
+    return "border-green-500/80 bg-green-50/40 dark:border-green-400/80 dark:bg-green-950/30"
+  }
+  if (status === "lost") {
+    return "border-red-500/80 bg-red-50/40 dark:border-red-400/80 dark:bg-red-950/30"
+  }
+  return "border-sidebar-border bg-background/80"
+}
+
+const popupFrameColorClass = (status: GameStatus): string => {
+  if (status === "won") {
+    return "border-green-500/80 dark:border-green-400/80"
+  }
+  if (status === "lost") {
+    return "border-red-500/80 dark:border-red-400/80"
+  }
+  return "border-sidebar-border"
 }
 
 const StatusIcon = (props: { status: GameStatus }) => {
@@ -286,7 +310,7 @@ export default function MinesweeperPopup(props: MinesweeperPopupProps) {
       </PopoverTrigger>
 
       <PopoverContent
-        class="border-sidebar-border bg-sidebar p-3 text-sidebar-foreground"
+        class={cn("bg-sidebar p-3 text-sidebar-foreground transition-colors", popupFrameColorClass(gameState().status))}
         style={{
           width: popupWidth(),
           "max-width": POPUP_MAX_WIDTH,
@@ -317,9 +341,9 @@ export default function MinesweeperPopup(props: MinesweeperPopupProps) {
           <button
             type="button"
             class={cn(
-              "inline-flex items-center rounded-md border p-1.5 justify-self-center",
+              "inline-flex items-center rounded-md border p-1.5 justify-self-center transition-colors",
               canRestart() ? "cursor-pointer hover:bg-accent/70" : "cursor-default",
-              statusTextColor(gameState().status)
+              statusButtonColorClass(gameState().status)
             )}
             onClick={() => controller.restartGame()}
             disabled={!canRestart()}
@@ -355,7 +379,10 @@ export default function MinesweeperPopup(props: MinesweeperPopupProps) {
           }
         >
           <div
-            class="mt-3 max-h-[min(60vh,36rem)] overflow-auto rounded-md border border-sidebar-border bg-background/80 p-2"
+            class={cn(
+              "mt-3 max-h-[min(60vh,36rem)] overflow-auto rounded-md border p-2 transition-colors",
+              boardFrameColorClass(gameState().status)
+            )}
             data-no-drag
           >
             <div
