@@ -1,5 +1,5 @@
 import { A, useLocation } from "@solidjs/router";
-import { Show } from "solid-js";
+import { Show, createSignal } from "solid-js";
 import {
   Sidebar,
   SidebarContent,
@@ -9,8 +9,10 @@ import {
   SidebarHeader,
   SidebarMenuButton,
 } from "~/components/ui/sidebar.tsx";
+import { Popover, PopoverTrigger } from "~/components/ui/popover.tsx";
 import { getRolePower, storeMyUserinfo } from "~/stores/MyUserinfo.ts";
 import { storeUserOnline } from "~/stores/Userinfo.ts";
+import { storeServerinfo } from "~/stores/Serverinfo.ts";
 import { Avatar, AvatarImage } from "./ui/avatar.tsx";
 import { storeAppStatus } from "~/stores/AppStatus.ts";
 import {IconBell, IconCircleFilled, IconDatabaseCog, IconList, IconSearch, IconSettings} from "@tabler/icons-solidjs";
@@ -21,11 +23,17 @@ import MinesweeperPopup from "./Minesweeper/MinesweeperPopup.tsx";
 
 export function AppSidebar() {
   const loc = useLocation();
+  const [isMinesweeperOpen, setIsMinesweeperOpen] = createSignal(false)
 
   return (
     <Sidebar class={"h-screen"}>
       <SidebarHeader>
-        <MinesweeperPopup />
+        <Popover open={isMinesweeperOpen()} onOpenChange={setIsMinesweeperOpen}>
+          <PopoverTrigger class="w-fit appearance-none border-0 bg-transparent p-0 text-left text-sidebar-foreground hover:bg-transparent">
+            <p class="text-xl">{storeServerinfo.name}</p>
+          </PopoverTrigger>
+          <MinesweeperPopup isOpen={isMinesweeperOpen()} />
+        </Popover>
       </SidebarHeader>
 
       <SidebarContent id={"sidebar-content flex flex-col"}>

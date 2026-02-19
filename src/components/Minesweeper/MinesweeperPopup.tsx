@@ -2,7 +2,7 @@ import { IconMoodSmileFilled, IconMoodWrrrFilled, IconRocket } from "@tabler/ico
 import { For, Match, Show, Switch, createEffect, createMemo, createSignal, onCleanup, type JSX } from "solid-js"
 import { Badge } from "~/components/ui/badge.tsx"
 import { Button } from "~/components/ui/button.tsx"
-import { Popover, PopoverContent, PopoverTrigger } from "~/components/ui/popover.tsx"
+import { PopoverContent } from "~/components/ui/popover.tsx"
 import { useIsMobile } from "~/components/ui/sidebar.tsx"
 import { cn } from "~/lib/utils.ts"
 import {
@@ -20,9 +20,6 @@ const CELL_GAP_PX = 2
 const CONTENT_HORIZONTAL_PADDING_PX = 24
 const POPUP_MAX_WIDTH = "92vw"
 type PopupOffset = { x: number; y: number }
-const INITIAL_POPUP_OFFSET: PopupOffset = { x: 0, y: 0 }
-let persistedPopupOffset: PopupOffset = { ...INITIAL_POPUP_OFFSET }
-let persistedPopupHasMoved = false
 
 const numberColorMap: Record<number, string> = {
   1: "text-blue-600 dark:text-blue-300",
@@ -82,8 +79,7 @@ const StatusIcon = (props: { status: GameStatus }) => {
 }
 
 type MinesweeperPopupProps = {
-  trigger?: JSX.Element
-  triggerClass?: string
+  isOpen: boolean
 }
 
 type CellButtonProps = {
@@ -208,12 +204,11 @@ const CellButton = (props: CellButtonProps) => {
 }
 
 export default function MinesweeperPopup(props: MinesweeperPopupProps) {
-  const [isOpen, setIsOpen] = createSignal(false)
   const isMobile = useIsMobile()
   const controller = createMinesweeperController("easy")
-  const [dragOffset, setDragOffsetSignal] = createSignal<PopupOffset>({ ...persistedPopupOffset })
+  const [dragOffset, setDragOffset] = createSignal<PopupOffset>({ x: 0, y: 0 })
   const [isDraggingPopup, setIsDraggingPopup] = createSignal(false)
-  const [hasMovedPopup, setHasMovedPopupSignal] = createSignal(persistedPopupHasMoved)
+  const [hasMovedPopup, setHasMovedPopup] = createSignal(false)
 
   let popupContentRef: HTMLDivElement | undefined
   let centerPositionRafId: number | null = null
@@ -226,16 +221,6 @@ export default function MinesweeperPopup(props: MinesweeperPopupProps) {
   let dragMaxDeltaX = 0
   let dragMinDeltaY = 0
   let dragMaxDeltaY = 0
-
-  const setDragOffset = (nextOffset: PopupOffset) => {
-    persistedPopupOffset = { x: nextOffset.x, y: nextOffset.y }
-    setDragOffsetSignal(persistedPopupOffset)
-  }
-
-  const setHasMovedPopup = (nextValue: boolean) => {
-    persistedPopupHasMoved = nextValue
-    setHasMovedPopupSignal(nextValue)
-  }
 
   const gameState = createMemo(() => controller.gameState())
   const canRestart = createMemo(() => gameState().status === "won" || gameState().status === "lost")
@@ -329,15 +314,23 @@ export default function MinesweeperPopup(props: MinesweeperPopupProps) {
     const boardKey = `${gameState().rows}x${gameState().cols}`
     boardWidthPx()
     boardHeightPx()
-    if (!isOpen()) return boardKey
+    if (!props.isOpen) return boardKey
     if (previousBoardKey !== undefined && previousBoardKey !== boardKey) {
       schedulePopupLayout("clamp")
     }
     return boardKey
   })
 
+  createEffect((wasOpen = false) => {
+    const nextOpen = props.isOpen
+    if (nextOpen && !wasOpen) {
+      schedulePopupLayout(hasMovedPopup() ? "clamp" : "center")
+    }
+    return nextOpen
+  })
+
   createEffect(() => {
-    if (!isOpen()) return
+    if (!props.isOpen) return
 
     const blockPopupContextMenu = (event: MouseEvent) => {
       if (!popupContentRef) return
@@ -414,130 +407,112 @@ export default function MinesweeperPopup(props: MinesweeperPopupProps) {
   })
 
   return (
-    <Popover
-      open={isOpen()}
-      onOpenChange={(nextOpen) => {
-        setIsOpen(nextOpen)
-        if (!nextOpen) return
-        schedulePopupLayout(hasMovedPopup() ? "clamp" : "center")
+    <PopoverContent
+      ref={popupContentRef}
+      class={cn(
+        "bg-sidebar p-3 text-sidebar-foreground select-none transition-colors",
+        popupFrameColorClass(gameState().status)
+      )}
+      style={{
+        width: popupWidth(),
+        "max-width": POPUP_MAX_WIDTH,
+        translate: `${dragOffset().x}px ${dragOffset().y}px`
       }}
+      onPointerDown={startPopupDrag}
+      onContextMenu={stopContextMenuInsidePopup}
+      onContextMenuCapture={stopContextMenuInsidePopup}
     >
-      <PopoverTrigger
-        class={
-          props.triggerClass ??
-          "w-fit appearance-none border-0 bg-transparent p-0 text-left text-xl font-normal text-sidebar-foreground hover:bg-transparent"
-        }
-      >
-        {props.trigger ?? "Giracle"}
-      </PopoverTrigger>
-
-      <PopoverContent
-        ref={popupContentRef}
+      <div
         class={cn(
-          "bg-sidebar p-3 text-sidebar-foreground select-none transition-colors",
-          popupFrameColorClass(gameState().status)
+          "grid grid-cols-[1fr_auto_1fr] items-center gap-2",
+          isDraggingPopup() ? "cursor-grabbing" : "cursor-auto"
         )}
-        style={{
-          width: popupWidth(),
-          "max-width": POPUP_MAX_WIDTH,
-          translate: `${dragOffset().x}px ${dragOffset().y}px`
-        }}
-        onPointerDown={startPopupDrag}
-        onContextMenu={stopContextMenuInsidePopup}
-        onContextMenuCapture={stopContextMenuInsidePopup}
+      >
+        <div class="justify-self-start">
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            class="h-7 px-3 text-xs"
+            onClick={() => controller.changeDifficulty(nextDifficulty())}
+            title="クリックで難易度を切り替え"
+            aria-label="難易度切り替え"
+          >
+            {DIFFICULTY_CONFIG[controller.difficulty()].label}
+          </Button>
+        </div>
+
+        <button
+          type="button"
+          class={cn(
+            "inline-flex items-center rounded-md border p-1.5 justify-self-center transition-colors",
+            canRestart() ? "cursor-pointer hover:bg-accent/70" : "cursor-default",
+            statusButtonColorClass(gameState().status)
+          )}
+          onClick={() => controller.restartGame()}
+          disabled={!canRestart()}
+          title={canRestart() ? "クリックで再スタート" : "プレイ中は再スタートできません"}
+          aria-label={`game-status-${gameState().status}`}
+        >
+          <StatusIcon status={gameState().status} />
+        </button>
+
+        <Badge variant="secondary" class="justify-self-end">
+          残り: {gameState().remainingMines}
+        </Badge>
+      </div>
+
+      <Show when={isMobile()}>
+        <div class="mt-2">
+          <Badge variant="outline">長押しでフラグ</Badge>
+        </div>
+      </Show>
+
+      <Show
+        when={!controller.errorMessage()}
+        fallback={
+          <div class="mt-3 rounded-md border border-destructive/40 bg-destructive/10 p-3 text-sm">
+            <p>ゲームの初期化に失敗しました。</p>
+            <Show when={controller.errorMessage()}>
+              <p class="mt-1 text-xs text-muted-foreground">{controller.errorMessage()}</p>
+            </Show>
+            <Button type="button" size="sm" class="mt-3" onClick={() => controller.retryInitialize()}>
+              再試行
+            </Button>
+          </div>
+        }
       >
         <div
           class={cn(
-            "grid grid-cols-[1fr_auto_1fr] items-center gap-2",
-            isDraggingPopup() ? "cursor-grabbing" : "cursor-auto"
+            "mt-3 max-h-[min(60vh,36rem)] overflow-auto rounded-md border p-2 transition-colors",
+            boardFrameColorClass(gameState().status)
           )}
-        >
-          <div class="justify-self-start">
-            <Button
-              type="button"
-              size="sm"
-              variant="outline"
-              class="h-7 px-3 text-xs"
-              onClick={() => controller.changeDifficulty(nextDifficulty())}
-              title="クリックで難易度を切り替え"
-              aria-label="難易度切り替え"
-            >
-              {DIFFICULTY_CONFIG[controller.difficulty()].label}
-            </Button>
-          </div>
-
-          <button
-            type="button"
-            class={cn(
-              "inline-flex items-center rounded-md border p-1.5 justify-self-center transition-colors",
-              canRestart() ? "cursor-pointer hover:bg-accent/70" : "cursor-default",
-              statusButtonColorClass(gameState().status)
-            )}
-            onClick={() => controller.restartGame()}
-            disabled={!canRestart()}
-            title={canRestart() ? "クリックで再スタート" : "プレイ中は再スタートできません"}
-            aria-label={`game-status-${gameState().status}`}
-          >
-            <StatusIcon status={gameState().status} />
-          </button>
-
-          <Badge variant="secondary" class="justify-self-end">
-            残り: {gameState().remainingMines}
-          </Badge>
-        </div>
-
-        <Show when={isMobile()}>
-          <div class="mt-2">
-            <Badge variant="outline">長押しでフラグ</Badge>
-          </div>
-        </Show>
-
-        <Show
-          when={!controller.errorMessage()}
-          fallback={
-            <div class="mt-3 rounded-md border border-destructive/40 bg-destructive/10 p-3 text-sm">
-              <p>ゲームの初期化に失敗しました。</p>
-              <Show when={controller.errorMessage()}>
-                <p class="mt-1 text-xs text-muted-foreground">{controller.errorMessage()}</p>
-              </Show>
-              <Button type="button" size="sm" class="mt-3" onClick={() => controller.retryInitialize()}>
-                再試行
-              </Button>
-            </div>
-          }
+          data-no-drag
         >
           <div
-            class={cn(
-              "mt-3 max-h-[min(60vh,36rem)] overflow-auto rounded-md border p-2 transition-colors",
-              boardFrameColorClass(gameState().status)
-            )}
-            data-no-drag
+            class="inline-grid gap-[2px]"
+            style={{
+              "grid-template-columns": `repeat(${gameState().cols}, minmax(0, ${CELL_SIZE_PX}px))`
+            }}
           >
-            <div
-              class="inline-grid gap-[2px]"
-              style={{
-                "grid-template-columns": `repeat(${gameState().cols}, minmax(0, ${CELL_SIZE_PX}px))`
-              }}
-            >
-              <For each={gameState().cells}>
-                {(row) => (
-                  <For each={row}>
-                    {(cell) => (
-                      <CellButton
-                        cell={cell}
-                        status={gameState().status}
-                        isMobile={isMobile()}
-                        onOpen={() => controller.openCell(cell.row, cell.col)}
-                        onToggleFlag={() => controller.toggleFlag(cell.row, cell.col)}
-                      />
-                    )}
-                  </For>
-                )}
-              </For>
-            </div>
+            <For each={gameState().cells}>
+              {(row) => (
+                <For each={row}>
+                  {(cell) => (
+                    <CellButton
+                      cell={cell}
+                      status={gameState().status}
+                      isMobile={isMobile()}
+                      onOpen={() => controller.openCell(cell.row, cell.col)}
+                      onToggleFlag={() => controller.toggleFlag(cell.row, cell.col)}
+                    />
+                  )}
+                </For>
+              )}
+            </For>
           </div>
-        </Show>
-      </PopoverContent>
-    </Popover>
+        </div>
+      </Show>
+    </PopoverContent>
   )
 }
