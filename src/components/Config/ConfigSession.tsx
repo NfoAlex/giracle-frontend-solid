@@ -160,17 +160,19 @@ export default function ConfigSession() {
         <For each={sessions()}>
           {(session) => (
             <Card class="p-4 flex flex-col md:flex-row item-start md:items-center gap-2">
-              <Button
-                onClick={()=>{ targetNameChangingSession = session; setModalNameChangingOpen(true); }}
-                class="shrink-0"
-                size={"icon"}
-                variant={"ghost"}
-              >
-                <IconPencil />
-              </Button>
-              <p class="truncate shrink">{ session.name }</p>
+              <span class="flex flex-row items-center gap-2">
+                <Button
+                  onClick={()=>{ targetNameChangingSession = session; setModalNameChangingOpen(true); }}
+                  class="shrink-0"
+                  size={"icon"}
+                  variant={"ghost"}
+                >
+                  <IconPencil />
+                </Button>
+                <p class="truncate shrink">{ session.name }</p>
+              </span>
               <span class="shrink-0 ml-auto flex flex-row items-center gap-4">
-                <Badge variant={"secondary"}>{ new Date(session.createdAt).toLocaleString() }</Badge>
+                <Badge variant={"outline"}>{ new Date(session.createdAt).toLocaleString() }</Badge>
                 <Show when={!session.thisIsYou}>
                   <Button
                     onClick={()=>{ targetDeletingSession=session; setModalDeletionOpen(true); }}
