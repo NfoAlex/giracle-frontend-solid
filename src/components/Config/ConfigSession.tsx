@@ -93,7 +93,7 @@ export default function ConfigSession() {
   onMount(sessionFetcher);
 
   return (
-    <div class="flex flex-col gap-6">
+    <div class="md:max-w-[750px] flex flex-col gap-6 mx-auto">
 
       {/* セッションログアウト確認用モーダル */}
       <Dialog open={modalDeletionOpen()} onOpenChange={setModalDeletionOpen}>
@@ -154,7 +154,9 @@ export default function ConfigSession() {
         </DialogContent>
       </Dialog>
 
-      <p>セッション管理するやつ</p>
+      <span class="flex items-center gap-2">
+        <p class="font-bold text-2xl my-2">セッション管理</p>
+      </span>
 
       <div class="overflow-auto flex flex-col gap-2">
         <For each={sessions()}>
