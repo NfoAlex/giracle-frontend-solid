@@ -103,7 +103,10 @@ export default function ConfigSession() {
           </DialogHeader>
           <DialogDescription>
             <p>遠隔でセッションをログアウトします。よろしいですか？</p>
-            <code>{ targetDeletingSession !== undefined ? targetDeletingSession.name : "?" }</code>
+            <span class="truncate flex items-center gap-2">
+              <p class="shrink-0">ログアウトするセッション:</p>
+              <span class="font-bold truncate w-32 md:w-[256px]">{ targetDeletingSession?.name ?? "?" }</span>
+            </span>
           </DialogDescription>
           <DialogFooter>
             <Button
@@ -127,8 +130,9 @@ export default function ConfigSession() {
           </DialogHeader>
           <DialogDescription>
             <p>変更先のセッション名を入力してください。</p>
-            <span>
-              現在 : <span class="font-bold">{ targetNameChangingSession !== undefined ? targetNameChangingSession.name : "?" }</span>
+            <span class="flex truncate items-center gap-2">
+              <p>現在 : </p>
+              <span class="font-bold truncate overflow-x-auto w-48 md:w-[256px]">{ targetNameChangingSession?.name ?? "?" }</span>
             </span>
           </DialogDescription>
           <TextField>
@@ -158,6 +162,7 @@ export default function ConfigSession() {
             <Card class="p-4 flex flex-col md:flex-row item-start md:items-center gap-2">
               <Button
                 onClick={()=>{ targetNameChangingSession = session; setModalNameChangingOpen(true); }}
+                class="shrink-0"
                 size={"icon"}
                 variant={"ghost"}
               >
