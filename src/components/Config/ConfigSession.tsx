@@ -37,7 +37,19 @@ export default function ConfigSession() {
     setFlags({...flags(), fetching: true});
     await GET_USER_SESSION()
       .then((r) => {
-        setSessions(r.data);
+        const DEBUG_SAMPLES: ISession[] = [];
+        for (let i=0; i<30; i++) {
+          DEBUG_SAMPLES.push({
+            id: 90 + i,
+            name: "debug_" + i,
+            createdAt: new Date(),
+            thisIsYou: false,
+            userId: "SAMPLE"
+          });
+        }
+        //DEBUG
+        //setSessions(r.data);
+        setSessions([...r.data, ...DEBUG_SAMPLES]);
 
         //セッションデータが３０個未満なら末端まで取得したと設定
         if (r.data.length < 30) {
@@ -93,7 +105,7 @@ export default function ConfigSession() {
   onMount(sessionFetcher);
 
   return (
-    <div class="md:max-w-[750px] h-full flex flex-col gap-2 mx-auto">
+    <div class="md:max-w-[750px] h-full flex flex-col mx-auto">
 
       {/* セッションログアウト確認用モーダル */}
       <Dialog open={modalDeletionOpen()} onOpenChange={setModalDeletionOpen}>
@@ -157,6 +169,8 @@ export default function ConfigSession() {
       <span class="flex items-center gap-2">
         <p class="font-bold text-2xl my-2">セッション管理</p>
       </span>
+
+      <hr class="mt-2" />
 
       <div class="flex flex-col shrink overflow-y-auto gap-2 py-4">
         <For each={sessions()}>
