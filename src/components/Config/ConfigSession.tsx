@@ -37,19 +37,7 @@ export default function ConfigSession() {
     setFlags({...flags(), fetching: true});
     await GET_USER_SESSION()
       .then((r) => {
-        const DEBUG_SAMPLES: ISession[] = [];
-        for (let i=0; i<30; i++) {
-          DEBUG_SAMPLES.push({
-            id: 90 + i,
-            name: "debug_" + i,
-            createdAt: new Date(),
-            thisIsYou: false,
-            userId: "SAMPLE"
-          });
-        }
-        //DEBUG
-        //setSessions(r.data);
-        setSessions([...r.data, ...DEBUG_SAMPLES]);
+        setSessions(r.data);
 
         //セッションデータが３０個未満なら末端まで取得したと設定
         if (r.data.length < 30) {
