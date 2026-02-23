@@ -1,5 +1,5 @@
 import { Card } from "../ui/card.tsx";
-import { IconPencil, IconTrash } from "@tabler/icons-solidjs";
+import { IconPencil, IconReload, IconTrash } from "@tabler/icons-solidjs";
 import { createSignal, For, onMount, Show } from "solid-js";
 import GET_USER_SESSION from "~/api/USER/USER_GET_SESSION.ts";
 import { Button } from "../ui/button.tsx";
@@ -166,8 +166,16 @@ export default function ConfigSession() {
         </DialogContent>
       </Dialog>
 
-      <span class="flex items-center gap-2">
+      <span class="flex flex-row items-center gap-2">
         <p class="font-bold text-2xl my-2">セッション管理</p>
+        <Button
+          onClick={()=>sessionFetcher()}
+          class="ml-auto"
+          size={"icon"}
+          variant={"secondary"}
+        >
+          <IconReload />
+        </Button>
       </span>
 
       <hr class="mt-2" />
