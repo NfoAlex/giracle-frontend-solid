@@ -27,7 +27,7 @@ export default function Config() {
   ));
 
   return (
-    <div class="p-2 h-full flex flex-col">
+    <div class="px-2 pt-2 h-screen flex flex-col">
 
       {/* ヘッダー */}
       <Card class="w-full py-3 px-5 mb-2 flex md:flex-col flex-row gap-2">
@@ -37,7 +37,7 @@ export default function Config() {
         </div>
       </Card>
 
-      <div class="grow flex flex-col md:flex-row gap-1">
+      <div class="overflow-hidden h-full grow flex flex-col md:flex-row gap-1">
 
         {/* スマホ用設定ページ選択 */}
         <div class="w-full md:hidden h-fit">
@@ -75,50 +75,52 @@ export default function Config() {
         </div>
 
         {/* デスクトップ用設定ページ選択 */}
-        <Card class="shrink-0 p-2 h-full w-64 hidden md:flex flex-col gap-1 overflow-y-auto text-left">
-          <SidebarMenuButton
-            onClick={()=>setDisplayMode("profile")}
-            variant={displayMode()==="profile"?"outline":"default"}
-            size={"lg"}
-          >
-            <IconUser />
-            プロフィール
-          </SidebarMenuButton>
-          <SidebarMenuButton
-            onClick={()=>setDisplayMode("session")}
-            variant={displayMode()==="session"?"outline":"default"}
-            size={"lg"}
-          >
-            <IconKey />
-            セッション管理
-          </SidebarMenuButton>
-          <SidebarMenuButton
-            onClick={()=>setDisplayMode("chat")}
-            variant={displayMode()==="chat"?"outline":"default"}
-            size={"lg"}
-          >
-            <IconHash />
-            会話
-          </SidebarMenuButton>
-          <SidebarMenuButton
-            onClick={()=>setDisplayMode("notification")}
-            variant={displayMode()==="notification"?"outline":"default"}
-            size={"lg"}
-          >
-            <IconBell />
-            通知
-          </SidebarMenuButton>
-          <SidebarMenuButton
-            onClick={()=>setDisplayMode("display")}
-            variant={displayMode()==="display"?"outline":"default"}
-            size={"lg"}
-          >
-            <IconEye />
-            表示
-          </SidebarMenuButton>
-        </Card>
+        <div class="shrink-0 pb-2 h-full w-64 hidden md:inline">
+          <Card class="p-2 h-full w-full flex flex-col gap-1 overflow-y-auto text-left">
+            <SidebarMenuButton
+              onClick={()=>setDisplayMode("profile")}
+              variant={displayMode()==="profile"?"outline":"default"}
+              size={"lg"}
+            >
+              <IconUser />
+              プロフィール
+            </SidebarMenuButton>
+            <SidebarMenuButton
+              onClick={()=>setDisplayMode("session")}
+              variant={displayMode()==="session"?"outline":"default"}
+              size={"lg"}
+            >
+              <IconKey />
+              セッション管理
+            </SidebarMenuButton>
+            <SidebarMenuButton
+              onClick={()=>setDisplayMode("chat")}
+              variant={displayMode()==="chat"?"outline":"default"}
+              size={"lg"}
+            >
+              <IconHash />
+              会話
+            </SidebarMenuButton>
+            <SidebarMenuButton
+              onClick={()=>setDisplayMode("notification")}
+              variant={displayMode()==="notification"?"outline":"default"}
+              size={"lg"}
+            >
+              <IconBell />
+              通知
+            </SidebarMenuButton>
+            <SidebarMenuButton
+              onClick={()=>setDisplayMode("display")}
+              variant={displayMode()==="display"?"outline":"default"}
+              size={"lg"}
+            >
+              <IconEye />
+              表示
+            </SidebarMenuButton>
+          </Card>
+        </div>
 
-        <div class="overflow-y-auto grow md:px-2 md:pt-0 pt-4">
+        <div class="overflow-y-auto h-full grow md:px-2 md:pt-0 pt-4">
           { displayMode()==="profile" && <ConfigProfile /> }
           { displayMode()==="session" && <ConfigSession /> }
           { displayMode()==="chat" && <ConfigChat /> }
