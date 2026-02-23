@@ -92,7 +92,7 @@ export default function ConfigProfile() {
   }
 
   return (
-    <div class="md:max-w-[750px] h-full overflow-y-auto mx-auto flex flex-col gap-2">
+    <div class="md:max-w-[750px] h-full overflow-y-auto mx-auto flex flex-col gap-2 pb-2">
       <span class="flex items-center gap-2">
         <p class="font-bold text-2xl my-2">プロフィール</p>
       </span>
