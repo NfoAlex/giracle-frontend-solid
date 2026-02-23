@@ -93,7 +93,7 @@ export default function ConfigSession() {
   onMount(sessionFetcher);
 
   return (
-    <div class="md:max-w-[750px] flex flex-col gap-6 mx-auto">
+    <div class="md:max-w-[750px] h-full flex flex-col gap-2 mx-auto">
 
       {/* セッションログアウト確認用モーダル */}
       <Dialog open={modalDeletionOpen()} onOpenChange={setModalDeletionOpen}>
@@ -158,7 +158,7 @@ export default function ConfigSession() {
         <p class="font-bold text-2xl my-2">セッション管理</p>
       </span>
 
-      <div class="overflow-auto flex flex-col gap-2">
+      <div class="flex flex-col shrink overflow-y-auto gap-2 py-4">
         <For each={sessions()}>
           {(session) => (
             <Card class="p-4 flex flex-col md:flex-row item-start md:items-center gap-2">
@@ -193,7 +193,7 @@ export default function ConfigSession() {
           )}
         </For>
         <Show when={flags().fetching}>
-          <p>ロード中...</p>
+          <p class="text-center">ロード中...</p>
         </Show>
         <Show when={!reachedSessionEnd}>
           <Button class="mx-auto" variant={"secondary"}>セッションをさらに読み込む</Button>
