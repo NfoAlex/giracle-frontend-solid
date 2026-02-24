@@ -163,7 +163,6 @@ export default function ConfigSession() {
 
       <span class="flex flex-row items-center gap-2">
         <p class="font-bold text-2xl my-2">セッション管理</p>
-        {reachedSessionEnd().toString()}
         <Button
           onClick={() => sessionFetcher({ reset: true })}
           class="ml-auto"
