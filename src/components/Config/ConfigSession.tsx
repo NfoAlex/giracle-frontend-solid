@@ -1,5 +1,5 @@
 import { Card } from "../ui/card.tsx";
-import { IconPencil, IconReload, IconTrash } from "@tabler/icons-solidjs";
+import { IconPencil, IconPlus, IconReload, IconTrash } from "@tabler/icons-solidjs";
 import { createSignal, For, onMount, Show } from "solid-js";
 import GET_USER_SESSION from "~/api/USER/USER_GET_SESSION.ts";
 import { Button } from "../ui/button.tsx";
@@ -29,31 +29,38 @@ export default function ConfigSession() {
   const [newSessionName, setNewSessionName] = createSignal("");
   let targetDeletingSession: ISession | undefined = undefined;
   let targetNameChangingSession: ISession | undefined = undefined;
+  let sessionFetcherCursor: number = 1;
   //モーダル制御用
   const [modalDeletionOpen, setModalDeletionOpen] = createSignal(false);
   const [modalNameChangingOpen, setModalNameChangingOpen] = createSignal(false);
 
-  const sessionFetcher = async (cursor: number = 1) => {
-    setFlags({...flags(), fetching: true});
-    await GET_USER_SESSION()
+  const sessionFetcher = async (options?: { reset?: boolean }) => {
+    setFlags({ ...flags(), fetching: true });
+    const cursor = options?.reset ? 1 : sessionFetcherCursor;
+    await GET_USER_SESSION(cursor)
       .then((r) => {
-        setSessions(r.data);
+        if (options?.reset) {
+          setSessions(r.data);
+        } else {
+          setSessions((s) => [...s, ...r.data]);
+          sessionFetcherCursor++;
+        }
 
         //セッションデータが３０個未満なら末端まで取得したと設定
         if (r.data.length < 30) {
-          setReachedSessionEnd(false);
+          setReachedSessionEnd(true);
         }
       })
       .catch((err) => {
-        console.error("ConfigSession :: err->", err, { cursor });
+        console.error("ConfigSession :: err->", err, { cursor: sessionFetcherCursor });
       })
       .finally(() => {
-        setFlags({...flags(), fetching: false});
+        setFlags({ ...flags(), fetching: false });
       });
   };
 
   const removeSession = async (sessionId: number) => {
-    setFlags({...flags(), deleting: true});
+    setFlags({ ...flags(), deleting: true });
     await DELETE_USER_SESSION(sessionId)
       .then((r) => {
         const deletedSessionId = r.data.sessionId;
@@ -64,7 +71,7 @@ export default function ConfigSession() {
         console.error("ConfigSession :: removeSession : セッションを削除できませんでした", sessionId);
       })
       .finally(() => {
-        setFlags({...flags(), deleting: false});
+        setFlags({ ...flags(), deleting: false });
         setModalDeletionOpen(false);
       });
   };
@@ -72,7 +79,7 @@ export default function ConfigSession() {
   const changeSessionName = async () => {
     const targetSession = targetNameChangingSession;
     if (targetSession === undefined) throw new Error("Target session data is undefined");
-    setFlags({...flags(), changingName: true});
+    setFlags({ ...flags(), changingName: true });
 
     await POST_USER_CHANGE_SESSION_NAME(targetSession.id, newSessionName())
       .then((r) => {
@@ -85,7 +92,7 @@ export default function ConfigSession() {
       })
       .catch((e) => console.error("ConfigSession :: changeSessionName : セッション名を変更できませんでした ", e))
       .finally(() => {
-        setFlags({...flags(), changingName: false});
+        setFlags({ ...flags(), changingName: false });
         setModalNameChangingOpen(false);
       });
   };
@@ -105,17 +112,17 @@ export default function ConfigSession() {
             <p>遠隔でセッションをログアウトします。よろしいですか？</p>
             <span class="truncate flex items-center gap-2">
               <p class="shrink-0">ログアウトするセッション:</p>
-              <span class="font-bold truncate w-32 md:w-[256px]">{ targetDeletingSession?.name ?? "?" }</span>
+              <span class="font-bold truncate w-32 md:w-[256px]">{targetDeletingSession?.name ?? "?"}</span>
             </span>
           </DialogDescription>
           <DialogFooter>
             <Button
-              onClick={()=>setModalDeletionOpen(false)}
+              onClick={() => setModalDeletionOpen(false)}
               variant={"ghost"}
               disabled={flags().deleting}
             >キャンセル</Button>
             <Button
-              onClick={()=>{removeSession(targetDeletingSession?.id || 0)}}
+              onClick={() => { removeSession(targetDeletingSession?.id || 0) }}
               variant={"destructive"}
               disabled={flags().deleting}
             >ログアウトする</Button>
@@ -132,7 +139,7 @@ export default function ConfigSession() {
             <p>変更先のセッション名を入力してください。</p>
             <span class="flex truncate items-center gap-2">
               <p>現在 : </p>
-              <span class="font-bold truncate overflow-x-auto w-64 md:w-[256px]">{ targetNameChangingSession?.name ?? "?" }</span>
+              <span class="font-bold truncate overflow-x-auto w-64 md:w-[256px]">{targetNameChangingSession?.name ?? "?"}</span>
             </span>
           </DialogDescription>
           <TextField>
@@ -145,11 +152,11 @@ export default function ConfigSession() {
           </TextField>
           <DialogFooter>
             <Button
-              onClick={()=>setModalNameChangingOpen(false)}
+              onClick={() => setModalNameChangingOpen(false)}
               variant={"ghost"}
               disabled={flags().changingName}
             >キャンセル</Button>
-            <Button onClick={()=>changeSessionName()} disabled={flags().changingName}>変更する</Button>
+            <Button onClick={() => changeSessionName()} disabled={flags().changingName}>変更する</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -157,7 +164,7 @@ export default function ConfigSession() {
       <span class="flex flex-row items-center gap-2">
         <p class="font-bold text-2xl my-2">セッション管理</p>
         <Button
-          onClick={()=>sessionFetcher()}
+          onClick={() => sessionFetcher({ reset: true })}
           class="ml-auto"
           size={"icon"}
           variant={"secondary"}
@@ -174,20 +181,20 @@ export default function ConfigSession() {
             <Card class="p-4 flex flex-col md:flex-row item-start md:items-center gap-2">
               <span class="truncate shrink flex flex-row items-center gap-2">
                 <Button
-                  onClick={()=>{ targetNameChangingSession = session; setModalNameChangingOpen(true); }}
+                  onClick={() => { targetNameChangingSession = session; setModalNameChangingOpen(true); }}
                   class="shrink-0"
                   size={"icon"}
                   variant={"ghost"}
                 >
                   <IconPencil />
                 </Button>
-                <p class="truncate shrink">{ session.name }</p>
+                <p class="truncate shrink">{session.name}</p>
               </span>
               <span class="shrink-0 ml-auto flex flex-row items-center gap-4">
-                <Badge variant={"outline"}>{ new Date(session.createdAt).toLocaleString() }</Badge>
+                <Badge variant={"outline"}>{new Date(session.createdAt).toLocaleString()}</Badge>
                 <Show when={!session.thisIsYou}>
                   <Button
-                    onClick={()=>{ targetDeletingSession=session; setModalDeletionOpen(true); }}
+                    onClick={() => { targetDeletingSession = session; setModalDeletionOpen(true); }}
                     size={"sm"}
                     variant={"destructive"}
                   >
@@ -205,8 +212,16 @@ export default function ConfigSession() {
         <Show when={flags().fetching}>
           <p class="text-center">ロード中...</p>
         </Show>
-        <Show when={!reachedSessionEnd}>
-          <Button class="mx-auto" variant={"secondary"}>セッションをさらに読み込む</Button>
+        <Show when={!reachedSessionEnd()}>
+          <Button
+            onClick={() => { sessionFetcher(); }}
+            class="mx-auto"
+            variant={"secondary"}
+            disabled={flags().fetching}
+          >
+            <IconPlus />
+            セッションをさらに読み込む
+          </Button>
         </Show>
       </div>
 
