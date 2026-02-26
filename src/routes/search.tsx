@@ -31,6 +31,7 @@ export default function Search() {
   const [sortOrder, setSortOrder] = createSignal<SearchSortOrder>("desc");
   const [fileFilter, setFileFilter] = createSignal<SearchFileFilter>("any");
   const [lastFetchedRawCount, setLastFetchedRawCount] = createSignal(0);
+  const [lastSearchedConditionKey, setLastSearchedConditionKey] = createSignal("");
 
   const channelOptions = createMemo(
     () => [CHANNEL_FILTER_ALL, ...storeMyUserinfo.ChannelJoin.map((cj) => cj.channelId)],
@@ -59,7 +60,7 @@ export default function Search() {
     return sortOptions.find((option) => option.value === value)?.label ?? "新しい順";
   };
 
-  const buildSearchParams = (nextLoadIndex: number) => {
+  const buildSearchConditionParams = () => {
     return {
       _content: query(),
       _channelId:
@@ -67,12 +68,23 @@ export default function Search() {
       _sort: sortOrder(),
       _hasFileAttachment:
         fileFilter() === "any" ? undefined : fileFilter() === "with_file",
+    };
+  };
+
+  const buildSearchConditionKey = () => {
+    return JSON.stringify(buildSearchConditionParams());
+  };
+
+  const buildSearchParams = (nextLoadIndex: number) => {
+    return {
+      ...buildSearchConditionParams(),
       _loadIndex: nextLoadIndex,
     };
   };
 
   const searchIt = (insertMode: boolean = false) => {
     const nextLoadIndex = insertMode ? loadIndex() + 1 : 1;
+    const searchConditionKey = buildSearchConditionKey();
     setProcessing(true);
     GET_MESSAGE_SEARCH(buildSearchParams(nextLoadIndex))
       .then((r) => {
@@ -89,6 +101,7 @@ export default function Search() {
           setLoadIndex(1); //リセット
           setSearchResults(result);
         }
+        setLastSearchedConditionKey(searchConditionKey);
         setSearchedOnce(true);
       })
       .catch((e) => console.error("Search :: search :: e ->", e))
@@ -203,7 +216,9 @@ export default function Search() {
           </For>
 
           {
-            searchedOnce() && lastFetchedRawCount() === SEARCH_PAGE_SIZE
+            searchedOnce()
+            && lastFetchedRawCount() === SEARCH_PAGE_SIZE
+            && lastSearchedConditionKey() === buildSearchConditionKey()
             &&
             <Button onClick={()=>searchIt(true)} variant={"secondary"} disabled={processing()}>もっと読み込む</Button>
           }
