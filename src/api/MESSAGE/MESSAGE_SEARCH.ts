@@ -7,7 +7,7 @@ export default async function GET_MESSAGE_SEARCH(dat: {
   _hasUrlPreview?: boolean,
   _hasFileAttachment?: boolean,
   _loadIndex?: number,
-  _sort?: "asc" | "dsc",
+  _sort?: "asc" | "desc",
 }): Promise<{
   message: `Searched messages`;
   data: IMessage[];
