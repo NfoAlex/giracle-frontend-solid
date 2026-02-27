@@ -1,6 +1,6 @@
 {
   "name": "giracle-front-solid",
-  "version": "0.20.0-alpha",
+  "version": "0.20.1-alpha",
   "description": "",
   "type": "module",
   "scripts": {
@@ -16,8 +16,8 @@
     "vite": "npm:rolldown-vite@latest"
   },
   "devDependencies": {
-    "@types/node": "^22.19.11",
-    "autoprefixer": "^10.4.24",
+    "@types/node": "^22.19.13",
+    "autoprefixer": "^10.4.27",
     "postcss": "^8.5.6",
     "tailwindcss": "^3.4.19",
     "typescript": "^5.9.3",
