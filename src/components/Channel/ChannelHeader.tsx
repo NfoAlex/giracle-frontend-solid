@@ -62,7 +62,7 @@ export default function ChannelHeader() {
         <Card class="py-3 px-5 flex items-center w-full gap-2">
           <SidebarTriggerWithDot />
           <span class={"shrink line-clamp-1"}>
-            <p class="italic">チャンネルが見つかりません {currentChannelId()} {storeChannelFetchStatus[currentChannelId()]}</p>
+            <p class="italic">チャンネルが見つかりません</p>
           </span>
         </Card>
       </Match>
