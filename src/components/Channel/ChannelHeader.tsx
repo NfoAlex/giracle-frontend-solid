@@ -6,19 +6,24 @@ import { Card } from "../ui/card.tsx";
 import { directGetterChannelInfo, storeChannelFetchStatus } from "~/stores/ChannelInfo.ts";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "../ui/hover-card.tsx";
 import ChannelManage from "./ChannelHeader/ChannelManage.tsx";
+import type { IChannel } from "~/types/Channel.ts";
 
 export default function ChannelHeader() {
   const params = useParams();
   const [currentChannelId, setCurrentChannelId] = createSignal<string>(params.channelId ?? params.id ?? "");
+  const [currentChannelInfo, setCurrentChannelInfo] = createSignal<IChannel | null>(null);
 
   createEffect(() => {
     if (params.channelId !== undefined) {
       setCurrentChannelId(params.channelId);
+      setCurrentChannelInfo(directGetterChannelInfo(params.channelId));
     }
   });
 
   return (
-    <Switch>
+    <Switch fallback={<div>{storeChannelFetchStatus[currentChannelId()]}</div>}>
+      <div>{storeChannelFetchStatus[currentChannelId()]}</div>
+
       <Match when={storeChannelFetchStatus[currentChannelId()] === "LOADING"}>
         <Card class="py-3 px-5 flex items-center w-full gap-2">
           <SidebarTriggerWithDot />
@@ -33,7 +38,7 @@ export default function ChannelHeader() {
           <SidebarTriggerWithDot />
 
           {/* チャンネルの閲覧権限がある時の錠前アイコン */}
-          <Show when={directGetterChannelInfo(currentChannelId()).ChannelViewableRole.length !== 0}>
+          <Show when={currentChannelInfo()?.ChannelViewableRole.length !== 0}>
             <HoverCard>
               <HoverCardTrigger>
                 <IconLock class={"shrink-0 cursor-help"} size={"18"} />
@@ -45,11 +50,11 @@ export default function ChannelHeader() {
           </Show>
 
           <span class={"shrink line-clamp-1"}>
-            <p>{directGetterChannelInfo(currentChannelId()).name}</p>
+            <p>{currentChannelInfo()?.name}</p>
           </span>
           <p class="text-gray-400 mx-1"> | </p>
           <span class={"shrink-[2] grow-0 line-clamp-1 max-w-[50%] md:max-w-full"}>
-            <p>{directGetterChannelInfo(currentChannelId()).description}</p>
+            <p>{currentChannelInfo()?.description}</p>
           </span>
 
           <span class={"ml-auto"}>
