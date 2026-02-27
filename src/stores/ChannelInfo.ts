@@ -1,9 +1,13 @@
 import { createStore } from "solid-js/store";
 import GET_CHANNEL_GET_INFO from "~/api/CHANNEL/CHANNEL_GET_INFO.ts";
-import { IChannel } from "~/types/Channel.ts";
+import type { IChannel } from "~/types/Channel.ts";
 
 export const [storeChannelInfo, setStoreChannelInfo] = createStore<{
   [key: string]: IChannel;
+}>({});
+
+export const [storeChannelFetchStatus, setStoreChannelFetchStatus] = createStore<{
+  [key: string]: "AVAILABLE" | "NOT_FOUND" | "LOADING" | "ERROR_INTERNAL";
 }>({});
 
 /**
@@ -28,6 +32,10 @@ export const directGetterChannelInfo = (
   channelId: string,
 ): IChannel => {
   if (storeChannelInfo[channelId] === undefined) {
+    setStoreChannelFetchStatus({
+      ...storeChannelFetchStatus,
+      [channelId]: "LOADING",
+    });
     updateChannelInfo({
       name: "ロード中...",
       id: channelId,
@@ -40,6 +48,10 @@ export const directGetterChannelInfo = (
       .then((r) => {
         //Storeに設定
         updateChannelInfo(r.data);
+        setStoreChannelFetchStatus({
+          ...storeChannelFetchStatus,
+          [channelId]: "AVAILABLE",
+        });
       })
       .catch((e) => {
         console.error("ChannelInfo :: getterChannelInfo : エラー -> ", e);
@@ -50,6 +62,10 @@ export const directGetterChannelInfo = (
           createdUserId: "",
           ChannelViewableRole: [],
           isArchived: false,
+        });
+        setStoreChannelFetchStatus({
+          ...storeChannelFetchStatus,
+          [channelId]: "NOT_FOUND",
         });
       });
   }
