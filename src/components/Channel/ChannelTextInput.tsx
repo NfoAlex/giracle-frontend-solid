@@ -16,14 +16,10 @@ export default function ChannelTextInput() {
   const params = useParams(); //URLパラメータを取得するやつ
   const [text, setText] = createSignal(""); //メッセージテキスト
   const [fileIds, setFileIds] = createSignal<string[]>([]); //送信に使うファイルIDの配列
-  const pushFileIds = (fileId: string) => { //ファイルIDを追加するようの関数
-    setFileIds([...fileIds(), fileId]);
-    console.log("ChannelTextInput :: pushFileIds : fileId->", fileId, fileIds());
-  }
   const [fileInput, setFileInput] = createSignal<File[]>([]); //ファイル選択ダイアログからのファイル入力受け取り用配列
   const [userSearchResult, setUserSearchResult] = createSignal<IUser[]>([]); //ユーザー検索結果
   let cursorPosition = 0; //フォーム上のカーソル位置
-  let [searchOptions, setSearchOptions] = createSignal<{ type:"user"|"channel", isEnabled:boolean, query: string, selectIndex: number }>({
+  let [searchOptions, setSearchOptions] = createSignal<{ type: "user" | "channel", isEnabled: boolean, query: string, selectIndex: number }>({
     type: "user",
     isEnabled: false,
     query: "",
@@ -178,7 +174,7 @@ export default function ChannelTextInput() {
    * @param fileId
    */
   const removeFileId = (fileId: string, fileName: string) => {
-    setFileInput(fileInput().filter(f=>f.name!==fileName));
+    setFileInput(fileInput().filter(f => f.name !== fileName));
     setFileIds(fileIds().filter(id => id !== fileId));
   }
 
@@ -193,8 +189,8 @@ export default function ChannelTextInput() {
                 <div class={"w-fit flex items-center"}>
                   <FileUploadPreview
                     file={file}
-                    dataSetter={pushFileIds}
-                    onRemove={(fileId, fileName)=>{ removeFileId(fileId, fileName) }}
+                    dataSetter={(fileId) => setFileIds([...fileIds(), fileId])}
+                    onRemove={(fileId, fileName) => { removeFileId(fileId, fileName) }}
                   />
                 </div>
               );
@@ -221,7 +217,7 @@ export default function ChannelTextInput() {
         <textarea
           id={"messageInput"}
           class={"shrink min-w-0 grow p-2 bg-background resize-none border rounded-md break-all h-fit whitespace-pre-wrap max-h-40"}
-          rows={text().match(/\n/g)?.length===0 ? 1 : (text().match(/\n/g)?.length ?? 0) + 1}
+          rows={text().match(/\n/g)?.length === 0 ? 1 : (text().match(/\n/g)?.length ?? 0) + 1}
           value={text()}
           onInput={(e) => {
             cursorPosition = e.currentTarget?.selectionStart || 0;
@@ -229,7 +225,7 @@ export default function ChannelTextInput() {
             checkMode();
           }}
           onKeyDown={(e) => {
-            switch(e.key) {
+            switch (e.key) {
               case "Enter": {
                 //検索モードが有効なら選択した情報をメッセージ文にバインド
                 if (searchOptions().isEnabled) {
@@ -240,7 +236,7 @@ export default function ChannelTextInput() {
                 //Macなら変換での勝手な送信をブロックする
                 if (/Mac/.test(navigator.userAgent) && e.isComposing) break;
                 if (e.shiftKey) break;
-                
+
                 //設定でCtrlキーを押す必要がある場合
                 if (storeClientConfig.chat.sendWithCtrlKey) {
                   if (!e.ctrlKey) break;
@@ -255,7 +251,7 @@ export default function ChannelTextInput() {
                 if (searchOptions().isEnabled) {
                   e.preventDefault();
                   if (0 < searchOptions().selectIndex)
-                    setSearchOptions({...searchOptions(), selectIndex: searchOptions().selectIndex - 1});
+                    setSearchOptions({ ...searchOptions(), selectIndex: searchOptions().selectIndex - 1 });
                 }
                 break;
               }
@@ -263,7 +259,7 @@ export default function ChannelTextInput() {
                 if (searchOptions().isEnabled) {
                   e.preventDefault();
                   if (userSearchResult().length > searchOptions().selectIndex + 1)
-                    setSearchOptions({...searchOptions(), selectIndex: searchOptions().selectIndex + 1});
+                    setSearchOptions({ ...searchOptions(), selectIndex: searchOptions().selectIndex + 1 });
                 }
                 break;
               }
@@ -284,8 +280,8 @@ export default function ChannelTextInput() {
               {(user, index) => {
                 return (
                   <div
-                    onClick={()=>bindSearchedItem(user, "user")}
-                    class={`flex items-center gap-2 p-2 rounded hover:bg-border ${searchOptions().selectIndex === index()&&"bg-border"}`}
+                    onClick={() => bindSearchedItem(user, "user")}
+                    class={`flex items-center gap-2 p-2 rounded hover:bg-border ${searchOptions().selectIndex === index() && "bg-border"}`}
                   >
                     <img alt={user.name} src={`/api/user/icon/${user.id}`} class={"w-8 h-8 rounded-full"} />
                     <div class={"flex-grow"}>
@@ -294,7 +290,7 @@ export default function ChannelTextInput() {
                   </div>
                 );
               }
-            }
+              }
             </For>
           </Card>
         </Show>
