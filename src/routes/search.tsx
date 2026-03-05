@@ -20,6 +20,12 @@ const CHANNEL_FILTER_ALL = "__all__";
 type SearchSortOrder = "asc" | "desc";
 type SearchFileFilter = "any" | "with_file" | "without_file";
 type SearchSelectOption = { value: string; label: string };
+type SearchCondition = {
+  content: string;
+  channelId: string;
+  sortOrder: SearchSortOrder;
+  fileFilter: SearchFileFilter;
+};
 
 export default function Search() {
   const [query, setQuery] = createSignal("");
@@ -31,7 +37,7 @@ export default function Search() {
   const [sortOrder, setSortOrder] = createSignal<SearchSortOrder>("desc");
   const [fileFilter, setFileFilter] = createSignal<SearchFileFilter>("any");
   const [lastFetchedRawCount, setLastFetchedRawCount] = createSignal(0);
-  const [lastSearchedConditionKey, setLastSearchedConditionKey] = createSignal("");
+  const [lastSearchedCondition, setLastSearchedCondition] = createSignal<SearchCondition | null>(null);
 
   const channelOptions = createMemo(
     () => [CHANNEL_FILTER_ALL, ...storeMyUserinfo.ChannelJoin.map((cj) => cj.channelId)],
@@ -52,41 +58,62 @@ export default function Search() {
     return directGetterChannelInfo(channelId).name;
   };
 
-  const getFileFilterLabel = (value: SearchFileFilter): string => {
-    return fileFilterOptions.find((option) => option.value === value)?.label ?? "指定なし";
+  const selectedSortOption = (): SearchSelectOption => {
+    return sortOptions.find((option) => option.value === sortOrder()) ?? sortOptions[0];
   };
 
-  const getSortLabel = (value: SearchSortOrder): string => {
-    return sortOptions.find((option) => option.value === value)?.label ?? "新しい順";
+  const selectedFileFilterOption = (): SearchSelectOption => {
+    return fileFilterOptions.find((option) => option.value === fileFilter()) ?? fileFilterOptions[0];
   };
 
-  const buildSearchConditionParams = () => {
+  const getCurrentSearchCondition = (): SearchCondition => {
     return {
-      _content: query(),
-      _channelId:
-        selectedChannelId() === CHANNEL_FILTER_ALL ? undefined : selectedChannelId(),
-      _sort: sortOrder(),
-      _hasFileAttachment:
-        fileFilter() === "any" ? undefined : fileFilter() === "with_file",
+      content: query(),
+      channelId: selectedChannelId(),
+      sortOrder: sortOrder(),
+      fileFilter: fileFilter(),
     };
   };
 
-  const buildSearchConditionKey = () => {
-    return JSON.stringify(buildSearchConditionParams());
+  const isSameSearchCondition = (
+    a: SearchCondition | null,
+    b: SearchCondition,
+  ): boolean => {
+    if (a === null) return false;
+    return (
+      a.content === b.content
+      && a.channelId === b.channelId
+      && a.sortOrder === b.sortOrder
+      && a.fileFilter === b.fileFilter
+    );
   };
 
-  const buildSearchParams = (nextLoadIndex: number) => {
+  const buildSearchParams = (condition: SearchCondition, nextLoadIndex: number) => {
     return {
-      ...buildSearchConditionParams(),
+      _content: condition.content,
+      _channelId:
+        condition.channelId === CHANNEL_FILTER_ALL ? undefined : condition.channelId,
+      _sort: condition.sortOrder,
+      _hasFileAttachment:
+        condition.fileFilter === "any" ? undefined : condition.fileFilter === "with_file",
       _loadIndex: nextLoadIndex,
     };
   };
 
+  const canLoadMore = () => {
+    const currentCondition = getCurrentSearchCondition();
+    return (
+      searchedOnce()
+      && lastFetchedRawCount() === SEARCH_PAGE_SIZE
+      && isSameSearchCondition(lastSearchedCondition(), currentCondition)
+    );
+  };
+
   const searchIt = (insertMode: boolean = false) => {
     const nextLoadIndex = insertMode ? loadIndex() + 1 : 1;
-    const searchConditionKey = buildSearchConditionKey();
+    const currentCondition = getCurrentSearchCondition();
     setProcessing(true);
-    GET_MESSAGE_SEARCH(buildSearchParams(nextLoadIndex))
+    GET_MESSAGE_SEARCH(buildSearchParams(currentCondition, nextLoadIndex))
       .then((r) => {
         setLastFetchedRawCount(r.data.length);
         //システムメッセージを除外
@@ -101,7 +128,7 @@ export default function Search() {
           setLoadIndex(1); //リセット
           setSearchResults(result);
         }
-        setLastSearchedConditionKey(searchConditionKey);
+        setLastSearchedCondition(currentCondition);
         setSearchedOnce(true);
       })
       .catch((e) => console.error("Search :: search :: e ->", e))
@@ -155,7 +182,7 @@ export default function Search() {
         <Select
           options={sortOptions}
           optionValue={(option) => option.value}
-          value={sortOptions.find((option) => option.value === sortOrder()) ?? sortOptions[0]}
+          value={selectedSortOption()}
           onChange={(option) => option && setSortOrder(option.value as SearchSortOrder)}
           itemComponent={(props) => (
             <SelectItem item={props.item}>
@@ -165,7 +192,7 @@ export default function Search() {
         >
           <SelectTrigger aria-label="search-sort-order">
             <SelectValue<SearchSelectOption>>
-              {(state) => <p>{state.selectedOption()?.label ?? getSortLabel(sortOrder())}</p>}
+              {(state) => <p>{state.selectedOption()?.label ?? selectedSortOption().label}</p>}
             </SelectValue>
           </SelectTrigger>
           <SelectContent />
@@ -174,7 +201,7 @@ export default function Search() {
         <Select
           options={fileFilterOptions}
           optionValue={(option) => option.value}
-          value={fileFilterOptions.find((option) => option.value === fileFilter()) ?? fileFilterOptions[0]}
+          value={selectedFileFilterOption()}
           onChange={(option) => option && setFileFilter(option.value as SearchFileFilter)}
           itemComponent={(props) => (
             <SelectItem item={props.item}>
@@ -184,7 +211,7 @@ export default function Search() {
         >
           <SelectTrigger aria-label="search-file-filter">
             <SelectValue<SearchSelectOption>>
-              {(state) => <p>{state.selectedOption()?.label ?? getFileFilterLabel(fileFilter())}</p>}
+              {(state) => <p>{state.selectedOption()?.label ?? selectedFileFilterOption().label}</p>}
             </SelectValue>
           </SelectTrigger>
           <SelectContent />
@@ -216,9 +243,7 @@ export default function Search() {
           </For>
 
           {
-            searchedOnce()
-            && lastFetchedRawCount() === SEARCH_PAGE_SIZE
-            && lastSearchedConditionKey() === buildSearchConditionKey()
+            canLoadMore()
             &&
             <Button onClick={()=>searchIt(true)} variant={"secondary"} disabled={processing()}>もっと読み込む</Button>
           }
