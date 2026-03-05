@@ -19,17 +19,17 @@ const CHANNEL_FILTER_ALL = "__all__";
 
 type SearchSortOrder = "asc" | "desc";
 type SearchFileFilter = "any" | "with_file" | "without_file";
-type SearchSelectOption<TValue extends string = string> = { value: TValue; label: string };
-
-const sortOptions: SearchSelectOption<SearchSortOrder>[] = [
-  { value: "desc", label: "新しい順" },
-  { value: "asc", label: "古い順" },
-];
-const fileFilterOptions: SearchSelectOption<SearchFileFilter>[] = [
-  { value: "any", label: "指定なし" },
-  { value: "with_file", label: "添付あり" },
-  { value: "without_file", label: "添付なし" },
-];
+const sortOptions: SearchSortOrder[] = ["desc", "asc"];
+const fileFilterOptions: SearchFileFilter[] = ["any", "with_file", "without_file"];
+const sortLabels: Record<SearchSortOrder, string> = {
+  desc: "新しい順",
+  asc: "古い順",
+};
+const fileFilterLabels: Record<SearchFileFilter, string> = {
+  any: "指定なし",
+  with_file: "添付あり",
+  without_file: "添付なし",
+};
 
 export default function Search() {
   const [query, setQuery] = createSignal("");
@@ -41,10 +41,11 @@ export default function Search() {
   const [sortOrder, setSortOrder] = createSignal<SearchSortOrder>("desc");
   const [fileFilter, setFileFilter] = createSignal<SearchFileFilter>("any");
   const [lastFetchedRawCount, setLastFetchedRawCount] = createSignal(0);
+  // 条件変更後に「もっと読み込む」で別条件を混ぜないため、直近検索条件を記録する
   const [lastSearchedConditionKey, setLastSearchedConditionKey] = createSignal("");
 
   const channelOptions = createMemo(
-    () => [CHANNEL_FILTER_ALL, ...storeMyUserinfo.ChannelJoin.map((cj) => cj.channelId)],
+    () => [CHANNEL_FILTER_ALL, ...new Set(storeMyUserinfo.ChannelJoin.map((cj) => cj.channelId))],
   );
 
   createEffect(() => {
@@ -58,15 +59,7 @@ export default function Search() {
     return directGetterChannelInfo(channelId).name;
   };
 
-  const selectedSortOption = (): SearchSelectOption<SearchSortOrder> => {
-    return sortOptions.find((option) => option.value === sortOrder()) ?? sortOptions[0];
-  };
-
-  const selectedFileFilterOption = (): SearchSelectOption<SearchFileFilter> => {
-    return fileFilterOptions.find((option) => option.value === fileFilter()) ?? fileFilterOptions[0];
-  };
-
-  const buildSearchConditionParams = () => {
+  const currentSearchCondition = createMemo(() => {
     return {
       _content: query(),
       _channelId:
@@ -75,15 +68,13 @@ export default function Search() {
       _hasFileAttachment:
         fileFilter() === "any" ? undefined : fileFilter() === "with_file",
     };
-  };
+  });
 
-  const buildSearchConditionKey = () => {
-    return JSON.stringify(buildSearchConditionParams());
-  };
+  const currentSearchConditionKey = createMemo(() => JSON.stringify(currentSearchCondition()));
 
   const buildSearchParams = (nextLoadIndex: number) => {
     return {
-      ...buildSearchConditionParams(),
+      ...currentSearchCondition(),
       _loadIndex: nextLoadIndex,
     };
   };
@@ -92,14 +83,14 @@ export default function Search() {
     return (
       searchedOnce()
       && lastFetchedRawCount() === SEARCH_PAGE_SIZE
-      && lastSearchedConditionKey() === buildSearchConditionKey()
+      && lastSearchedConditionKey() === currentSearchConditionKey()
     );
   };
 
   const searchIt = (insertMode: boolean = false) => {
     if (processing()) return;
     const nextLoadIndex = insertMode ? loadIndex() + 1 : 1;
-    const searchConditionKey = buildSearchConditionKey();
+    const searchConditionKey = currentSearchConditionKey();
     setProcessing(true);
     GET_MESSAGE_SEARCH(buildSearchParams(nextLoadIndex))
       .then((r) => {
@@ -169,18 +160,17 @@ export default function Search() {
 
         <Select
           options={sortOptions}
-          optionValue={(option) => option.value}
-          value={selectedSortOption()}
-          onChange={(option) => option && setSortOrder(option.value)}
+          value={sortOrder()}
+          onChange={(value) => value && setSortOrder(value)}
           itemComponent={(props) => (
             <SelectItem item={props.item}>
-              {props.item.rawValue.label}
+              {sortLabels[props.item.rawValue]}
             </SelectItem>
           )}
         >
           <SelectTrigger aria-label="search-sort-order">
-            <SelectValue<SearchSelectOption>>
-              {(state) => <p>{state.selectedOption()?.label ?? selectedSortOption().label}</p>}
+            <SelectValue<SearchSortOrder>>
+              {(state) => <p>{sortLabels[state.selectedOption() ?? "desc"]}</p>}
             </SelectValue>
           </SelectTrigger>
           <SelectContent />
@@ -188,18 +178,17 @@ export default function Search() {
 
         <Select
           options={fileFilterOptions}
-          optionValue={(option) => option.value}
-          value={selectedFileFilterOption()}
-          onChange={(option) => option && setFileFilter(option.value)}
+          value={fileFilter()}
+          onChange={(value) => value && setFileFilter(value)}
           itemComponent={(props) => (
             <SelectItem item={props.item}>
-              {props.item.rawValue.label}
+              {fileFilterLabels[props.item.rawValue]}
             </SelectItem>
           )}
         >
           <SelectTrigger aria-label="search-file-filter">
-            <SelectValue<SearchSelectOption>>
-              {(state) => <p>{state.selectedOption()?.label ?? selectedFileFilterOption().label}</p>}
+            <SelectValue<SearchFileFilter>>
+              {(state) => <p>{fileFilterLabels[state.selectedOption() ?? "any"]}</p>}
             </SelectValue>
           </SelectTrigger>
           <SelectContent />
@@ -216,7 +205,7 @@ export default function Search() {
             {(message) => (
               <Card class="p-2">
                 <span>
-                  <UserinfoModalWrapper userId={message.userId} class="flex flex-row iterms-center gap-2">
+                  <UserinfoModalWrapper userId={message.userId} class="flex flex-row items-center gap-2">
                     <Avatar>
                       <AvatarImage src={"/api/user/icon/" + message.userId} />
                     </Avatar>
