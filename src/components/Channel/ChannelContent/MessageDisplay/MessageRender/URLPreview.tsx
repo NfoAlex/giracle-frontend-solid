@@ -15,10 +15,28 @@ export default function URLPreview(props: { urlPreview: IMessageUrlPreview }) {
     <div class={"py-1 flex flex-col gap-1"}>
 
       <Dialog open={open()} onOpenChange={setOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>URL Preview</DialogTitle>
+        <DialogContent class="pt-12 flex flex-col gap-0">
+          <DialogHeader class="my-4 flex flex-col gap-4">
+            {
+              props.urlPreview.imageLink
+              &&
+              <ImageWithModal class={"border rounded w-full h-52 object-cover"} src={props.urlPreview.imageLink} />
+            }
+            <div class="flex items-center gap-2">
+              {
+                props.urlPreview.faviconLink
+                  ? <img class={"w-5 h-fit shrink-0 truncate"} src={props.urlPreview.faviconLink} alt="favicon" />
+                  : <IconLink />
+              }
+              <DialogTitle class="truncate">{props.urlPreview.title}</DialogTitle>
+            </div>
           </DialogHeader>
+
+          <hr />
+
+          <div class="max-h-96 overflow-y-auto pt-4">
+            <p class="whitespace-pre-wrap break-all">{props.urlPreview.description}</p>
+          </div>
         </DialogContent>
       </Dialog>
 
