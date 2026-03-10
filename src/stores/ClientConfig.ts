@@ -10,12 +10,13 @@ export const storeClientConfig = createMutable({
   },
   display: {
     messageGapLevel: 0, //0-6
+    maxUrlPreviewTextLength: 50
   },
 });
 
 /**
  * 設定を格納するだけ
- * @param newConfig 
+ * @param newConfig
  */
 export const bindClientConfig = (newConfig: Partial<typeof storeClientConfig>) => {
   const configRootKeys = ["chat", "notification", "display"] as const;
