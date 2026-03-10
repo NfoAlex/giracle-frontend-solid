@@ -1,15 +1,15 @@
 import { Badge } from "~/components/ui/badge.tsx";
 import { Card } from "~/components/ui/card.tsx";
 import { TextField, TextFieldInput } from "~/components/ui/text-field.tsx";
-import {Avatar, AvatarImage} from "~/components/ui/avatar.tsx";
+import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar.tsx";
 import SidebarTriggerWithDot from "~/components/unique/SidebarTriggerWithDot.tsx";
-import {getterUserinfo, storeUserOnline} from "~/stores/Userinfo.ts";
-import {For, createSignal, createMemo} from "solid-js";
+import { getterUserinfo, storeUserOnline } from "~/stores/Userinfo.ts";
+import { For, createSignal, createMemo } from "solid-js";
 import UserinfoModalWrapper from "~/components/unique/UserinfoModalWrapper.tsx";
 
 export default function Search() {
   const [query, setQuery] = createSignal("");
-  
+
   const searchResults = createMemo(() => {
     const q = query().trim();
 
@@ -22,7 +22,7 @@ export default function Search() {
       return userInfo.name.includes(q);
     });
   });
-  
+
   return (
     <div class="h-svh pt-2 px-2 overflow-y-hidden flex flex-col">
       <Card class="w-full py-3 px-5 flex items-center gap-2">
@@ -30,14 +30,14 @@ export default function Search() {
         <p>オンラインユーザー</p>
         <Badge class={"ml-auto"} >{storeUserOnline.length}人がオンライン</Badge>
       </Card>
-      
+
       <span class="mx-auto w-full flex items-center gap-2 mt-2">
         <TextField class="grow">
           <TextFieldInput
             placeholder="ユーザーを検索"
             class="h-12 md:h-10"
             value={query()}
-            onInput={(e) => setQuery(e.currentTarget.value)} 
+            onInput={(e) => setQuery(e.currentTarget.value)}
           />
         </TextField>
       </span>
@@ -49,7 +49,8 @@ export default function Search() {
           {(userId) => (
             <UserinfoModalWrapper userId={userId} class={"p-2 rounded-md flex items-center gap-2 hover:bg-accent"}>
               <Avatar class={"w-8 h-auto"}>
-                <AvatarImage src={`/api/user/icon/${userId}`}/>
+                <AvatarImage src={`/api/user/icon/${userId}`} />
+                <AvatarFallback class="w-full h-full">{getterUserinfo(userId).name}</AvatarFallback>
               </Avatar>
               <p class={"truncate"}>
                 {getterUserinfo(userId).name}
