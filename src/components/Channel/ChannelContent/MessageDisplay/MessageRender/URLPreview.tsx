@@ -15,7 +15,7 @@ export default function URLPreview(props: { urlPreview: IMessageUrlPreview }) {
     <div class={"py-1 flex flex-col gap-1"}>
 
       <Dialog open={open()} onOpenChange={setOpen}>
-        <DialogContent class="pt-12 flex flex-col gap-0">
+        <DialogContent class="pt-8 flex flex-col gap-0">
           <DialogHeader class="my-4 flex flex-col gap-4">
             {
               props.urlPreview.imageLink
