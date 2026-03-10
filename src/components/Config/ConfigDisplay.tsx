@@ -2,7 +2,7 @@ import { storeClientConfig } from "~/stores/ClientConfig.ts";
 import { Card } from "../ui/card.tsx";
 import { Slider, SliderFill, SliderThumb, SliderTrack } from "../ui/slider";
 import { useColorMode } from "@kobalte/core/color-mode";
-import { IconBrush, IconMoonFilled, IconSpacingVertical, IconSunFilled } from "@tabler/icons-solidjs";
+import { IconBrush, IconLink, IconMoonFilled, IconSpacingVertical, IconSunFilled } from "@tabler/icons-solidjs";
 import { NumberField, NumberFieldDecrementTrigger, NumberFieldGroup, NumberFieldIncrementTrigger, NumberFieldInput } from "../ui/number-field.tsx";
 
 export default function ConfigDisplay() {
@@ -72,7 +72,7 @@ export default function ConfigDisplay() {
       <Card class="p-4 flex flex-col gap-4">
         <span class="flex flex-col gap-4">
           <span class="font-bold flex items-center gap-2">
-            <IconSpacingVertical />
+            <IconLink />
             URLプレビュー概要の最大文字数
           </span>
           <span class="flex flex-col gap-2">
