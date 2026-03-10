@@ -28,7 +28,11 @@ export default function URLPreview(props: { urlPreview: IMessageUrlPreview }) {
                   ? <img class={"w-5 h-fit shrink-0 truncate"} src={props.urlPreview.faviconLink} alt="favicon" />
                   : <IconLink />
               }
-              <DialogTitle class="truncate">{props.urlPreview.title}</DialogTitle>
+              <DialogTitle class="truncate">
+                <a href={props.urlPreview.url} target="_blank" rel="noreferrer" class="shrink line-clamp-2">
+                  {props.urlPreview.title}
+                </a>
+              </DialogTitle>
             </div>
           </DialogHeader>
 
