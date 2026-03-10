@@ -1,7 +1,7 @@
-import {For, Show} from "solid-js";
+import { For, Show } from "solid-js";
 import type { IMessage } from "~/types/Message.ts";
 import MessageTextRender from "./MessageRender/MessageTextRender.tsx";
-import {getterUserinfo} from "~/stores/Userinfo.ts";
+import { getterUserinfo } from "~/stores/Userinfo.ts";
 import UserinfoModalWrapper from "~/components/unique/UserinfoModalWrapper.tsx";
 import SystemMessageRender from "./MessageRender/SystemMessageRender.tsx";
 import FilePreview from "./MessageRender/FilePreview.tsx";
@@ -65,14 +65,18 @@ export default function MessageRender(props: {
         {/* メッセージ本文 */}
         {
           props.message.content.length > 500 || breakLinesNum() > 5
-          ?
+            ?
             <LongTextDisplay message={props.message} />
-          :
+            :
             <MessageTextRender content={props.message.content} />
         }
 
         { //URLプレビュー
-          (props.message.MessageUrlPreview?.length > 0) && <URLPreview MessageUrlPreview={props.message.MessageUrlPreview} />
+          (props.message.MessageUrlPreview?.length > 0)
+          &&
+          <For each={props.message.MessageUrlPreview}>
+            {(urlPreview) => <URLPreview urlPreview={urlPreview} />}
+          </For>
         }
 
         { //ファイルプレビュー

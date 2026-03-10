@@ -1,13 +1,13 @@
-import {Card} from "~/components/ui/card.tsx";
-import type {IMessage} from "~/types/Message.ts";
-import {createSignal, For, Show} from "solid-js";
-import {Button} from "~/components/ui/button.tsx";
-import {Badge} from "~/components/ui/badge.tsx";
+import { Card } from "~/components/ui/card.tsx";
+import type { IMessage } from "~/types/Message.ts";
+import { createSignal, For, Show } from "solid-js";
+import { Button } from "~/components/ui/button.tsx";
+import { Badge } from "~/components/ui/badge.tsx";
 import UserinfoModalWrapper from "~/components/unique/UserinfoModalWrapper.tsx";
-import {Avatar, AvatarImage} from "~/components/ui/avatar.tsx";
-import {getterUserinfo} from "~/stores/Userinfo.ts";
-import {IconBrowserMaximize} from "@tabler/icons-solidjs";
-import {storeMyUserinfo} from "~/stores/MyUserinfo.ts";
+import { Avatar, AvatarImage } from "~/components/ui/avatar.tsx";
+import { getterUserinfo } from "~/stores/Userinfo.ts";
+import { IconBrowserMaximize } from "@tabler/icons-solidjs";
+import { storeMyUserinfo } from "~/stores/MyUserinfo.ts";
 import MessageTextRender from "./MessageTextRender.tsx";
 import URLPreview from "./URLPreview.tsx";
 import { Dialog, DialogContent } from "~/components/ui/dialog.tsx";
@@ -38,8 +38,8 @@ export default function LongTextDisplay(props: { message: IMessage }) {
                 <AvatarImage src={`/api/user/icon/${props.message.userId}`} />
               </Avatar>
             </UserinfoModalWrapper>
-            <p class={"line-clamp-1 truncate"}>{ getterUserinfo(props.message.userId).name }</p>
-            <Badge variant={"secondary"} class={"ml-auto"}>{ new Date(props.message.createdAt).toLocaleString() }</Badge>
+            <p class={"line-clamp-1 truncate"}>{getterUserinfo(props.message.userId).name}</p>
+            <Badge variant={"secondary"} class={"ml-auto"}>{new Date(props.message.createdAt).toLocaleString()}</Badge>
           </span>
           <hr />
 
@@ -47,7 +47,11 @@ export default function LongTextDisplay(props: { message: IMessage }) {
           <MessageTextRender content={props.message.content} />
 
           { //URLプレビュー
-            (props.message.MessageUrlPreview?.length > 0) && <URLPreview MessageUrlPreview={props.message.MessageUrlPreview} />
+            (props.message.MessageUrlPreview?.length > 0)
+            &&
+            <For each={props.message.MessageUrlPreview}>
+              {(urlPreview) => <URLPreview urlPreview={urlPreview} />}
+            </For>
           }
 
           { //ファイルプレビュー
@@ -76,11 +80,11 @@ export default function LongTextDisplay(props: { message: IMessage }) {
       <Card class={"w-full p-3 my-1 flex flex-col gap-2"}>
         {/* メッセージレンダー、改行が多ければ省略表示する文字数を減らす */}
         <MessageTextRender
-          content={breakLinesNum() > 5 ? props.message.content.slice(0,10) + "..." : props.message.content.slice(0,100) + "..."}
+          content={breakLinesNum() > 5 ? props.message.content.slice(0, 10) + "..." : props.message.content.slice(0, 100) + "..."}
         />
         <hr />
         <span class={"flex items-center"}>
-          <Button onClick={()=>setOpen(true)} size={"sm"}>
+          <Button onClick={() => setOpen(true)} size={"sm"}>
             <IconBrowserMaximize />
             長文メッセージを展開する
           </Button>
@@ -94,7 +98,7 @@ export default function LongTextDisplay(props: { message: IMessage }) {
             </Show>
 
             <Badge variant={"secondary"}>
-              { props.message.content.length }文字
+              {props.message.content.length}文字
             </Badge>
           </span>
         </span>
