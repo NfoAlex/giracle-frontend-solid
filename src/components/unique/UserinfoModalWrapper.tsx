@@ -1,24 +1,24 @@
-import {createSignal, For, JSX, Show} from "solid-js";
-import {Dialog, DialogContent, DialogTrigger} from "~/components/ui/dialog.tsx";
-import {getterUserinfo, storeUserinfo, storeUserOnline} from "~/stores/Userinfo.ts";
-import {Avatar, AvatarFallback, AvatarImage} from "~/components/ui/avatar.tsx";
-import {Badge} from "~/components/ui/badge.tsx";
-import {IconCircleFilled, IconPencil, IconPlus} from "@tabler/icons-solidjs";
-import {getRolePower, storeMyUserinfo} from "~/stores/MyUserinfo.ts";
-import {Button} from "~/components/ui/button.tsx";
-import {A} from "@solidjs/router";
-import {Label} from "~/components/ui/label.tsx";
-import {Card} from "~/components/ui/card.tsx";
+import { createSignal, For, JSX, Show } from "solid-js";
+import { Dialog, DialogContent, DialogTrigger } from "~/components/ui/dialog.tsx";
+import { getterUserinfo, storeUserinfo, storeUserOnline } from "~/stores/Userinfo.ts";
+import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar.tsx";
+import { Badge } from "~/components/ui/badge.tsx";
+import { IconCircleFilled, IconPencil, IconPlus } from "@tabler/icons-solidjs";
+import { getRolePower, storeMyUserinfo } from "~/stores/MyUserinfo.ts";
+import { Button } from "~/components/ui/button.tsx";
+import { A } from "@solidjs/router";
+import { Label } from "~/components/ui/label.tsx";
+import { Card } from "~/components/ui/card.tsx";
 import RoleChip from "~/components/unique/RoleChip";
-import {Popover, PopoverContent, PopoverTrigger} from "~/components/ui/popover";
-import type {IRole} from "~/types/Role.ts";
-import {storeRoleInfo} from "~/stores/RoleInfo.ts";
+import { Popover, PopoverContent, PopoverTrigger } from "~/components/ui/popover";
+import type { IRole } from "~/types/Role.ts";
+import { storeRoleInfo } from "~/stores/RoleInfo.ts";
 import POST_ROLE_LINK from "~/api/ROLE/ROLE_LINK";
 import POST_ROLE_UNLINK from "~/api/ROLE/ROLE_UNLINK";
 import POST_USER_BAN from "~/api/USER/USER_BAN";
 import POST_USER_UNBAN from "~/api/USER/USER_UNBAN";
 
-export default function UserinfoModalWrapper(props: {children: JSX.Element, userId: string, class?: string}) {
+export default function UserinfoModalWrapper(props: { children: JSX.Element, userId: string, class?: string }) {
   const [user] = createSignal(getterUserinfo(props.userId));
   const [open, setOpen] = createSignal(false);
 
@@ -105,14 +105,14 @@ export default function UserinfoModalWrapper(props: {children: JSX.Element, user
               {
                 storeUserinfo[user().id].isBanned
                 &&
-                  <Badge class="ml-auto" variant={"error"}>BANされたユーザー</Badge>
+                <Badge class="ml-auto" variant={"error"}>BANされたユーザー</Badge>
               }
               {
                 storeMyUserinfo.id === user().id && !storeUserinfo[user().id].isBanned
                 &&
-                  <Button size="icon" as={A} href="/app/config" class="ml-auto">
-                    <IconPencil />
-                  </Button>
+                <Button size="icon" as={A} href="/app/config" class="ml-auto">
+                  <IconPencil />
+                </Button>
               }
             </span>
 
@@ -132,7 +132,7 @@ export default function UserinfoModalWrapper(props: {children: JSX.Element, user
                       deletable={getRolePower("manageRole")}
                       roleId={role.roleId}
                       userId={props.userId}
-                      onDelete={(roleId)=>unlinkRole(roleId)}
+                      onDelete={(roleId) => unlinkRole(roleId)}
                     />
                   }
                 </For>
@@ -154,9 +154,9 @@ export default function UserinfoModalWrapper(props: {children: JSX.Element, user
                         {(role) => //ロールリンクされていないものだけ表示
                           !storeUserinfo[user().id].RoleLink.some((rl) => rl.roleId === role.id)
                           &&
-                            <span onclick={()=>linkRole(role.id)} class="cursor-pointer pr-2">
-                              <RoleChip deletable={false} roleId={role.id} />
-                            </span>
+                          <span onclick={() => linkRole(role.id)} class="cursor-pointer pr-2">
+                            <RoleChip deletable={false} roleId={role.id} />
+                          </span>
                         }
                       </For>
                     </div>
@@ -172,9 +172,9 @@ export default function UserinfoModalWrapper(props: {children: JSX.Element, user
                 <Card class="p-2 flex flex-col gap-1">
                   {
                     !storeUserinfo[user().id].isBanned ?
-                      <Button ondblclick={()=>controlBanState(true)} class={"w-full"} variant={"destructive"}>BANする</Button>
+                      <Button ondblclick={() => controlBanState(true)} class={"w-full"} variant={"destructive"}>BANする</Button>
                       :
-                      <Button ondblclick={()=>controlBanState(false)} class={"w-full"} variant={"default"}>BANを解除する</Button>
+                      <Button ondblclick={() => controlBanState(false)} class={"w-full"} variant={"default"}>BANを解除する</Button>
                   }
                   <Label class={"text-border"}>ダブルクリックで操作</Label>
                 </Card>
