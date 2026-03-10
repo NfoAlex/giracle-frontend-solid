@@ -91,7 +91,7 @@ export default function URLPreview(props: { urlPreview: IMessageUrlPreview }) {
           <Button
             onClick={() => setOpen(true)}
             size={"sm"}
-            class="ml-auto mt-2"
+            class="text-xs ml-auto mt-2"
             variant={"ghost"}
           >全文を表示</Button>
         </CardContent>
