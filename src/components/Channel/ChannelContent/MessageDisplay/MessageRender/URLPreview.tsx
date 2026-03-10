@@ -32,7 +32,7 @@ export default function URLPreview(props: { MessageUrlPreview: IMessageUrlPrevie
                 </Show>
               </div>
             </div>
-            <CardHeader class="p-6">
+            <CardHeader class="p-4">
               <CardTitle class={"flex flex-row items-center gap-2"}>
                 {
                   urlPreview.faviconLink
@@ -47,7 +47,7 @@ export default function URLPreview(props: { MessageUrlPreview: IMessageUrlPrevie
               </CardTitle>
             </CardHeader>
             <hr />
-            <CardContent class={"whitespace-pre-wrap break-all p-6"}>
+            <CardContent class={"whitespace-pre-wrap break-all p-4"}>
               <p>
                 {
                   urlPreview.description.length >= storeClientConfig.display.maxUrlPreviewTextLength
