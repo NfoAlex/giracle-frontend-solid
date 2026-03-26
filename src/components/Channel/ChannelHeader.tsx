@@ -54,8 +54,6 @@ export default function ChannelHeader() {
 
       {/* チャンネルヘッダー */}
       <Switch fallback={<div>{storeChannelFetchStatus[currentChannelId()]}</div>}>
-        <div>{storeChannelFetchStatus[currentChannelId()]}</div>
-
         <Match when={storeChannelFetchStatus[currentChannelId()] === "LOADING"}>
           <Card class="py-3 px-5 flex items-center w-full gap-2">
             <SidebarTriggerWithDot />
@@ -68,9 +66,11 @@ export default function ChannelHeader() {
         <Match when={storeChannelFetchStatus[currentChannelId()] === "AVAILABLE"}>
           <Card
             onClick={() => setModalManageOpen(true)}
-            class="py-3 px-5 flex items-center w-full gap-2 cursor-pointer hover:bg-muted"
+            class="py-3 px-5 flex items-center w-full gap-2 cursor-pointer hover:bg-muted has-[button:hover]:bg-transparent has-[button:hover]:dark:bg-transparent"
           >
-            <SidebarTriggerWithDot />
+            <span class="shrink-0" onClick={(e) => e.stopPropagation()}>
+              <SidebarTriggerWithDot />
+            </span>
 
             {/* チャンネルの閲覧権限がある時の錠前アイコン */}
             <Show when={currentChannelInfo()?.ChannelViewableRole.length !== 0}>
