@@ -49,12 +49,12 @@ export default function ChannelHeader() {
             </HoverCard>
           </Show>
 
-          <span class={"shrink line-clamp-1"}>
-            <p>{currentChannelInfo()?.name}</p>
+          <span class={"shrink max-w-1/3 line-clamp-1"}>
+            <p class={"truncate"}>{currentChannelInfo()?.name}</p>
           </span>
           <p class="text-gray-400 mx-1"> | </p>
-          <span class={"shrink-[2] grow-0 line-clamp-1 max-w-[50%] md:max-w-full"}>
-            <p>{currentChannelInfo()?.description}</p>
+          <span class={"shrink-[2] md:shrink max-w-1/2 line-clamp-1 md:max-w-full"}>
+            <p class={"truncate"}>{currentChannelInfo()?.description}</p>
           </span>
 
           <span class={"ml-auto"}>
