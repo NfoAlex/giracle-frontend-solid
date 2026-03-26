@@ -15,28 +15,24 @@ export default function ChannelManage(props: { channelId: string }) {
           {getRolePower("manageChannel") ? <IconPencil /> : <IconInfoCircle />}
         </Button>
       </DialogTrigger>
-      <DialogContent class={"pt-10 w-full"}>
+      <DialogContent class={"flex flex-col gap-0 pt-10 w-full h-3/4"}>
         <DialogHeader>
           <p>チャンネル情報</p>
         </DialogHeader>
-        <DialogDescription class={"overflow-x-hidden w-full"}>
+        <DialogDescription class={"overflow-x-hidden w-full h-full shrink"}>
 
-          <Tabs defaultValue="info" class="w-full max-h-3/4 flex flex-col">
+          <Tabs defaultValue="info" class="w-full">
             <TabsList class="w-fit">
               <TabsTrigger value="info">概要</TabsTrigger>
               <TabsTrigger value="users">参加者</TabsTrigger>
             </TabsList>
 
-            <hr class="mt-2" />
-
-            <div class="overflow-x-hidden overflow-y-auto w-full">
-              <TabsContent value="info">
-                <ChannelInfo channelId={props.channelId} />
-              </TabsContent>
-              <TabsContent value="users">
-                <ChannelMembers channelId={props.channelId} />
-              </TabsContent>
-            </div>
+            <TabsContent value="info">
+              <ChannelInfo channelId={props.channelId} />
+            </TabsContent>
+            <TabsContent value="users">
+              <ChannelMembers channelId={props.channelId} />
+            </TabsContent>
           </Tabs>
 
         </DialogDescription>
