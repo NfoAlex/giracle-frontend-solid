@@ -31,8 +31,6 @@ export default function MessageDisplay(props: {
   };
 
   const displayDateLine = () => {
-    if (props.messageArrayIndex === 0) return false;
-
     const previousMessage = storeHistory[props.message.channelId]?.history[props.messageArrayIndex + 1];
     if (previousMessage === undefined) return true;
 
@@ -71,7 +69,7 @@ export default function MessageDisplay(props: {
       <Show when={displayDateLine()}>
         <div class="flex justify-center items-center gap-3 py-1">
           <hr class={"grow"} />
-          <Badge class={"shrink-0"} variant={"secondary"}>{ new Date(props.message.createdAt).toLocaleDateString() }</Badge>
+          <Badge class={"shrink-0"} variant={"secondary"}>{new Date(props.message.createdAt).toLocaleDateString()}</Badge>
           <hr class={"grow"} />
         </div>
       </Show>
@@ -89,7 +87,7 @@ export default function MessageDisplay(props: {
       >
         { //メッセージ表示
           !props.message.isSystemMessage //システムメッセージかどうか
-          ?
+            ?
 
             <>
               {/* アイコン表示部分 */}
@@ -98,7 +96,7 @@ export default function MessageDisplay(props: {
                   <UserinfoModalWrapper userId={props.message.userId} >
                     <Avatar class="mx-auto">
                       <AvatarImage src={`/api/user/icon/${props.message.userId}`} />
-                      <AvatarFallback>{ props.message.userId.slice(0,2) }</AvatarFallback>
+                      <AvatarFallback>{props.message.userId.slice(0, 2)}</AvatarFallback>
                     </Avatar>
                   </UserinfoModalWrapper>
                 </Show>
@@ -116,13 +114,13 @@ export default function MessageDisplay(props: {
               >
                 { //メッセージ表示部分。編集モードか否かで表示を変える
                   editing()
-                  ?
+                    ?
                     <EditMessage
                       messageId={props.message.id}
                       content={props.message.content}
                       onCancelEdit={() => setEditing(false)}
                     />
-                  :
+                    :
                     <MentionReadWrapper messageId={props.message.id}>
                       <MessageRender
                         message={props.message}
@@ -136,7 +134,7 @@ export default function MessageDisplay(props: {
                   <div class={"absolute right-1 z-50"} style={"bottom:calc(100% - 15px);"}>
                     <HoverMenu
                       message={props.message}
-                      onEditMode={()=>{ setEditing(true); setHovered(false); }}
+                      onEditMode={() => { setEditing(true); setHovered(false); }}
                       onReacting={(mode) => { setReacting(mode); }}
                     />
                   </div>
@@ -144,7 +142,7 @@ export default function MessageDisplay(props: {
               </div>
             </>
 
-          :
+            :
 
             <MessageRender
               message={props.message}
@@ -158,13 +156,13 @@ export default function MessageDisplay(props: {
         (
           (
             targetMessageReadTimeBefore() //一つ古い既読時間
-              ===
+            ===
             props.message.createdAt.valueOf() //メッセージの時間
           )
-            &&
+          &&
           props.messageArrayIndex !== 0 //最新メッセージ以外条件
         )
-          &&
+        &&
         (<NewMessageLine />)
       }
     </div>
