@@ -15,11 +15,11 @@ export default function ChannelManage(props: { channelId: string }) {
           {getRolePower("manageChannel") ? <IconPencil /> : <IconInfoCircle />}
         </Button>
       </DialogTrigger>
-      <DialogContent class={"flex flex-col gap-0 pt-10 w-full h-3/4"}>
+      <DialogContent class={"flex flex-col gap-0 pt-10 w-full h-5/6 md:h-3/4"}>
         <DialogHeader>
-          <p>チャンネル情報</p>
+          <p class={"ml-2"}>チャンネル情報</p>
         </DialogHeader>
-        <DialogDescription class={"overflow-x-hidden w-full h-full shrink"}>
+        <DialogDescription class={"overflow-x-hidden mt-2 px-2 w-full h-full shrink"}>
 
           <Tabs defaultValue="info" class="w-full">
             <TabsList class="w-fit">

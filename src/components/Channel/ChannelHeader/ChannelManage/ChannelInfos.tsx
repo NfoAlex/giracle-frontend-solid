@@ -52,10 +52,10 @@ export default function ChannelInfo(props: { channelId: string }) {
   }));
 
   return (
-    <div>
-      <Card class={"p-4"}>
+    <div class="flex flex-col gap-2">
+      <Card class={"p-4 shrink flex flex-col"}>
         <Label class={"text-muted-foreground"}>チャンネル名</Label>
-        <div class={"text-card-foreground w-full overflow-x-scroll"}>
+        <div class={"grow text-card-foreground w-full overflow-x-scroll"}>
           {
             editName()
               ?
@@ -84,13 +84,13 @@ export default function ChannelInfo(props: { channelId: string }) {
           }
         </div>
 
-        <hr class={"my-4"} />
+        <hr class={"my-2"} />
 
         <Label class={"text-muted-foreground"}>概要</Label>
         {
           !editDescription()
             ?
-            <div class={"py-3 relative max-h-64 overflow-y-auto whitespace-pre-wrap break-words"}>
+            <div class={"grow py-3 relative max-h-64 overflow-y-auto whitespace-pre-wrap break-words"}>
               <p>{directGetterChannelInfo(props.channelId).description}</p>
               {directGetterChannelInfo(props.channelId).description === "" && <p class={"text-muted-foreground"}>概要が空です。</p>}
 
@@ -100,7 +100,7 @@ export default function ChannelInfo(props: { channelId: string }) {
                 <Button
                   onClick={() => setEditDescription(true)}
                   class={" float-right border rounded-md h-10 w-10 z-10"}
-                  variant={"secondary"}
+                  variant={"outline"}
                 >
                   <IconPencil />
                 </Button>
@@ -122,7 +122,7 @@ export default function ChannelInfo(props: { channelId: string }) {
         }
       </Card>
 
-      <hr class={"my-4"} />
+      <hr class={"my-2"} />
 
       <Label>閲覧できるロール  {roleIsDiff() && "*"}</Label>
       <RoleLinker
