@@ -21,7 +21,7 @@ export default function ChannelManage(props: { channelId: string }) {
         </DialogHeader>
         <DialogDescription class={"overflow-x-hidden w-full"}>
 
-          <Tabs defaultValue="info" class="w-full h-[450px] flex flex-col">
+          <Tabs defaultValue="info" class="w-full max-h-3/4 flex flex-col">
             <TabsList class="w-fit">
               <TabsTrigger value="info">概要</TabsTrigger>
               <TabsTrigger value="users">参加者</TabsTrigger>
