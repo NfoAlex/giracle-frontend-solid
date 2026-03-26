@@ -40,7 +40,7 @@ export default function ChannelBrowser() {
         //console.log("ChannelBrowser :: leaveChannel :: r ->", r);
         //StoreからチャンネルIdをを削除
         setStoreMyUserinfo((prev) => (
-          {...prev, ChannelJoin: prev.ChannelJoin.filter((cj) => cj.channelId !== channelId)}
+          { ...prev, ChannelJoin: prev.ChannelJoin.filter((cj) => cj.channelId !== channelId) }
         ));
       })
       .catch((err) => console.error("ChannelBrowser :: leaveChannel :: err ->", err));
@@ -98,7 +98,7 @@ export default function ChannelBrowser() {
 
       <hr class="mt-3" />
 
-      <div class="flex flex-col gap-2 pt-2 pb-28 overflow-y-auto">
+      <div class="w-full flex flex-col gap-2 pt-2 pb-28 overflow-y-auto">
         <Show when={processing()}>
           <p class="mx-auto">ロード中...</p>
         </Show>
@@ -106,23 +106,23 @@ export default function ChannelBrowser() {
           {(channel) => (
             <Show when={!channel.isArchived || displayArchived()}>
               <Card class="w-full py-5 md:py-3 px-5 flex items-center gap-2">
-                <A href={`/app/channel/${channel.id}`} class="shrink-0 max-w-1/2 line-clamp-1 hover:underline">
-                  <p>{channel.name}</p>
+                <A href={`/app/channel/${channel.id}`} class="shrink max-w-[1/2] line-clamp-1 hover:underline">
+                  <p class={"truncate"}>{channel.name}</p>
                 </A>
-                <p class="font-thin"> | </p>
-                <p class="grow max-w-1/2 line-clamp-2">{channel.description}</p>
+                {channel.description && <p class="font-thin"> | </p>}
+                <p class="shrink max-w-[1/3] line-clamp-2 truncate">{channel.description}</p>
                 <div class="ml-auto flex items-center gap-2">
-                  { channel.isArchived && <IconArchiveFilled color="orange" /> }
+                  {channel.isArchived && <IconArchiveFilled color="orange" />}
 
-                  { 
+                  {
                     storeMyUserinfo.ChannelJoin.some((cj) => cj.channelId === channel.id)
-                    ?
-                      <Button onclick={()=>leaveChannel(channel.id)} variant={"outline"}>退出</Button>
-                    :
-                      <Button onclick={()=>joinChannel(channel.id)}>参加</Button>
+                      ?
+                      <Button onclick={() => leaveChannel(channel.id)} variant={"outline"}>退出</Button>
+                      :
+                      <Button onclick={() => joinChannel(channel.id)}>参加</Button>
                   }
 
-                  { getRolePower("manageChannel") && <DeleteChannel fetchChannels={fetchChannels} channel={channel} /> }
+                  {getRolePower("manageChannel") && <DeleteChannel fetchChannels={fetchChannels} channel={channel} />}
                 </div>
               </Card>
             </Show>
@@ -132,7 +132,7 @@ export default function ChannelBrowser() {
       </div>
 
       {/* チャンネル作成FAB */}
-      { getRolePower("manageChannel") && <CreateChannel fetchChannels={fetchChannels} /> }
+      {getRolePower("manageChannel") && <CreateChannel fetchChannels={fetchChannels} />}
     </div>
   )
 }
