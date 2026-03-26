@@ -52,7 +52,7 @@ export default function ChannelInfo(props: { channelId: string }) {
   }));
 
   return (
-    <div class="mt-2">
+    <div>
       <Card class={"p-4"}>
         <Label class={"text-muted-foreground"}>チャンネル名</Label>
         <div class={"text-card-foreground w-full overflow-x-scroll"}>
@@ -90,14 +90,20 @@ export default function ChannelInfo(props: { channelId: string }) {
         {
           !editDescription()
             ?
-            <div class={"pt-3 pb-12 relative max-h-64 overflow-y-auto whitespace-pre-wrap break-words"}>
+            <div class={"py-3 relative max-h-64 overflow-y-auto whitespace-pre-wrap break-words"}>
               <p>{directGetterChannelInfo(props.channelId).description}</p>
               {directGetterChannelInfo(props.channelId).description === "" && <p class={"text-muted-foreground"}>概要が空です。</p>}
 
               { //権限ある場合の編集ボタン
                 getRolePower("manageChannel")
                 &&
-                <Button onClick={() => setEditDescription(true)} class={"absolute bottom-2 right-0 border rounded-md h-10 w-10"} variant={"outline"} ><IconPencil /></Button>
+                <Button
+                  onClick={() => setEditDescription(true)}
+                  class={" float-right border rounded-md h-10 w-10 z-10"}
+                  variant={"secondary"}
+                >
+                  <IconPencil />
+                </Button>
               }
             </div>
             :
@@ -110,7 +116,7 @@ export default function ChannelInfo(props: { channelId: string }) {
               </TextField>
               <div class={"w-fit ml-auto p-2 flex items-center gap-1"}>
                 <Button onClick={updateChannel} class={"border rounded-md h-10 w-10"} ><IconCheck /></Button>
-                <Button onClick={() => setEditDescription(false)} class={"border rounded-md h-10 w-10"} variant={"outline"} ><IconX /></Button>
+                <Button onClick={() => setEditDescription(false)} class={"border rounded-md h-10 w-10"} variant={"secondary"} ><IconX /></Button>
               </div>
             </div>
         }
