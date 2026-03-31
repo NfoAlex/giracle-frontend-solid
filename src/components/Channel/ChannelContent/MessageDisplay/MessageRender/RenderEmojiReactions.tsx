@@ -49,10 +49,10 @@ export default function RenderEmojiReactions(props: { reaction: IMessage["reacti
   const fetchReactedUser = async (emojiCode: string) => {
     //もしホバーをやめているなら停止
     if (hoveringEmojiCode() !== emojiCode) return;
-    //指定の絵文字リアクションをしているユーザーを取得中の場合は何もしない
-    statusFetchingEmojiCode[emojiCode] = true;
+    //キャッシュが既にある場合は何もしない
     if (reactedUserArrs[emojiCode]) return;
     //取得、格納
+    statusFetchingEmojiCode[emojiCode] = true;
     GET_MESSAGE_WHO_REACTED(props.messageId, emojiCode)
       .then((res) => {
         reactedUserArrs[emojiCode] = res.data;
