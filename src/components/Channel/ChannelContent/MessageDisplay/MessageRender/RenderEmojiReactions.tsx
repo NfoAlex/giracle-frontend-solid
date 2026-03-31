@@ -66,17 +66,13 @@ export default function RenderEmojiReactions(props: { reaction: IMessage["reacti
     on(
       () => props.reaction.map((r) => r.count).join(","),
       () => {
-        if (props) {
-          //リアクションしたユーザーを初期化
-          for (const emojiCode in reactedUserArrs) {
-            if (reactedUserArrs[emojiCode] !== undefined) {
-              delete reactedUserArrs[emojiCode];
-            }
-          }
-          //もしホバー中なら再取得させる
-          if (hoveringEmojiCode() !== "") {
-            fetchReactedUser(hoveringEmojiCode());
-          }
+        //リアクションしたユーザーを初期化
+        for (const emojiCode of Object.keys(reactedUserArrs)) {
+          delete reactedUserArrs[emojiCode];
+        }
+        //もしホバー中なら再取得させる
+        if (hoveringEmojiCode() !== "") {
+          fetchReactedUser(hoveringEmojiCode());
         }
       }
     )
