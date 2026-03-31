@@ -1,6 +1,6 @@
-import type {IMessage} from "~/types/Message.ts";
-import {createEffect, createSignal, For, on, Show} from "solid-js";
-import {Card} from "~/components/ui/card.tsx";
+import type { IMessage } from "~/types/Message.ts";
+import { createEffect, createSignal, For, on, Show } from "solid-js";
+import { Card } from "~/components/ui/card.tsx";
 import DELETE_MESSAGE_DELETE_EMOJI_REACTION from "~/api/MESSAGE/MESSAGE_DELETE_EMOJI_REACTION.ts";
 import POST_MESSAGE_EMOJI_REACTION from "~/api/MESSAGE/MESSAGE_EMOJI_REACTION.ts";
 import GET_MESSAGE_WHO_REACTED from "~/api/MESSAGE/MESSAGE_WHO_REACTED.ts";
@@ -11,10 +11,10 @@ import DisplayAllReactedUserModal from "./RenderEmojiReactions/DisplayAllReacted
 import { Button } from "~/components/ui/button.tsx";
 import { Badge } from "~/components/ui/badge.tsx";
 
-export default function RenderEmojiReactions(props: {reaction: IMessage["reactionSummary"], messageId: string, channelId: string}) {
+export default function RenderEmojiReactions(props: { reaction: IMessage["reactionSummary"], messageId: string, channelId: string }) {
   //リアクションをしているユーザー取得のためのデータJSONと取得状態用JSON
-  const reactedUserArrs = createMutable<{ [emojiCode:string]: string[] }>({});
-  const statusFetchingEmojiCode = createMutable<{ [emojiCode:string]: boolean }>({});
+  const reactedUserArrs = createMutable<{ [emojiCode: string]: string[] }>({});
+  const statusFetchingEmojiCode = createMutable<{ [emojiCode: string]: boolean }>({});
   //ホバー状態に入っている絵文字コード
   const [hoveringEmojiCode, setHoverEmojiCode] = createSignal<string>("");
 
@@ -86,19 +86,19 @@ export default function RenderEmojiReactions(props: {reaction: IMessage["reactio
     <div class={"py-1 flex items-center flex-wrap gap-1"}>
       <For each={props.reaction}>
         {
-          (r)=> {
+          (r) => {
             return (
               <Card
                 onClick={() => r.includingYou ? deleteReaction(r.emojiCode) : addReaction(r.emojiCode)}
                 onMouseEnter={() => {
                   setHoverEmojiCode(r.emojiCode);
-                  setTimeout(()=>{ if (hoveringEmojiCode()!=="") fetchReactedUser(r.emojiCode); }, 500)
+                  setTimeout(() => { if (hoveringEmojiCode() !== "") fetchReactedUser(r.emojiCode); }, 500)
                 }}
                 onMouseLeave={() => setHoverEmojiCode("")}
                 class={`select-none relative p-1 text-sm flex items-center gap-1 cursor-pointer hover:bg-accent hover:border-background border-accent ${r.includingYou ? "bg-accent border-primary" : ""}`}
               >
                 <RenderEmoji emojiCode={r.emojiCode} />
-                <span>{ r.count }</span>
+                <span>{r.count}</span>
 
                 {/* ホバー表示 */}
                 <Show when={hoveringEmojiCode() === r.emojiCode}>
@@ -111,13 +111,13 @@ export default function RenderEmojiReactions(props: {reaction: IMessage["reactio
                       <span class="shrink-0">
                         <RenderEmoji emojiCode={r.emojiCode} />
                       </span>
-                      <p class="line-clamp-2 overflow-x-auto">{ r.emojiCode }</p>
+                      <p class="line-clamp-2 overflow-x-auto">{r.emojiCode}</p>
                     </span>
                     <hr class="my-1" />
                     <span class="flex flex-wrap gap-1">
                       {
                         reactedUserArrs[r.emojiCode] !== undefined
-                        ?
+                          ?
                           <>
 
                             <For each={reactedUserArrs[r.emojiCode]}>
@@ -137,14 +137,14 @@ export default function RenderEmojiReactions(props: {reaction: IMessage["reactio
                             { //リアクションした人が5人以上いる場合はもっと見るボタンを表示(詳細モーダル表示)
                               reactedUserArrs[r.emojiCode].length >= 5 &&
                               <Button
-                                onClick={()=>setDialogOpen(true)}
+                                onClick={() => setDialogOpen(true)}
                                 class="w-full cursor-pointer"
                                 size={"sm"}
                               >もっと見る</Button>
                             }
 
                           </>
-                        :
+                          :
                           <p>...</p>
                       }
                     </span>
