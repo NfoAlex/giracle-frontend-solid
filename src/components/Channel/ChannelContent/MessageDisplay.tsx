@@ -1,4 +1,4 @@
-import { createEffect, createSignal, on, onCleanup, onMount, Show } from "solid-js";
+import { createEffect, createSignal, on, onCleanup, Show } from "solid-js";
 import { storeHistory } from "~/stores/History.ts";
 import { IMessage } from "~/types/Message.ts";
 import { Badge } from "../../ui/badge.tsx";
@@ -17,11 +17,21 @@ export default function MessageDisplay(props: {
   messageArrayIndex: number,
   message: IMessage,
   displayAvatar: boolean,
+  triggerEdit?: () => boolean,
+  onExitEdit?: () => void,
 }) {
   let messageRef: HTMLDivElement | undefined;
   const [hovered, setHovered] = createSignal(false);
   const [reacting, setReacting] = createSignal(false);
   const [editing, setEditing] = createSignal(false);
+
+  //外部から編集モードをトリガーする
+  createEffect(on(
+    () => props.triggerEdit?.(),
+    (trigger) => {
+      if (trigger) setEditing(true);
+    }
+  ));
 
   //新着線表示用の既読時間取得
   const targetMessageReadTimeBefore = () => {
@@ -118,7 +128,7 @@ export default function MessageDisplay(props: {
                     <EditMessage
                       messageId={props.message.id}
                       content={props.message.content}
-                      onCancelEdit={() => setEditing(false)}
+                      onCancelEdit={() => { setEditing(false); props.onExitEdit?.(); }}
                     />
                     :
                     <MentionReadWrapper messageId={props.message.id}>

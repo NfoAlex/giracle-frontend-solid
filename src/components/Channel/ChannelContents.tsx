@@ -9,6 +9,7 @@ import { IconArrowDown } from "@tabler/icons-solidjs";
 import MessageDisplay from "./ChannelContent/MessageDisplay.tsx";
 import { storeMessageReadTime, updateReadTime } from "~/stores/Readtime.ts";
 import POST_MESSAGE_UPDATE_READTIME from "~/api/MESSAGE/MESSAGE_UPDATE_READTIME.ts";
+import { storeMyUserinfo } from "~/stores/MyUserinfo.ts";
 
 const channelScrollPos: Map<string, number> = new Map();
 
@@ -16,7 +17,7 @@ export default function ChannelContents() {
   const param = useParams();
   const [isFocused, setIsFocused] = createSignal(true);
   const [currentChannelId, setCurrentChannelId] = createSignal<string>(param.channelId ?? "");
-  //const [editingMsgId, setEditingMsgId] = createSignal("");
+  const [editingMsgId, setEditingMsgId] = createSignal("");
   let stateFetchingHistory = false;
   let scrollRafId = 0;
 
@@ -354,24 +355,24 @@ export default function ChannelContents() {
     //console.log("ChannelContents :: toggleWindowFocus : isFocused->", isFocused());
   };
   //上矢印キーハンドラ(編集モードに入るための処理)
-  // const handleKeyUp = (event: KeyboardEvent) => {
-  //   if (event.key === "ArrowUp" && editingMsgId() === "") {
-  //     //履歴要素が取得できないなら停止
-  //     const el = document.getElementById("history");
-  //     if (el === null) return;
-  //     //もしテキストが入力された状態なら停止
-  //     const inputEl = document.getElementById("messageInput") as HTMLInputElement;
-  //     if (inputEl.value !== "") return;
+  const handleKeyArrowUp = (event: KeyboardEvent) => {
+    if (event.key === "ArrowUp" && editingMsgId() === "") {
+      //もしテキストが入力された状態なら停止
+      const inputEl = document.getElementById("messageInput") as HTMLInputElement | null;
+      if (inputEl && inputEl.value !== "") return;
 
-  //     //一番近い自分のメッセージを探して編集モードにする
-  //     for (let i = 0; i < storeHistory[currentChannelId()]?.history.length; i++) {
-  //       if (storeHistory[currentChannelId()]?.history[i].userId === storeMyUserinfo.id) {
-  //         setEditingMsgId(storeHistory[currentChannelId()]?.history[i].id);
-  //         return;
-  //       }
-  //     }
-  //   }
-  // };
+      //一番近い自分のメッセージを探して編集モードにする
+      const history = storeHistory[currentChannelId()]?.history;
+      if (!history) return;
+      for (let i = 0; i < history.length; i++) {
+        if (history[i].userId === storeMyUserinfo.id) {
+          event.preventDefault(); // スクロールを防ぐ
+          setEditingMsgId(history[i].id);
+          return;
+        }
+      }
+    }
+  };
 
   //履歴の更新監視
   createEffect(on(
@@ -440,7 +441,7 @@ export default function ChannelContents() {
 
     window.addEventListener("focus", setWindowFocused);
     window.addEventListener("blur", unSetWindowFocused);
-    //window.addEventListener("keyup", handleKeyUp);
+    window.addEventListener("keydown", handleKeyArrowUp);
   });
 
   onCleanup(() => {
@@ -449,7 +450,7 @@ export default function ChannelContents() {
 
     window.removeEventListener("focus", setWindowFocused);
     window.removeEventListener("blur", unSetWindowFocused);
-    //window.removeEventListener("keyup", handleKeyUp);
+    window.removeEventListener("keydown", handleKeyArrowUp);
   });
 
   return (
@@ -464,6 +465,8 @@ export default function ChannelContents() {
               message={h}
               messageArrayIndex={index()}
               displayAvatar={!sameSenderAsNext(index())}
+              triggerEdit={() => editingMsgId() === h.id}
+              onExitEdit={() => setEditingMsgId("")}
             />
           )}
         </For>
