@@ -2,7 +2,7 @@ import { useParams } from "@solidjs/router";
 import { Show, createEffect, createSignal, onCleanup, onMount, on, For } from "solid-js";
 import { setStoreHistory, storeHistory } from "~/stores/History.ts";
 import FetchHistory from "~/utils/FethchHistory.ts";
-import {IMessage} from "~/types/Message.tsx";
+import { IMessage } from "~/types/Message.tsx";
 import { storeClientConfig } from "~/stores/ClientConfig.ts";
 import { Button } from "../ui/button.tsx";
 import { IconArrowDown } from "@tabler/icons-solidjs";
@@ -23,183 +23,284 @@ export default function ChannelContents() {
   const historyElementId = "history";
   const getHistoryElement = () => document.getElementById(historyElementId) as HTMLElement | null;
 
-  const waitForDomToSettle = async () => {
-    await new Promise((r) => setTimeout(r, 0));
-    await new Promise((r) => requestAnimationFrame(() => r(null)));
-    await new Promise((r) => requestAnimationFrame(() => r(null)));
-  };
+  const JBrowserApis = {
+    /**
+     * 履歴表示上で画面上部に近いかどうか
+     * @param container 履歴表示要素
+     * @param thresholdPx 画面上部からの距離
+     * @returns
+     */
+    isNearVisualTop: (container: HTMLElement, thresholdPx: number) => {
+      // flex-col-reverse 前提: scrollTop=0 が「下（最新側）」、最大が「上（古い側）」
+      const maxScrollTop = container.scrollHeight - container.clientHeight;
+      const distanceToVisualTop = maxScrollTop - Math.abs(container.scrollTop);
+      return distanceToVisualTop <= thresholdPx;
+    },
 
-  //スクロール位置のアンカーを取得する
-  const captureScrollAnchor = (container: HTMLElement): { id: string; offsetTopInContainer: number } | null => {
-    const containerRect = container.getBoundingClientRect();
-    const candidates = container.querySelectorAll<HTMLElement>("[id^='messageId::']");
-    if (candidates.length === 0) return null;
+    /**
+     * 履歴表示上で画面下部に近いかどうか
+     * @param container 履歴表示要素
+     * @param thresholdPx 画面下部からの距離
+     * @returns
+     */
+    isNearVisualBottom: (container: HTMLElement, thresholdPx: number) => {
+      // flex-col-reverse 前提: scrollTop=0 が「下（最新側）」
+      const distanceToVisualBottom = Math.abs(container.scrollTop);
+      return distanceToVisualBottom <= thresholdPx;
+    },
 
-    let bestEl: HTMLElement | null = null;
-    let bestDistance = Number.POSITIVE_INFINITY;
+    /**
+     * DOMが安定するのを待つ
+     * @returns
+     */
+    waitForDomToSettle: async () => {
+      await new Promise((r) => setTimeout(r, 0));
+      await new Promise((r) => requestAnimationFrame(() => r(null)));
+      await new Promise((r) => requestAnimationFrame(() => r(null)));
+    },
 
-    for (const el of candidates) {
-      const rect = el.getBoundingClientRect();
-      const intersects = rect.bottom > containerRect.top && rect.top < containerRect.bottom;
-      if (!intersects) continue;
+    /**
+     * スクロール位置のアンカーを取得する
+     * @param container 履歴表示要素
+     * @returns スクロール位置のアンカー
+     */
+    captureScrollAnchor: (container: HTMLElement): { id: string; offsetTopInContainer: number } | null => {
+      const containerRect = container.getBoundingClientRect();
+      const candidates = container.querySelectorAll<HTMLElement>("[id^='messageId::']");
+      if (candidates.length === 0) return null;
 
-      const distance = Math.abs(rect.top - containerRect.top);
-      if (distance < bestDistance) {
-        bestDistance = distance;
-        bestEl = el;
+      let bestEl: HTMLElement | null = null;
+      let bestDistance = Number.POSITIVE_INFINITY;
+
+      for (const el of candidates) {
+        const rect = el.getBoundingClientRect();
+        const intersects = rect.bottom > containerRect.top && rect.top < containerRect.bottom;
+        if (!intersects) continue;
+
+        const distance = Math.abs(rect.top - containerRect.top);
+        if (distance < bestDistance) {
+          bestDistance = distance;
+          bestEl = el;
+        }
       }
+
+      if (!bestEl) return null;
+      const bestRect = bestEl.getBoundingClientRect();
+      return { id: bestEl.id, offsetTopInContainer: bestRect.top - containerRect.top };
+    },
+
+    /**
+     * スクロール位置をアンカーから復元する
+     * @param container 履歴表示要素
+     * @param anchor スクロール位置のアンカー
+     * @returns
+     */
+    restoreScrollFromAnchor: async (
+      container: HTMLElement,
+      anchor: { id: string; offsetTopInContainer: number } | null,
+    ) => {
+      if (!anchor) return;
+      await JBrowserApis.waitForDomToSettle();
+
+      const anchorEl = document.getElementById(anchor.id) as HTMLElement | null;
+      if (!anchorEl) return;
+
+      const containerRect = container.getBoundingClientRect();
+      const anchorRect = anchorEl.getBoundingClientRect();
+      const newOffset = anchorRect.top - containerRect.top;
+      const delta = newOffset - anchor.offsetTopInContainer;
+      container.scrollTop += delta;
+    },
+
+    /**
+     * スクロールの監視用
+     * @param event
+     */
+    handleScroll: (event: Event) => {
+      //HTMLのものであることをTSに示すため
+      if (!(event.target instanceof HTMLElement)) return;
+      //スクロール位置を保存
+      channelScrollPos.set(currentChannelId(), event.target.scrollTop);
+
+      //console.log("ChannelContents :: handleScroll : event->", event.target.scrollTop, event.target.scrollHeight - event.target.offsetHeight);
+      if (scrollRafId) cancelAnimationFrame(scrollRafId);
+      JGiracleUtils.checkAndUpdateReadTime();
+      scrollRafId = requestAnimationFrame(() => {
+        scrollRafId = 0;
+        JHistoryController.checkScrollPosAndFetchHistory();
+      });
     }
-
-    if (!bestEl) return null;
-    const bestRect = bestEl.getBoundingClientRect();
-    return { id: bestEl.id, offsetTopInContainer: bestRect.top - containerRect.top };
   };
 
-  //スクロール位置をアンカーから復元する
-  const restoreScrollFromAnchor = async (
-    container: HTMLElement,
-    anchor: { id: string; offsetTopInContainer: number } | null,
-  ) => {
-    if (!anchor) return;
-    await waitForDomToSettle();
+  const JGiracleUtils = {
+    //既読時間更新中フラグ
+    statusUpdatingReadTime: false,
 
-    const anchorEl = document.getElementById(anchor.id) as HTMLElement | null;
-    if (!anchorEl) return;
+    /**
+     * 更新条件を確認して既読時間をサーバーに同期する
+     */
+    checkAndUpdateReadTime: async () => {
+      //もし既読時間更新中なら停止
+      if (JGiracleUtils.statusUpdatingReadTime) return;
 
-    const containerRect = container.getBoundingClientRect();
-    const anchorRect = anchorEl.getBoundingClientRect();
-    const newOffset = anchorRect.top - containerRect.top;
-    const delta = newOffset - anchor.offsetTopInContainer;
-    container.scrollTop += delta;
+      //チャンネルの末端に到達していなければ更新しない
+      if (storeHistory[currentChannelId()]?.atEnd === false) return;
+      //フォーカスしているか
+      if (!isFocused()) return;
+      //下にスクロールできているかどうか
+      const el = getHistoryElement();
+      if (!el) return;
+      if (JBrowserApis.isNearVisualBottom(el, 40) === false) return;
+
+      //最新メッセージの時間
+      const latestMessageTime = storeHistory[currentChannelId()]?.history[0]?.createdAt;
+      //現在の既読時間
+      const currentReadTime = storeMessageReadTime.find((mrt) => {
+        return mrt.channelId === currentChannelId();
+      })?.readTime;
+      //console.log("ChannelContents :: checkAndUpdateReadTime : latestMessageTime, currentReadTime->", latestMessageTime, currentReadTime);
+      //更新の条件確認
+      if (latestMessageTime === undefined) return;
+      //現在の既読時間があるなら、最新メッセージ時間と比較して更新の必要があるかどうか調べる
+      if (currentReadTime !== undefined) {
+        if (new Date(currentReadTime).valueOf() >= new Date(latestMessageTime).valueOf()) return;
+      }
+
+      //既読時間更新中フラグを立てる
+      JGiracleUtils.statusUpdatingReadTime = true;
+
+      //Storeでの既読時間を先に更新
+      updateReadTime(currentChannelId(), latestMessageTime);
+      //サーバーに同期
+      await POST_MESSAGE_UPDATE_READTIME(
+        currentChannelId(),
+        latestMessageTime,
+      )
+        .catch((err) => {
+          console.error("ChannelContents :: updateReadTime : err->", err);
+        });
+      JGiracleUtils.statusUpdatingReadTime = false;
+    }
   };
 
-  const isNearVisualTop = (container: HTMLElement, thresholdPx: number) => {
-    // flex-col-reverse 前提: scrollTop=0 が「下（最新側）」、最大が「上（古い側）」
-    const maxScrollTop = container.scrollHeight - container.clientHeight;
-    const distanceToVisualTop = maxScrollTop - Math.abs(container.scrollTop);
-    return distanceToVisualTop <= thresholdPx;
-  };
+  const JHistoryController = {
+    /**
+   * 最新の履歴を取得して、移動する
+   */
+    moveToNewest: async () => {
+      //履歴取得状態を設定
+      stateFetchingHistory = true;
 
-  const isNearVisualBottom = (container: HTMLElement, thresholdPx: number) => {
-    // flex-col-reverse 前提: scrollTop=0 が「下（最新側）」
-    const distanceToVisualBottom = Math.abs(container.scrollTop);
-    return distanceToVisualBottom <= thresholdPx;
-  };
+      //履歴をStoreから削除
+      setStoreHistory((prev) => {
+        const newStore = { ...prev };
+        newStore[currentChannelId()] = {
+          atEnd: false,
+          atTop: false,
+          history: [],
+        };
+        return newStore;
+      });
+      await JBrowserApis.waitForDomToSettle();
+      //取得して格納
+      await FetchHistory(currentChannelId(), { messageTimeFrom: "", fetchLength: 15 }, "older");
 
-  /**
+      //スクロールを一番下に移動
+      const el = getHistoryElement();
+      if (el) {
+        el.scrollTop = 0;
+      }
+      await JBrowserApis.waitForDomToSettle();
+
+      //履歴取得状態解除
+      stateFetchingHistory = false;
+      //履歴取得処理
+      JHistoryController.checkScrollPosAndFetchHistory();
+    },
+
+    /**
+     * 最新の既読時間にあたるメッセージへスクロールする
+     * @returns
+     */
+    scrollToLatestRead: () => new Promise((resolve) => {
+      const targetEl = document.getElementById("NEW_LINE");
+      if (targetEl === null) {
+        resolve(void 0);
+        return;
+      };
+
+      targetEl.scrollIntoView({ block: "center" });
+      resolve(void 0);
+      return;
+    }),
+
+    /**
    * 現在のスクロール位置を確認してから該当する履歴取得をする
    * @param optionalRetry 再試行状態での実行するかどうか。基本的に履歴取得時に最新あるいは最古のメッセージIdが参照できなかったときのリトライに使う。
    */
-  const checkScrollPosAndFetchHistory = async (optionalRetry = false) => {
-    //console.log("_ChannelContents :: checkScrollPosAndFetchHistory : ", { stateFetchingHistory, isFocused: isFocused(), optionalRetry });
-    //履歴の取得処理中、または再試行状態でないなら停止
-    if (stateFetchingHistory && !optionalRetry) return;
+    checkScrollPosAndFetchHistory: async (optionalRetry = false) => {
+      //console.log("_ChannelContents :: checkScrollPosAndFetchHistory : ", { stateFetchingHistory, isFocused: isFocused(), optionalRetry });
+      //履歴の取得処理中、または再試行状態でないなら停止
+      if (stateFetchingHistory && !optionalRetry) return;
 
-    const channelId = currentChannelId();
-    if (!channelId) return;
-    const historyState = { ...storeHistory[channelId] };
-    if (!historyState) return;
+      const channelId = currentChannelId();
+      if (!channelId) return;
+      const historyState = { ...storeHistory[channelId] };
+      if (!historyState) return;
 
-    //console.log("_ChannelContents :: checkScrollPosAndFetchHistory : historyState->", { atTop: historyState.atTop, atEnd: historyState.atEnd, history: historyState.history });
+      //console.log("_ChannelContents :: checkScrollPosAndFetchHistory : historyState->", { atTop: historyState.atTop, atEnd: historyState.atEnd, history: historyState.history });
 
-    const el = getHistoryElement();
-    if (!el) return;
+      const el = getHistoryElement();
+      if (!el) return;
 
-    const thresholdPx = 40;
+      const thresholdPx = 40;
 
-    // 「上（古い側）」に到達 → older を追加取得
-    if (!historyState.atTop && isNearVisualTop(el, thresholdPx)) {
-      stateFetchingHistory = true;
+      // 「上（古い側）」に到達 → older を追加取得
+      if (!historyState.atTop && JBrowserApis.isNearVisualTop(el, thresholdPx)) {
+        stateFetchingHistory = true;
 
-      const anchor = captureScrollAnchor(el);
-      const oldest = historyState?.history?.at(-1);
-      await FetchHistory(
-        channelId,
-        {
-          messageIdFrom: oldest?.id,
-        },
-        "older",
-      );
-      await restoreScrollFromAnchor(el, anchor);
-      await waitForDomToSettle();
-      stateFetchingHistory = false;
-    }
-
-    // 「下（新しい側）」に到達 → newer を追加取得（必要な場合）
-    if (!historyState.atEnd && isNearVisualBottom(el, thresholdPx)) {
-      stateFetchingHistory = true;
-
-      const anchor = captureScrollAnchor(el);
-      const newest = historyState?.history !== undefined ? historyState?.history[0] : undefined;
-      //console.log("_ChannelContents :: checkScrollPosAndFetchHistory : newest", newest);
-      if (newest === undefined) {
+        const anchor = JBrowserApis.captureScrollAnchor(el);
+        const oldest = historyState?.history?.at(-1);
+        await FetchHistory(
+          channelId,
+          {
+            messageIdFrom: oldest?.id,
+          },
+          "older",
+        );
+        await JBrowserApis.restoreScrollFromAnchor(el, anchor);
+        await JBrowserApis.waitForDomToSettle();
         stateFetchingHistory = false;
-        //もし再試行での実行「でない」なら再試行状態で実行、これは遅延を置いた履歴取得トリガーのための措置（未来方向のみ）
-        if (!optionalRetry) setTimeout(() => checkScrollPosAndFetchHistory(true), 0);
-        return;
       }
-      await FetchHistory(
-        channelId,
-        {
-          messageIdFrom: newest.id,
-        },
-        "newer",
-      );
-      await restoreScrollFromAnchor(el, anchor);
-      await waitForDomToSettle();
-      stateFetchingHistory = false;
+
+      // 「下（新しい側）」に到達 → newer を追加取得（必要な場合）
+      if (!historyState.atEnd && JBrowserApis.isNearVisualBottom(el, thresholdPx)) {
+        stateFetchingHistory = true;
+
+        const anchor = JBrowserApis.captureScrollAnchor(el);
+        const newest = historyState?.history !== undefined ? historyState?.history[0] : undefined;
+        //console.log("_ChannelContents :: checkScrollPosAndFetchHistory : newest", newest);
+        if (newest === undefined) {
+          stateFetchingHistory = false;
+          //もし再試行での実行「でない」なら再試行状態で実行、これは遅延を置いた履歴取得トリガーのための措置（未来方向のみ）
+          if (!optionalRetry) setTimeout(() => JHistoryController.checkScrollPosAndFetchHistory(true), 0);
+          return;
+        }
+        await FetchHistory(
+          channelId,
+          {
+            messageIdFrom: newest.id,
+          },
+          "newer",
+        );
+        await JBrowserApis.restoreScrollFromAnchor(el, anchor);
+        await JBrowserApis.waitForDomToSettle();
+        stateFetchingHistory = false;
+      }
+
+      // 既読時間更新確認処理へ
+      await JGiracleUtils.checkAndUpdateReadTime();
     }
-
-    // 既読時間更新確認処理へ
-    await checkAndUpdateReadTime();
-  };
-
-  let statusUpdatingReadTime = false;
-
-  /**
-   * 更新条件を確認して既読時間をサーバーに同期する
-   */
-  const checkAndUpdateReadTime = async () => {
-    //もし既読時間更新中なら停止
-    if (statusUpdatingReadTime) return;
-
-    //チャンネルの末端に到達していなければ更新しない
-    if (storeHistory[currentChannelId()]?.atEnd === false) return;
-    //フォーカスしているか
-    if (!isFocused()) return;
-    //下にスクロールできているかどうか
-    const el = getHistoryElement();
-    if (!el) return;
-    if (isNearVisualBottom(el, 40) === false) return;
-
-    //最新メッセージの時間
-    const latestMessageTime = storeHistory[currentChannelId()]?.history[0]?.createdAt;
-    //現在の既読時間
-    const currentReadTime = storeMessageReadTime.find((mrt) => {
-      return mrt.channelId === currentChannelId();
-    })?.readTime;
-    //console.log("ChannelContents :: checkAndUpdateReadTime : latestMessageTime, currentReadTime->", latestMessageTime, currentReadTime);
-    //更新の条件確認
-    if (latestMessageTime === undefined) return;
-    //現在の既読時間があるなら、最新メッセージ時間と比較して更新の必要があるかどうか調べる
-    if (currentReadTime !== undefined) {
-      if (new Date(currentReadTime).valueOf() >= new Date(latestMessageTime).valueOf()) return;
-    }
-    
-    //既読時間更新中フラグを立てる
-    statusUpdatingReadTime = true;
-    
-    //Storeでの既読時間を先に更新
-    updateReadTime(currentChannelId(), latestMessageTime);
-    //サーバーに同期
-    await POST_MESSAGE_UPDATE_READTIME(
-      currentChannelId(),
-      latestMessageTime,
-    )
-      .catch((err) => {
-        console.error("ChannelContents :: updateReadTime : err->", err);
-      })
-    statusUpdatingReadTime = false;
   };
 
   /**
@@ -223,75 +324,6 @@ export default function ChannelContents() {
       storeHistory[currentChannelId()].history[index + 1].userId;
   };
 
-  /**
-   * 最新の履歴を取得して、移動する
-   */
-  const moveToNewest = async () => {
-    //履歴取得状態を設定
-    stateFetchingHistory = true;
-
-    //履歴をStoreから削除
-    setStoreHistory((prev) => {
-      const newStore = { ...prev };
-      newStore[currentChannelId()] = {
-        atEnd: false,
-        atTop: false,
-        history: [],
-      };
-      return newStore;
-    });
-    await waitForDomToSettle();
-    //取得して格納
-    await FetchHistory(currentChannelId(), { messageTimeFrom: "", fetchLength: 15 }, "older");
-
-    //スクロールを一番下に移動
-    const el = getHistoryElement();
-    if (el) {
-      el.scrollTop = 0;
-    }
-    await waitForDomToSettle();
-
-    //履歴取得状態解除
-    stateFetchingHistory = false;
-    //履歴取得処理
-    checkScrollPosAndFetchHistory();
-  };
-
-  /**
-   * 最新の既読時間にあたるメッセージへスクロールする
-   * @returns
-   */
-  const scrollToLatestRead = () => new Promise((resolve) => {
-    const targetEl = document.getElementById("NEW_LINE");
-    if (targetEl === null) {
-      resolve(void 0);
-      return;
-    };
-
-    targetEl.scrollIntoView({ block: "center" });
-    resolve(void 0);
-    return;
-  });
-
-  /**
-   * スクロールの監視用
-   * @param event
-   */
-  const handleScroll = (event: Event) => {
-    //HTMLのものであることをTSに示すため
-    if (!(event.target instanceof HTMLElement)) return;
-    //スクロール位置を保存
-    channelScrollPos.set(currentChannelId(), event.target.scrollTop);
-
-    //console.log("ChannelContents :: handleScroll : event->", event.target.scrollTop, event.target.scrollHeight - event.target.offsetHeight);
-    if (scrollRafId) cancelAnimationFrame(scrollRafId);
-    checkAndUpdateReadTime();
-    scrollRafId = requestAnimationFrame(() => {
-      scrollRafId = 0;
-      checkScrollPosAndFetchHistory();
-    });
-  };
-
   //ウィンドウのフォーカス状態の切り替え用
   const setWindowFocused = () => {
     //もしフォーカスされていたらスクロール位置を確認して履歴を取得させる
@@ -301,7 +333,7 @@ export default function ChannelContents() {
     setIsFocused(true);
     //console.log("ChannelContents :: toggleWindowFocus : isFocused->", isFocused());
 
-    if (flagWasFocused) checkScrollPosAndFetchHistory();
+    if (flagWasFocused) JHistoryController.checkScrollPosAndFetchHistory();
   };
   const unSetWindowFocused = () => {
     setIsFocused(false);
@@ -333,11 +365,11 @@ export default function ChannelContents() {
     () => {
       //console.log("ChannelContents :: createEffect : 履歴更新された", storeHistory[currentChannelId()]?.history);
       //既読時間を更新
-      checkAndUpdateReadTime();
+      JGiracleUtils.checkAndUpdateReadTime();
 
       //もしチャンネルの先端あるいは末端に到達していないならもう一度調べる
       if (!storeHistory[currentChannelId()]?.atEnd || !storeHistory[currentChannelId()]?.atTop) {
-        checkScrollPosAndFetchHistory();
+        JHistoryController.checkScrollPosAndFetchHistory();
       }
     })
   );
@@ -373,12 +405,12 @@ export default function ChannelContents() {
         const el = getHistoryElement();
         //スクロール位置復元、無いなら最新既読位置へ
         if (channelScrollPos.has(currentChannelId()) && el !== null) {
-          await waitForDomToSettle();
+          await JBrowserApis.waitForDomToSettle();
           el.scrollTop = channelScrollPos.get(currentChannelId()) ?? 0;
         } else {
-          await scrollToLatestRead();
+          await JHistoryController.scrollToLatestRead();
         }
-        checkScrollPosAndFetchHistory();
+        JHistoryController.checkScrollPosAndFetchHistory();
         return;
       }
 
@@ -388,13 +420,13 @@ export default function ChannelContents() {
       const el = getHistoryElement();
       //スクロール位置復元、無いなら最新既読位置へ
       if (channelScrollPos.has(currentChannelId()) && el !== null) {
-        await waitForDomToSettle();
+        await JBrowserApis.waitForDomToSettle();
         el.scrollTop = channelScrollPos.get(currentChannelId()) ?? 0;
       } else {
-        await scrollToLatestRead();
+        await JHistoryController.scrollToLatestRead();
       }
       stateFetchingHistory = false;
-      checkScrollPosAndFetchHistory();
+      JHistoryController.checkScrollPosAndFetchHistory();
     }
   ));
 
@@ -402,7 +434,7 @@ export default function ChannelContents() {
     //fetchHistory();
     const el = document.getElementById("history");
     if (el === null) return;
-    el.addEventListener("scroll", handleScroll);
+    el.addEventListener("scroll", JBrowserApis.handleScroll);
 
     window.addEventListener("focus", setWindowFocused);
     window.addEventListener("blur", unSetWindowFocused);
@@ -411,7 +443,7 @@ export default function ChannelContents() {
 
   onCleanup(() => {
     const el = getHistoryElement();
-    if (el) el.removeEventListener("scroll", handleScroll);
+    if (el) el.removeEventListener("scroll", JBrowserApis.handleScroll);
 
     window.removeEventListener("focus", setWindowFocused);
     window.removeEventListener("blur", unSetWindowFocused);
@@ -443,7 +475,7 @@ export default function ChannelContents() {
         !storeHistory[currentChannelId()]?.atEnd
         &&
         <div class="absolute bottom-10 right-10 z-10">
-          <Button onClick={moveToNewest} class="w-16 h-16"><IconArrowDown style="height:28px; width:28px;" /></Button>
+          <Button onClick={JHistoryController.moveToNewest} class="w-16 h-16"><IconArrowDown style="height:28px; width:28px;" /></Button>
         </div>
       }
     </div>
