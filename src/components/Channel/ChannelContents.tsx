@@ -113,6 +113,20 @@ export default function ChannelContents() {
     },
 
     /**
+     * スクロール位置を保存されたMap値から復元する
+     */
+    restoreScrollFromMap: async () => {
+      const el = getHistoryElement();
+      //スクロール位置復元、無いなら最新既読位置へ
+      if (channelScrollPos.has(currentChannelId()) && el !== null) {
+        await JBrowserApis.waitForDomToSettle();
+        el.scrollTop = channelScrollPos.get(currentChannelId()) ?? 0;
+      } else {
+        await JHistoryController.scrollToLatestRead();
+      }
+    },
+
+    /**
      * スクロールの監視用
      * @param event
      */
@@ -402,14 +416,8 @@ export default function ChannelContents() {
 
       //必要無し :: その場で履歴取得条件確認
       if (!historyNeeded) {
-        const el = getHistoryElement();
         //スクロール位置復元、無いなら最新既読位置へ
-        if (channelScrollPos.has(currentChannelId()) && el !== null) {
-          await JBrowserApis.waitForDomToSettle();
-          el.scrollTop = channelScrollPos.get(currentChannelId()) ?? 0;
-        } else {
-          await JHistoryController.scrollToLatestRead();
-        }
+        JBrowserApis.restoreScrollFromMap();
         JHistoryController.checkScrollPosAndFetchHistory();
         return;
       }
@@ -417,14 +425,8 @@ export default function ChannelContents() {
       //必要あり :: 履歴を取得して格納、その後履歴取得条件確認
       stateFetchingHistory = true;
       await FetchHistory(currentChannelId(), { messageTimeFrom: latestReadTime?.readTime, fetchLength: 3 }, "newer");
-      const el = getHistoryElement();
       //スクロール位置復元、無いなら最新既読位置へ
-      if (channelScrollPos.has(currentChannelId()) && el !== null) {
-        await JBrowserApis.waitForDomToSettle();
-        el.scrollTop = channelScrollPos.get(currentChannelId()) ?? 0;
-      } else {
-        await JHistoryController.scrollToLatestRead();
-      }
+      JBrowserApis.restoreScrollFromMap();
       stateFetchingHistory = false;
       JHistoryController.checkScrollPosAndFetchHistory();
     }
