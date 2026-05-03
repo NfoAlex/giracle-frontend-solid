@@ -1,4 +1,5 @@
 import { createMemo, For, type JSX } from "solid-js";
+import { A } from "@solidjs/router";
 // Dynamic は不要になったので削除
 // onMount も不要になったので削除
 import { directGetterChannelInfo } from "~/stores/ChannelInfo.ts";
@@ -85,11 +86,32 @@ export default function MessageTextRender(props: { content: string }) {
       // マッチ部分をタイプに応じてJSXに変換
       switch (obj.type) {
         case "link":
-          messageRenderingFinal.push(
-            <a href={obj.idOrValue} target="_blank" rel="noopener noreferrer" class="underline whitespace-pre-wrap break-words">
-              {obj.idOrValue}
-            </a>
-          );
+          const frontendUrl = import.meta.env.VITE_FRONTEND_URL || window.location.origin;
+          let isInternalHistoryLink = false;
+          let internalPath = "";
+
+          //フロントのリンクであるならチャンネル内の移動用リンクにする
+          if (obj.idOrValue.startsWith(frontendUrl)) {
+            const path = obj.idOrValue.substring(frontendUrl.length);
+            if (path.startsWith("/app/channel/")) {
+              isInternalHistoryLink = true;
+              internalPath = path;
+            }
+          }
+
+          if (isInternalHistoryLink) {
+            messageRenderingFinal.push(
+              <A href={internalPath} class="underline whitespace-pre-wrap break-words text-blue-500">
+                {obj.idOrValue}
+              </A>
+            );
+          } else {
+            messageRenderingFinal.push(
+              <a href={obj.idOrValue} target="_blank" rel="noopener noreferrer" class="underline whitespace-pre-wrap break-words text-blue-500">
+                {obj.idOrValue}
+              </a>
+            );
+          }
           break;
         case "userId":
           // createMemo 内でリアクティブな値を参照すると、その値の変更時にメモが再計算される

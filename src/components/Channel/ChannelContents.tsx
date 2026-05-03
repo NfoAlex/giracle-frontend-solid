@@ -2,7 +2,7 @@ import { useParams } from "@solidjs/router";
 import { Show, createEffect, createSignal, onCleanup, onMount, on, For } from "solid-js";
 import { setStoreHistory, storeHistory } from "~/stores/History.ts";
 import FetchHistory from "~/utils/FethchHistory.ts";
-import { IMessage } from "~/types/Message.tsx";
+import type { IMessage } from "~/types/Message.tsx";
 import { storeClientConfig } from "~/stores/ClientConfig.ts";
 import { Button } from "../ui/button.tsx";
 import { IconArrowDown } from "@tabler/icons-solidjs";
@@ -390,12 +390,15 @@ export default function ChannelContents() {
   );
 
   createEffect(on(
-    () => param.channelId,
-    async (_, prevChannelId) => {
-      if (param.channelId === undefined) return;
-      setCurrentChannelId(param.channelId);
+    () => [param.channelId, param.messageId],
+    async ([currentChId, currentMsgId], prevArgs) => {
+      const prevChannelId = prevArgs?.[0];
+
+      if (currentChId === undefined) return;
+      setCurrentChannelId(currentChId);
+
       //移動前チャンネルの新着線用比較時間を更新
-      if (prevChannelId !== undefined) {
+      if (prevChannelId !== undefined && prevChannelId !== currentChId) {
         const currentReadTimeForPrevChannel = storeMessageReadTime.find((mrt) => {
           return mrt.channelId === prevChannelId;
         })?.readTime;
@@ -404,6 +407,45 @@ export default function ChannelContents() {
           updateReadTime(prevChannelId, currentReadTimeForPrevChannel);
         }
       }
+
+      // messageIdが指定された場合のジャンプ処理
+      if (currentMsgId !== undefined) {
+        // すでに表示中の履歴に存在するか確認
+        const history = storeHistory[currentChannelId()]?.history;
+        if (history && history.some(m => m.id === currentMsgId)) {
+          await JBrowserApis.waitForDomToSettle();
+          const targetEl = document.getElementById(`messageId::${currentMsgId}`);
+          if (targetEl) {
+            targetEl.scrollIntoView({ behavior: "smooth", block: "center" });
+            targetEl.classList.add("bg-accent", "transition-colors", "duration-1000");
+            setTimeout(() => targetEl.classList.remove("bg-accent", "transition-colors", "duration-1000"), 2000);
+          }
+          return;
+        }
+
+        // 存在しない場合は履歴をリセットして再取得
+        stateFetchingHistory = true;
+        setStoreHistory((prev) => {
+          const newStore = { ...prev };
+          newStore[currentChannelId()] = { atEnd: false, atTop: false, history: [] };
+          return newStore;
+        });
+        await FetchHistory(currentChannelId(), { messageIdFrom: currentMsgId, fetchLength: 20 }, "older");
+        await FetchHistory(currentChannelId(), { messageIdFrom: currentMsgId, fetchLength: 20 }, "newer");
+
+        await JBrowserApis.waitForDomToSettle();
+        const targetEl = document.getElementById(`messageId::${currentMsgId}`);
+        if (targetEl) {
+          targetEl.scrollIntoView({ behavior: "smooth", block: "center" });
+          targetEl.classList.add("bg-accent", "transition-colors", "duration-1000");
+          setTimeout(() => targetEl.classList.remove("bg-accent", "transition-colors", "duration-1000"), 2000);
+        }
+        stateFetchingHistory = false;
+        return;
+      }
+
+      // 通常のチャンネル移動時処理（msgIdがない場合で、channelIdが切り替わった場合）
+      if (currentChId === prevChannelId) return;
 
       //既読時間取得
       const latestReadTime = storeMessageReadTime.find((mrt) => {
