@@ -20,17 +20,17 @@ export default function MessageTextRender(props: { content: string }) {
     // newlinePattern やその他のパターンは textContent の whitespace-pre-wrap で処理するため不要かも
 
     type MatchType = "link" | "userId" | "channel" | "inlineCode";
-    interface MatchObject {
+    interface IMatchObject {
       context: string;
       type: MatchType;
       index: number;
       idOrValue: string; // パース後の値 (URL, ID, コード内容)
     }
 
-    const objectIndex: MatchObject[] = [];
+    const contentObjectIndex: IMatchObject[] = [];
 
-    // マッチを追加するヘルパー関数 (ID抽出も追加)
-    const addMatches = (regex: RegExp, type: MatchType, idExtractor?: (match: RegExpExecArray) => string) => {
+    // 表示コンテンツパターンのマッチを判別、追加するヘルパー関数
+    const findMatches = (regex: RegExp, type: MatchType) => {
       let match;
       // lastIndexをリセットして最初から検索
       regex.lastIndex = 0;
@@ -50,7 +50,7 @@ export default function MessageTextRender(props: { content: string }) {
           default:
             idOrValue = match[0]; // フォールバック
         }
-        objectIndex.push({
+        contentObjectIndex.push({
           context: match[0], // マッチした元の文字列
           type: type,
           index: match.index,
@@ -60,19 +60,19 @@ export default function MessageTextRender(props: { content: string }) {
     };
 
     // パターンを検索
-    addMatches(urlPattern, "link");
-    addMatches(mentionPattern, "userId");
-    addMatches(channelPattern, "channel");
-    addMatches(inlineCodePattern, "inlineCode");
+    findMatches(urlPattern, "link");
+    findMatches(mentionPattern, "userId");
+    findMatches(channelPattern, "channel");
+    findMatches(inlineCodePattern, "inlineCode");
 
     // インデックスでソート
-    objectIndex.sort((a, b) => a.index - b.index);
+    contentObjectIndex.sort((a, b) => a.index - b.index);
 
     const messageRenderingFinal: JSX.Element[] = [];
     let lastIndex = 0;
 
     // テキストとマッチ部分を交互に処理
-    for (const obj of objectIndex) {
+    for (const obj of contentObjectIndex) {
       // マッチまでのテキスト部分を追加
       if (obj.index > lastIndex) {
         const textSegment = props.content.slice(lastIndex, obj.index);
@@ -155,12 +155,12 @@ export default function MessageTextRender(props: { content: string }) {
 
     // 空のコンテンツの場合のフォールバック
     if (messageRenderingFinal.length === 0 && props.content === "") {
-        return []; // or [<span />] など、必要に応じて
+      return []; // or [<span />] など、必要に応じて
     }
 
     // 計算結果（JSX要素の配列）を返す
     return messageRenderingFinal;
-  }); // 依存配列は SolidJS が自動で検出
+  });
 
   // biome-ignore lint/correctness/useJsxKeyInIterable: SolidのForは通常Keyなしで効率的
   return (
