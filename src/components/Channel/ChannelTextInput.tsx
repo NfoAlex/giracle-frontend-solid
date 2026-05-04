@@ -65,22 +65,22 @@ export default function ChannelTextInput() {
    */
   const checkMode = () => {
     //メンションを検索する
-    const matches = [...text().matchAll(/@\S+/g)];
-    //カーソル位置までのメンションを取得
-    const matchesFilter = matches.filter((obj) => cursorPosition >= obj.index);
+    const searchQueryMatches = [...text().matchAll(/@\S+/g)];
+    //カーソル位置までの入力されたメンションクエリーを取得
+    const matchesFilter = searchQueryMatches.filter((obj) => cursorPosition >= obj.index);
 
-    //カーソル位置がメンション条件の範囲中にあるかどうか
-    for (const arr of matchesFilter) {
+    //カーソル位置がメンションクエリー文字の範囲中にあるかどうか
+    for (const query of matchesFilter) {
       //console.log("ChannelTextInput :: checkMode : arr->", arr.index, (arr.index + arr[0].length));
-      if (arr.index <= cursorPosition && cursorPosition <= (arr.index + arr[0].length + 1)) {
+      if (query.index <= cursorPosition && cursorPosition <= (query.index + query[0].length + 1)) {
         setSearchOptions({
           type: "user",
           isEnabled: true,
-          query: arr[0].slice(1),
+          query: query[0].slice(1),
           selectIndex: 0,
         })
         //ユーザーを検索する
-        if (arr[0].length >= 2)
+        if (query[0].length >= 2)
           searchUser(searchOptions().query);
 
         return;
@@ -240,7 +240,7 @@ export default function ChannelTextInput() {
                 //Macなら変換での勝手な送信をブロックする
                 if (/Mac/.test(navigator.userAgent) && e.isComposing) break;
                 if (e.shiftKey) break;
-                
+
                 //設定でCtrlキーを押す必要がある場合
                 if (storeClientConfig.chat.sendWithCtrlKey) {
                   if (!e.ctrlKey) break;
