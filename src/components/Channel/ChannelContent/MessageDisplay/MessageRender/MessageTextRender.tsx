@@ -68,14 +68,16 @@ export default function MessageTextRender(props: { content: string }) {
     // インデックスでソート
     contentObjectIndex.sort((a, b) => a.index - b.index);
 
+    //レンダーするJSX用配列
     const messageRenderingFinal: JSX.Element[] = [];
-    let lastIndex = 0;
+    //処理をした文字位置
+    let lastProcessedIndex = 0;
 
     // テキストとマッチ部分を交互に処理
     for (const obj of contentObjectIndex) {
       // マッチまでのテキスト部分を追加
-      if (obj.index > lastIndex) {
-        const textSegment = props.content.slice(lastIndex, obj.index);
+      if (obj.index > lastProcessedIndex) {
+        const textSegment = props.content.slice(lastProcessedIndex, obj.index);
         // textSegment を改行文字 (\n) で分割し、それぞれを span でラップするか、
         // 単一の span に white-space: pre-wrap を適用する
         messageRenderingFinal.push(
@@ -126,7 +128,6 @@ export default function MessageTextRender(props: { content: string }) {
           );
           break;
         case "channel":
-          // directGetterChannelInfo もリアクティブなソースであれば追跡される
           const channelInfo = directGetterChannelInfo(obj.idOrValue);
           messageRenderingFinal.push(
             <span class="font-medium cursor-pointer hover:underline mx-px">
@@ -142,12 +143,12 @@ export default function MessageTextRender(props: { content: string }) {
           );
           break;
       }
-      lastIndex = obj.index + obj.context.length;
+      lastProcessedIndex = obj.index + obj.context.length;
     }
 
     // 最後のマッチ以降の残りのテキストを追加
-    if (lastIndex < props.content.length) {
-      const remainingText = props.content.slice(lastIndex);
+    if (lastProcessedIndex < props.content.length) {
+      const remainingText = props.content.slice(lastProcessedIndex);
       messageRenderingFinal.push(
         <span class="whitespace-pre-wrap break-words">{remainingText}</span>
       );
