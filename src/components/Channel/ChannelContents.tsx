@@ -389,6 +389,7 @@ export default function ChannelContents() {
     })
   );
 
+  //チャンネル移動監視
   createEffect(on(
     () => [param.channelId, param.messageId],
     async ([currentChId, currentMsgId], prevArgs) => {
@@ -414,6 +415,7 @@ export default function ChannelContents() {
         const history = storeHistory[currentChannelId()]?.history;
         if (history && history.some(m => m.id === currentMsgId)) {
           await JBrowserApis.waitForDomToSettle();
+          //対象メッセージまでジャンプして着色
           const targetEl = document.getElementById(`messageId::${currentMsgId}`);
           if (targetEl) {
             targetEl.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -453,12 +455,12 @@ export default function ChannelContents() {
       });
 
       //履歴を取得する必要があるかどうか確認
-      const historyNeeded = storeHistory[currentChannelId()] === undefined ||
+      const flagHistoryNeeded = storeHistory[currentChannelId()] === undefined ||
         storeHistory[currentChannelId()]?.history === undefined ||
         storeHistory[currentChannelId()]?.history.length === 0;
 
       //必要無し :: その場で履歴取得条件確認
-      if (!historyNeeded) {
+      if (!flagHistoryNeeded) {
         //スクロール位置復元、無いなら最新既読位置へ
         JBrowserApis.restoreScrollFromMap();
         JHistoryController.checkScrollPosAndFetchHistory();
