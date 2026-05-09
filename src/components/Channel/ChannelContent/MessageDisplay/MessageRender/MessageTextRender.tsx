@@ -1,7 +1,5 @@
 import { createMemo, For, type JSX } from "solid-js";
 import { A } from "@solidjs/router";
-// Dynamic は不要になったので削除
-// onMount も不要になったので削除
 import { directGetterChannelInfo } from "~/stores/ChannelInfo.ts";
 import { getterUserinfo } from "~/stores/Userinfo.ts";
 import { storeMyUserinfo } from "~/stores/MyUserinfo.ts";
@@ -17,7 +15,6 @@ export default function MessageTextRender(props: { content: string }) {
     const mentionPattern = /@<([a-f0-9-]+)>/g;
     const channelPattern = /#<([a-f0-9-]+)>/g;
     const inlineCodePattern = /`([^`]+)`/g;
-    // newlinePattern やその他のパターンは textContent の whitespace-pre-wrap で処理するため不要かも
 
     type MatchType = "link" | "userId" | "channel" | "inlineCode";
     interface IMatchObject {
@@ -165,7 +162,7 @@ export default function MessageTextRender(props: { content: string }) {
 
   // biome-ignore lint/correctness/useJsxKeyInIterable: SolidのForは通常Keyなしで効率的
   return (
-    <div class="py-1 w-full"> {/* items-baselineを追加するとBadgeなどの縦位置が揃いやすい */}
+    <div class="py-1 w-full">
       <For each={parsedContent()}>{(el) => el}</For>
     </div>
   );
