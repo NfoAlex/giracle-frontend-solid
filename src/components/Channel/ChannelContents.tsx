@@ -455,9 +455,6 @@ export default function ChannelContents() {
         return;
       }
 
-      // 通常のチャンネル移動時処理（msgIdがない場合で、channelIdが切り替わった場合）
-      if (currentChId === prevChannelId) return;
-
       //既読時間取得
       const latestReadTime = storeMessageReadTime.find((mrt) => {
         return mrt.channelId === currentChannelId();
