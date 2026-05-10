@@ -114,6 +114,7 @@ export default function MessageDisplay(props: {
 
               {/* ホバー判定部分 */}
               <div
+                id={`messageId::${props.message.id}::content`}
                 class={
                   `relative shrink-0 grow-0 rounded-md px-2 ml-auto ${hovered() ? "hover:bg-accent" : ""} ${props.message.content.includes("@<" + storeMyUserinfo.id + ">") && "border-2"}`
                 }

@@ -151,7 +151,7 @@ export default function ChannelContents() {
      * @param messageId そこまでスクロールさせるメッセージのId
      */
     scrollToTargetMessage: (messageId: string) => {
-      const targetEl = document.getElementById(`messageId::${messageId}`);
+      const targetEl = document.getElementById(`messageId::${messageId}::content`);
       if (targetEl) {
         targetEl.scrollIntoView({ behavior: "smooth", block: "center" });
         targetEl.classList.add("bg-accent", "transition-colors", "duration-1000", "rounded");
