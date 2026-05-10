@@ -155,6 +155,8 @@ export default function ChannelContents() {
       if (targetEl) {
         targetEl.scrollIntoView({ behavior: "smooth", block: "center" });
         targetEl.classList.add("bg-accent", "transition-colors", "duration-1000", "rounded");
+        setTimeout(() => targetEl.classList.remove("bg-accent", "transition-colors", "duration-500"), 500);
+        setTimeout(() => targetEl.classList.add("bg-accent", "transition-colors", "duration-500", "rounded"), 1000);
         setTimeout(() => targetEl.classList.remove("bg-accent", "transition-colors", "duration-1000"), 2000);
       }
       return;
