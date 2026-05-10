@@ -398,7 +398,8 @@ export default function ChannelContents() {
       //既読時間を更新
       JGiracleUtils.checkAndUpdateReadTime();
 
-      if (param.channelId !== currentChannelId()) return;
+      //if (param.channelId !== currentChannelId()) return;
+      return;
 
       //もしチャンネルの先端あるいは末端に到達していないならもう一度調べる
       if (!storeHistory[currentChannelId()]?.atEnd || !storeHistory[currentChannelId()]?.atTop) {
