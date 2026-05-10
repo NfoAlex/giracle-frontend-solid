@@ -49,7 +49,7 @@ const TopForMoving = () => {
 }
 
 const storageManager = createLocalStorageManager("vite-ui-theme")
-render(() => 
+render(() =>
   <Router root={
     (props) => {
       const navi = useNavigate();
@@ -88,8 +88,7 @@ render(() =>
       <SwipeToOpenSidebarWrapper>
         <Route path="/" component={lazy(() => import("./routes/index.tsx"))} />
         <Route path="/channel">
-          <Route path="/:channelId" component={Channel} />
-          <Route path="/:channelId/:messageId" component={Channel} />
+          <Route path="/:channelId/:messageId?" component={Channel} />
         </Route>
         <Route path="/online-user" component={lazy(() => import("./routes/online-user.tsx"))} />
         <Route path="/config" component={lazy(() => import("./routes/config.tsx"))} />
