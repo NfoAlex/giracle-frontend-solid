@@ -144,7 +144,21 @@ export default function ChannelContents() {
         scrollRafId = 0;
         JHistoryController.checkScrollPosAndFetchHistory();
       });
-    }
+    },
+
+    /**
+     * Storeにあるメッセージにスクロール、着色させる
+     * @param messageId そこまでスクロールさせるメッセージのId
+     */
+    scrollToTargetMessage: (messageId: string) => {
+      const targetEl = document.getElementById(`messageId::${messageId}`);
+      if (targetEl) {
+        targetEl.scrollIntoView({ behavior: "smooth", block: "center" });
+        targetEl.classList.add("bg-accent", "transition-colors", "duration-1000", "rounded");
+        setTimeout(() => targetEl.classList.remove("bg-accent", "transition-colors", "duration-1000"), 2000);
+      }
+      return;
+    },
   };
 
   const JGiracleUtils = {
@@ -382,6 +396,8 @@ export default function ChannelContents() {
       //既読時間を更新
       JGiracleUtils.checkAndUpdateReadTime();
 
+      if (param.channelId !== currentChannelId()) return;
+
       //もしチャンネルの先端あるいは末端に到達していないならもう一度調べる
       if (!storeHistory[currentChannelId()]?.atEnd || !storeHistory[currentChannelId()]?.atTop) {
         JHistoryController.checkScrollPosAndFetchHistory();
@@ -416,12 +432,7 @@ export default function ChannelContents() {
         if (history && history.some(m => m.id === currentMsgId)) {
           await JBrowserApis.waitForDomToSettle();
           //対象メッセージまでジャンプして着色
-          const targetEl = document.getElementById(`messageId::${currentMsgId}`);
-          if (targetEl) {
-            targetEl.scrollIntoView({ behavior: "smooth", block: "center" });
-            targetEl.classList.add("bg-accent", "transition-colors", "duration-1000");
-            setTimeout(() => targetEl.classList.remove("bg-accent", "transition-colors", "duration-1000"), 2000);
-          }
+          JBrowserApis.scrollToTargetMessage(currentMsgId);
           return;
         }
 
@@ -436,12 +447,7 @@ export default function ChannelContents() {
         await FetchHistory(currentChannelId(), { messageIdFrom: currentMsgId, fetchLength: 20 }, "newer");
 
         await JBrowserApis.waitForDomToSettle();
-        const targetEl = document.getElementById(`messageId::${currentMsgId}`);
-        if (targetEl) {
-          targetEl.scrollIntoView({ behavior: "smooth", block: "center" });
-          targetEl.classList.add("bg-accent", "transition-colors", "duration-1000");
-          setTimeout(() => targetEl.classList.remove("bg-accent", "transition-colors", "duration-1000"), 2000);
-        }
+        JBrowserApis.scrollToTargetMessage(currentMsgId);
         stateFetchingHistory = false;
         return;
       }
