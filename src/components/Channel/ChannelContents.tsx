@@ -455,31 +455,33 @@ export default function ChannelContents() {
         return;
       }
 
-      //既読時間取得
-      const latestReadTime = storeMessageReadTime.find((mrt) => {
-        return mrt.channelId === currentChannelId();
-      });
+      { //履歴の取得処理
+        //履歴を取得する必要があるかどうかフラグ
+        const flagHistoryNeeded = storeHistory[currentChannelId()] === undefined ||
+          storeHistory[currentChannelId()]?.history === undefined ||
+          storeHistory[currentChannelId()]?.history.length === 0;
 
-      //履歴を取得する必要があるかどうか確認
-      const flagHistoryNeeded = storeHistory[currentChannelId()] === undefined ||
-        storeHistory[currentChannelId()]?.history === undefined ||
-        storeHistory[currentChannelId()]?.history.length === 0;
+        //必要無し :: その場で履歴取得条件確認
+        if (!flagHistoryNeeded) {
+          //スクロール位置復元、無いなら最新既読位置へ
+          JBrowserApis.restoreScrollFromMap();
+          JHistoryController.checkScrollPosAndFetchHistory();
+          return;
+        }
 
-      //必要無し :: その場で履歴取得条件確認
-      if (!flagHistoryNeeded) {
+        //必要あり :: 履歴を取得して格納、その後履歴取得条件確認
+        //既読時間取得
+        const latestReadTime = storeMessageReadTime.find((mrt) => {
+          return mrt.channelId === currentChannelId();
+        });
+
+        stateFetchingHistory = true;
+        await FetchHistory(currentChannelId(), { messageTimeFrom: latestReadTime?.readTime, fetchLength: 3 }, "newer");
         //スクロール位置復元、無いなら最新既読位置へ
         JBrowserApis.restoreScrollFromMap();
+        stateFetchingHistory = false;
         JHistoryController.checkScrollPosAndFetchHistory();
-        return;
       }
-
-      //必要あり :: 履歴を取得して格納、その後履歴取得条件確認
-      stateFetchingHistory = true;
-      await FetchHistory(currentChannelId(), { messageTimeFrom: latestReadTime?.readTime, fetchLength: 3 }, "newer");
-      //スクロール位置復元、無いなら最新既読位置へ
-      JBrowserApis.restoreScrollFromMap();
-      stateFetchingHistory = false;
-      JHistoryController.checkScrollPosAndFetchHistory();
     }
   ));
 
