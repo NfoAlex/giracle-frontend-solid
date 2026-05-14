@@ -97,6 +97,28 @@ export default function ChannelContents() {
 
   };
 
+  interface IExecutorOptionInput {
+    readTime: Parameters<typeof FnHistoryControllers.fetchHistory>
+  };
+  type TExecutorQueueItem = {
+    [K in keyof IExecutorOptionInput]: {
+      action: K;
+      option?: IExecutorOptionInput[K];
+    };
+  }[keyof IExecutorOptionInput];
+
+  const FnExecutor = {
+    execute: async (queue: TExecutorQueueItem[]) => {
+      for (const q of queue) {
+        switch (q.action) {
+          case "readTime":
+            await FnGiracleServices.tryUpdateReadTime();
+            break;
+        };
+      }
+    }
+  };
+
   /**
    * 一つ次のメッセージ(新しい方が)が同じ送信者であるかどうか
    * @param index
