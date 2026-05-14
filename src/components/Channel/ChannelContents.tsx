@@ -17,7 +17,7 @@ const channelScrollPos: Map<string, number> = new Map();
 
 export default function ChannelContents() {
   const param = useParams();
-  const [isFocused, setIsFocused] = createSignal(true);
+  const [isWindowFocused, setIsWindowFocused] = createSignal(true);
   const [currentChannelId, setCurrentChannelId] = createSignal<string>(param.channelId ?? "");
   const [editingMsgId, setEditingMsgId] = createSignal("");
   let stateFetchingHistory = false;
@@ -86,24 +86,14 @@ export default function ChannelContents() {
       storeHistory[currentChannelId()].history[index + 1].userId;
   };
 
-  const windowFocusController = {
-    setTrue: () => {
-      //もしフォーカスされていたらスクロール位置を確認して履歴を取得させる
-      let flagWasFocused = false;
-      if (!isFocused()) flagWasFocused = true;
-
-      setIsFocused(true);
-      //console.log("ChannelContents :: toggleWindowFocus : isFocused->", isFocused());
-
-      //if (flagWasFocused) JHistoryController.checkScrollPosAndFetchHistory();
-    },
-    setFalse: () => {
-      setIsFocused(false);
-      //console.log("ChannelContents :: toggleWindowFocus : isFocused->", isFocused());
-    }
-  };
-  //上矢印キーハンドラ(編集モードに入るための処理)
-  const handleKeyArrowUp = (event: KeyboardEvent) => {
+  /**
+   * ブラウザでの入力系のEventListener用関数群
+   */
+  const BrowserEventHandlers = {
+    /**
+     * 上矢印キーリスナー。編集モードショートカット
+     */
+    KeyArrowUp: (event: KeyboardEvent) => {
     if (event.key === "ArrowUp" && editingMsgId() === "") {
       //もしテキストが入力された状態なら停止
       const inputEl = document.getElementById("messageInput") as HTMLInputElement | null;
@@ -118,6 +108,31 @@ export default function ChannelContents() {
           setEditingMsgId(history[i].id);
           return;
         }
+        }
+      }
+    },
+
+    Scroll: (event: Event) => {
+      //TODo :: 履歴取得からの既読チェック
+    },
+
+    /**
+     * Windowのフォーカス操作
+     */
+    windowFocusFns: {
+      setTrue: () => {
+        //もしフォーカスされていたらスクロール位置を確認して履歴を取得させる
+        let flagWasFocused = false;
+        if (!isWindowFocused()) flagWasFocused = true;
+
+        setIsWindowFocused(true);
+        //console.log("ChannelContents :: toggleWindowFocus : isFocused->", isFocused());
+
+        //if (flagWasFocused) JHistoryController.checkScrollPosAndFetchHistory();
+      },
+      setFalse: () => {
+        setIsWindowFocused(false);
+        //console.log("ChannelContents :: toggleWindowFocus : isFocused->", isFocused());
       }
     }
   };
@@ -136,18 +151,18 @@ export default function ChannelContents() {
     if (el === null) return;
     //el.addEventListener("scroll", JBrowserApis.handleScroll);
 
-    window.addEventListener("focus", windowFocusController.setTrue);
-    window.addEventListener("blur", windowFocusController.setFalse);
-    window.addEventListener("keydown", handleKeyArrowUp);
+    window.addEventListener("focus", BrowserEventHandlers.windowFocusFns.setTrue);
+    window.addEventListener("blur", BrowserEventHandlers.windowFocusFns.setFalse);
+    window.addEventListener("keydown", BrowserEventHandlers.KeyArrowUp);
   });
 
   onCleanup(() => {
     const el = getHistoryElement();
     //if (el) el.removeEventListener("scroll", JBrowserApis.handleScroll);
 
-    window.removeEventListener("focus", windowFocusController.setTrue);
-    window.removeEventListener("blur", windowFocusController.setFalse);
-    window.removeEventListener("keydown", handleKeyArrowUp);
+    window.removeEventListener("focus", BrowserEventHandlers.windowFocusFns.setTrue);
+    window.removeEventListener("blur", BrowserEventHandlers.windowFocusFns.setFalse);
+    window.removeEventListener("keydown", BrowserEventHandlers.KeyArrowUp);
   });
 
   return (
