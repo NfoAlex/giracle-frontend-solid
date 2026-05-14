@@ -64,6 +64,39 @@ export default function ChannelContents() {
 
   };
 
+  const FnGiracleServices = {
+
+    /**
+     * 既読時間を更新する
+     */
+    tryUpdateReadTime: async () => {
+      if (storeHistory[currentChannelId()]?.atEnd === false) return;
+      if (!isWindowFocused()) return;
+
+      //既読時間Storeの時間と最新メッセージの時間を比較
+      const latestMessageTime = storeHistory[currentChannelId()]?.history[0]?.createdAt;
+      if (latestMessageTime === undefined) return;
+      const currentReadTime = storeMessageReadTime.find((readTimeJson) => {
+        return readTimeJson.channelId === currentChannelId();
+      })?.readTime;
+      if (currentReadTime === undefined) return;
+      if (new Date(currentReadTime).valueOf() >= new Date(latestMessageTime).valueOf()) return;
+
+      //サーバーに同期してStore更新
+      await POST_MESSAGE_UPDATE_READTIME(
+        currentChannelId(),
+        latestMessageTime,
+      )
+        .then(() => {
+          updateReadTime(currentChannelId(), latestMessageTime);
+        })
+        .catch((err) => {
+          console.error("ChannelContents :: FnGiracleServices.tryUpdateReadTime : err->", err);
+        });
+    },
+
+  };
+
   /**
    * 一つ次のメッセージ(新しい方が)が同じ送信者であるかどうか
    * @param index
@@ -94,20 +127,20 @@ export default function ChannelContents() {
      * 上矢印キーリスナー。編集モードショートカット
      */
     KeyArrowUp: (event: KeyboardEvent) => {
-    if (event.key === "ArrowUp" && editingMsgId() === "") {
-      //もしテキストが入力された状態なら停止
-      const inputEl = document.getElementById("messageInput") as HTMLInputElement | null;
-      if (inputEl && inputEl.value !== "") return;
+      if (event.key === "ArrowUp" && editingMsgId() === "") {
+        //もしテキストが入力された状態なら停止
+        const inputEl = document.getElementById("messageInput") as HTMLInputElement | null;
+        if (inputEl && inputEl.value !== "") return;
 
-      //一番近い自分のメッセージを探して編集モードにする
-      const history = storeHistory[currentChannelId()]?.history;
-      if (!history) return;
-      for (let i = 0; i < history.length; i++) {
-        if (history[i].userId === storeMyUserinfo.id) {
-          event.preventDefault(); // スクロールを防ぐ
-          setEditingMsgId(history[i].id);
-          return;
-        }
+        //一番近い自分のメッセージを探して編集モードにする
+        const history = storeHistory[currentChannelId()]?.history;
+        if (!history) return;
+        for (let i = 0; i < history.length; i++) {
+          if (history[i].userId === storeMyUserinfo.id) {
+            event.preventDefault(); // スクロールを防ぐ
+            setEditingMsgId(history[i].id);
+            return;
+          }
         }
       }
     },
