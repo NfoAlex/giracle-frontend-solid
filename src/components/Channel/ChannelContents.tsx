@@ -269,7 +269,7 @@ export default function ChannelContents() {
       }
     },
 
-    checkConditionToFecthHistory: async (flagRetry = false) => {
+    checkConditionToFecthHistory: async () => {
       //if (FnExecutor.stateFetchingHistory) return;
 
       const currentChannelIdNow = currentChannelId();
@@ -308,12 +308,6 @@ export default function ChannelContents() {
           { action: "waitToDraw" },
           { action: "tryUpdateReadTime" }
         ]);
-      }
-
-      //取得処理を一通り終えた後にまだ条件が動くなら再実行
-      if (!flagRetry && (checkCanFetchForOlder() || checkCanFetchForNewer())) {
-        console.log("ChannelContent :: FnExecutor.checkConditionToFetchHistory : 再実行します", checkCanFetchForOlder(), checkCanFetchForNewer());
-        FnExecutor.checkConditionToFecthHistory(true);
       }
     },
 
@@ -410,6 +404,17 @@ export default function ChannelContents() {
       }
     }
   };
+
+  //履歴の最新部分更新監視
+  createEffect(on(
+    () => `${storeHistory[currentChannelId()]?.history.at(-1)?.id}`,
+    () => {
+      FnExecutor.execute([
+        { action: "tryUpdateReadTime" }
+      ]);
+      FnExecutor.checkConditionToFecthHistory();
+    })
+  );
 
   //チャンネル移動監視
   createEffect(on(
