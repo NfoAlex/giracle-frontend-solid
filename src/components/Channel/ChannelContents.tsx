@@ -294,8 +294,8 @@ export default function ChannelContents() {
         await FnExecutor.execute([
           { action: "captureScrollAnchor" },
           { action: "fetchHistory", option: [currentChannelIdNow, { messageIdFrom: oldest?.id }, "older"] },
-          { action: "waitToDraw" },
           { action: "restoreFromAnchor" },
+          { action: "waitToDraw" },
           { action: "waitToDraw" },
           { action: "tryUpdateReadTime" }
         ]);
@@ -306,8 +306,8 @@ export default function ChannelContents() {
         await FnExecutor.execute([
           { action: "captureScrollAnchor" },
           { action: "fetchHistory", option: [currentChannelIdNow, { messageIdFrom: newest?.id }, "newer"] },
-          { action: "waitToDraw" },
           { action: "restoreFromAnchor" },
+          { action: "waitToDraw" },
           { action: "waitToDraw" },
           { action: "tryUpdateReadTime" }
         ]);
