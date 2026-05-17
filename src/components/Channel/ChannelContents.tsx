@@ -22,6 +22,7 @@ export default function ChannelContents() {
   let scrollRafId = 0;
 
   const historyElementId = "history";
+  let globalStateFetchingHistory = false;
 
   const FnBrowserApis = {
 
@@ -137,6 +138,9 @@ export default function ChannelContents() {
       },
       _direction: "older" | "newer" = "older",
     ) => {
+      if (globalStateFetchingHistory) return;
+      globalStateFetchingHistory = true;
+
       await POST_CHANNEL_GET_HISTORY(
         _channelId,
         _dat.messageIdFrom,
@@ -145,7 +149,7 @@ export default function ChannelContents() {
         _direction,
       )
         .then((r) => {
-          console.log("ChannelContent :: FnHistoryController.fetchHistory : r->", r);
+          //console.log("ChannelContent :: FnHistoryController.fetchHistory : r->", r);
           //if (r.data.history.length === 0) { console.log("ChannelContent :: fetchHistory : 履歴がありません"); return; }
           updateHistoryPosition(_channelId, {
             atEnd: r.data.atEnd,
@@ -156,7 +160,10 @@ export default function ChannelContents() {
         })
         .catch((e) =>
           console.error("ChannelContent :: FnHistoryControllers.fetchHistory : エラー->", _dat, e),
-        );
+        )
+        .finally(() => {
+          globalStateFetchingHistory = false;
+        });
     },
 
   };
@@ -229,7 +236,7 @@ export default function ChannelContents() {
       //let flagFetchingHistory = false;
 
       for (const q of queue) {
-        if (FnExecutor.stateFetchingHistory) break;
+        //if (FnExecutor.stateFetchingHistory) break;
         switch (q.action) {
           case "tryUpdateReadTime":
             await FnGiracleServices.tryUpdateReadTime();
@@ -270,7 +277,7 @@ export default function ChannelContents() {
     },
 
     checkConditionToFecthHistory: async () => {
-      //if (FnExecutor.stateFetchingHistory) return;
+      if (globalStateFetchingHistory) return;
 
       const currentChannelIdNow = currentChannelId();
 
@@ -282,17 +289,18 @@ export default function ChannelContents() {
       const historyState = { ...storeHistory[currentChannelIdNow] };
       if (!historyState) return;
 
-      console.log("ChannelContent :: checkConditionToFetchHistory : トリガー");
+      //console.log("ChannelContent :: checkConditionToFetchHistory : トリガー");
 
       let checkCanFetchForOlder = () => !isHistoryAtTop && containerAtTop;
       let checkCanFetchForNewer = () => !isHistoryAtEnd && containerAtBottom;
 
       if (checkCanFetchForOlder()) {
         const oldest = historyState?.history?.at(-1);
-        console.log("ChannelContent :: FnExecutor.checkConditionToFetchHistory : ForOlderでのoldest", { action: "fetchHistory", option: [currentChannelIdNow, { messageIdFrom: oldest?.id, fetchLength: 20 }, "older"] });
+        console.log("ChannelContent :: FnExecutor.checkConditionToFetchHistory : 古い方向に取得🔷", { isHistoryAtEnd, isHistoryAtTop, containerAtTop, containerAtBottom });
         await FnExecutor.execute([
           { action: "captureScrollAnchor" },
-          { action: "fetchHistory", option: [currentChannelIdNow, { messageIdFrom: oldest?.id, fetchLength: 20 }, "older"] },
+          { action: "fetchHistory", option: [currentChannelIdNow, { messageIdFrom: oldest?.id }, "older"] },
+          { action: "waitToDraw" },
           { action: "restoreFromAnchor" },
           { action: "waitToDraw" },
           { action: "tryUpdateReadTime" }
@@ -300,10 +308,11 @@ export default function ChannelContents() {
       }
       if (checkCanFetchForNewer()) {
         const newest = historyState?.history !== undefined ? historyState?.history[0] : undefined;
-        console.log("ChannelContent :: FnExecutor.checkConditionToFetchHistory : ForNewrでのnewest", newest);
+        console.log("ChannelContent :: FnExecutor.checkConditionToFetchHistory : 新しい方向に取得🔶", { isHistoryAtEnd, isHistoryAtTop, containerAtTop, containerAtBottom });
         await FnExecutor.execute([
           { action: "captureScrollAnchor" },
-          { action: "fetchHistory", option: [currentChannelIdNow, { messageIdFrom: newest?.id, fetchLength: 20 }, "newer"] },
+          { action: "fetchHistory", option: [currentChannelIdNow, { messageIdFrom: newest?.id }, "newer"] },
+          { action: "waitToDraw" },
           { action: "restoreFromAnchor" },
           { action: "waitToDraw" },
           { action: "tryUpdateReadTime" }
@@ -382,7 +391,11 @@ export default function ChannelContents() {
       }
     },
 
-    Scroll: (event: Event) => FnExecutor.checkConditionToFecthHistory(),
+    ScrollFns: {
+      handler :(event: Event) => {
+        FnExecutor.checkConditionToFecthHistory();
+      },
+    },
 
     /**
      * Windowのフォーカス操作
@@ -408,11 +421,12 @@ export default function ChannelContents() {
   //履歴の最新部分更新監視
   createEffect(on(
     () => `${storeHistory[currentChannelId()]?.history.at(-1)?.id}`,
-    () => {
-      FnExecutor.execute([
-        { action: "tryUpdateReadTime" }
+    async () => {
+      await FnExecutor.execute([
+        { action: "tryUpdateReadTime" },
+        { action: "waitToDraw" }
       ]);
-      FnExecutor.checkConditionToFecthHistory();
+      //FnExecutor.checkConditionToFecthHistory();
     })
   );
 
@@ -449,7 +463,7 @@ export default function ChannelContents() {
     //fetchHistory();
     const el = FnBrowserApis.getHistoryElement();
     if (el === null) return;
-    el.addEventListener("scroll", BrowserEventHandlers.Scroll);
+    el.addEventListener("scroll", BrowserEventHandlers.ScrollFns.handler);
 
     window.addEventListener("focus", BrowserEventHandlers.windowFocusFns.setTrue);
     window.addEventListener("blur", BrowserEventHandlers.windowFocusFns.setFalse);
@@ -458,7 +472,7 @@ export default function ChannelContents() {
 
   onCleanup(() => {
     const el = FnBrowserApis.getHistoryElement();
-    if (el) el.removeEventListener("scroll", BrowserEventHandlers.Scroll);
+    if (el) el.removeEventListener("scroll", BrowserEventHandlers.ScrollFns.handler);
 
     window.removeEventListener("focus", BrowserEventHandlers.windowFocusFns.setTrue);
     window.removeEventListener("blur", BrowserEventHandlers.windowFocusFns.setFalse);
