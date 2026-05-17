@@ -19,7 +19,6 @@ export default function ChannelContents() {
   const [isWindowFocused, setIsWindowFocused] = createSignal(true);
   const [currentChannelId, setCurrentChannelId] = createSignal<string>(param.channelId ?? "");
   const [editingMsgId, setEditingMsgId] = createSignal("");
-  let scrollRafId = 0;
 
   const historyElementId = "history";
   let globalStateFetchingHistory = false;
@@ -216,7 +215,6 @@ export default function ChannelContents() {
   }[keyof IExecutorOptionInput];
 
   const FnExecutor = {
-    stateFetchingHistory: false,
 
     execute: async (queue: TExecutorQueueItem[]) => {
       //コンテナ上のスクロール制御用
@@ -233,10 +231,8 @@ export default function ChannelContents() {
           offsetTopInContainer: 0,
         }
       };
-      //let flagFetchingHistory = false;
 
       for (const q of queue) {
-        //if (FnExecutor.stateFetchingHistory) break;
         switch (q.action) {
           case "tryUpdateReadTime":
             await FnGiracleServices.tryUpdateReadTime();
@@ -247,13 +243,11 @@ export default function ChannelContents() {
               console.error("ChannelContent :: FnExecutor(fetchHistory) : エラー[optionが関数にあっていません]", q);
               break;
             };
-            FnExecutor.stateFetchingHistory = true;
             await FnHistoryControllers.fetchHistory(
               q.option[0], //channelId
               q.option[1], //dat
               q.option[2], //direction
             );
-            FnExecutor.stateFetchingHistory = false;
             break;
 
           case "captureScrollAnchor":
@@ -426,7 +420,6 @@ export default function ChannelContents() {
         { action: "tryUpdateReadTime" },
         { action: "waitToDraw" }
       ]);
-      //FnExecutor.checkConditionToFecthHistory();
     })
   );
 
@@ -439,8 +432,8 @@ export default function ChannelContents() {
 
       setCurrentChannelId(currentChId);
 
-      const isHistoryAtEnd = storeHistory[currentChannelId()]?.atEnd;
-      const isHistoryAtTop = storeHistory[currentChannelId()]?.atTop;
+      //const isHistoryAtEnd = storeHistory[currentChannelId()]?.atEnd;
+      //const isHistoryAtTop = storeHistory[currentChannelId()]?.atTop;
 
       const readTime = storeMessageReadTime.find((readTimeObj) => {
         return readTimeObj.channelId === currentChId;
