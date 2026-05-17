@@ -1,7 +1,6 @@
 import { useParams } from "@solidjs/router";
 import { Show, createEffect, createSignal, onCleanup, onMount, on, For } from "solid-js";
 import { insertHistory, setStoreHistory, setStoreImageDimensions, storeHistory, updateHistoryPosition } from "~/stores/History.ts";
-import FetchHistory from "~/utils/FethchHistory.ts";
 import type { IMessage } from "~/types/Message.tsx";
 import { storeClientConfig } from "~/stores/ClientConfig.ts";
 import { Button } from "../ui/button.tsx";
@@ -20,11 +19,109 @@ export default function ChannelContents() {
   const [isWindowFocused, setIsWindowFocused] = createSignal(true);
   const [currentChannelId, setCurrentChannelId] = createSignal<string>(param.channelId ?? "");
   const [editingMsgId, setEditingMsgId] = createSignal("");
-  let stateFetchingHistory = false;
   let scrollRafId = 0;
 
   const historyElementId = "history";
-  const getHistoryElement = () => document.getElementById(historyElementId) as HTMLElement | null;
+
+  const FnBrowserApis = {
+
+    getHistoryElement: () => {
+      const container = document.getElementById(historyElementId) as HTMLElement | null;
+      if (!container) return null;
+
+      return container;
+    },
+
+    /**
+     * 履歴表示上で画面上部に近いかどうか
+     * @param container 履歴表示要素
+     * @param thresholdPx 画面上部からの距離
+     * @returns
+     */
+    isScrolledToNearTop: (thresholdPx: number = 40) => {
+      const container = FnBrowserApis.getHistoryElement();
+      if (!container) return null;
+
+      // flex-col-reverse 前提: scrollTop=0 が「下（最新側）」、最大が「上（古い側）」
+      const maxScrollTop = container.scrollHeight - container.clientHeight;
+      const distanceToVisualTop = maxScrollTop - Math.abs(container.scrollTop);
+      return distanceToVisualTop <= thresholdPx;
+    },
+
+    /**
+     * 履歴表示上で画面下部に近いかどうか
+     * @param container 履歴表示要素
+     * @param thresholdPx 画面下部からの距離
+     * @returns
+     */
+    isScrolledToVisualBottom: (thresholdPx: number = 40) => {
+      const container = FnBrowserApis.getHistoryElement();
+      if (!container) return null;
+
+      // flex-col-reverse 前提: scrollTop=0 が「下（最新側）」
+      const distanceToVisualBottom = Math.abs(container.scrollTop);
+      return distanceToVisualBottom <= thresholdPx;
+    },
+
+    waitForDomToSettle: async () => {
+      await new Promise((r) => setTimeout(r, 0));
+      await new Promise((r) => requestAnimationFrame(() => r(null)));
+      await new Promise((r) => requestAnimationFrame(() => r(null)));
+    },
+
+    /**
+     * 履歴スクロール前のメッセージIdと移動量をアンカーとして書き出す
+     */
+    captureScrollAnchor: (): { id: string; offsetTopInContainer: number } | null => {
+      const container = FnBrowserApis.getHistoryElement();
+      if (!container) return null;
+
+      const containerRect = container.getBoundingClientRect();
+      const candidates = container.querySelectorAll<HTMLElement>("[id^='messageId::']");
+      if (candidates.length === 0) return null;
+
+      let bestMessageEl: HTMLElement | null = null;
+      let bestDistance = Number.POSITIVE_INFINITY;
+
+      for (const el of candidates) {
+        const rect = el.getBoundingClientRect();
+        const intersects = rect.bottom > containerRect.top && rect.top < containerRect.bottom;
+        if (!intersects) continue;
+
+        const distance = Math.abs(rect.top - containerRect.top);
+        if (distance < bestDistance) {
+          bestDistance = distance;
+          bestMessageEl = el;
+        }
+      }
+
+      if (!bestMessageEl) return null;
+      const bestRect = bestMessageEl.getBoundingClientRect();
+      return { id: bestMessageEl.id, offsetTopInContainer: bestRect.top - containerRect.top };
+    },
+
+    /**
+     * 履歴表示コンテナ上のスクロール位置を指定メッセージIdと移動量をもとにスクロールさせる
+     */
+    restoreScrollFromAnchor: async (
+      anchor: { id: string; offsetTopInContainer: number } | null,
+    ) => {
+      if (!anchor) return;
+      //await FnBrowserApis.waitForDomToSettle();
+
+      const container = FnBrowserApis.getHistoryElement();
+      if (!container) return;
+      const anchorEl = document.getElementById(anchor.id) as HTMLElement | null;
+      if (!anchorEl) return;
+
+      const containerRect = container.getBoundingClientRect();
+      const anchorRect = anchorEl.getBoundingClientRect();
+      const newOffset = anchorRect.top - containerRect.top;
+      const delta = newOffset - anchor.offsetTopInContainer;
+      container.scrollTop += delta;
+    },
+
+  }
 
   const FnHistoryControllers = {
 
@@ -48,7 +145,7 @@ export default function ChannelContents() {
         _direction,
       )
         .then((r) => {
-          //console.log("ChannelContent :: fetchHistory : r->", r);
+          console.log("ChannelContent :: FnHistoryController.fetchHistory : r->", r);
           //if (r.data.history.length === 0) { console.log("ChannelContent :: fetchHistory : 履歴がありません"); return; }
           updateHistoryPosition(_channelId, {
             atEnd: r.data.atEnd,
@@ -58,7 +155,7 @@ export default function ChannelContents() {
           insertHistory(r.data.history);
         })
         .catch((e) =>
-          console.error("ChannelContent :: FnHistoryControllers.fetchHistory : エラー->", e),
+          console.error("ChannelContent :: FnHistoryControllers.fetchHistory : エラー->", _dat, e),
         );
     },
 
@@ -98,7 +195,11 @@ export default function ChannelContents() {
   };
 
   interface IExecutorOptionInput {
-    readTime: Parameters<typeof FnHistoryControllers.fetchHistory>
+    tryUpdateReadTime: Parameters<typeof FnGiracleServices.tryUpdateReadTime>,
+    fetchHistory: Parameters<typeof FnHistoryControllers.fetchHistory>,
+    captureScrollAnchor: [],
+    restoreFromAnchor: Parameters<typeof FnBrowserApis.restoreScrollFromAnchor>,
+    waitToDraw: []
   };
   type TExecutorQueueItem = {
     [K in keyof IExecutorOptionInput]: {
@@ -108,15 +209,135 @@ export default function ChannelContents() {
   }[keyof IExecutorOptionInput];
 
   const FnExecutor = {
+    stateFetchingHistory: false,
+
     execute: async (queue: TExecutorQueueItem[]) => {
+      //コンテナ上のスクロール制御用
+      const stateAnchor: {
+        isRegistered: boolean;
+        data: {
+          id: string;
+          offsetTopInContainer: number;
+        } | null
+      } = {
+        isRegistered: false,
+        data: {
+          id: "",
+          offsetTopInContainer: 0,
+        }
+      };
+      //let flagFetchingHistory = false;
+
       for (const q of queue) {
+        if (FnExecutor.stateFetchingHistory) break;
         switch (q.action) {
-          case "readTime":
+          case "tryUpdateReadTime":
             await FnGiracleServices.tryUpdateReadTime();
+            break;
+
+          case "fetchHistory":
+            if (q.option === undefined) {
+              console.error("ChannelContent :: FnExecutor(fetchHistory) : エラー[optionが関数にあっていません]", q);
+              break;
+            };
+            FnExecutor.stateFetchingHistory = true;
+            await FnHistoryControllers.fetchHistory(
+              q.option[0], //channelId
+              q.option[1], //dat
+              q.option[2], //direction
+            );
+            FnExecutor.stateFetchingHistory = false;
+            break;
+
+          case "captureScrollAnchor":
+            //アンカーを記憶しこの処理ループで使用されていると登録
+            stateAnchor.data = FnBrowserApis.captureScrollAnchor();
+            stateAnchor.isRegistered = true;
+            break;
+
+          case "restoreFromAnchor":
+            if (stateAnchor.isRegistered === false) {
+              break;
+            }
+            await FnBrowserApis.restoreScrollFromAnchor(stateAnchor.data);
+            break;
+
+          case "waitToDraw":
+            await FnBrowserApis.waitForDomToSettle();
             break;
         };
       }
+    },
+
+    checkConditionToFecthHistory: async (flagRetry = false) => {
+      //if (FnExecutor.stateFetchingHistory) return;
+
+      const currentChannelIdNow = currentChannelId();
+
+      const isHistoryAtEnd = storeHistory[currentChannelIdNow]?.atEnd;
+      const isHistoryAtTop = storeHistory[currentChannelIdNow]?.atTop;
+      const containerAtTop = FnBrowserApis.isScrolledToNearTop();
+      const containerAtBottom = FnBrowserApis.isScrolledToVisualBottom();
+
+      const historyState = { ...storeHistory[currentChannelIdNow] };
+      if (!historyState) return;
+
+      console.log("ChannelContent :: checkConditionToFetchHistory : トリガー");
+
+      let checkCanFetchForOlder = () => !isHistoryAtTop && containerAtTop;
+      let checkCanFetchForNewer = () => !isHistoryAtEnd && containerAtBottom;
+
+      if (checkCanFetchForOlder()) {
+        const oldest = historyState?.history?.at(-1);
+        console.log("ChannelContent :: FnExecutor.checkConditionToFetchHistory : ForOlderでのoldest", { action: "fetchHistory", option: [currentChannelIdNow, { messageIdFrom: oldest?.id, fetchLength: 20 }, "older"] });
+        await FnExecutor.execute([
+          { action: "captureScrollAnchor" },
+          { action: "fetchHistory", option: [currentChannelIdNow, { messageIdFrom: oldest?.id, fetchLength: 20 }, "older"] },
+          { action: "restoreFromAnchor" },
+          { action: "waitToDraw" },
+          { action: "tryUpdateReadTime" }
+        ]);
+      }
+      if (checkCanFetchForNewer()) {
+        const newest = historyState?.history !== undefined ? historyState?.history[0] : undefined;
+        console.log("ChannelContent :: FnExecutor.checkConditionToFetchHistory : ForNewrでのnewest", newest);
+        await FnExecutor.execute([
+          { action: "captureScrollAnchor" },
+          { action: "fetchHistory", option: [currentChannelIdNow, { messageIdFrom: newest?.id, fetchLength: 20 }, "newer"] },
+          { action: "restoreFromAnchor" },
+          { action: "waitToDraw" },
+          { action: "tryUpdateReadTime" }
+        ]);
+      }
+
+      //取得処理を一通り終えた後にまだ条件が動くなら再実行
+      if (!flagRetry && (checkCanFetchForOlder() || checkCanFetchForNewer())) {
+        console.log("ChannelContent :: FnExecutor.checkConditionToFetchHistory : 再実行します", checkCanFetchForOlder(), checkCanFetchForNewer());
+        FnExecutor.checkConditionToFecthHistory(true);
+      }
+    },
+
+    executePreset: {
+      /**
+       * 最新位置へ表示履歴を移動
+       */
+      moveToNewest: () => {
+        setStoreHistory((prev) => {
+        const newStore = { ...prev };
+          newStore[currentChannelId()] = {
+            atEnd: false,
+            atTop: false,
+            history: [],
+          };
+          return newStore;
+        });
+
+        FnExecutor.execute([
+          { action: "fetchHistory", option: [currentChannelId(), { messageIdFrom: "", fetchLength: 20 }, "older"]}
+        ]);
+      }
     }
+
   };
 
   /**
@@ -167,9 +388,7 @@ export default function ChannelContents() {
       }
     },
 
-    Scroll: (event: Event) => {
-      //TODo :: 履歴取得からの既読チェック
-    },
+    Scroll: (event: Event) => FnExecutor.checkConditionToFecthHistory(),
 
     /**
      * Windowのフォーカス操作
@@ -196,15 +415,36 @@ export default function ChannelContents() {
   createEffect(on(
     () => [param.channelId, param.messageId],
     async ([currentChId, currentMsgId], prevArgs) => {
+      console.log("ChannelContent :: createEffect : currentChId", currentChId);
+      if (currentChId === undefined) return;
 
+      setCurrentChannelId(currentChId);
+
+      const isHistoryAtEnd = storeHistory[currentChannelId()]?.atEnd;
+      const isHistoryAtTop = storeHistory[currentChannelId()]?.atTop;
+
+      const readTime = storeMessageReadTime.find((readTimeObj) => {
+        return readTimeObj.channelId === currentChId;
+      })?.readTime;
+
+      //履歴がStoreにそもそも無いとき
+      if (storeHistory[currentChannelId()] === undefined) {
+        await FnExecutor.execute([
+          { action: "fetchHistory", option: [currentChannelId(), { messageTimeFrom: readTime, fetchLength: 20 }, "older"] },
+          { action: "waitToDraw" }
+        ]);
+        return;
+      }
+
+      FnExecutor.checkConditionToFecthHistory();
     }
   ));
 
   onMount(() => {
     //fetchHistory();
-    const el = document.getElementById("history");
+    const el = FnBrowserApis.getHistoryElement();
     if (el === null) return;
-    //el.addEventListener("scroll", JBrowserApis.handleScroll);
+    el.addEventListener("scroll", BrowserEventHandlers.Scroll);
 
     window.addEventListener("focus", BrowserEventHandlers.windowFocusFns.setTrue);
     window.addEventListener("blur", BrowserEventHandlers.windowFocusFns.setFalse);
@@ -212,8 +452,8 @@ export default function ChannelContents() {
   });
 
   onCleanup(() => {
-    const el = getHistoryElement();
-    //if (el) el.removeEventListener("scroll", JBrowserApis.handleScroll);
+    const el = FnBrowserApis.getHistoryElement();
+    if (el) el.removeEventListener("scroll", BrowserEventHandlers.Scroll);
 
     window.removeEventListener("focus", BrowserEventHandlers.windowFocusFns.setTrue);
     window.removeEventListener("blur", BrowserEventHandlers.windowFocusFns.setFalse);
@@ -247,7 +487,7 @@ export default function ChannelContents() {
         !storeHistory[currentChannelId()]?.atEnd
         &&
         <div class="absolute bottom-10 right-10 z-10">
-          <Button onClick={undefined} class="w-16 h-16"><IconArrowDown style="height:28px; width:28px;" /></Button>
+          <Button onClick={FnExecutor.executePreset.moveToNewest} class="w-16 h-16"><IconArrowDown style="height:28px; width:28px;" /></Button>
         </div>
       }
     </div>
