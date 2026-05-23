@@ -296,7 +296,6 @@ export default function ChannelContents() {
           { action: "fetchHistory", option: [currentChannelIdNow, { messageIdFrom: oldest?.id }, "older"] },
           { action: "restoreFromAnchor" },
           { action: "waitToDraw" },
-          { action: "waitToDraw" },
           { action: "tryUpdateReadTime" }
         ]);
       }
@@ -307,7 +306,6 @@ export default function ChannelContents() {
           { action: "captureScrollAnchor" },
           { action: "fetchHistory", option: [currentChannelIdNow, { messageIdFrom: newest?.id }, "newer"] },
           { action: "restoreFromAnchor" },
-          { action: "waitToDraw" },
           { action: "waitToDraw" },
           { action: "tryUpdateReadTime" }
         ]);
