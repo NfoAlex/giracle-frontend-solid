@@ -15,7 +15,7 @@ import { storeUserOnline } from "~/stores/Userinfo.ts";
 import { storeServerinfo } from "~/stores/Serverinfo.ts";
 import { Avatar, AvatarImage } from "./ui/avatar.tsx";
 import { storeAppStatus } from "~/stores/AppStatus.ts";
-import {IconBell, IconCircleFilled, IconDatabaseCog, IconList, IconSearch, IconSettings} from "@tabler/icons-solidjs";
+import { IconBell, IconCircleFilled, IconDatabaseCog, IconList, IconSearch, IconSettings } from "@tabler/icons-solidjs";
 import {storeInbox} from "~/stores/Inbox.ts";
 import {Badge} from "~/components/ui/badge.tsx";
 import ChannelButtons from "./Sidebar/ChannelButtons.tsx";
