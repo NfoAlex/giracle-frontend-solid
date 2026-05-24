@@ -447,12 +447,14 @@ export default function ChannelContents() {
 
       setCurrentChannelId(currentChId);
 
-      //const isHistoryAtEnd = storeHistory[currentChannelId()]?.atEnd;
-      //const isHistoryAtTop = storeHistory[currentChannelId()]?.atTop;
-
       const readTime = storeMessageReadTime.find((readTimeObj) => {
         return readTimeObj.channelId === currentChId;
       })?.readTime;
+
+      await FnExecutor.execute([
+        { action: "tryUpdateReadTime" },
+        { action: "waitToDraw" }
+      ]);
 
       //履歴がStoreにそもそも無いとき
       if (storeHistory[currentChannelId()] === undefined) {
@@ -468,7 +470,6 @@ export default function ChannelContents() {
   ));
 
   onMount(() => {
-    //fetchHistory();
     const el = FnBrowserApis.getHistoryElement();
     if (el === null) return;
     el.addEventListener("scroll", BrowserEventHandlers.ScrollFns.handler);
