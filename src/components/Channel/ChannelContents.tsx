@@ -182,7 +182,22 @@ export default function ChannelContents() {
       const currentReadTime = storeMessageReadTime.find((readTimeJson) => {
         return readTimeJson.channelId === currentChannelId();
       })?.readTime;
-      if (currentReadTime === undefined) return;
+      //既読時間がそもそも無い場合は最新メッセージ時間を既読時間として保存する
+      if (currentReadTime === undefined) {
+        await POST_MESSAGE_UPDATE_READTIME(
+          currentChannelId(),
+          latestMessageTime,
+        )
+          .then(() => {
+            updateReadTime(currentChannelId(), latestMessageTime);
+          })
+          .catch((err) => {
+            console.error("ChannelContents :: FnGiracleServices.tryUpdateReadTime : err->", err);
+          });
+
+        return;
+      }
+
       if (new Date(currentReadTime).valueOf() >= new Date(latestMessageTime).valueOf()) return;
 
       //サーバーに同期してStore更新
