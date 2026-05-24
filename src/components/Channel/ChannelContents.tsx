@@ -140,6 +140,10 @@ export default function ChannelContents() {
       if (globalStateFetchingHistory) return;
       globalStateFetchingHistory = true;
 
+      //下向きにスクロールを自動化するためのもの（履歴配列表示がflex-reverseで下基準なので）
+      let anchor = null;
+      if (_direction === "newer") anchor = FnBrowserApis.captureScrollAnchor();
+
       await POST_CHANNEL_GET_HISTORY(
         _channelId,
         _dat.messageIdFrom,
@@ -147,7 +151,7 @@ export default function ChannelContents() {
         _dat.fetchLength,
         _direction,
       )
-        .then((r) => {
+        .then(async (r) => {
           //console.log("ChannelContent :: FnHistoryController.fetchHistory : r->", r);
           //if (r.data.history.length === 0) { console.log("ChannelContent :: fetchHistory : 履歴がありません"); return; }
           updateHistoryPosition(_channelId, {
@@ -156,6 +160,9 @@ export default function ChannelContents() {
           });
           setStoreImageDimensions(produce(prev => (Object.assign(prev, r.data.ImageDimensions))));
           insertHistory(r.data.history);
+
+          await FnBrowserApis.waitForDomToSettle();
+          if (_direction === "newer") FnBrowserApis.restoreScrollFromAnchor(anchor);
         })
         .catch((e) =>
           console.error("ChannelContent :: FnHistoryControllers.fetchHistory : エラー->", _dat, e),
@@ -218,8 +225,6 @@ export default function ChannelContents() {
   interface IExecutorOptionInput {
     tryUpdateReadTime: Parameters<typeof FnGiracleServices.tryUpdateReadTime>,
     fetchHistory: Parameters<typeof FnHistoryControllers.fetchHistory>,
-    captureScrollAnchor: [],
-    restoreFromAnchor: Parameters<typeof FnBrowserApis.restoreScrollFromAnchor>,
     waitToDraw: []
   };
   type TExecutorQueueItem = {
@@ -265,19 +270,6 @@ export default function ChannelContents() {
             );
             break;
 
-          case "captureScrollAnchor":
-            //アンカーを記憶しこの処理ループで使用されていると登録
-            stateAnchor.data = FnBrowserApis.captureScrollAnchor();
-            stateAnchor.isRegistered = true;
-            break;
-
-          case "restoreFromAnchor":
-            if (stateAnchor.isRegistered === false) {
-              break;
-            }
-            await FnBrowserApis.restoreScrollFromAnchor(stateAnchor.data);
-            break;
-
           case "waitToDraw":
             await FnBrowserApis.waitForDomToSettle();
             break;
@@ -307,10 +299,9 @@ export default function ChannelContents() {
         const oldest = historyState?.history?.at(-1);
         console.log("ChannelContent :: FnExecutor.checkConditionToFetchHistory : 古い方向に取得🔷", { isHistoryAtEnd, isHistoryAtTop, containerAtTop, containerAtBottom });
         await FnExecutor.execute([
-          { action: "captureScrollAnchor" },
+          //{ action: "captureScrollAnchor" },
           { action: "fetchHistory", option: [currentChannelIdNow, { messageIdFrom: oldest?.id }, "older"] },
-          { action: "restoreFromAnchor" },
-          { action: "waitToDraw" },
+          //{ action: "restoreFromAnchor" },
           { action: "waitToDraw" },
           { action: "tryUpdateReadTime" }
         ]);
@@ -319,10 +310,9 @@ export default function ChannelContents() {
         const newest = historyState?.history !== undefined ? historyState?.history[0] : undefined;
         console.log("ChannelContent :: FnExecutor.checkConditionToFetchHistory : 新しい方向に取得🔶", { isHistoryAtEnd, isHistoryAtTop, containerAtTop, containerAtBottom });
         await FnExecutor.execute([
-          { action: "captureScrollAnchor" },
+          //{ action: "captureScrollAnchor" },
           { action: "fetchHistory", option: [currentChannelIdNow, { messageIdFrom: newest?.id }, "newer"] },
-          { action: "restoreFromAnchor" },
-          { action: "waitToDraw" },
+          //{ action: "restoreFromAnchor" },
           { action: "waitToDraw" },
           { action: "tryUpdateReadTime" }
         ]);
@@ -335,7 +325,7 @@ export default function ChannelContents() {
        */
       moveToNewest: () => {
         setStoreHistory((prev) => {
-        const newStore = { ...prev };
+          const newStore = { ...prev };
           newStore[currentChannelId()] = {
             atEnd: false,
             atTop: false,
@@ -345,7 +335,7 @@ export default function ChannelContents() {
         });
 
         FnExecutor.execute([
-          { action: "fetchHistory", option: [currentChannelId(), { messageIdFrom: "", fetchLength: 20 }, "older"]}
+          { action: "fetchHistory", option: [currentChannelId(), { messageIdFrom: "", fetchLength: 20 }, "older"] }
         ]);
       }
     }
@@ -401,7 +391,7 @@ export default function ChannelContents() {
     },
 
     ScrollFns: {
-      handler :(event: Event) => {
+      handler: (event: Event) => {
         FnExecutor.checkConditionToFecthHistory();
       },
     },
