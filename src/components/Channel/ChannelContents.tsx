@@ -277,7 +277,7 @@ export default function ChannelContents() {
       }
     },
 
-    checkConditionToFecthHistory: async () => {
+    checkConditionToFecthHistory: async (repeatOnce = false) => {
       if (globalStateFetchingHistory) return;
 
       const currentChannelIdNow = currentChannelId();
@@ -299,9 +299,7 @@ export default function ChannelContents() {
         const oldest = historyState?.history?.at(-1);
         console.log("ChannelContent :: FnExecutor.checkConditionToFetchHistory : 古い方向に取得🔷", { isHistoryAtEnd, isHistoryAtTop, containerAtTop, containerAtBottom });
         await FnExecutor.execute([
-          //{ action: "captureScrollAnchor" },
           { action: "fetchHistory", option: [currentChannelIdNow, { messageIdFrom: oldest?.id }, "older"] },
-          //{ action: "restoreFromAnchor" },
           { action: "waitToDraw" },
           { action: "tryUpdateReadTime" }
         ]);
@@ -310,13 +308,13 @@ export default function ChannelContents() {
         const newest = historyState?.history !== undefined ? historyState?.history[0] : undefined;
         console.log("ChannelContent :: FnExecutor.checkConditionToFetchHistory : 新しい方向に取得🔶", { isHistoryAtEnd, isHistoryAtTop, containerAtTop, containerAtBottom });
         await FnExecutor.execute([
-          //{ action: "captureScrollAnchor" },
           { action: "fetchHistory", option: [currentChannelIdNow, { messageIdFrom: newest?.id }, "newer"] },
-          //{ action: "restoreFromAnchor" },
           { action: "waitToDraw" },
           { action: "tryUpdateReadTime" }
         ]);
       }
+
+      if (repeatOnce) FnExecutor.checkConditionToFecthHistory();
     },
 
     executePreset: {
