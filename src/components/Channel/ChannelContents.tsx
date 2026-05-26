@@ -172,6 +172,15 @@ export default function ChannelContents() {
         });
     },
 
+    /**
+     * 画面内にメッセージがあればそこにスクロールする
+     */
+    scrollToMessage: (messageId: string) => {
+      const messageElement = document.getElementById(`message-${messageId}`);
+      if (!messageElement) return;
+      messageElement.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+
   };
 
   const FnGiracleServices = {
@@ -225,6 +234,7 @@ export default function ChannelContents() {
   interface IExecutorOptionInput {
     tryUpdateReadTime: Parameters<typeof FnGiracleServices.tryUpdateReadTime>,
     fetchHistory: Parameters<typeof FnHistoryControllers.fetchHistory>,
+    scrollToMessage: Parameters<typeof FnHistoryControllers.scrollToMessage>,
     waitToDraw: []
   };
   type TExecutorQueueItem = {
@@ -267,6 +277,16 @@ export default function ChannelContents() {
               q.option[0], //channelId
               q.option[1], //dat
               q.option[2], //direction
+            );
+            break;
+
+          case "scrollToMessage":
+            if (q.option === undefined) {
+              console.error("ChannelContent :: FnExecutor(scrollToMessage) : エラー[optionが関数にあっていません]", q);
+              break;
+            };
+            FnHistoryControllers.scrollToMessage(
+              q.option[0], //messageId
             );
             break;
 
@@ -335,6 +355,31 @@ export default function ChannelContents() {
         FnExecutor.execute([
           { action: "fetchHistory", option: [currentChannelId(), { messageIdFrom: "", fetchLength: 20 }, "older"] }
         ]);
+      },
+
+      /**
+       * 特定のメッセージへ履歴を移動してスクロールする
+       *
+       * @param messageId 移動先のメッセージID
+       */
+      moveToTargetMessage: (messageId: string) => {
+        setStoreHistory((prev) => {
+          const newStore = { ...prev };
+          newStore[currentChannelId()] = {
+            atEnd: false,
+            atTop: false,
+            history: [],
+          };
+          return newStore;
+        });
+
+        FnExecutor.execute([
+          { action: "fetchHistory", option: [currentChannelId(), { messageIdFrom: messageId }, "older"] },
+          { action: "waitToDraw" },
+          { action: "fetchHistory", option: [currentChannelId(), { messageIdFrom: messageId }, "newer"] },
+          { action: "waitToDraw" },
+          { action: "scrollToMessage", option: [messageId] },
+        ])
       }
     }
 
@@ -453,7 +498,7 @@ export default function ChannelContents() {
         return;
       }
 
-      FnExecutor.checkConditionToFecthHistory();
+      FnExecutor.checkConditionToFecthHistory(true);
     }
   ));
 
