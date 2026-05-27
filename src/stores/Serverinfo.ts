@@ -1,4 +1,4 @@
-import { createMutable, createStore } from "solid-js/store";
+import { createStore } from "solid-js/store";
 import type { IServer } from "~/types/Server.ts";
 
 export const [storeServerinfo, setStoreServerinfo] = createStore<IServer>({
