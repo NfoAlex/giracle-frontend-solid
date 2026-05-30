@@ -535,6 +535,7 @@ export default function ChannelContents() {
             <SkeletonLoader />
           </div>
         </Show>
+
         <For each={storeHistory[currentChannelId()]?.history}>
           {(h, index) => (
             <MessageDisplay
@@ -546,6 +547,14 @@ export default function ChannelContents() {
             />
           )}
         </For>
+
+        <Show when={!storeHistory[currentChannelId()]?.atTop}>
+          <div class="flex flex-col gap-4">
+            <SkeletonLoader />
+            <SkeletonLoader />
+            <SkeletonLoader />
+          </div>
+        </Show>
 
         <Show when={storeHistory[currentChannelId()]?.atTop}>
           <p>履歴の末端まで到達しました。</p>
