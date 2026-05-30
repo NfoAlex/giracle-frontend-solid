@@ -11,6 +11,7 @@ import POST_MESSAGE_UPDATE_READTIME from "~/api/MESSAGE/MESSAGE_UPDATE_READTIME.
 import { storeMyUserinfo } from "~/stores/MyUserinfo.ts";
 import POST_CHANNEL_GET_HISTORY from "~/api/CHANNEL/CHANNEL_GET_HISTORY.ts";
 import { produce } from "solid-js/store";
+import SkeletonLoader from "./ChannelContent/SkeletonLoader.tsx";
 
 const channelScrollPos: Map<string, number> = new Map();
 
@@ -527,6 +528,13 @@ export default function ChannelContents() {
         id="history"
         class={`h-full w-full overflow-y-auto flex flex-col-reverse gap-${storeClientConfig.display.messageGapLevel}`}
       >
+        <Show when={!storeHistory[currentChannelId()]?.atEnd}>
+          <div class="flex flex-col gap-4">
+            <SkeletonLoader />
+            <SkeletonLoader />
+            <SkeletonLoader />
+          </div>
+        </Show>
         <For each={storeHistory[currentChannelId()]?.history}>
           {(h, index) => (
             <MessageDisplay
