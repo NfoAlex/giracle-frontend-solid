@@ -452,7 +452,7 @@ export default function ChannelContents() {
         setIsWindowFocused(true);
         //console.log("ChannelContents :: toggleWindowFocus : isFocused->", isFocused());
 
-        //if (flagWasFocused) JHistoryController.checkScrollPosAndFetchHistory();
+        if (flagWasFocused) FnExecutor.checkConditionToFecthHistory();
       },
       setFalse: () => {
         setIsWindowFocused(false);
