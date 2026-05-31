@@ -320,8 +320,7 @@ export default function ChannelContents() {
         //console.log("ChannelContent :: FnExecutor.checkConditionToFetchHistory : 古い方向に取得🔷", { isHistoryAtEnd, isHistoryAtTop, containerAtTop, containerAtBottom });
         await FnExecutor.execute([
           { action: "fetchHistory", option: [currentChannelIdNow, { messageIdFrom: oldest?.id }, "older"] },
-          { action: "waitToDraw" },
-          { action: "tryUpdateReadTime" }
+          { action: "waitToDraw" }
         ]);
         flagFetchedHistory = true;
       }
@@ -330,11 +329,15 @@ export default function ChannelContents() {
         //console.log("ChannelContent :: FnExecutor.checkConditionToFetchHistory : 新しい方向に取得🔶", { isHistoryAtEnd, isHistoryAtTop, containerAtTop, containerAtBottom });
         await FnExecutor.execute([
           { action: "fetchHistory", option: [currentChannelIdNow, { messageIdFrom: newest?.id }, "newer"] },
-          { action: "waitToDraw" },
-          { action: "tryUpdateReadTime" }
+          { action: "waitToDraw" }
         ]);
         flagFetchedHistory = true;
       }
+
+      await FnExecutor.execute([
+        { action: "waitToDraw" },
+        { action: "tryUpdateReadTime" }
+      ]);
 
       if (flagFetchedHistory) FnExecutor.checkConditionToFecthHistory();
     },
