@@ -143,7 +143,7 @@ export default function ChannelContents() {
 
       //下向きにスクロールを自動化するためのもの（履歴配列表示がflex-reverseで下基準なので）
       let anchor = null;
-      if (_direction === "newer") anchor = FnBrowserApis.captureScrollAnchor();
+      anchor = FnBrowserApis.captureScrollAnchor();
 
       await POST_CHANNEL_GET_HISTORY(
         _channelId,
@@ -163,7 +163,7 @@ export default function ChannelContents() {
           insertHistory(r.data.history);
 
           await FnBrowserApis.waitForDomToSettle();
-          if (_direction === "newer") FnBrowserApis.restoreScrollFromAnchor(anchor);
+          FnBrowserApis.restoreScrollFromAnchor(anchor);
         })
         .catch((e) =>
           console.error("ChannelContent :: FnHistoryControllers.fetchHistory : エラー->", _dat, e),
