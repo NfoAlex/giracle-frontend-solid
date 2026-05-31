@@ -298,7 +298,7 @@ export default function ChannelContents() {
       }
     },
 
-    checkConditionToFecthHistory: async (repeatOnce = false) => {
+    checkConditionToFecthHistory: async () => {
       const currentChannelIdNow = currentChannelId();
 
       const isHistoryAtEnd = storeHistory[currentChannelIdNow]?.atEnd;
@@ -313,27 +313,30 @@ export default function ChannelContents() {
 
       let checkCanFetchForOlder = () => !isHistoryAtTop && containerAtTop;
       let checkCanFetchForNewer = () => !isHistoryAtEnd && containerAtBottom;
+      let flagFetchedHistory = false;
 
       if (checkCanFetchForOlder()) {
         const oldest = historyState?.history?.at(-1);
-        console.log("ChannelContent :: FnExecutor.checkConditionToFetchHistory : 古い方向に取得🔷", { isHistoryAtEnd, isHistoryAtTop, containerAtTop, containerAtBottom });
+        //console.log("ChannelContent :: FnExecutor.checkConditionToFetchHistory : 古い方向に取得🔷", { isHistoryAtEnd, isHistoryAtTop, containerAtTop, containerAtBottom });
         await FnExecutor.execute([
           { action: "fetchHistory", option: [currentChannelIdNow, { messageIdFrom: oldest?.id }, "older"] },
           { action: "waitToDraw" },
           { action: "tryUpdateReadTime" }
         ]);
+        flagFetchedHistory = true;
       }
       if (checkCanFetchForNewer()) {
         const newest = historyState?.history !== undefined ? historyState?.history[0] : undefined;
-        console.log("ChannelContent :: FnExecutor.checkConditionToFetchHistory : 新しい方向に取得🔶", { isHistoryAtEnd, isHistoryAtTop, containerAtTop, containerAtBottom });
+        //console.log("ChannelContent :: FnExecutor.checkConditionToFetchHistory : 新しい方向に取得🔶", { isHistoryAtEnd, isHistoryAtTop, containerAtTop, containerAtBottom });
         await FnExecutor.execute([
           { action: "fetchHistory", option: [currentChannelIdNow, { messageIdFrom: newest?.id }, "newer"] },
           { action: "waitToDraw" },
           { action: "tryUpdateReadTime" }
         ]);
+        flagFetchedHistory = true;
       }
 
-      if (repeatOnce) FnExecutor.checkConditionToFecthHistory();
+      if (flagFetchedHistory) FnExecutor.checkConditionToFecthHistory();
     },
 
     executePreset: {
@@ -483,21 +486,19 @@ export default function ChannelContents() {
         return readTimeObj.channelId === currentChId;
       })?.readTime;
 
-      await FnExecutor.execute([
-        { action: "tryUpdateReadTime" },
-        { action: "waitToDraw" }
-      ]);
-
       //履歴がStoreにそもそも無いとき
       if (storeHistory[currentChannelId()] === undefined) {
         await FnExecutor.execute([
           { action: "fetchHistory", option: [currentChannelId(), { messageTimeFrom: readTime, fetchLength: 20 }, "older"] },
           { action: "waitToDraw" }
         ]);
-        return;
       }
+      await FnExecutor.execute([
+        { action: "tryUpdateReadTime" },
+        { action: "waitToDraw" }
+      ]);
 
-      FnExecutor.checkConditionToFecthHistory(true);
+      FnExecutor.checkConditionToFecthHistory();
     }
   ));
 
