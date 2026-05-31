@@ -39,7 +39,7 @@ export default function ChannelContents() {
      * @param thresholdPx 画面上部からの距離
      * @returns
      */
-    isScrolledToNearTop: (thresholdPx: number = 40) => {
+    isScrolledToNearTop: (thresholdPx: number = 350) => {
       const container = FnBrowserApis.getHistoryElement();
       if (!container) return null;
 
@@ -55,7 +55,7 @@ export default function ChannelContents() {
      * @param thresholdPx 画面下部からの距離
      * @returns
      */
-    isScrolledToVisualBottom: (thresholdPx: number = 40) => {
+    isScrolledToVisualBottom: (thresholdPx: number = 350) => {
       const container = FnBrowserApis.getHistoryElement();
       if (!container) return null;
 
@@ -299,8 +299,6 @@ export default function ChannelContents() {
     },
 
     checkConditionToFecthHistory: async (repeatOnce = false) => {
-      if (globalStateFetchingHistory) return;
-
       const currentChannelIdNow = currentChannelId();
 
       const isHistoryAtEnd = storeHistory[currentChannelIdNow]?.atEnd;
