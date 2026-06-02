@@ -192,6 +192,7 @@ export default function ChannelContents() {
     tryUpdateReadTime: async () => {
       if (storeHistory[currentChannelId()]?.atEnd === false) return;
       if (!isWindowFocused()) return;
+      if (!FnBrowserApis.isScrolledToVisualBottom()) return;
 
       //既読時間Storeの時間と最新メッセージの時間を比較
       const latestMessageTime = storeHistory[currentChannelId()]?.history[0]?.createdAt;
@@ -458,8 +459,9 @@ export default function ChannelContents() {
         let timer: number;
         return (_: Event) => {
           clearTimeout(timer);
-          timer = window.setTimeout(() => {
-        FnExecutor.checkConditionToFecthHistory();
+          timer = window.setTimeout(async () => {
+            await FnExecutor.execute([{ action: "tryUpdateReadTime" }]);
+            FnExecutor.checkConditionToFecthHistory();
           }, 100);
         };
       })(),
