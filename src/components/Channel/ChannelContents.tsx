@@ -450,13 +450,14 @@ export default function ChannelContents() {
     windowFocusFns: {
       setTrue: () => {
         //もしフォーカスされていたらスクロール位置を確認して履歴を取得させる
-        let flagWasFocused = false;
-        if (!isWindowFocused()) flagWasFocused = true;
+        //let flagWasFocused = false;
+        //if (!isWindowFocused()) flagWasFocused = true;
 
         setIsWindowFocused(true);
         //console.log("ChannelContents :: toggleWindowFocus : isFocused->", isFocused());
 
-        if (flagWasFocused) FnExecutor.checkConditionToFecthHistory();
+        //if (flagWasFocused) FnExecutor.checkConditionToFecthHistory();
+        FnExecutor.checkConditionToFecthHistory();
       },
       setFalse: () => {
         setIsWindowFocused(false);
