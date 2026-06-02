@@ -500,8 +500,9 @@ export default function ChannelContents() {
     })
   );
 
+  //チャンネルから離れるときにスクロール位置を保存
   useBeforeLeave(() => {
-    globalStateChannelMoveDone = false;
+    globalStateChannelMoveDone = false; //チャンネル移動完了フラグ初期化
 
     const target = FnBrowserApis.getHistoryElement();
     if (target) {
@@ -519,14 +520,13 @@ export default function ChannelContents() {
       setCurrentChannelId(currentChId);
 
       const el = FnBrowserApis.getHistoryElement();
-      //スクロール位置復元、無いなら最新既読位置へ
+      //スクロール位置復元
       if (channelScrollPos.has(currentChannelId()) && el !== null) {
         await FnExecutor.execute([{ action: "waitToDraw" }]);
         el.scrollTop = channelScrollPos.get(currentChannelId()) ?? 0;
-      } else {
-        //await JHistoryController.scrollToLatestRead();
       }
 
+      //このチャンネルの既読時間
       const readTime = storeMessageReadTime.find((readTimeObj) => {
         return readTimeObj.channelId === currentChId;
       })?.readTime;
@@ -539,6 +539,7 @@ export default function ChannelContents() {
         ]);
       }
 
+      //チャンネル移動完了フラグを立てて履歴取得トリガー確認
       globalStateChannelMoveDone = true;
       FnExecutor.checkConditionToFecthHistory();
     }
