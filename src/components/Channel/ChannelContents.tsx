@@ -23,6 +23,7 @@ export default function ChannelContents() {
 
   const historyElementId = "history";
   let globalStateFetchingHistory = false;
+  let globalStateChannelMoveDone = false;
 
   const FnBrowserApis = {
 
@@ -499,7 +500,6 @@ export default function ChannelContents() {
     })
   );
 
-  let globalStateChannelMoveDone = false;
   useBeforeLeave(() => {
     globalStateChannelMoveDone = false;
 
