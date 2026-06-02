@@ -316,6 +316,8 @@ export default function ChannelContents() {
     },
 
     checkConditionToFecthHistory: async () => {
+      if (!globalStateChannelMoveDone) return;
+
       const currentChannelIdNow = currentChannelId();
 
       const isHistoryAtEnd = storeHistory[currentChannelIdNow]?.atEnd;
@@ -489,6 +491,16 @@ export default function ChannelContents() {
     })
   );
 
+  let globalStateChannelMoveDone = false;
+  useBeforeLeave(() => {
+    globalStateChannelMoveDone = false;
+
+    const target = FnBrowserApis.getHistoryElement();
+    if (target) {
+      channelScrollPos.set(currentChannelId(), target.scrollTop);
+    }
+  });
+
   //チャンネル移動監視
   createEffect(on(
     () => [param.channelId, param.messageId],
@@ -497,6 +509,15 @@ export default function ChannelContents() {
       if (currentChId === undefined) return;
 
       setCurrentChannelId(currentChId);
+
+      const el = FnBrowserApis.getHistoryElement();
+      //スクロール位置復元、無いなら最新既読位置へ
+      if (channelScrollPos.has(currentChannelId()) && el !== null) {
+        await FnExecutor.execute([{ action: "waitToDraw" }]);
+        el.scrollTop = channelScrollPos.get(currentChannelId()) ?? 0;
+      } else {
+        //await JHistoryController.scrollToLatestRead();
+      }
 
       const readTime = storeMessageReadTime.find((readTimeObj) => {
         return readTimeObj.channelId === currentChId;
@@ -510,6 +531,7 @@ export default function ChannelContents() {
         ]);
       }
 
+      globalStateChannelMoveDone = true;
       FnExecutor.checkConditionToFecthHistory();
     }
   ));
