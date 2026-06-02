@@ -1,0 +1,3 @@
+# for solid-ui
+overrides:
+  "tailwindcss": "^3.4.19"
