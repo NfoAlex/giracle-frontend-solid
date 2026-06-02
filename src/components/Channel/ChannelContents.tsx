@@ -6,7 +6,7 @@ import { storeClientConfig } from "~/stores/ClientConfig.ts";
 import { Button } from "../ui/button.tsx";
 import { IconArrowDown } from "@tabler/icons-solidjs";
 import MessageDisplay from "./ChannelContent/MessageDisplay.tsx";
-import { storeMessageReadTime, updateReadTime } from "~/stores/Readtime.ts";
+import { setStoreMessageReadTime, storeMessageReadTime } from "~/stores/Readtime.ts";
 import POST_MESSAGE_UPDATE_READTIME from "~/api/MESSAGE/MESSAGE_UPDATE_READTIME.ts";
 import { storeMyUserinfo } from "~/stores/MyUserinfo.ts";
 import POST_CHANNEL_GET_HISTORY from "~/api/CHANNEL/CHANNEL_GET_HISTORY.ts";
