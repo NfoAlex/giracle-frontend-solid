@@ -1,4 +1,4 @@
-import { useParams } from "@solidjs/router";
+import { useBeforeLeave, useParams } from "@solidjs/router";
 import { Show, createEffect, createSignal, onCleanup, onMount, on, For } from "solid-js";
 import { insertHistory, setStoreHistory, setStoreImageDimensions, storeHistory, updateHistoryPosition } from "~/stores/History.ts";
 import type { IMessage } from "~/types/Message.tsx";
