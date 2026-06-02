@@ -497,10 +497,6 @@ export default function ChannelContents() {
           { action: "waitToDraw" }
         ]);
       }
-      await FnExecutor.execute([
-        { action: "tryUpdateReadTime" },
-        { action: "waitToDraw" }
-      ]);
 
       FnExecutor.checkConditionToFecthHistory();
     }
