@@ -8,10 +8,3 @@ export const [storeMessageReadTime, setStoreMessageReadTime] = createStore<
     readTimeBefore: string;
   }[]
 >([]);
-
-/**
- * 既読時間を更新
- * @param channelId
- * @param readTime
- */
-export const updateReadTime = (channelId: string, readTime: string) => { }
