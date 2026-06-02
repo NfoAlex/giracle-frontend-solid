@@ -189,7 +189,7 @@ export default function ChannelContents() {
     /**
      * 既読時間を更新する
      */
-    tryUpdateReadTime: async (updateStoreBeforeToo = false) => {
+    tryUpdateReadTime: async () => {
       if (storeHistory[currentChannelId()]?.atEnd === false) return;
       if (!isWindowFocused()) return;
 
@@ -231,7 +231,7 @@ export default function ChannelContents() {
         const newReadTime = {
           channelId: currentChannelId(),
           readTime: latestMessageTime,
-          readTimeBefore: updateStoreBeforeToo ? latestMessageTime : currentReadTime
+          readTimeBefore: currentReadTime
         };
         const newStore = prev.filter((c) => c.channelId !== currentChannelId());
         newStore.push({ ...newReadTime });
@@ -487,7 +487,7 @@ export default function ChannelContents() {
     () => `${storeHistory[currentChannelId()]?.history.at(-1)?.id}`,
     async () => {
       if (globalStateFetchingHistory) return;
-      await FnGiracleServices.tryUpdateReadTime(true);
+      await FnGiracleServices.tryUpdateReadTime();
     })
   );
 
