@@ -1,4 +1,4 @@
-import { createMutable, createStore } from "solid-js/store";
+import { createStore } from "solid-js/store";
 import type { IServer } from "~/types/Server.ts";
 
 export const [storeServerinfo, setStoreServerinfo] = createStore<IServer>({
@@ -8,9 +8,10 @@ export const [storeServerinfo, setStoreServerinfo] = createStore<IServer>({
   RegisterInviteOnly: false,
   RegisterAnnounceChannelId: "",
   MessageMaxLength: 1,
+  MessageMaxFileSize: 1,
   defaultJoinChannel: []
 });
 
 export const bindServerinfo = (value: Partial<IServer>) => {
-  setStoreServerinfo({...storeServerinfo, ...value});
+  setStoreServerinfo({ ...storeServerinfo, ...value });
 };

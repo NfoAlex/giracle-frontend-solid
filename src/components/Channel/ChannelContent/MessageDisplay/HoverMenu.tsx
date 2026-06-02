@@ -1,5 +1,5 @@
 import {Card} from "~/components/ui/card.tsx";
-import {IconMoodHappy, IconPencil, IconTrash, IconCornerUpLeft} from "@tabler/icons-solidjs";
+import {IconMoodHappy, IconPencil, IconTrash, IconCornerUpLeft, IconLink} from "@tabler/icons-solidjs";
 import DELETE_MESSAGE_DELETE from "~/api/MESSAGE/MESSAGE_DELETE.ts";
 import {getRolePower, storeMyUserinfo} from "~/stores/MyUserinfo.ts";
 import type {IMessage} from "~/types/Message.ts";
@@ -70,6 +70,19 @@ export default function HoverMenu(props: {
         class={"w-8 h-8"}
       >
         <IconCornerUpLeft />
+      </Button>
+      <Button
+        onClick={() => {
+          const frontendUrl = import.meta.env.VITE_FRONTEND_URL || window.location.origin;
+          const link = `${frontendUrl}/app/channel/${props.message.channelId}/${props.message.id}`;
+          navigator.clipboard.writeText(link);
+        }}
+        size="icon"
+        variant={"ghost"}
+        class={"w-8 h-8"}
+        title="リンクをコピー"
+      >
+        <IconLink />
       </Button>
       {
         storeMyUserinfo.id === props.message.userId

@@ -5,14 +5,14 @@ import GET_USER_INFO from "~/api/USER/USER_INFO.ts";
 import { storeAppStatus } from "~/stores/AppStatus.ts";
 import { setStoreHasNewMessage } from "~/stores/HasNewMessage.ts";
 import { setStoreMyUserinfo } from "~/stores/MyUserinfo.ts";
-import { setStoreMessageReadTime, setStoreMessageReadTimeBefore } from "~/stores/Readtime.ts";
+import { setStoreMessageReadTime } from "~/stores/Readtime.ts";
 import { setStoreRoleInfo } from "~/stores/RoleInfo.ts";
 import type { IRole } from "~/types/Role.ts";
 import { initWS } from "~/WS/WScontroller.ts";
 import GET_MESSAGE_INBOX from "~/api/MESSAGE/MESSAGE_INBOX.ts";
-import {setStoreInbox} from "~/stores/Inbox.ts";
+import { setStoreInbox } from "~/stores/Inbox.ts";
 import GET_SERVER_CUSTOM_EMOJI from "~/api/SERVER/SERVER_CUSTOM_EMOJI.ts";
-import {bindCustomEmoji} from "~/stores/CustomEmoji.ts";
+import { bindCustomEmoji } from "~/stores/CustomEmoji.ts";
 import { bindClientConfig } from "~/stores/ClientConfig.ts";
 import GET_SERVER_CONFIG from "~/api/SERVER/SERVER_CONFIG.ts";
 import { bindServerinfo } from "~/stores/Serverinfo.ts";
@@ -50,8 +50,7 @@ export default function InitLoad(_userId: string, initWsToo = false) {
   //メッセージ既読時間を取得、格納
   GET_MESSAGE_GET_READTIME().then((r) => {
     //console.log("InitLoad :: GET_MESSAGE_GET_READTIME : 自分の既読時間r->", r);
-    setStoreMessageReadTime([...r.data]);
-    setStoreMessageReadTimeBefore([...r.data]);
+    setStoreMessageReadTime(r.data.map(r => { return { ...r, readTimeBefore: r.readTime }; }));
   });
   //新着メッセージの有無を取得、格納
   GET_MESSAGE_GET_NEW().then((r) => {

@@ -1,6 +1,5 @@
 import { createMemo, For, type JSX } from "solid-js";
-// Dynamic は不要になったので削除
-// onMount も不要になったので削除
+import { A } from "@solidjs/router";
 import { directGetterChannelInfo } from "~/stores/ChannelInfo.ts";
 import { getterUserinfo } from "~/stores/Userinfo.ts";
 import { storeMyUserinfo } from "~/stores/MyUserinfo.ts";
@@ -16,20 +15,19 @@ export default function MessageTextRender(props: { content: string }) {
     const mentionPattern = /@<([a-f0-9-]+)>/g;
     const channelPattern = /#<([a-f0-9-]+)>/g;
     const inlineCodePattern = /`([^`]+)`/g;
-    // newlinePattern やその他のパターンは textContent の whitespace-pre-wrap で処理するため不要かも
 
     type MatchType = "link" | "userId" | "channel" | "inlineCode";
-    interface MatchObject {
+    interface IMatchObject {
       context: string;
       type: MatchType;
       index: number;
       idOrValue: string; // パース後の値 (URL, ID, コード内容)
     }
 
-    const objectIndex: MatchObject[] = [];
+    const contentObjectIndex: IMatchObject[] = [];
 
-    // マッチを追加するヘルパー関数 (ID抽出も追加)
-    const addMatches = (regex: RegExp, type: MatchType, idExtractor?: (match: RegExpExecArray) => string) => {
+    // 表示コンテンツパターンのマッチを判別、追加するヘルパー関数
+    const findMatches = (regex: RegExp, type: MatchType) => {
       let match;
       // lastIndexをリセットして最初から検索
       regex.lastIndex = 0;
@@ -49,7 +47,7 @@ export default function MessageTextRender(props: { content: string }) {
           default:
             idOrValue = match[0]; // フォールバック
         }
-        objectIndex.push({
+        contentObjectIndex.push({
           context: match[0], // マッチした元の文字列
           type: type,
           index: match.index,
@@ -59,22 +57,24 @@ export default function MessageTextRender(props: { content: string }) {
     };
 
     // パターンを検索
-    addMatches(urlPattern, "link");
-    addMatches(mentionPattern, "userId");
-    addMatches(channelPattern, "channel");
-    addMatches(inlineCodePattern, "inlineCode");
+    findMatches(urlPattern, "link");
+    findMatches(mentionPattern, "userId");
+    findMatches(channelPattern, "channel");
+    findMatches(inlineCodePattern, "inlineCode");
 
     // インデックスでソート
-    objectIndex.sort((a, b) => a.index - b.index);
+    contentObjectIndex.sort((a, b) => a.index - b.index);
 
+    //レンダーするJSX用配列
     const messageRenderingFinal: JSX.Element[] = [];
-    let lastIndex = 0;
+    //処理をした文字位置
+    let lastProcessedIndex = 0;
 
     // テキストとマッチ部分を交互に処理
-    for (const obj of objectIndex) {
+    for (const obj of contentObjectIndex) {
       // マッチまでのテキスト部分を追加
-      if (obj.index > lastIndex) {
-        const textSegment = props.content.slice(lastIndex, obj.index);
+      if (obj.index > lastProcessedIndex) {
+        const textSegment = props.content.slice(lastProcessedIndex, obj.index);
         // textSegment を改行文字 (\n) で分割し、それぞれを span でラップするか、
         // 単一の span に white-space: pre-wrap を適用する
         messageRenderingFinal.push(
@@ -85,11 +85,32 @@ export default function MessageTextRender(props: { content: string }) {
       // マッチ部分をタイプに応じてJSXに変換
       switch (obj.type) {
         case "link":
-          messageRenderingFinal.push(
-            <a href={obj.idOrValue} target="_blank" rel="noopener noreferrer" class="underline whitespace-pre-wrap break-words">
-              {obj.idOrValue}
-            </a>
-          );
+          const frontendUrl = import.meta.env.VITE_FRONTEND_URL || window.location.origin;
+          let isInternalHistoryLink = false;
+          let internalPath = "";
+
+          //フロントのリンクであるならチャンネル内の移動用リンクにする
+          if (obj.idOrValue.startsWith(frontendUrl)) {
+            const path = obj.idOrValue.substring(frontendUrl.length);
+            if (path.startsWith("/app/channel/")) {
+              isInternalHistoryLink = true;
+              internalPath = path;
+            }
+          }
+
+          if (isInternalHistoryLink) {
+            messageRenderingFinal.push(
+              <A href={internalPath} class="underline whitespace-pre-wrap break-words text-blue-500">
+                {obj.idOrValue}
+              </A>
+            );
+          } else {
+            messageRenderingFinal.push(
+              <a href={obj.idOrValue} target="_blank" rel="noopener noreferrer" class="underline whitespace-pre-wrap break-words text-blue-500">
+                {obj.idOrValue}
+              </a>
+            );
+          }
           break;
         case "userId":
           // createMemo 内でリアクティブな値を参照すると、その値の変更時にメモが再計算される
@@ -104,7 +125,6 @@ export default function MessageTextRender(props: { content: string }) {
           );
           break;
         case "channel":
-          // directGetterChannelInfo もリアクティブなソースであれば追跡される
           const channelInfo = directGetterChannelInfo(obj.idOrValue);
           messageRenderingFinal.push(
             <span class="font-medium cursor-pointer hover:underline mx-px">
@@ -120,12 +140,12 @@ export default function MessageTextRender(props: { content: string }) {
           );
           break;
       }
-      lastIndex = obj.index + obj.context.length;
+      lastProcessedIndex = obj.index + obj.context.length;
     }
 
     // 最後のマッチ以降の残りのテキストを追加
-    if (lastIndex < props.content.length) {
-      const remainingText = props.content.slice(lastIndex);
+    if (lastProcessedIndex < props.content.length) {
+      const remainingText = props.content.slice(lastProcessedIndex);
       messageRenderingFinal.push(
         <span class="whitespace-pre-wrap break-words">{remainingText}</span>
       );
@@ -133,16 +153,16 @@ export default function MessageTextRender(props: { content: string }) {
 
     // 空のコンテンツの場合のフォールバック
     if (messageRenderingFinal.length === 0 && props.content === "") {
-        return []; // or [<span />] など、必要に応じて
+      return []; // or [<span />] など、必要に応じて
     }
 
     // 計算結果（JSX要素の配列）を返す
     return messageRenderingFinal;
-  }); // 依存配列は SolidJS が自動で検出
+  });
 
   // biome-ignore lint/correctness/useJsxKeyInIterable: SolidのForは通常Keyなしで効率的
   return (
-    <div class="py-1 w-full"> {/* items-baselineを追加するとBadgeなどの縦位置が揃いやすい */}
+    <div class="py-1 w-full">
       <For each={parsedContent()}>{(el) => el}</For>
     </div>
   );

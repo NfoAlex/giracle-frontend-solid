@@ -5,7 +5,7 @@ import { Badge } from "../../ui/badge.tsx";
 import UserinfoModalWrapper from "../../unique/UserinfoModalWrapper.tsx";
 import { Avatar, AvatarFallback, AvatarImage } from "../../ui/avatar.tsx";
 import { storeMyUserinfo } from "~/stores/MyUserinfo.ts";
-import { storeMessageReadTimeBefore } from "~/stores/Readtime.ts";
+import { storeMessageReadTime } from "~/stores/Readtime.ts";
 import DisplayReply from "./MessageDisplay/DisplayReply.tsx";
 import EditMessage from "./MessageDisplay/EditMessage.tsx";
 import MentionReadWrapper from "./MessageDisplay/MentionReadWrapper.tsx";
@@ -35,9 +35,9 @@ export default function MessageDisplay(props: {
 
   //新着線表示用の既読時間取得
   const targetMessageReadTimeBefore = () => {
-    return storeMessageReadTimeBefore.find(
+    return storeMessageReadTime.find(
       (c) => c.channelId === props.message.channelId
-    )?.readTime.valueOf();
+    )?.readTimeBefore;
   };
 
   const displayDateLine = () => {
@@ -114,6 +114,7 @@ export default function MessageDisplay(props: {
 
               {/* ホバー判定部分 */}
               <div
+                id={`messageId::${props.message.id}::content`}
                 class={
                   `relative shrink-0 grow-0 rounded-md px-2 ml-auto ${hovered() ? "hover:bg-accent" : ""} ${props.message.content.includes("@<" + storeMyUserinfo.id + ">") && "border-2"}`
                 }
