@@ -206,7 +206,12 @@ export default function ChannelContents() {
           latestMessageTime,
         )
           .then(() => {
-            updateReadTime(currentChannelId(), latestMessageTime);
+            setStoreMessageReadTime((prev) => {
+              const newReadTime = { channelId: currentChannelId(), readTime: latestMessageTime };
+              const newStore = prev.filter((c) => c.channelId !== currentChannelId());
+              newStore.push({ ...newReadTime });
+              return newStore;
+            });
           })
           .catch((err) => {
             console.error("ChannelContents :: FnGiracleServices.tryUpdateReadTime : err->", err);
@@ -223,7 +228,12 @@ export default function ChannelContents() {
         latestMessageTime,
       )
         .then(() => {
-          updateReadTime(currentChannelId(), latestMessageTime);
+          setStoreMessageReadTime((prev) => {
+            const newReadTime = { channelId: currentChannelId(), readTime: latestMessageTime };
+            const newStore = prev.filter((c) => c.channelId !== currentChannelId());
+            newStore.push({ ...newReadTime });
+            return newStore;
+          });
         })
         .catch((err) => {
           console.error("ChannelContents :: FnGiracleServices.tryUpdateReadTime : err->", err);
