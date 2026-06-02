@@ -454,9 +454,15 @@ export default function ChannelContents() {
     },
 
     ScrollFns: {
-      handler: (event: Event) => {
+      handler: (() => {
+        let timer: number;
+        return (_: Event) => {
+          clearTimeout(timer);
+          timer = window.setTimeout(() => {
         FnExecutor.checkConditionToFecthHistory();
-      },
+          }, 100);
+        };
+      })(),
     },
 
     /**
