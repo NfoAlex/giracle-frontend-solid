@@ -189,7 +189,7 @@ export default function ChannelContents() {
     /**
      * 既読時間を更新する
      */
-    tryUpdateReadTime: async () => {
+    tryUpdateReadTime: async (updateStoreBeforeToo = false) => {
       if (storeHistory[currentChannelId()]?.atEnd === false) return;
       if (!isWindowFocused()) return;
 
@@ -207,7 +207,11 @@ export default function ChannelContents() {
         )
           .then(() => {
             setStoreMessageReadTime((prev) => {
-              const newReadTime = { channelId: currentChannelId(), readTime: latestMessageTime };
+              const newReadTime = {
+                channelId: currentChannelId(),
+                readTime: latestMessageTime,
+                readTimeBefore: latestMessageTime
+              };
               const newStore = prev.filter((c) => c.channelId !== currentChannelId());
               newStore.push({ ...newReadTime });
               return newStore;
@@ -222,19 +226,22 @@ export default function ChannelContents() {
 
       if (new Date(currentReadTime).valueOf() >= new Date(latestMessageTime).valueOf()) return;
 
+      //Store更新してからサーバーに同期
+      setStoreMessageReadTime((prev) => {
+        const newReadTime = {
+          channelId: currentChannelId(),
+          readTime: latestMessageTime,
+          readTimeBefore: updateStoreBeforeToo ? latestMessageTime : currentReadTime
+        };
+        const newStore = prev.filter((c) => c.channelId !== currentChannelId());
+        newStore.push({ ...newReadTime });
+        return newStore;
+      });
       //サーバーに同期してStore更新
       await POST_MESSAGE_UPDATE_READTIME(
         currentChannelId(),
         latestMessageTime,
       )
-        .then(() => {
-          setStoreMessageReadTime((prev) => {
-            const newReadTime = { channelId: currentChannelId(), readTime: latestMessageTime };
-            const newStore = prev.filter((c) => c.channelId !== currentChannelId());
-            newStore.push({ ...newReadTime });
-            return newStore;
-          });
-        })
         .catch((err) => {
           console.error("ChannelContents :: FnGiracleServices.tryUpdateReadTime : err->", err);
         });
@@ -463,7 +470,8 @@ export default function ChannelContents() {
         //console.log("ChannelContents :: toggleWindowFocus : isFocused->", isFocused());
 
         //if (flagWasFocused) FnExecutor.checkConditionToFecthHistory();
-        FnExecutor.checkConditionToFecthHistory();
+        //FnExecutor.checkConditionToFecthHistory();
+        FnExecutor.execute([{ action: "waitToDraw" }, { action: "tryUpdateReadTime" }]);
       },
       setFalse: () => {
         setIsWindowFocused(false);
@@ -477,11 +485,7 @@ export default function ChannelContents() {
     () => `${storeHistory[currentChannelId()]?.history.at(-1)?.id}`,
     async () => {
       if (globalStateFetchingHistory) return;
-
-      await FnExecutor.execute([
-        { action: "waitToDraw" },
-        { action: "tryUpdateReadTime" }
-      ]);
+      await FnGiracleServices.tryUpdateReadTime(true);
     })
   );
 
