@@ -476,9 +476,11 @@ export default function ChannelContents() {
   createEffect(on(
     () => `${storeHistory[currentChannelId()]?.history.at(-1)?.id}`,
     async () => {
+      if (globalStateFetchingHistory) return;
+
       await FnExecutor.execute([
-        { action: "tryUpdateReadTime" },
-        { action: "waitToDraw" }
+        { action: "waitToDraw" },
+        { action: "tryUpdateReadTime" }
       ]);
     })
   );
