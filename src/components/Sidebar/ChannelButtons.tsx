@@ -39,7 +39,7 @@ export default function ChannelButtons() {
         if (bIndex === undefined) {
           return -1;
         }
-        
+
         return aIndex - bIndex;
       });
       //console.log("ChannelButtons :: createEffect : sorted->", sorted);
@@ -67,7 +67,7 @@ export default function ChannelButtons() {
     if (indexString) {
       try {
         channelIndexes = JSON.parse(indexString);
-      } catch(e) {
+      } catch (e) {
         console.error("ChannelButtons :: onMount : e->", e);
       }
     }
@@ -90,14 +90,14 @@ export default function ChannelButtons() {
         //ソートした方向に合わせてvirtualListを更新
         if (evt.newIndex > evt.oldIndex) {
           const oldPosItem = virtualList[evt.oldIndex];
-          for (let i=evt.oldIndex; i<evt.newIndex; i++) {
-            virtualList[i] = virtualList[i+1];
+          for (let i = evt.oldIndex; i < evt.newIndex; i++) {
+            virtualList[i] = virtualList[i + 1];
           }
           virtualList[evt.newIndex] = oldPosItem;
         } else {
           const oldPosItem = virtualList[evt.oldIndex];
-          for (let i=evt.oldIndex; i>evt.newIndex; i--) {
-            virtualList[i] = virtualList[i-1];
+          for (let i = evt.oldIndex; i > evt.newIndex; i--) {
+            virtualList[i] = virtualList[i - 1];
           }
           virtualList[evt.newIndex] = oldPosItem;
         }
@@ -129,18 +129,18 @@ export default function ChannelButtons() {
             <SidebarMenuButton
               as={A}
               href={`/app/channel/${c.channelId}`}
-              variant={loc.pathname === `/app/channel/${c.channelId}` ? "outline" : "default"}
+              variant={loc.pathname.startsWith(`/app/channel/${c.channelId}`) ? "outline" : "default"}
               class="truncate flex flex-row items-center md:p-2 p-5"
             >
               { //チャンネルの閲覧権限がある時の錠前アイコン、違うなら"#"アイコン
                 directGetterChannelInfo(c.channelId).ChannelViewableRole.length !== 0
-                ?
+                  ?
                   <IconLock class={"shrink-0 drag-handler"} size={"18"} />
-                :
+                  :
                   <IconHash class={"drag-handler"} />
               }
               <p class={storeHasNewMessage[c.channelId] ? "truncate" : "text-muted-foreground truncate"}>
-                { directGetterChannelInfo(c.channelId).name }
+                {directGetterChannelInfo(c.channelId).name}
               </p>
               {
                 (storeHasNewMessage[c.channelId] || hasMention(c.channelId))
