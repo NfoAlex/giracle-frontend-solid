@@ -96,6 +96,7 @@ export default function MessageTextRender(props: { content: string }) {
             </a>
           );
           break;
+
         case "messageLink":
           {
             const path = `/app/channel/${obj.idOrValue}`;
@@ -106,6 +107,7 @@ export default function MessageTextRender(props: { content: string }) {
             );
           }
           break;
+
         case "userId":
           // createMemo 内でリアクティブな値を参照すると、その値の変更時にメモが再計算される
           const userInfo = getterUserinfo(obj.idOrValue);
@@ -118,6 +120,7 @@ export default function MessageTextRender(props: { content: string }) {
             </UserinfoModalWrapper>
           );
           break;
+
         case "channel":
           const channelInfo = directGetterChannelInfo(obj.idOrValue);
           messageRenderingFinal.push(
@@ -126,6 +129,7 @@ export default function MessageTextRender(props: { content: string }) {
             </span>
           );
           break;
+
         case "inlineCode":
           messageRenderingFinal.push(
             <code class="bg-gray-200 dark:bg-gray-700 rounded px-1 py-0.5 text-sm font-mono mx-px">
@@ -133,6 +137,7 @@ export default function MessageTextRender(props: { content: string }) {
             </code>
           );
           break;
+
       }
       lastProcessedIndex = obj.index + obj.context.length;
     }
