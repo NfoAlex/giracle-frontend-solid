@@ -526,6 +526,13 @@ export default function ChannelContents() {
 
       setCurrentChannelId(currentChId);
 
+      //メッセージId指定があれば移動
+      if (currentMsgId) {
+        if (currentMsgId === prevArgs?.[1]) return;
+        FnExecutor.executePreset.moveToTargetMessage(currentMsgId);
+        return;
+      }
+
       const el = FnBrowserApis.getHistoryElement();
       //スクロール位置復元
       if (channelScrollPos.has(currentChannelId()) && el !== null) {
