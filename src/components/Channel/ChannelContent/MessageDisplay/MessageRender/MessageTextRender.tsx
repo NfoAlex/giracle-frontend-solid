@@ -101,7 +101,7 @@ export default function MessageTextRender(props: { content: string }) {
           {
             const path = `/app/channel/${obj.idOrValue}`;
             messageRenderingFinal.push(
-              <A href={path} class="underline whitespace-pre-wrap break-words text-blue-500">
+              <A href={path} class="whitespace-pre-wrap break-words bg-border hover:underline my-auto mx-px align-baseline inline-flex rounded px-1">
                 #
                 {
                   directGetterChannelInfo(obj.idOrValue.split("/")[0]).name.length > 18
