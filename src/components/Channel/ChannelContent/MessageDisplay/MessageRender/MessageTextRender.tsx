@@ -86,31 +86,25 @@ export default function MessageTextRender(props: { content: string }) {
       switch (obj.type) {
         case "link":
           const frontendUrl = import.meta.env.VITE_FRONTEND_URL || window.location.origin;
-          let isInternalHistoryLink = false;
-          let internalPath = "";
 
           //フロントのリンクであるならチャンネル内の移動用リンクにする
           if (obj.idOrValue.startsWith(frontendUrl)) {
             const path = obj.idOrValue.substring(frontendUrl.length);
             if (path.startsWith("/app/channel/")) {
-              isInternalHistoryLink = true;
-              internalPath = path;
+              messageRenderingFinal.push(
+                <A href={path} class="underline whitespace-pre-wrap break-words text-blue-500">
+                  ちゃんねるりんく : {obj.idOrValue}
+                </A>
+              );
+              break;
             }
           }
 
-          if (isInternalHistoryLink) {
-            messageRenderingFinal.push(
-              <A href={internalPath} class="underline whitespace-pre-wrap break-words text-blue-500">
-                {obj.idOrValue}
-              </A>
-            );
-          } else {
-            messageRenderingFinal.push(
-              <a href={obj.idOrValue} target="_blank" rel="noopener noreferrer" class="underline whitespace-pre-wrap break-words text-blue-500">
-                {obj.idOrValue}
-              </a>
-            );
-          }
+          messageRenderingFinal.push(
+            <a href={obj.idOrValue} target="_blank" rel="noopener noreferrer" class="underline whitespace-pre-wrap break-words text-blue-500">
+              {obj.idOrValue}
+            </a>
+          );
           break;
         case "userId":
           // createMemo 内でリアクティブな値を参照すると、その値の変更時にメモが再計算される
