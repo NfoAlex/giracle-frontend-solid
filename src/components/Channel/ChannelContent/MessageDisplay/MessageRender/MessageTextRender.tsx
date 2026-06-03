@@ -102,7 +102,14 @@ export default function MessageTextRender(props: { content: string }) {
             const path = `/app/channel/${obj.idOrValue}`;
             messageRenderingFinal.push(
               <A href={path} class="underline whitespace-pre-wrap break-words text-blue-500">
-                {obj.idOrValue}
+                #
+                {
+                  directGetterChannelInfo(obj.idOrValue.split("/")[0]).name.length > 18
+                    ?
+                    directGetterChannelInfo(obj.idOrValue.split("/")[0]).name.slice(0, 18) + "..."
+                    :
+                    directGetterChannelInfo(obj.idOrValue.split("/")[0]).name
+                } のメッセージ
               </A>
             );
           }
