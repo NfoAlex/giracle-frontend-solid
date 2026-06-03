@@ -385,6 +385,13 @@ export default function ChannelContents() {
        * @param messageId 移動先のメッセージID
        */
       moveToTargetMessage: (messageId: string) => {
+        //今のStoreにあるか調べてあるなら移動して終了
+        const messageElement = document.getElementById(`message-${messageId}`);
+        if (messageElement) {
+          messageElement.scrollIntoView({ behavior: "smooth", block: "center" });
+          return;
+        }
+
         setStoreHistory((prev) => {
           const newStore = { ...prev };
           newStore[currentChannelId()] = {
