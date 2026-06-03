@@ -1,10 +1,10 @@
-import {Card} from "~/components/ui/card.tsx";
-import {IconMoodHappy, IconPencil, IconTrash, IconCornerUpLeft, IconLink} from "@tabler/icons-solidjs";
+import { Card } from "~/components/ui/card.tsx";
+import { IconMoodHappy, IconPencil, IconTrash, IconCornerUpLeft, IconLink } from "@tabler/icons-solidjs";
 import DELETE_MESSAGE_DELETE from "~/api/MESSAGE/MESSAGE_DELETE.ts";
-import {getRolePower, storeMyUserinfo} from "~/stores/MyUserinfo.ts";
-import type {IMessage} from "~/types/Message.ts";
-import {Button} from "~/components/ui/button.tsx";
-import {createSignal} from "solid-js";
+import { getRolePower, storeMyUserinfo } from "~/stores/MyUserinfo.ts";
+import type { IMessage } from "~/types/Message.ts";
+import { Button } from "~/components/ui/button.tsx";
+import { createSignal } from "solid-js";
 import storeReplyingMessageId from "~/stores/ReplyingMessageId.ts";
 import EmojiPicker from "./HoverMenu/EmojiPicker.tsx";
 
@@ -50,16 +50,16 @@ export default function HoverMenu(props: {
 
   return (
     <Card class={"p-2 flex items-center"}>
-      <p class={"text-sm font-extralight mr-2"}>{ new Date(props.message.createdAt).toLocaleString() }</p>
+      <p class={"text-sm font-extralight mr-2"}>{new Date(props.message.createdAt).toLocaleString()}</p>
 
       <div class={"md:relative"}>
-        <Button onClick={()=>toggleOpenEmoji()} variant={"ghost"} class={"w-8 h-8"}><IconMoodHappy /></Button>
+        <Button onClick={() => toggleOpenEmoji()} variant={"ghost"} class={"w-8 h-8"}><IconMoodHappy /></Button>
         {
           openEmoji()
           &&
           <EmojiPicker
             message={props.message}
-            onClicked={()=> { setOpenEmoji(false); props.onReacting(false); } }
+            onClicked={() => { setOpenEmoji(false); props.onReacting(false); }}
           />
         }
       </div>
@@ -73,8 +73,7 @@ export default function HoverMenu(props: {
       </Button>
       <Button
         onClick={() => {
-          const frontendUrl = import.meta.env.VITE_FRONTEND_URL || window.location.origin;
-          const link = `${frontendUrl}/app/channel/${props.message.channelId}/${props.message.id}`;
+          const link = `&<${props.message.channelId}:${props.message.id}>`;
           navigator.clipboard.writeText(link);
         }}
         size="icon"

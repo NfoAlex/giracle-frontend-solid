@@ -12,11 +12,12 @@ export default function MessageTextRender(props: { content: string }) {
 
     const urlPattern =
       /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/gi;
+    const messageLinkPattern = /&<([a-f0-9-]+):([a-f0-9-]+)>/g;
     const mentionPattern = /@<([a-f0-9-]+)>/g;
     const channelPattern = /#<([a-f0-9-]+)>/g;
     const inlineCodePattern = /`([^`]+)`/g;
 
-    type MatchType = "link" | "userId" | "channel" | "inlineCode";
+    type MatchType = "link" | "messageLink" | "userId" | "channel" | "inlineCode";
     interface IMatchObject {
       context: string;
       type: MatchType;
@@ -37,9 +38,12 @@ export default function MessageTextRender(props: { content: string }) {
           case "link":
             idOrValue = match[0]; // リンクはそのまま
             break;
+          case "messageLink":
+            idOrValue = match[1] + "/" + match[2]; // キャプチャグループ1 (チャンネルId) + "/" + キャプチャグループ2 (メッセージId)
+            break;
           case "userId":
           case "channel":
-            idOrValue = match[1]; // キャプチャグループ1 (ID)
+            idOrValue = match[1]; // キャプチャグループ1 (チャンネルId)
             break;
           case "inlineCode":
             idOrValue = match[1]; // キャプチャグループ1 (コード内容)
@@ -58,6 +62,7 @@ export default function MessageTextRender(props: { content: string }) {
 
     // パターンを検索
     findMatches(urlPattern, "link");
+    findMatches(messageLinkPattern, "messageLink");
     findMatches(mentionPattern, "userId");
     findMatches(channelPattern, "channel");
     findMatches(inlineCodePattern, "inlineCode");
@@ -85,26 +90,21 @@ export default function MessageTextRender(props: { content: string }) {
       // マッチ部分をタイプに応じてJSXに変換
       switch (obj.type) {
         case "link":
-          const frontendUrl = import.meta.env.VITE_FRONTEND_URL || window.location.origin;
-
-          //フロントのリンクであるならチャンネル内の移動用リンクにする
-          if (obj.idOrValue.startsWith(frontendUrl)) {
-            const path = obj.idOrValue.substring(frontendUrl.length);
-            if (path.startsWith("/app/channel/")) {
-              messageRenderingFinal.push(
-                <A href={path} class="underline whitespace-pre-wrap break-words text-blue-500">
-                  ちゃんねるりんく : {obj.idOrValue}
-                </A>
-              );
-              break;
-            }
-          }
-
           messageRenderingFinal.push(
             <a href={obj.idOrValue} target="_blank" rel="noopener noreferrer" class="underline whitespace-pre-wrap break-words text-blue-500">
               {obj.idOrValue}
             </a>
           );
+          break;
+        case "messageLink":
+          {
+            const path = `/app/channel/${obj.idOrValue}`;
+            messageRenderingFinal.push(
+              <A href={path} class="underline whitespace-pre-wrap break-words text-blue-500">
+                {obj.idOrValue}
+              </A>
+            );
+          }
           break;
         case "userId":
           // createMemo 内でリアクティブな値を参照すると、その値の変更時にメモが再計算される
