@@ -386,7 +386,7 @@ export default function ChannelContents() {
        */
       moveToTargetMessage: (messageId: string) => {
         //今のStoreにあるか調べてあるなら移動して終了
-        const messageElement = document.getElementById(`message-${messageId}`);
+        const messageElement = document.getElementById(`messageId::${messageId}`);
         if (messageElement) {
           messageElement.scrollIntoView({ behavior: "smooth", block: "center" });
           return;
