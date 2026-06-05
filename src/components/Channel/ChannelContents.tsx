@@ -542,11 +542,12 @@ export default function ChannelContents() {
 
       setCurrentChannelId(currentChId);
 
-      //メッセージId指定があれば移動
+      //メッセージId指定があれば移動して完了
       if (currentMsgId) {
         if (currentMsgId === prevArgs?.[1]) return;
         await FnExecutor.executePreset.moveToTargetMessage(currentMsgId);
         FnBrowserApis.blinkTargetMessage(currentMsgId);
+        globalStateChannelMoveDone = true;
         return;
       }
 
