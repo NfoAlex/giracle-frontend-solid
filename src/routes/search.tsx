@@ -1,8 +1,9 @@
-import { IconSearch } from "@tabler/icons-solidjs";
+import { A } from "@solidjs/router";
+import { IconArrowRight, IconSearch } from "@tabler/icons-solidjs";
 import { createEffect, createMemo, createSignal, For } from "solid-js";
 import GET_MESSAGE_SEARCH from "~/api/MESSAGE/MESSAGE_SEARCH.ts";
 import MessageRender from "~/components/Channel/ChannelContent/MessageDisplay/MessageRender.tsx";
-import { Avatar, AvatarImage } from "~/components/ui/avatar.tsx";
+import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar.tsx";
 import { Button } from "~/components/ui/button.tsx";
 import { Card } from "~/components/ui/card.tsx";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~/components/ui/select.tsx";
@@ -203,13 +204,14 @@ export default function Search() {
           {searchedOnce() && searchResults().length === 0 && <p class="text-center">結果が見つかりませんでした...</p>}
           <For each={searchResults()}>
             {(message) => (
-              <Card class="p-2">
+              <Card class="p-3 flex flex-col gap-3">
                 <span>
-                  <UserinfoModalWrapper userId={message.userId} class="flex flex-row items-center gap-2">
-                    <Avatar>
+                  <UserinfoModalWrapper userId={message.userId} class="flex flex-row items-center gap-2 hover:underline">
+                    <Avatar class="w-10 h-10">
                       <AvatarImage src={"/api/user/icon/" + message.userId} />
+                      <AvatarFallback>{getterUserinfo(message.userId).name[0]}</AvatarFallback>
                     </Avatar>
-                    <p style="padding-top: 0.45rem;">{getterUserinfo(message.userId).name}</p>
+                    <p>{getterUserinfo(message.userId).name}</p>
                   </UserinfoModalWrapper>
                 </span>
                 <span class={"grow"}>
@@ -220,6 +222,14 @@ export default function Search() {
                   <span class="shrink-0 text-sm text-gray-500">{new Date(message.createdAt).toLocaleString()}</span>
                   <span>・</span>
                   <span class="shrink text-sm text-gray-500 truncate">#{directGetterChannelInfo(message.channelId).name}</span>
+
+                  <Button
+                    as={A}
+                    href={`/app/channel/${message.channelId}/${message.id}`}
+                    variant={"secondary"}
+                    size={"icon"}
+                    class="shrink-0 ml-auto"
+                  ><IconArrowRight /></Button>
                 </div>
               </Card>
             )}
@@ -232,6 +242,6 @@ export default function Search() {
           }
         </span>
       </div>
-    </div>
+    </div >
   );
 }
