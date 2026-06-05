@@ -194,7 +194,7 @@ export default function ChannelContents() {
      * 画面内にメッセージがあればそこにスクロールする
      */
     scrollToMessage: (messageId: string) => {
-      const messageElement = document.getElementById(`message-${messageId}`);
+      const messageElement = document.getElementById(`message::${messageId}`);
       if (!messageElement) return;
       messageElement.scrollIntoView({ behavior: "smooth", block: "center" });
     }
