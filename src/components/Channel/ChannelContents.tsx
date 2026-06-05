@@ -405,6 +405,7 @@ export default function ChannelContents() {
         const messageElement = document.getElementById(`messageId::${messageId}`);
         if (messageElement) {
           messageElement.scrollIntoView({ behavior: "smooth", block: "center" });
+          FnBrowserApis.blinkTargetMessage(messageId);
           return;
         }
 
@@ -424,7 +425,8 @@ export default function ChannelContents() {
           { action: "fetchHistory", option: [currentChannelId(), { messageIdFrom: messageId }, "newer"] },
           { action: "waitToDraw" },
           { action: "scrollToMessage", option: [messageId] },
-        ])
+        ]);
+        FnBrowserApis.blinkTargetMessage(messageId);
       }
     }
 
@@ -546,7 +548,6 @@ export default function ChannelContents() {
       if (currentMsgId) {
         if (currentMsgId === prevArgs?.[1]) return;
         await FnExecutor.executePreset.moveToTargetMessage(currentMsgId);
-        FnBrowserApis.blinkTargetMessage(currentMsgId);
         globalStateChannelMoveDone = true;
         return;
       }
