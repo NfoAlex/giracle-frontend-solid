@@ -404,7 +404,7 @@ export default function ChannelContents() {
         //今のStoreにあるか調べてあるなら移動して終了
         const messageElement = document.getElementById(`messageId::${messageId}`);
         if (messageElement) {
-          messageElement.scrollIntoView({ behavior: "smooth", block: "center" });
+          await FnExecutor.execute([{ action: "scrollToMessage", option: [messageId] }]);
           FnBrowserApis.blinkTargetMessage(messageId);
           return;
         }
