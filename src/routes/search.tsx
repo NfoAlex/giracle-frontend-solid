@@ -215,6 +215,12 @@ export default function Search() {
                 <span class={"grow"}>
                   <MessageRender message={message} displayUserName={false} />
                 </span>
+                <hr />
+                <div class="flex flex-row gap-2 items-center">
+                  <span class="shrink-0 text-sm text-gray-500">{new Date(message.createdAt).toLocaleString()}</span>
+                  <span>・</span>
+                  <span class="shrink text-sm text-gray-500 truncate">#{directGetterChannelInfo(message.channelId).name}</span>
+                </div>
               </Card>
             )}
           </For>
