@@ -1,8 +1,9 @@
-import { IconSearch } from "@tabler/icons-solidjs";
+import { A } from "@solidjs/router";
+import { IconArrowRight, IconSearch } from "@tabler/icons-solidjs";
 import { createEffect, createMemo, createSignal, For } from "solid-js";
 import GET_MESSAGE_SEARCH from "~/api/MESSAGE/MESSAGE_SEARCH.ts";
 import MessageRender from "~/components/Channel/ChannelContent/MessageDisplay/MessageRender.tsx";
-import { Avatar, AvatarImage } from "~/components/ui/avatar.tsx";
+import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar.tsx";
 import { Button } from "~/components/ui/button.tsx";
 import { Card } from "~/components/ui/card.tsx";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~/components/ui/select.tsx";
@@ -17,15 +18,15 @@ import type { IMessage } from "~/types/Message.ts";
 const SEARCH_PAGE_SIZE = 30;
 const CHANNEL_FILTER_ALL = "__all__";
 
-type SearchSortOrder = "asc" | "desc";
-type SearchFileFilter = "any" | "with_file" | "without_file";
-const sortOptions: SearchSortOrder[] = ["desc", "asc"];
-const fileFilterOptions: SearchFileFilter[] = ["any", "with_file", "without_file"];
-const sortLabels: Record<SearchSortOrder, string> = {
+type TSearchSortOrder = "asc" | "desc";
+type TSearchFileFilter = "any" | "with_file" | "without_file";
+const sortOptions: TSearchSortOrder[] = ["desc", "asc"];
+const fileFilterOptions: TSearchFileFilter[] = ["any", "with_file", "without_file"];
+const sortLabels: Record<TSearchSortOrder, string> = {
   desc: "新しい順",
   asc: "古い順",
 };
-const fileFilterLabels: Record<SearchFileFilter, string> = {
+const fileFilterLabels: Record<TSearchFileFilter, string> = {
   any: "指定なし",
   with_file: "添付あり",
   without_file: "添付なし",
@@ -38,8 +39,8 @@ export default function Search() {
   const [loadIndex, setLoadIndex] = createSignal(1);
   const [processing, setProcessing] = createSignal(false);
   const [selectedChannelId, setSelectedChannelId] = createSignal(CHANNEL_FILTER_ALL);
-  const [sortOrder, setSortOrder] = createSignal<SearchSortOrder>("desc");
-  const [fileFilter, setFileFilter] = createSignal<SearchFileFilter>("any");
+  const [sortOrder, setSortOrder] = createSignal<TSearchSortOrder>("desc");
+  const [fileFilter, setFileFilter] = createSignal<TSearchFileFilter>("any");
   const [lastFetchedRawCount, setLastFetchedRawCount] = createSignal(0);
   // 条件変更後に「もっと読み込む」で別条件を混ぜないため、直近検索条件を記録する
   const [lastSearchedConditionKey, setLastSearchedConditionKey] = createSignal("");
@@ -120,7 +121,7 @@ export default function Search() {
         <SidebarTriggerWithDot />
         <p>メッセージ検索</p>
       </Card>
-      
+
       <span class="mx-auto w-full flex items-center gap-2 mt-2">
         <TextField class="grow">
           <TextFieldInput
@@ -169,7 +170,7 @@ export default function Search() {
           )}
         >
           <SelectTrigger aria-label="search-sort-order">
-            <SelectValue<SearchSortOrder>>
+            <SelectValue<TSearchSortOrder>>
               {(state) => <p>{sortLabels[state.selectedOption() ?? "desc"]}</p>}
             </SelectValue>
           </SelectTrigger>
@@ -187,7 +188,7 @@ export default function Search() {
           )}
         >
           <SelectTrigger aria-label="search-file-filter">
-            <SelectValue<SearchFileFilter>>
+            <SelectValue<TSearchFileFilter>>
               {(state) => <p>{fileFilterLabels[state.selectedOption() ?? "any"]}</p>}
             </SelectValue>
           </SelectTrigger>
@@ -199,22 +200,37 @@ export default function Search() {
 
       <div class="w-full grow overflow-y-auto pt-2 pb-4">
         <span class="flex flex-col gap-6 md:gap-2 overflow-y-auto overflow-x-hidden">
-          { !searchedOnce() && <p class="text-center">メッセージ文を検索してください。</p> }
-          { searchedOnce() && searchResults().length === 0 && <p class="text-center">結果が見つかりませんでした...</p>}
+          {!searchedOnce() && <p class="text-center">メッセージ文を検索してください。</p>}
+          {searchedOnce() && searchResults().length === 0 && <p class="text-center">結果が見つかりませんでした...</p>}
           <For each={searchResults()}>
             {(message) => (
-              <Card class="p-2">
+              <Card class="p-3 flex flex-col gap-3">
                 <span>
-                  <UserinfoModalWrapper userId={message.userId} class="flex flex-row items-center gap-2">
-                    <Avatar>
+                  <UserinfoModalWrapper userId={message.userId} class="flex flex-row items-center gap-2 hover:underline">
+                    <Avatar class="w-10 h-10">
                       <AvatarImage src={"/api/user/icon/" + message.userId} />
+                      <AvatarFallback>{getterUserinfo(message.userId).name[0]}</AvatarFallback>
                     </Avatar>
-                    <p style="padding-top: 0.45rem;">{ getterUserinfo(message.userId).name }</p>
+                    <p>{getterUserinfo(message.userId).name}</p>
                   </UserinfoModalWrapper>
                 </span>
                 <span class={"grow"}>
                   <MessageRender message={message} displayUserName={false} />
                 </span>
+                <hr />
+                <div class="flex flex-row gap-2 items-center">
+                  <span class="shrink-0 text-sm text-gray-500">{new Date(message.createdAt).toLocaleString()}</span>
+                  <span>・</span>
+                  <span class="shrink text-sm text-gray-500 truncate">#{directGetterChannelInfo(message.channelId).name}</span>
+
+                  <Button
+                    as={A}
+                    href={`/app/channel/${message.channelId}/${message.id}`}
+                    variant={"secondary"}
+                    size={"icon"}
+                    class="shrink-0 ml-auto"
+                  ><IconArrowRight /></Button>
+                </div>
               </Card>
             )}
           </For>
@@ -222,10 +238,10 @@ export default function Search() {
           {
             canLoadMore()
             &&
-            <Button onClick={()=>searchIt(true)} variant={"secondary"} disabled={processing()}>もっと読み込む</Button>
+            <Button onClick={() => searchIt(true)} variant={"secondary"} disabled={processing()}>もっと読み込む</Button>
           }
         </span>
       </div>
-    </div>
+    </div >
   );
 }

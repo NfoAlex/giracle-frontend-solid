@@ -123,6 +123,22 @@ export default function ChannelContents() {
       container.scrollTop += delta;
     },
 
+    /**
+     * 指定のメッセージを点滅させる
+     * @param messageId
+     */
+    blinkTargetMessage: async (messageId: string) => {
+      const targetEl = document.getElementById(`messageId::${messageId}::content`) as HTMLElement | null;
+      if (!targetEl) return;
+
+      targetEl.classList.add("bg-accent", "transition-colors", "duration-1000", "rounded");
+      setTimeout(() => targetEl.classList.remove("bg-accent", "transition-colors", "duration-500"), 500);
+      setTimeout(() => targetEl.classList.add("bg-accent", "transition-colors", "duration-500", "rounded"), 1000);
+      setTimeout(() => targetEl.classList.remove("bg-accent", "transition-colors", "duration-1000"), 1500);
+      setTimeout(() => targetEl.classList.add("bg-accent", "transition-colors", "duration-500", "rounded"), 2000);
+      setTimeout(() => targetEl.classList.remove("bg-accent", "transition-colors", "duration-1000"), 3000);
+    }
+
   }
 
   const FnHistoryControllers = {
@@ -178,7 +194,7 @@ export default function ChannelContents() {
      * 画面内にメッセージがあればそこにスクロールする
      */
     scrollToMessage: (messageId: string) => {
-      const messageElement = document.getElementById(`message-${messageId}`);
+      const messageElement = document.getElementById(`messageId::${messageId}`);
       if (!messageElement) return;
       messageElement.scrollIntoView({ behavior: "smooth", block: "center" });
     }
@@ -384,7 +400,15 @@ export default function ChannelContents() {
        *
        * @param messageId 移動先のメッセージID
        */
-      moveToTargetMessage: (messageId: string) => {
+      moveToTargetMessage: async (messageId: string) => {
+        //今のStoreにあるか調べてあるなら移動して終了
+        const messageElement = document.getElementById(`messageId::${messageId}`);
+        if (messageElement) {
+          await FnExecutor.execute([{ action: "scrollToMessage", option: [messageId] }]);
+          FnBrowserApis.blinkTargetMessage(messageId);
+          return;
+        }
+
         setStoreHistory((prev) => {
           const newStore = { ...prev };
           newStore[currentChannelId()] = {
@@ -395,13 +419,14 @@ export default function ChannelContents() {
           return newStore;
         });
 
-        FnExecutor.execute([
+        await FnExecutor.execute([
           { action: "fetchHistory", option: [currentChannelId(), { messageIdFrom: messageId }, "older"] },
           { action: "waitToDraw" },
           { action: "fetchHistory", option: [currentChannelId(), { messageIdFrom: messageId }, "newer"] },
           { action: "waitToDraw" },
           { action: "scrollToMessage", option: [messageId] },
-        ])
+        ]);
+        FnBrowserApis.blinkTargetMessage(messageId);
       }
     }
 
@@ -518,6 +543,14 @@ export default function ChannelContents() {
       if (currentChId === undefined) return;
 
       setCurrentChannelId(currentChId);
+
+      //メッセージId指定があれば移動して完了
+      if (currentMsgId) {
+        if (currentMsgId === prevArgs?.[1]) return;
+        await FnExecutor.executePreset.moveToTargetMessage(currentMsgId);
+        globalStateChannelMoveDone = true;
+        return;
+      }
 
       const el = FnBrowserApis.getHistoryElement();
       //スクロール位置復元
