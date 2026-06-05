@@ -128,7 +128,7 @@ export default function ChannelContents() {
      * @param messageId
      */
     blinkTargetMessage: async (messageId: string) => {
-      const targetEl = document.getElementById(`messageId::${messageId}`) as HTMLElement | null;
+      const targetEl = document.getElementById(`messageId::${messageId}::content`) as HTMLElement | null;
       if (!targetEl) return;
 
       targetEl.classList.add("bg-accent", "transition-colors", "duration-1000", "rounded");
