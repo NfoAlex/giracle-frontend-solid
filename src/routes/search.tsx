@@ -17,15 +17,15 @@ import type { IMessage } from "~/types/Message.ts";
 const SEARCH_PAGE_SIZE = 30;
 const CHANNEL_FILTER_ALL = "__all__";
 
-type SearchSortOrder = "asc" | "desc";
-type SearchFileFilter = "any" | "with_file" | "without_file";
-const sortOptions: SearchSortOrder[] = ["desc", "asc"];
-const fileFilterOptions: SearchFileFilter[] = ["any", "with_file", "without_file"];
-const sortLabels: Record<SearchSortOrder, string> = {
+type TSearchSortOrder = "asc" | "desc";
+type TSearchFileFilter = "any" | "with_file" | "without_file";
+const sortOptions: TSearchSortOrder[] = ["desc", "asc"];
+const fileFilterOptions: TSearchFileFilter[] = ["any", "with_file", "without_file"];
+const sortLabels: Record<TSearchSortOrder, string> = {
   desc: "新しい順",
   asc: "古い順",
 };
-const fileFilterLabels: Record<SearchFileFilter, string> = {
+const fileFilterLabels: Record<TSearchFileFilter, string> = {
   any: "指定なし",
   with_file: "添付あり",
   without_file: "添付なし",
@@ -38,8 +38,8 @@ export default function Search() {
   const [loadIndex, setLoadIndex] = createSignal(1);
   const [processing, setProcessing] = createSignal(false);
   const [selectedChannelId, setSelectedChannelId] = createSignal(CHANNEL_FILTER_ALL);
-  const [sortOrder, setSortOrder] = createSignal<SearchSortOrder>("desc");
-  const [fileFilter, setFileFilter] = createSignal<SearchFileFilter>("any");
+  const [sortOrder, setSortOrder] = createSignal<TSearchSortOrder>("desc");
+  const [fileFilter, setFileFilter] = createSignal<TSearchFileFilter>("any");
   const [lastFetchedRawCount, setLastFetchedRawCount] = createSignal(0);
   // 条件変更後に「もっと読み込む」で別条件を混ぜないため、直近検索条件を記録する
   const [lastSearchedConditionKey, setLastSearchedConditionKey] = createSignal("");
@@ -120,7 +120,7 @@ export default function Search() {
         <SidebarTriggerWithDot />
         <p>メッセージ検索</p>
       </Card>
-      
+
       <span class="mx-auto w-full flex items-center gap-2 mt-2">
         <TextField class="grow">
           <TextFieldInput
@@ -169,7 +169,7 @@ export default function Search() {
           )}
         >
           <SelectTrigger aria-label="search-sort-order">
-            <SelectValue<SearchSortOrder>>
+            <SelectValue<TSearchSortOrder>>
               {(state) => <p>{sortLabels[state.selectedOption() ?? "desc"]}</p>}
             </SelectValue>
           </SelectTrigger>
@@ -187,7 +187,7 @@ export default function Search() {
           )}
         >
           <SelectTrigger aria-label="search-file-filter">
-            <SelectValue<SearchFileFilter>>
+            <SelectValue<TSearchFileFilter>>
               {(state) => <p>{fileFilterLabels[state.selectedOption() ?? "any"]}</p>}
             </SelectValue>
           </SelectTrigger>
@@ -199,8 +199,8 @@ export default function Search() {
 
       <div class="w-full grow overflow-y-auto pt-2 pb-4">
         <span class="flex flex-col gap-6 md:gap-2 overflow-y-auto overflow-x-hidden">
-          { !searchedOnce() && <p class="text-center">メッセージ文を検索してください。</p> }
-          { searchedOnce() && searchResults().length === 0 && <p class="text-center">結果が見つかりませんでした...</p>}
+          {!searchedOnce() && <p class="text-center">メッセージ文を検索してください。</p>}
+          {searchedOnce() && searchResults().length === 0 && <p class="text-center">結果が見つかりませんでした...</p>}
           <For each={searchResults()}>
             {(message) => (
               <Card class="p-2">
@@ -209,7 +209,7 @@ export default function Search() {
                     <Avatar>
                       <AvatarImage src={"/api/user/icon/" + message.userId} />
                     </Avatar>
-                    <p style="padding-top: 0.45rem;">{ getterUserinfo(message.userId).name }</p>
+                    <p style="padding-top: 0.45rem;">{getterUserinfo(message.userId).name}</p>
                   </UserinfoModalWrapper>
                 </span>
                 <span class={"grow"}>
@@ -222,7 +222,7 @@ export default function Search() {
           {
             canLoadMore()
             &&
-            <Button onClick={()=>searchIt(true)} variant={"secondary"} disabled={processing()}>もっと読み込む</Button>
+            <Button onClick={() => searchIt(true)} variant={"secondary"} disabled={processing()}>もっと読み込む</Button>
           }
         </span>
       </div>
