@@ -14,7 +14,7 @@ export default function RenderEmoji(props: { emojiCode: string }) {
   // createMemoを使って絵文字表示用データを効率的に導出
   const emojiDisplay = createMemo(() => {
     const data = emojiData();
-    
+
     // データがない場合
     if (data === null) {
       return {
@@ -22,7 +22,7 @@ export default function RenderEmoji(props: { emojiCode: string }) {
         content: props.emojiCode.slice(0, 5)
       };
     }
-    
+
     // カスタム絵文字（URL付き）
     if (data.url !== undefined) {
       return {
@@ -31,7 +31,7 @@ export default function RenderEmoji(props: { emojiCode: string }) {
         alt: props.emojiCode
       };
     }
-    
+
     // ユニコード絵文字
     return {
       type: 'unicode',
@@ -50,7 +50,7 @@ export default function RenderEmoji(props: { emojiCode: string }) {
           class="w-6 h-6"
         />
       ) : (
-        <span class="h-6" style="font-size:18px;">{emojiDisplay().unicode}</span>
+        <span class="w-6 h-6" style="font-size:18px;">{emojiDisplay().unicode}</span>
       )}
     </div>
   );

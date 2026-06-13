@@ -25,7 +25,7 @@ export default function URLPreview(props: { urlPreview: IMessageUrlPreview }) {
             <div class="flex items-center gap-2">
               {
                 props.urlPreview.faviconLink
-                  ? <img class={"w-5 h-fit shrink-0 truncate"} src={props.urlPreview.faviconLink} alt="favicon" />
+                  ? <img class={"w-5 h-5 shrink-0 truncate"} src={props.urlPreview.faviconLink} alt="favicon" />
                   : <IconLink />
               }
               <DialogTitle class="truncate">
