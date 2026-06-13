@@ -541,17 +541,25 @@ export default function ChannelContents() {
   createEffect(on(
     () => [param.channelId, param.messageId],
     async ([currentChId, currentMsgId], prevArgs) => {
-      console.log("ChannelContent :: createEffect : currentChId", currentChId);
+      //console.log("ChannelContent :: createEffect : currentChId", currentChId, currentMsgId, prevArgs);
       if (currentChId === undefined) return;
 
       setCurrentChannelId(currentChId);
 
       //メッセージId指定があれば移動して完了
       if (currentMsgId) {
-        if (currentMsgId === prevArgs?.[1]) return;
         await FnExecutor.executePreset.moveToTargetMessage(currentMsgId);
         globalStateChannelMoveDone = true;
         return;
+      }
+
+      //同じチャンネルIdでの移動の場合ここで停止
+      {
+        const previousChannelId = prevArgs?.[0];
+        if (previousChannelId && currentChId === previousChannelId) {
+          globalStateChannelMoveDone = true;
+          return;
+        }
       }
 
       const el = FnBrowserApis.getHistoryElement();
