@@ -114,7 +114,6 @@ export default function MessageTextRender(props: { content: string }) {
                 }, 0);
                 return;
               }
-              // 同パスでも強制的にシグナル等でリセット
               nav(`/app/channel/${channelId}/${messageId}`);
             }
 
