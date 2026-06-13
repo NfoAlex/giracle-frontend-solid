@@ -196,7 +196,9 @@ export default function ChannelContents() {
     scrollToMessage: (messageId: string) => {
       const messageElement = document.getElementById(`messageId::${messageId}`);
       if (!messageElement) return;
-      messageElement.scrollIntoView({ behavior: "smooth", block: "center" });
+      requestAnimationFrame(() => {
+        messageElement.scrollIntoView({ behavior: "smooth", block: "center" });
+      });
     }
 
   };
