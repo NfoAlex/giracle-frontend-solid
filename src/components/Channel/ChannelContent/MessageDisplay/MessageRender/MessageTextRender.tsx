@@ -1,5 +1,5 @@
 import { createMemo, For, type JSX } from "solid-js";
-import { A } from "@solidjs/router";
+import { useLocation, useNavigate } from "@solidjs/router";
 import { directGetterChannelInfo } from "~/stores/ChannelInfo.ts";
 import { getterUserinfo } from "~/stores/Userinfo.ts";
 import { storeMyUserinfo } from "~/stores/MyUserinfo.ts";
@@ -99,9 +99,27 @@ export default function MessageTextRender(props: { content: string }) {
 
         case "messageLink":
           {
-            const path = `/app/channel/${obj.idOrValue}`;
+            const channelId = obj.idOrValue.split("/")[0];
+            const messageId = obj.idOrValue.split("/")[1];
+            const classesMessageLink = "whitespace-pre-wrap break-words bg-border hover:underline my-auto mx-px align-baseline inline-flex rounded px-1";
+
+            const nav = useNavigate();
+            const loc = useLocation();
+            const jump = (e: MouseEvent) => {
+              e.preventDefault();
+              if (loc.pathname.endsWith(`${channelId}/${messageId}`)) {
+                nav(`/app/channel/${channelId}`);
+                setTimeout(() => {
+                  nav(`/app/channel/${channelId}/${messageId}`);
+                }, 0);
+                return;
+              }
+              // 同パスでも強制的にシグナル等でリセット
+              nav(`/app/channel/${channelId}/${messageId}`);
+            }
+
             messageRenderingFinal.push(
-              <A href={path} class="whitespace-pre-wrap break-words bg-border hover:underline my-auto mx-px align-baseline inline-flex rounded px-1">
+              <span onClick={jump} class={classesMessageLink}>
                 #
                 {
                   directGetterChannelInfo(obj.idOrValue.split("/")[0]).name.length > 18
@@ -110,7 +128,7 @@ export default function MessageTextRender(props: { content: string }) {
                     :
                     directGetterChannelInfo(obj.idOrValue.split("/")[0]).name
                 } のメッセージ
-              </A>
+              </span>
             );
           }
           break;
