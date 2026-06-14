@@ -101,7 +101,7 @@ export default function MessageTextRender(props: { content: string }) {
           {
             const channelId = obj.idOrValue.split("/")[0];
             const messageId = obj.idOrValue.split("/")[1];
-            const classesMessageLink = "whitespace-pre-wrap break-words bg-border hover:underline my-auto mx-px align-baseline inline-flex rounded px-1";
+            const classesMessageLink = "cursor-pointer whitespace-pre-wrap break-words bg-border hover:underline my-auto mx-px align-baseline inline-flex rounded px-1";
 
             const nav = useNavigate();
             const loc = useLocation();
