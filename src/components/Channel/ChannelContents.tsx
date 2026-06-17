@@ -304,6 +304,12 @@ export default function ChannelContents() {
 
       //console.log("ChannelContent :: checkConditionToFetchHistory : トリガー");
 
+      //履歴Storeが初期化されたうえでの取得判別だと既読時間から取って終わり
+      if (!historyState.atEnd && !historyState.atTop && historyState.history.length === 0) {
+        await FnExecutor.executePreset.fetchFromLastRead();
+        return;
+      }
+
       let checkCanFetchForOlder = () => !isHistoryAtTop && containerAtTop;
       let checkCanFetchForNewer = () => !isHistoryAtEnd && containerAtBottom;
       let flagFetchedHistory = false;
@@ -328,7 +334,7 @@ export default function ChannelContents() {
         flagFetchedHistory = true;
       }
 
-      if (flagFetchedHistory) FnExecutor.checkConditionToFecthHistory();
+      if (flagFetchedHistory) await FnExecutor.checkConditionToFecthHistory();
     },
 
     executePreset: {
@@ -348,6 +354,22 @@ export default function ChannelContents() {
 
         FnExecutor.execute([
           { action: "fetchHistory", option: [currentChannelId(), { messageIdFrom: "", fetchLength: 20 }, "older"] }
+        ]);
+      },
+
+      /**
+       * 既読時間から履歴を取得する
+       */
+      fetchFromLastRead: async () => {
+        if (storeHistory[currentChannelId()] !== undefined) return;
+
+        const readTime = storeMessageReadTime.find((readTimeObj) => {
+          return readTimeObj.channelId === currentChannelId();
+        })?.readTime;
+
+        await FnExecutor.execute([
+          { action: "fetchHistory", option: [currentChannelId(), { messageTimeFrom: readTime, fetchLength: 20 }, "older"] },
+          { action: "waitToDraw" }
         ]);
       },
 
@@ -474,12 +496,18 @@ export default function ChannelContents() {
 
   //履歴の最新部分更新監視
   createEffect(on(
-    () => `${storeHistory[currentChannelId()]?.history.at(-1)?.id}`,
+    () => storeHistory[currentChannelId()]?.history.at(-1)?.id,
     async () => {
-      if (globalStateFetchingHistory) return;
-      await FnGiracleServices.tryUpdateReadTime();
-    })
-  );
+      //console.log("ChannelContent :: createEffect(storeHistory[currentChannelId()]?.history.at(-1)?.id) : トリガー");
+      // 新着メッセージ到着時 → 既読時間更新のみ
+      setTimeout(async () => {
+        if (globalStateFetchingHistory) return;
+        await FnExecutor.checkConditionToFecthHistory();
+        await FnGiracleServices.tryUpdateReadTime();
+      });
+    },
+    { defer: true }
+  ));
 
   //チャンネルから離れるときにスクロール位置を保存
   useBeforeLeave(() => {
@@ -523,18 +551,8 @@ export default function ChannelContents() {
         el.scrollTop = channelScrollPos.get(currentChannelId()) ?? 0;
       }
 
-      //このチャンネルの既読時間
-      const readTime = storeMessageReadTime.find((readTimeObj) => {
-        return readTimeObj.channelId === currentChId;
-      })?.readTime;
-
-      //履歴がStoreにそもそも無いとき
-      if (storeHistory[currentChannelId()] === undefined) {
-        await FnExecutor.execute([
-          { action: "fetchHistory", option: [currentChannelId(), { messageTimeFrom: readTime, fetchLength: 20 }, "older"] },
-          { action: "waitToDraw" }
-        ]);
-      }
+      //既読時間から履歴を取得
+      await FnExecutor.executePreset.fetchFromLastRead();
 
       //チャンネル移動完了フラグを立てて履歴取得トリガー確認
       globalStateChannelMoveDone = true;
