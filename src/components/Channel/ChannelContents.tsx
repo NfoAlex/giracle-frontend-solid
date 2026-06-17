@@ -334,7 +334,7 @@ export default function ChannelContents() {
         flagFetchedHistory = true;
       }
 
-      if (flagFetchedHistory) FnExecutor.checkConditionToFecthHistory();
+      if (flagFetchedHistory) await FnExecutor.checkConditionToFecthHistory();
     },
 
     executePreset: {
