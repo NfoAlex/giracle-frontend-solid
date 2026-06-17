@@ -352,6 +352,22 @@ export default function ChannelContents() {
       },
 
       /**
+       * 既読時間から履歴を取得する
+       */
+      fetchFromLastRead: async () => {
+        if (storeHistory[currentChannelId()] !== undefined) return;
+
+        const readTime = storeMessageReadTime.find((readTimeObj) => {
+          return readTimeObj.channelId === currentChannelId();
+        })?.readTime;
+
+        await FnExecutor.execute([
+          { action: "fetchHistory", option: [currentChannelId(), { messageTimeFrom: readTime, fetchLength: 20 }, "older"] },
+          { action: "waitToDraw" }
+        ]);
+      },
+
+      /**
        * 特定のメッセージへ履歴を移動してスクロールする
        *
        * @param messageId 移動先のメッセージID
@@ -523,18 +539,8 @@ export default function ChannelContents() {
         el.scrollTop = channelScrollPos.get(currentChannelId()) ?? 0;
       }
 
-      //このチャンネルの既読時間
-      const readTime = storeMessageReadTime.find((readTimeObj) => {
-        return readTimeObj.channelId === currentChId;
-      })?.readTime;
-
-      //履歴がStoreにそもそも無いとき
-      if (storeHistory[currentChannelId()] === undefined) {
-        await FnExecutor.execute([
-          { action: "fetchHistory", option: [currentChannelId(), { messageTimeFrom: readTime, fetchLength: 20 }, "older"] },
-          { action: "waitToDraw" }
-        ]);
-      }
+      //既読時間から履歴を取得
+      await FnExecutor.executePreset.fetchFromLastRead();
 
       //チャンネル移動完了フラグを立てて履歴取得トリガー確認
       globalStateChannelMoveDone = true;
