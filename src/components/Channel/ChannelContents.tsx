@@ -12,6 +12,7 @@ import { storeMyUserinfo } from "~/stores/MyUserinfo.ts";
 import POST_CHANNEL_GET_HISTORY from "~/api/CHANNEL/CHANNEL_GET_HISTORY.ts";
 import { produce } from "solid-js/store";
 import SkeletonLoader from "./ChannelContent/SkeletonLoader.tsx";
+import UpdateReadTimeOnRemoteAndStore from "~/utils/UpdateReadTimeOnRemoteAndStore.util.ts";
 
 const channelScrollPos: Map<string, number> = new Map();
 
@@ -210,61 +211,14 @@ export default function ChannelContents() {
      */
     tryUpdateReadTime: async () => {
       if (storeHistory[currentChannelId()]?.atEnd === false) return;
-      if (!isWindowFocused()) return;
+      if (!document.hasFocus()) return;
       if (!FnBrowserApis.isScrolledToVisualBottom()) return;
 
       //既読時間Storeの時間と最新メッセージの時間を比較
       const latestMessageTime = storeHistory[currentChannelId()]?.history[0]?.createdAt;
       if (latestMessageTime === undefined) return;
-      const currentReadTime = storeMessageReadTime.find((readTimeJson) => {
-        return readTimeJson.channelId === currentChannelId();
-      })?.readTime;
-      //既読時間がそもそも無い場合は最新メッセージ時間を既読時間として保存する
-      if (currentReadTime === undefined) {
-        await POST_MESSAGE_UPDATE_READTIME(
-          currentChannelId(),
-          latestMessageTime,
-        )
-          .then(() => {
-            setStoreMessageReadTime((prev) => {
-              const newReadTime = {
-                channelId: currentChannelId(),
-                readTime: latestMessageTime,
-                readTimeBefore: latestMessageTime
-              };
-              const newStore = prev.filter((c) => c.channelId !== currentChannelId());
-              newStore.push({ ...newReadTime });
-              return newStore;
-            });
-          })
-          .catch((err) => {
-            console.error("ChannelContents :: FnGiracleServices.tryUpdateReadTime : err->", err);
-          });
 
-        return;
-      }
-
-      if (new Date(currentReadTime).valueOf() >= new Date(latestMessageTime).valueOf()) return;
-
-      //Store更新してからサーバーに同期
-      setStoreMessageReadTime((prev) => {
-        const newReadTime = {
-          channelId: currentChannelId(),
-          readTime: latestMessageTime,
-          readTimeBefore: currentReadTime
-        };
-        const newStore = prev.filter((c) => c.channelId !== currentChannelId());
-        newStore.push({ ...newReadTime });
-        return newStore;
-      });
-      //サーバーに同期してStore更新
-      await POST_MESSAGE_UPDATE_READTIME(
-        currentChannelId(),
-        latestMessageTime,
-      )
-        .catch((err) => {
-          console.error("ChannelContents :: FnGiracleServices.tryUpdateReadTime : err->", err);
-        });
+      UpdateReadTimeOnRemoteAndStore(currentChannelId(), latestMessageTime);
     },
 
   };
