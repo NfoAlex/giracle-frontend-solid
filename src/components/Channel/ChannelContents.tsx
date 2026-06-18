@@ -414,6 +414,11 @@ export default function ChannelContents() {
           { action: "waitToDraw" },
           { action: "scrollToMessage", option: [messageId] },
         ]);
+        //もしメッセージが見つからなかった場合既読時間から取り返す
+        if (!storeHistory[currentChannelId()].history.some((m) => m.id === messageId)) {
+          FnExecutor.executePreset.fetchFromLastRead();
+          return;
+        }
         FnBrowserApis.blinkTargetMessage(messageId);
       }
     }
