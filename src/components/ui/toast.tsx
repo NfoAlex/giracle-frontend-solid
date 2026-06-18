@@ -40,9 +40,10 @@ const Toaster = <T extends ValidComponent = "ol">(
   return (
     <Portal>
       <ToastPrimitive.Region>
+        {/* 位置を下から上に移動させるためclassを改変済み */}
         <ToastPrimitive.List
           class={cn(
-            "fixed top-0 z-[100] flex max-h-screen w-full flex-col-reverse gap-2 p-4 sm:bottom-0 sm:right-0 sm:top-auto sm:flex-col md:max-w-[420px]",
+            "fixed top-0 z-[100] flex max-h-screen w-full flex-col gap-2 p-4 sm:bottom-auto sm:right-0 sm:top-0 sm:flex-col md:max-w-[420px]",
             local.class
           )}
           {...others}
