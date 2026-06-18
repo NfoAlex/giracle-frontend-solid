@@ -363,7 +363,15 @@ export default function ChannelContents() {
        * 既読時間から履歴を取得する
        */
       fetchFromLastRead: async () => {
-        if (storeHistory[currentChannelId()] !== undefined) return;
+        setStoreHistory((prev) => {
+          const newStore = { ...prev };
+          newStore[currentChannelId()] = {
+            atEnd: false,
+            atTop: false,
+            history: [],
+          };
+          return newStore;
+        });
 
         const readTime = storeMessageReadTime.find((readTimeObj) => {
           return readTimeObj.channelId === currentChannelId();
