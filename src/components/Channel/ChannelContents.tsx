@@ -13,6 +13,7 @@ import POST_CHANNEL_GET_HISTORY from "~/api/CHANNEL/CHANNEL_GET_HISTORY.ts";
 import { produce } from "solid-js/store";
 import SkeletonLoader from "./ChannelContent/SkeletonLoader.tsx";
 import UpdateReadTimeOnRemoteAndStore from "~/utils/UpdateReadTimeOnRemoteAndStore.util.ts";
+import { showToast } from "../ui/toast.tsx";
 
 const channelScrollPos: Map<string, number> = new Map();
 
@@ -186,7 +187,7 @@ export default function ChannelContents() {
           FnBrowserApis.restoreScrollFromAnchor(anchor);
         })
         .catch((e) =>
-          console.error("ChannelContent :: FnHistoryControllers.fetchHistory : エラー->", _dat, e),
+          console.warn("ChannelContent :: FnHistoryControllers.fetchHistory : エラー->", _dat, e),
         )
         .finally(() => {
           globalStateFetchingHistory = false;
@@ -363,7 +364,15 @@ export default function ChannelContents() {
        * 既読時間から履歴を取得する
        */
       fetchFromLastRead: async () => {
-        if (storeHistory[currentChannelId()] !== undefined) return;
+        setStoreHistory((prev) => {
+          const newStore = { ...prev };
+          newStore[currentChannelId()] = {
+            atEnd: false,
+            atTop: false,
+            history: [],
+          };
+          return newStore;
+        });
 
         const readTime = storeMessageReadTime.find((readTimeObj) => {
           return readTimeObj.channelId === currentChannelId();
@@ -406,6 +415,12 @@ export default function ChannelContents() {
           { action: "waitToDraw" },
           { action: "scrollToMessage", option: [messageId] },
         ]);
+        //もしメッセージが見つからなかった場合既読時間から取り返す
+        if (!storeHistory[currentChannelId()].history.some((m) => m.id === messageId)) {
+          showToast({ title: "エラー", variant: "error", description: "対象のメッセージを取得できませんでした。削除された可能性があります。" })
+          FnExecutor.executePreset.fetchFromLastRead();
+          return;
+        }
         FnBrowserApis.blinkTargetMessage(messageId);
       }
     }
@@ -496,14 +511,13 @@ export default function ChannelContents() {
     }
   };
 
-  //履歴の最新部分更新監視
+  //履歴の最古部分更新監視
   createEffect(on(
     () => storeHistory[currentChannelId()]?.history.at(-1)?.id,
     async () => {
       //console.log("ChannelContent :: createEffect(storeHistory[currentChannelId()]?.history.at(-1)?.id) : トリガー");
       // 新着メッセージ到着時 → 既読時間更新のみ
       setTimeout(async () => {
-        if (globalStateFetchingHistory) return;
         await FnExecutor.checkConditionToFecthHistory();
         await FnGiracleServices.tryUpdateReadTime();
       });
@@ -553,8 +567,10 @@ export default function ChannelContents() {
         el.scrollTop = channelScrollPos.get(currentChannelId()) ?? 0;
       }
 
-      //既読時間から履歴を取得
-      await FnExecutor.executePreset.fetchFromLastRead();
+      //履歴が無い場合既読時間から取得してみる
+      if (!storeHistory[currentChId]?.atEnd && !storeHistory[currentChId]?.atTop && (storeHistory[currentChId]?.history?.length ?? 0) === 0) {
+        await FnExecutor.executePreset.fetchFromLastRead();
+      }
 
       //チャンネル移動完了フラグを立てて履歴取得トリガー確認
       globalStateChannelMoveDone = true;

@@ -12,10 +12,11 @@ import { AppSidebar } from './components/Sidebar.tsx';
 import Channel from './routes/channel/[id].tsx';
 import GET_SERVER_CONFIG from './api/SERVER/SERVER_CONFIG.ts';
 import { setStoreServerinfo, storeServerinfo } from './stores/Serverinfo.ts';
-import {ColorModeProvider, ColorModeScript, createLocalStorageManager} from "@kobalte/core";
+import { ColorModeProvider, ColorModeScript, createLocalStorageManager } from "@kobalte/core";
 import AuthGuard from "~/components/AuthGuard.tsx";
 import SwipeToOpenSidebarWrapper from "~/components/unique/SwipeToOpenSidebarWrapper.tsx";
 import { ExternalNavigater } from './utils/ExternalNavigater.ts';
+import { Toaster } from './components/ui/toast.tsx';
 
 const root = document.getElementById('root');
 
@@ -29,7 +30,7 @@ if (import.meta.env.DEV && !(root instanceof HTMLElement)) {
 GET_SERVER_CONFIG()
   .then((r) => {
     //console.log("AuthGuard : GET_SERVER_CONFIG r->", r);
-    setStoreServerinfo ({
+    setStoreServerinfo({
       ...storeServerinfo,
       ...r.data,
     });
@@ -67,6 +68,7 @@ render(() =>
         <>
           <ColorModeScript storageType={storageManager.type} />
           <ColorModeProvider storageManager={storageManager}>
+            <Toaster />
             <SidebarProvider>
               <Show when={useLocation().pathname.startsWith("/app")}>
                 <AppSidebar />
