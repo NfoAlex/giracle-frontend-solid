@@ -566,8 +566,10 @@ export default function ChannelContents() {
         el.scrollTop = channelScrollPos.get(currentChannelId()) ?? 0;
       }
 
-      //既読時間から履歴を取得
-      await FnExecutor.executePreset.fetchFromLastRead();
+      //履歴が無い場合既読時間から取得してみる
+      if (!storeHistory[currentChId]?.atEnd && !storeHistory[currentChId]?.atTop && (storeHistory[currentChId]?.history?.length ?? 0) === 0) {
+        await FnExecutor.executePreset.fetchFromLastRead();
+      }
 
       //チャンネル移動完了フラグを立てて履歴取得トリガー確認
       globalStateChannelMoveDone = true;
