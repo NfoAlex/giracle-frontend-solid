@@ -159,7 +159,6 @@ export default function ChannelContents() {
       if (globalStateFetchingHistory) return;
       globalStateFetchingHistory = true;
 
-      //下向きにスクロールを自動化するためのもの（履歴配列表示がflex-reverseで下基準なので）
       let anchor = null;
       anchor = FnBrowserApis.captureScrollAnchor();
 
@@ -178,6 +177,9 @@ export default function ChannelContents() {
             atTop: r.data.atTop,
           });
           setStoreImageDimensions(produce(prev => (Object.assign(prev, r.data.ImageDimensions))));
+          //スクロール位置記憶
+          let anchor = null;
+          anchor = FnBrowserApis.captureScrollAnchor();
           insertHistory(r.data.history);
 
           await FnBrowserApis.waitForDomToSettle();
