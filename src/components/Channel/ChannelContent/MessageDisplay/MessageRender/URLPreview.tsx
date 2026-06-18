@@ -22,10 +22,10 @@ export default function URLPreview(props: { urlPreview: IMessageUrlPreview }) {
               &&
               <ImageWithModal class={"border rounded w-full h-52 object-cover"} src={props.urlPreview.imageLink} />
             }
-            <div class="flex items-center gap-2">
+            <div class="flex items-center gap-2 w-5 h-5">
               {
                 props.urlPreview.faviconLink
-                  ? <img class={"w-5 h-5 shrink-0 truncate"} src={props.urlPreview.faviconLink} alt="favicon" />
+                  ? <img class={"shrink-0 truncate"} src={props.urlPreview.faviconLink} alt="favicon" />
                   : <IconLink />
               }
               <DialogTitle class="truncate">
