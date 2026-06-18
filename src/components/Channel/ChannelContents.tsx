@@ -417,7 +417,7 @@ export default function ChannelContents() {
         ]);
         //もしメッセージが見つからなかった場合既読時間から取り返す
         if (!storeHistory[currentChannelId()].history.some((m) => m.id === messageId)) {
-          showToast({ title: "エラー", variant: "error", description: "対象のメッセージを取得できませんでした" })
+          showToast({ title: "エラー", variant: "error", description: "対象のメッセージを取得できませんでした。削除された可能性があります。" })
           FnExecutor.executePreset.fetchFromLastRead();
           return;
         }
