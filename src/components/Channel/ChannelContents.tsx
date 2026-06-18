@@ -509,14 +509,13 @@ export default function ChannelContents() {
     }
   };
 
-  //履歴の最新部分更新監視
+  //履歴の最古部分更新監視
   createEffect(on(
     () => storeHistory[currentChannelId()]?.history.at(-1)?.id,
     async () => {
       //console.log("ChannelContent :: createEffect(storeHistory[currentChannelId()]?.history.at(-1)?.id) : トリガー");
       // 新着メッセージ到着時 → 既読時間更新のみ
       setTimeout(async () => {
-        if (globalStateFetchingHistory) return;
         await FnExecutor.checkConditionToFecthHistory();
         await FnGiracleServices.tryUpdateReadTime();
       });
