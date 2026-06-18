@@ -13,6 +13,7 @@ import POST_CHANNEL_GET_HISTORY from "~/api/CHANNEL/CHANNEL_GET_HISTORY.ts";
 import { produce } from "solid-js/store";
 import SkeletonLoader from "./ChannelContent/SkeletonLoader.tsx";
 import UpdateReadTimeOnRemoteAndStore from "~/utils/UpdateReadTimeOnRemoteAndStore.util.ts";
+import { showToast } from "../ui/toast.tsx";
 
 const channelScrollPos: Map<string, number> = new Map();
 
@@ -416,6 +417,7 @@ export default function ChannelContents() {
         ]);
         //もしメッセージが見つからなかった場合既読時間から取り返す
         if (!storeHistory[currentChannelId()].history.some((m) => m.id === messageId)) {
+          showToast({ title: "エラー", variant: "error", description: "対象のメッセージを取得できませんでした" })
           FnExecutor.executePreset.fetchFromLastRead();
           return;
         }
