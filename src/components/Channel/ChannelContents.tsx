@@ -186,7 +186,7 @@ export default function ChannelContents() {
           FnBrowserApis.restoreScrollFromAnchor(anchor);
         })
         .catch((e) =>
-          console.error("ChannelContent :: FnHistoryControllers.fetchHistory : エラー->", _dat, e),
+          console.warn("ChannelContent :: FnHistoryControllers.fetchHistory : エラー->", _dat, e),
         )
         .finally(() => {
           globalStateFetchingHistory = false;
