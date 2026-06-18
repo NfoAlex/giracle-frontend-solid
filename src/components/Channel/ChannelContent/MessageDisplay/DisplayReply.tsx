@@ -7,11 +7,30 @@ import { IconCornerUpRight } from "@tabler/icons-solidjs";
 import { storeMyUserinfo } from "~/stores/MyUserinfo.ts";
 import { storeReplyDisplayCache } from "~/stores/ReplyDisplayCache.ts";
 import MessageTextRender from "./MessageRender/MessageTextRender.tsx";
+import { useLocation, useNavigate } from "@solidjs/router";
 
-export default function DisplayReply(props: {replyingMessageId?: string | null}) {
+export default function DisplayReply(props: { replyingMessageId?: string | null }) {
   if (props.replyingMessageId === null || props.replyingMessageId === undefined) {
     return <></>;
   }
+  const nav = useNavigate();
+  const loc = useLocation();
+
+  const jumpToMessage = () => {
+    if (props.replyingMessageId === null || props.replyingMessageId === undefined) return;
+
+    const channelId = storeReplyDisplayCache.cache[props.replyingMessageId]!.channelId;
+    const messageId = props.replyingMessageId;
+
+    if (loc.pathname.endsWith(`${channelId}/${messageId}`)) {
+      nav(`/app/channel/${channelId}`);
+      setTimeout(() => {
+        nav(`/app/channel/${channelId}/${messageId}`);
+      }, 0);
+      return;
+    }
+    nav(`/app/channel/${channelId}/${messageId}`);
+  };
 
   onMount(() => {
     if (!props.replyingMessageId) {
@@ -58,14 +77,16 @@ export default function DisplayReply(props: {replyingMessageId?: string | null})
             <UserinfoModalWrapper userId={storeReplyDisplayCache.cache[props.replyingMessageId]!.userId} class="shrink-0 flex flex-row items-center gap-1">
               <Avatar class="mx-auto w-5 h-5">
                 <AvatarImage src={`/api/user/icon/${storeReplyDisplayCache.cache[props.replyingMessageId]!.userId}`} />
-                <AvatarFallback>{ storeReplyDisplayCache.cache[props.replyingMessageId]!.userId.slice(0,2) }</AvatarFallback>
+                <AvatarFallback class="w-5 h-5">{storeReplyDisplayCache.cache[props.replyingMessageId]!.userId.slice(0, 2)}</AvatarFallback>
               </Avatar>
               <span class="font-bold">
-                { getterUserinfo(storeReplyDisplayCache.cache[props.replyingMessageId]!.userId).name }
+                {getterUserinfo(storeReplyDisplayCache.cache[props.replyingMessageId]!.userId).name}
               </span>
             </UserinfoModalWrapper>
-            <span class="shrink truncate line-clamp-1">
-              <MessageTextRender content={storeReplyDisplayCache.cache[props.replyingMessageId]!.content} />
+            <span onClick={jumpToMessage} class="shrink truncate line-clamp-1 cursor-pointer">
+              <span class="pointer-events-none">
+                <MessageTextRender content={storeReplyDisplayCache.cache[props.replyingMessageId]!.content} />
+              </span>
             </span>
           </div>
         </Match>
