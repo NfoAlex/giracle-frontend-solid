@@ -6,9 +6,26 @@ import { directGetterChannelInfo } from "~/stores/ChannelInfo";
 import { fnMessageFetchCache } from "~/stores/MessageFetchCache";
 import { getterUserinfo } from "~/stores/Userinfo";
 import MessageTextRender from "./MessageTextRender";
+import { useLocation, useNavigate } from "@solidjs/router";
+import { IconArrowRight } from "@tabler/icons-solidjs";
 
 export default function MessageLinkPreview(props: { channelId: string, messageId: string }) {
   const message = createMemo(() => fnMessageFetchCache.getMessage(props.channelId, props.messageId));
+  const loc = useLocation();
+  const nav = useNavigate();
+
+  //すでに同じメッセージリンクを開いていた時を考慮したジャンプ関数
+  const jump = (e: MouseEvent) => {
+    e.preventDefault();
+    if (loc.pathname.endsWith(`${props.channelId}/${props.messageId}`)) {
+      nav(`/app/channel/${props.channelId}`);
+      setTimeout(() => {
+        nav(`/app/channel/${props.channelId}/${props.messageId}`);
+      }, 0);
+      return;
+    }
+    nav(`/app/channel/${props.channelId}/${props.messageId}`);
+  };
 
   return (
     <Show when={!fnMessageFetchCache.getIsDeleted(props.messageId)}>
@@ -26,7 +43,10 @@ export default function MessageLinkPreview(props: { channelId: string, messageId
         </div>
         <hr />
         <MessageTextRender content={message().content.length > 150 ? message().content.slice(0, 150) + "..." : message().content} />
-        <p class="text-gray-500 text-sm">{new Date(message().createdAt).toLocaleString()}</p>
+        <span onClick={jump} class="text-gray-500 text-sm cursor-pointer hover:underline flex items-center justify-end">
+          <p>{new Date(message().createdAt).toLocaleString()}</p>
+          <span class="ml-auto"><IconArrowRight /></span>
+        </span>
       </Card>
     </Show>
   )
