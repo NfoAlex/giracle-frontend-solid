@@ -61,5 +61,14 @@ export const fnMessageFetchCache = {
 
   getIsDeleted: (messageId: string) => {
     return storeMessageFetchCache.isDeleted[messageId];
+  },
+
+  setAsDeleted: (messageId: string) => {
+    storeMessageFetchCache.cache[messageId] = {
+      ...messageHolder,
+      content: "削除されたメッセージ",
+      id: messageId,
+    };
+    storeMessageFetchCache.isDeleted[messageId] = true;
   }
 }
