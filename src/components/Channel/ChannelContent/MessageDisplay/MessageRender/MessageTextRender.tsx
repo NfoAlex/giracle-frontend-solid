@@ -3,7 +3,6 @@ import { directGetterChannelInfo } from "~/stores/ChannelInfo.ts";
 import { getterUserinfo } from "~/stores/Userinfo.ts";
 import { storeMyUserinfo } from "~/stores/MyUserinfo.ts";
 import UserinfoModalWrapper from "~/components/unique/UserinfoModalWrapper.tsx";
-import { storeMessageUpdate } from "~/stores/MessageUpdate";
 import MessageLink from "./MessageTextRender/MessageLink";
 
 const urlPattern =
