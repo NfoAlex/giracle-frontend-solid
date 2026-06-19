@@ -4,7 +4,7 @@ import { storeMessageReadTime } from "~/stores/Readtime.ts";
 import { setStoreHasNewMessage, storeHasNewMessage } from "~/stores/HasNewMessage.ts";
 import { storeReplyDisplayCache } from "~/stores/ReplyDisplayCache.ts";
 import { setStoreInbox } from "~/stores/Inbox.ts";
-import { setStoreMessageUpdate } from "~/stores/MessageUpdate";
+import { fnMessageFetchCache } from "~/stores/MessageFetchCache";
 
 export default function WSMessageDeleted(dat: { messageId: IMessage["id"], channelId: string }) {
   //console.log("WSMessageDeleted :: triggered dat->", dat);
@@ -37,12 +37,7 @@ export default function WSMessageDeleted(dat: { messageId: IMessage["id"], chann
   storeReplyDisplayCache.cache[dat.messageId] && delete storeReplyDisplayCache.cache[dat.messageId];
   storeReplyDisplayCache.isDeleted[dat.messageId] = true;
   //削除通知受け取り用Storeに格納
-  setStoreMessageUpdate((prev) => {
-    return {
-      ...prev,
-      deleted: dat.messageId
-    }
-  });
+  fnMessageFetchCache.setAsDeleted(dat.messageId);
 
   // ------------------- ここから未読が削除された時用の新着削除判別👇 ------------------- //
 
