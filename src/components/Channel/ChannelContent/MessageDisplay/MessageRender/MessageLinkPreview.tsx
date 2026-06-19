@@ -25,7 +25,7 @@ export default function MessageLinkPreview(props: { channelId: string, messageId
           <span class="shrink text-sm text-gray-500 truncate">#{directGetterChannelInfo(message().channelId).name}</span>
         </div>
         <hr />
-        <MessageTextRender content={message().content} />
+        <MessageTextRender content={message().content.length > 150 ? message().content.slice(0, 150) + "..." : message().content} />
         <p class="text-gray-400 text-sm">{new Date(message().createdAt).toLocaleString()}</p>
       </Card>
     </Show>
