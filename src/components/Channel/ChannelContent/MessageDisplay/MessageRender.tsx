@@ -54,7 +54,8 @@ export default function MessageRender(props: {
     );
   }
 
-  const messageLinks = props.message.content.match(messageLinkPattern);
+  //メッセージLink抽出。重複防止でSet
+  const messageLinks = [...new Set(props.message.content.match(messageLinkPattern))];
 
   return (
     <div class="w-full">
