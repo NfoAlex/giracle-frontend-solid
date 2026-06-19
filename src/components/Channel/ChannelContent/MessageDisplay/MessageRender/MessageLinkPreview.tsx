@@ -29,7 +29,7 @@ export default function MessageLinkPreview(props: { channelId: string, messageId
 
   return (
     <Show when={!fnMessageFetchCache.getIsDeleted(props.messageId)}>
-      <Card class="p-2 flex flex-col gap-2">
+      <Card class="md:w-72 lg:w-96 sm:w-1/2 p-2 flex flex-col gap-2">
         <div class="flex items-center gap-2">
           <UserinfoModalWrapper userId={message()!.userId} class="flex flex-row items-center gap-2 hover:underline">
             <Avatar class="w-6 h-6">
