@@ -1,6 +1,7 @@
 import type { IMessage } from "~/types/Message.ts";
 import { setStoreHistory } from "~/stores/History.ts";
 import { storeReplyDisplayCache } from "~/stores/ReplyDisplayCache.ts";
+import { fnMessageFetchCache } from "~/stores/MessageFetchCache";
 
 /**
  * メッセージの更新処理
@@ -19,7 +20,7 @@ export default function WSUpdateMessage(dat: IMessage) {
     //メッセージを更新
     const newHistory = prev[dat.channelId].history.map((message) => {
       if (message.id === dat.id) {
-        return {...message, ...dat};
+        return { ...message, ...dat };
       } else {
         return message;
       }
@@ -34,8 +35,10 @@ export default function WSUpdateMessage(dat: IMessage) {
     };
   });
 
+  //TODO :: storeMessageFetchCacheへ置き換え
   //返信表示キャッシュの更新
   if (storeReplyDisplayCache.cache[dat.id]) {
-    storeReplyDisplayCache.cache[dat.id] = {...storeReplyDisplayCache.cache[dat.id], ...dat};
+    storeReplyDisplayCache.cache[dat.id] = { ...storeReplyDisplayCache.cache[dat.id], ...dat };
   }
+  fnMessageFetchCache.updateMessage(dat);
 }

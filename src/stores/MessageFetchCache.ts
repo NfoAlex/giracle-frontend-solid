@@ -59,6 +59,11 @@ export const fnMessageFetchCache = {
     return storeMessageFetchCache.cache[messageId];
   },
 
+  updateMessage: (message: IMessage) => {
+    if (storeMessageFetchCache.isDeleted[message.id]) return;
+    storeMessageFetchCache.cache[message.id] = { ...storeMessageFetchCache.cache[message.id], ...message };
+  },
+
   getIsDeleted: (messageId: string) => {
     return storeMessageFetchCache.isDeleted[messageId];
   },

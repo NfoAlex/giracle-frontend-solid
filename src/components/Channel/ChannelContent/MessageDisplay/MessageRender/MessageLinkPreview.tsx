@@ -45,6 +45,7 @@ export default function MessageLinkPreview(props: { channelId: string, messageId
         <MessageTextRender content={message().content.length > 150 ? message().content.slice(0, 150) + "..." : message().content} />
         <span onClick={jump} class="text-gray-500 text-sm cursor-pointer hover:underline flex items-center justify-end">
           <p>{new Date(message().createdAt).toLocaleString()}</p>
+          {message().isEdited && <p>・ 編集済み</p>}
           <span class="ml-auto"><IconArrowRight /></span>
         </span>
       </Card>
