@@ -1,3 +1,4 @@
+import { Show } from "solid-js";
 import { useLocation, useNavigate } from "@solidjs/router";
 import { directGetterChannelInfo } from "~/stores/ChannelInfo";
 import { fnMessageFetchCache } from "~/stores/MessageFetchCache";
@@ -7,16 +8,8 @@ import { fnMessageFetchCache } from "~/stores/MessageFetchCache";
  * @param props
  */
 export default function MessageLink(props: { channelId: string, messageId: string }) {
-  const isDeleted = fnMessageFetchCache.getIsDeleted(props.messageId);
   const classesMessageLink = "cursor-pointer whitespace-pre-wrap break-words bg-border hover:underline my-auto mx-px align-baseline inline-flex rounded px-1";
-
-  if (isDeleted) {
-    return (
-      <span class={classesMessageLink + " text-gray-400 italic"}>
-        削除されたメッセージ
-      </span>
-    )
-  }
+  const classesMessageDeletedLink = "whitespace-pre-wrap break-words bg-border my-auto mx-px align-baseline inline-flex rounded px-1 text-gray-400 italic";
 
   const nav = useNavigate();
   const loc = useLocation();
@@ -35,15 +28,20 @@ export default function MessageLink(props: { channelId: string, messageId: strin
   };
 
   return (
-    <span onClick={jump} class={classesMessageLink}>
-      #
-      {
-        directGetterChannelInfo(props.channelId).name.length > 18
-          ?
-          directGetterChannelInfo(props.channelId).name.slice(0, 18) + "..."
-          :
-          directGetterChannelInfo(props.channelId).name
-      } のメッセージ
-    </span>
+    <Show
+      when={!fnMessageFetchCache.getIsDeleted(props.messageId)}
+      fallback={<span class={classesMessageDeletedLink}>削除されたメッセージ</span>}
+    >
+      <span onClick={jump} class={classesMessageLink}>
+        #
+        {
+          directGetterChannelInfo(props.channelId).name.length > 18
+            ?
+            directGetterChannelInfo(props.channelId).name.slice(0, 18) + "..."
+            :
+            directGetterChannelInfo(props.channelId).name
+        } のメッセージ
+      </span>
+    </Show>
   )
 }
