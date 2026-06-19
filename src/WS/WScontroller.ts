@@ -8,17 +8,17 @@ import WSRoleUnlinked from "./Role/RoleUnlinked.ts";
 import WSChannelDeleted from "./Channel/ChannelDeleted.ts";
 import WSMessageDeleted from "./Message/MessageDelete.ts";
 import WSUpdateMessage from "~/WS/Message/UpdateMessage.ts";
-import {setStoreUserOnline} from "~/stores/Userinfo.ts";
+import { setStoreUserOnline } from "~/stores/Userinfo.ts";
 import WSUserConnected from "~/WS/User/UserConnected.ts";
 import WSUserDisconnected from "~/WS/User/UserDisconnected.ts";
 import WSInboxDelete from "~/WS/inbox/inboxDeleted.ts";
 import WSInboxAdded from "~/WS/inbox/inboxAdded.ts";
 import InitLoad from "~/utils/InitLoad.ts";
-import {storeMyUserinfo} from "~/stores/MyUserinfo.ts";
+import { storeMyUserinfo } from "~/stores/MyUserinfo.ts";
 import WSUserProfileUpdate from "~/WS/User/UserProfileUpdate.ts";
 import WSReadTimeUpdate from "~/WS/Message/ReadTimeUpdate.ts";
-import {setStoreHistory} from "~/stores/History.ts";
-import {produce} from "solid-js/store";
+import { setStoreHistory } from "~/stores/History.ts";
+import { produce } from "solid-js/store";
 import WSMessageAddReaction from "~/WS/Message/MessageAddReaction.ts";
 import WSMessageDeleteReaction from "~/WS/Message/MessageDeleteReaction.ts";
 import WSCustomEmojiUploaded from "~/WS/Server/CustomEmojiUploaded.ts";
@@ -27,6 +27,7 @@ import WSChannelLeft from "./Channel/ChannelLeft.ts";
 import WSChannelJoined from "./Channel/ChannelJoined.ts";
 import FetchHistory from "~/utils/FethchHistory.ts";
 import { storeMessageReadTime } from "~/stores/Readtime.ts";
+import { fnMessageFetchCache } from "~/stores/MessageFetchCache.ts";
 
 //WSインスタンス
 export let ws: WebSocket | undefined = undefined;
@@ -55,7 +56,7 @@ export const initWS = async () => {
         FLAGwsError = true;
       }
 
-      switch(json.signal) {
+      switch (json.signal) {
 
         //カスタム絵文字作成の受け取り
         case "server::CustomEmojiUploaded":
@@ -160,7 +161,7 @@ export const initWS = async () => {
           WSUserDisconnected(json.data);
           break;
       }
-    } catch(e) {
+    } catch (e) {
       console.error("WScontroller :: initWS(.onmessage) : error->", e, " \ndata->", event.data);
     }
   };
@@ -186,6 +187,8 @@ export const initWS = async () => {
         }
         return prev;
       }));
+      //メッセージキャッシュStoreを初期化
+      fnMessageFetchCache.clearCache();
 
       //チャンネルIdをlocationから取得
       const path = document.location.pathname;
