@@ -75,5 +75,10 @@ export const fnMessageFetchCache = {
       id: messageId,
     };
     storeMessageFetchCache.isDeleted[messageId] = true;
+  },
+
+  clearCache: () => {
+    storeMessageFetchCache.cache = {};
+    storeMessageFetchCache.isDeleted = {};
   }
 }
