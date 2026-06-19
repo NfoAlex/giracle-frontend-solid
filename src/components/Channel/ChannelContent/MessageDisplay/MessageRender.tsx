@@ -61,7 +61,7 @@ export default function MessageRender(props: {
           </span>
         </UserinfoModalWrapper>
       </Show>
-      <div class="flex flex-col">
+      <div class="flex flex-col gap-1 py-1">
         {/* メッセージ本文 */}
         {
           props.message.content.length > 500 || breakLinesNum() > 5
