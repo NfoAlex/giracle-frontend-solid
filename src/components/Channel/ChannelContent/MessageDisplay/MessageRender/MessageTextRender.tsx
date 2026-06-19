@@ -22,8 +22,6 @@ interface IMatchObject {
 }
 
 export default function MessageTextRender(props: { content: string }) {
-  const latestDeletedMessageId = storeMessageUpdate.deleted;
-
   // props.content や依存するストアの値が変わった時だけ再計算されるメモを作成
   const parsedContent = createMemo<JSX.Element[]>(() => {
     // console.log("Running linkify logic for content:", props.content); // デバッグ用
