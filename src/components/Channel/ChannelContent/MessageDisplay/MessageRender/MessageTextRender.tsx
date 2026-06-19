@@ -1,10 +1,10 @@
 import { createMemo, For, type JSX } from "solid-js";
-import { useLocation, useNavigate } from "@solidjs/router";
 import { directGetterChannelInfo } from "~/stores/ChannelInfo.ts";
 import { getterUserinfo } from "~/stores/Userinfo.ts";
 import { storeMyUserinfo } from "~/stores/MyUserinfo.ts";
 import UserinfoModalWrapper from "~/components/unique/UserinfoModalWrapper.tsx";
 import { storeMessageUpdate } from "~/stores/MessageUpdate";
+import MessageLink from "./MessageTextRender/MessageLink";
 
 const urlPattern =
   /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/gi;
@@ -103,44 +103,9 @@ export default function MessageTextRender(props: { content: string }) {
         case "messageLink":
           const channelId = obj.idOrValue.split("/")[0];
           const messageId = obj.idOrValue.split("/")[1];
-          const classesMessageLink = "cursor-pointer whitespace-pre-wrap break-words bg-border hover:underline my-auto mx-px align-baseline inline-flex rounded px-1";
-
-          //削除されていた場合そう表示して終了
-          if (latestDeletedMessageId === messageId) {
-            messageRenderingFinal.push(
-              <span class={classesMessageLink + " text-gray-400 italic"}>
-                削除されたメッセージ
-              </span>
-            );
-            break;
-          }
-
-          const nav = useNavigate();
-          const loc = useLocation();
-          //すでに同じメッセージリンクを開いていた時を考慮したジャンプ関数
-          const jump = (e: MouseEvent) => {
-            e.preventDefault();
-            if (loc.pathname.endsWith(`${channelId}/${messageId}`)) {
-              nav(`/app/channel/${channelId}`);
-              setTimeout(() => {
-                nav(`/app/channel/${channelId}/${messageId}`);
-              }, 0);
-              return;
-            }
-            nav(`/app/channel/${channelId}/${messageId}`);
-          }
 
           messageRenderingFinal.push(
-            <span onClick={jump} class={classesMessageLink}>
-              #
-              {
-                directGetterChannelInfo(obj.idOrValue.split("/")[0]).name.length > 18
-                  ?
-                  directGetterChannelInfo(obj.idOrValue.split("/")[0]).name.slice(0, 18) + "..."
-                  :
-                  directGetterChannelInfo(obj.idOrValue.split("/")[0]).name
-              } のメッセージ
-            </span>
+            <MessageLink channelId={channelId} messageId={messageId} />
           );
           break;
 
