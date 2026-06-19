@@ -1,6 +1,7 @@
 import { createMutable } from "solid-js/store";
 import GET_MESSAGE_GET from "~/api/MESSAGE/MESSAGE_GET";
 import type { IMessage } from "~/types/Message.ts";
+import { storeHistory } from "./History";
 
 const messageHolder: IMessage = {
   channelId: "",
@@ -32,6 +33,13 @@ export const fnMessageFetchCache = {
   getMessage: (channelId: string, messageId: string): IMessage => {
     if (storeMessageFetchCache.isDeleted[messageId]) return messageHolder;
     if (storeMessageFetchCache.cache[messageId]) return storeMessageFetchCache.cache[messageId];
+
+    //履歴Storeから探してきてあればそれを返す
+    const msgFromStore = storeHistory[channelId]?.history.find(msg => msg.id === messageId);
+    if (msgFromStore) {
+      storeMessageFetchCache.cache[messageId] = msgFromStore;
+      return storeMessageFetchCache.cache[messageId];
+    }
 
     //表示には適用させるためにawaitしていない
     GET_MESSAGE_GET(messageId)
