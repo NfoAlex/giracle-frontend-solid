@@ -8,6 +8,9 @@ import FilePreview from "./MessageRender/FilePreview.tsx";
 import URLPreview from "./MessageRender/URLPreview.tsx";
 import LongTextDisplay from "./MessageRender/LongTextDisplay.tsx";
 import RenderEmojiReactions from "./MessageRender/RenderEmojiReactions.tsx";
+import MessageLinkPreview from "./MessageRender/MessageLinkPreview.tsx";
+
+const messageLinkPattern = /&<([a-f0-9-]+):([a-f0-9-]+)>/g;
 
 export default function MessageRender(props: {
   message: IMessage;
@@ -40,7 +43,7 @@ export default function MessageRender(props: {
     }
     //時間のみ返す
     return timeObj.toLocaleTimeString();
-  }
+  };
 
   //システムメッセージだった時の表示
   if (props.message.isSystemMessage) {
@@ -50,6 +53,8 @@ export default function MessageRender(props: {
       </div>
     );
   }
+
+  const messageLinks = props.message.content.match(messageLinkPattern);
 
   return (
     <div class="w-full">
@@ -69,6 +74,18 @@ export default function MessageRender(props: {
             <LongTextDisplay message={props.message} />
             :
             <MessageTextRender content={props.message.content} />
+        }
+
+        { //メッセージリンクプレビュー
+          <For each={messageLinks}>
+            {
+              (messageLink) => {
+                const channelId = messageLink.split(":")[0].slice(2);
+                const messageId = messageLink.split(":")[1].slice(0, -1);
+                return <MessageLinkPreview channelId={channelId} messageId={messageId} />
+              }
+            }
+          </For>
         }
 
         { //URLプレビュー
