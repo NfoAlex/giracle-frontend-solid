@@ -4,26 +4,29 @@ import { directGetterChannelInfo } from "~/stores/ChannelInfo.ts";
 import { getterUserinfo } from "~/stores/Userinfo.ts";
 import { storeMyUserinfo } from "~/stores/MyUserinfo.ts";
 import UserinfoModalWrapper from "~/components/unique/UserinfoModalWrapper.tsx";
+import { storeMessageUpdate } from "~/stores/MessageUpdate";
+
+const urlPattern =
+  /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/gi;
+const messageLinkPattern = /&<([a-f0-9-]+):([a-f0-9-]+)>/g;
+const mentionPattern = /@<([a-f0-9-]+)>/g;
+const channelPattern = /#<([a-f0-9-]+)>/g;
+const inlineCodePattern = /`([^`]+)`/g;
+
+type MatchType = "link" | "messageLink" | "userId" | "channel" | "inlineCode";
+interface IMatchObject {
+  context: string;
+  type: MatchType;
+  index: number;
+  idOrValue: string; // パース後の値 (URL, ID, コード内容)
+}
 
 export default function MessageTextRender(props: { content: string }) {
+  const latestDeletedMessageId = storeMessageUpdate.deleted;
+
   // props.content や依存するストアの値が変わった時だけ再計算されるメモを作成
   const parsedContent = createMemo<JSX.Element[]>(() => {
     // console.log("Running linkify logic for content:", props.content); // デバッグ用
-
-    const urlPattern =
-      /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/gi;
-    const messageLinkPattern = /&<([a-f0-9-]+):([a-f0-9-]+)>/g;
-    const mentionPattern = /@<([a-f0-9-]+)>/g;
-    const channelPattern = /#<([a-f0-9-]+)>/g;
-    const inlineCodePattern = /`([^`]+)`/g;
-
-    type MatchType = "link" | "messageLink" | "userId" | "channel" | "inlineCode";
-    interface IMatchObject {
-      context: string;
-      type: MatchType;
-      index: number;
-      idOrValue: string; // パース後の値 (URL, ID, コード内容)
-    }
 
     const contentObjectIndex: IMatchObject[] = [];
 
@@ -98,38 +101,47 @@ export default function MessageTextRender(props: { content: string }) {
           break;
 
         case "messageLink":
-          {
-            const channelId = obj.idOrValue.split("/")[0];
-            const messageId = obj.idOrValue.split("/")[1];
-            const classesMessageLink = "cursor-pointer whitespace-pre-wrap break-words bg-border hover:underline my-auto mx-px align-baseline inline-flex rounded px-1";
+          const channelId = obj.idOrValue.split("/")[0];
+          const messageId = obj.idOrValue.split("/")[1];
+          const classesMessageLink = "cursor-pointer whitespace-pre-wrap break-words bg-border hover:underline my-auto mx-px align-baseline inline-flex rounded px-1";
 
-            const nav = useNavigate();
-            const loc = useLocation();
-            const jump = (e: MouseEvent) => {
-              e.preventDefault();
-              if (loc.pathname.endsWith(`${channelId}/${messageId}`)) {
-                nav(`/app/channel/${channelId}`);
-                setTimeout(() => {
-                  nav(`/app/channel/${channelId}/${messageId}`);
-                }, 0);
-                return;
-              }
-              nav(`/app/channel/${channelId}/${messageId}`);
-            }
-
+          //削除されていた場合そう表示して終了
+          if (latestDeletedMessageId === messageId) {
             messageRenderingFinal.push(
-              <span onClick={jump} class={classesMessageLink}>
-                #
-                {
-                  directGetterChannelInfo(obj.idOrValue.split("/")[0]).name.length > 18
-                    ?
-                    directGetterChannelInfo(obj.idOrValue.split("/")[0]).name.slice(0, 18) + "..."
-                    :
-                    directGetterChannelInfo(obj.idOrValue.split("/")[0]).name
-                } のメッセージ
+              <span class={classesMessageLink + " text-gray-400 italic"}>
+                削除されたメッセージ
               </span>
             );
+            break;
           }
+
+          const nav = useNavigate();
+          const loc = useLocation();
+          //すでに同じメッセージリンクを開いていた時を考慮したジャンプ関数
+          const jump = (e: MouseEvent) => {
+            e.preventDefault();
+            if (loc.pathname.endsWith(`${channelId}/${messageId}`)) {
+              nav(`/app/channel/${channelId}`);
+              setTimeout(() => {
+                nav(`/app/channel/${channelId}/${messageId}`);
+              }, 0);
+              return;
+            }
+            nav(`/app/channel/${channelId}/${messageId}`);
+          }
+
+          messageRenderingFinal.push(
+            <span onClick={jump} class={classesMessageLink}>
+              #
+              {
+                directGetterChannelInfo(obj.idOrValue.split("/")[0]).name.length > 18
+                  ?
+                  directGetterChannelInfo(obj.idOrValue.split("/")[0]).name.slice(0, 18) + "..."
+                  :
+                  directGetterChannelInfo(obj.idOrValue.split("/")[0]).name
+              } のメッセージ
+            </span>
+          );
           break;
 
         case "userId":
