@@ -45,8 +45,6 @@ export default async function UpdateReadTimeOnRemoteAndStore(channelId: string, 
     return;
   };
 
-  console.log("UpdateReadTimeOnRemoteAndStore :: こうしんする->", { channelId, messageCreatedAt, option });
-
   BindToReadTimeStore(channelId, messageCreatedAt, currentReadTime, option);
   await POST_MESSAGE_UPDATE_READTIME(
     channelId,
