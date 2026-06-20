@@ -88,7 +88,7 @@ export default function MessageDisplay(props: {
         props.message.replyingMessageId !== null
         &&
         <div class="ml-auto mt-1" style={"width: calc(100% - 45px);"}>
-          <DisplayReply replyingMessageId={props.message.replyingMessageId} />
+          <DisplayReply replyingMessageId={props.message.replyingMessageId} channelId={props.message.channelId} />
         </div>
       }
 
