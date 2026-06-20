@@ -2,7 +2,6 @@ import { setStoreHistory, storeHistory } from "~/stores/History.ts";
 import type { IMessage } from "~/types/Message.ts";
 import { storeMessageReadTime } from "~/stores/Readtime.ts";
 import { setStoreHasNewMessage, storeHasNewMessage } from "~/stores/HasNewMessage.ts";
-import { storeReplyDisplayCache } from "~/stores/ReplyDisplayCache.ts";
 import { setStoreInbox } from "~/stores/Inbox.ts";
 import { fnMessageFetchCache } from "~/stores/MessageFetchCache";
 
@@ -33,9 +32,6 @@ export default function WSMessageDeleted(dat: { messageId: IMessage["id"], chann
     return prev.filter((inboxItem) => inboxItem.messageId !== dat.messageId);
   });
 
-  //返信表示のキャッシュから削除、削除フラグも立てる
-  storeReplyDisplayCache.cache[dat.messageId] && delete storeReplyDisplayCache.cache[dat.messageId];
-  storeReplyDisplayCache.isDeleted[dat.messageId] = true;
   //削除通知受け取り用Storeに格納
   fnMessageFetchCache.setAsDeleted(dat.messageId);
 
