@@ -40,7 +40,6 @@ export default function DisplayReply(props: { replyingMessageId?: string | null,
     <div
       class={`px-1 flex flex-row items-center w-full truncate ${storeMyUserinfo.id === message()?.userId && "border-2 rounded bg-border"}`}
     >
-      <span> {message() !== undefined ? message()?.toString() : "undefined"} {isDeleted().toString()} </span>
       <Switch>
         <Match when={isDeleted()}>
           <IconCornerUpRight class="w-5 h-5 mr-1" />
