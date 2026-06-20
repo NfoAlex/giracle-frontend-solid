@@ -1,6 +1,5 @@
 import type { IMessage } from "~/types/Message.ts";
 import { setStoreHistory } from "~/stores/History.ts";
-import { storeReplyDisplayCache } from "~/stores/ReplyDisplayCache.ts";
 import { fnMessageFetchCache } from "~/stores/MessageFetchCache";
 
 /**
@@ -35,10 +34,6 @@ export default function WSUpdateMessage(dat: IMessage) {
     };
   });
 
-  //TODO :: storeMessageFetchCacheへ置き換え
-  //返信表示キャッシュの更新
-  if (storeReplyDisplayCache.cache[dat.id]) {
-    storeReplyDisplayCache.cache[dat.id] = { ...storeReplyDisplayCache.cache[dat.id], ...dat };
-  }
+  //キャッシュ更新
   fnMessageFetchCache.updateMessage(dat);
 }
