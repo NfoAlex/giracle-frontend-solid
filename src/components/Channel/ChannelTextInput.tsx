@@ -196,6 +196,7 @@ export default function ChannelTextInput() {
         console.log("ChannelTextInput :: Input.keyHandler.at : e.key", e.key, { sectionPosition });
         switch (e.key) {
           case " ": {
+            e.preventDefault();
             Section.addSection(sectionPosition, "text");
             break;
           };
