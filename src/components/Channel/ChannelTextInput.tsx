@@ -171,7 +171,12 @@ export default function ChannelTextInput() {
           };
 
           case "Backspace": {
-            Input.keyHandler.common.Backspace();
+            console.log("ChannelTextInput :: Input.keyHandler.default : Backspace", inputSections()[sectionPosition]);
+            if (inputSections()[sectionPosition].value.length <= 1) {
+              Section.deleteSection(sectionPosition);
+            } else {
+              Input.keyHandler.common.Backspace();
+            }
             break;
           };
 
