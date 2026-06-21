@@ -1,303 +1,438 @@
-import { createSignal, For, Show } from "solid-js";
+import { createMemo, createSignal, For, Match, Show, Switch as SolidSwitch } from "solid-js";
 import { useParams } from "@solidjs/router";
 import { IconSend, IconUpload } from "@tabler/icons-solidjs";
-import POST_MESSAGE_SEND from "~/api/MESSAGE/MESSAGE_SEND.ts";
-import storeReplyingMessageId from "~/stores/ReplyingMessageId.ts";
-import GET_USER_SEARCH from "~/api/USER/USER_SEARCH.ts";
-import ReplyMessageDisplay from "./ChannelTextInput/ReplyMessageDisplay.tsx";
-import FileUploadPreview from "./ChannelTextInput/FileUploadPreview.tsx";
-import { Button } from "../ui/button.tsx";
-import { storeClientConfig } from "~/stores/ClientConfig.ts";
-import { Card } from "../ui/card.tsx";
-import { IChannel } from "~/types/Channel.ts";
-import { IUser } from "~/types/User.ts";
+import POST_MESSAGE_SEND from "~/api/MESSAGE/MESSAGE_SEND";
+import storeReplyingMessageId from "~/stores/ReplyingMessageId";
+import ReplyMessageDisplay from "./ChannelTextInput/ReplyMessageDisplay";
+import FileUploadPreview from "./ChannelTextInput/FileUploadPreview";
+import MessageTextRender from "./ChannelContent/MessageDisplay/MessageRender/MessageTextRender";
+import { Button } from "../ui/button";
+import { Card } from "../ui/card";
+import { storeClientConfig } from "~/stores/ClientConfig";
+import GET_USER_SEARCH from "~/api/USER/USER_SEARCH";
+import type { IUser } from "~/types/User";
+
+interface IInputSections {
+  type: "text" | "mention" | "channel" | "emoji" | "newline" | "url" | "messageLink";
+  value: string;
+  /** メンション用：確定済みユーザーID */
+  lockedUserId?: string;
+  /** メンション用：確定済みかどうか */
+  isReady?: boolean;
+}
 
 export default function ChannelTextInput() {
-  const params = useParams(); //URLパラメータを取得するやつ
-  const [text, setText] = createSignal(""); //メッセージテキスト
-  const [fileIds, setFileIds] = createSignal<string[]>([]); //送信に使うファイルIDの配列
-  const pushFileIds = (fileId: string) => { //ファイルIDを追加するようの関数
-    setFileIds([...fileIds(), fileId]);
-    console.log("ChannelTextInput :: pushFileIds : fileId->", fileId, fileIds());
-  }
-  const [fileInput, setFileInput] = createSignal<File[]>([]); //ファイル選択ダイアログからのファイル入力受け取り用配列
-  const [userSearchResult, setUserSearchResult] = createSignal<IUser[]>([]); //ユーザー検索結果
-  let cursorPosition = 0; //フォーム上のカーソル位置
-  let [searchOptions, setSearchOptions] = createSignal<{ type:"user"|"channel", isEnabled:boolean, query: string, selectIndex: number }>({
-    type: "user",
-    isEnabled: false,
-    query: "",
-    selectIndex: 0
-  });
+  const params = useParams();
+  const currentChannelId = createMemo(() => params.channelId ?? "");
 
-  const sendMsg = () => {
-    //console.log("ChannelTextInput :: sendMsg : params.id->", {...params});
+  // --- セクション配列（ブロック分割入力） ---
+  const [inputSections, setInputSections] = createSignal<IInputSections[]>([
+    { type: "text", value: "" },
+  ]);
+  const [currentFocusIndex, setCurrentFocusIndex] = createSignal(0);
 
-    //空メッセージは送信しない
-    if (text().trim() === "" && fileIds().length === 0) return;
+  // --- メンション検索 ---
+  const [userList, setUserList] = createSignal<IUser[]>([]);
 
-    POST_MESSAGE_SEND(params.channelId, text(), fileIds(), storeReplyingMessageId[params.channelId] || undefined)
-      .then(() => {
-        //console.log("POST_MESSAGE_SEND :: r->", r);
-      })
-      .catch((e) => {
-        console.error("POST_MESSAGE_SEND :: e->", e);
-      });
+  // --- ファイル関連 ---
+  const [fileIds, setFileIds] = createSignal<string[]>([]);
+  const [fileInput, setFileInput] = createSignal<File[]>([]);
 
-    //送信ボタンを押されたことを考慮しフォーカスをテキスト入力へ移す（あとスマホ用）
-    document.getElementById("messageInput")?.focus();
-    //初期化処理
-    setText("");
-    setFileIds([]);
-    setFileInput([]);
-    delete storeReplyingMessageId[params.channelId];
-    //検索モードを初期化
-    setSearchOptions({
-      type: "user",
-      isEnabled: false,
-      query: "",
-      selectIndex: 0,
-    });
-  }
-
-  /**
-   * 検索モードの条件判別、設定をする
-   */
-  const checkMode = () => {
-    //メンションを検索する
-    const searchQueryMatches = [...text().matchAll(/@\S+/g)];
-    //カーソル位置までの入力されたメンションクエリーを取得
-    const matchesFilter = searchQueryMatches.filter((obj) => cursorPosition >= obj.index);
-
-    //カーソル位置がメンションクエリー文字の範囲中にあるかどうか
-    for (const query of matchesFilter) {
-      //console.log("ChannelTextInput :: checkMode : arr->", arr.index, (arr.index + arr[0].length));
-      if (query.index <= cursorPosition && cursorPosition <= (query.index + query[0].length + 1)) {
-        setSearchOptions({
-          type: "user",
-          isEnabled: true,
-          query: query[0].slice(1),
-          selectIndex: 0,
-        })
-        //ユーザーを検索する
-        if (query[0].length >= 2)
-          searchUser(searchOptions().query);
-
-        return;
-      }
-    }
-    //console.log("ChannelTextInput :: checkMode : cursorPosition->", cursorPosition, " matches->", matches, matchesFilter);
-
-    //メンション検索が無効の場合
-    setSearchOptions(
-      {
-        type: "user",
-        isEnabled: false,
-        query: "",
-        selectIndex: 0,
-      }
-    );
-  }
-
-  /**
-   * 検索結果から選択した情報メッセージ文へバインドする
-   * @param item バインドする情報
-   * @param type バインドする情報の種類
-   */
-  const bindSearchedItem = (item: IChannel | IUser, type: "user" | "channel") => {
-    if (type === "user") {
-      //メッセージ文にバインド
-      setText(text().replace(searchOptions().query, `<${item.id}> `));
-      //フォーカスを戻す
-      document.getElementById("messageInput")?.focus();
-      //検索モードを初期化
-      setSearchOptions({
-        type: "user",
-        isEnabled: false,
-        query: "",
-        selectIndex: 0,
-      });
-    }
-    if (type === "channel") {
-      // これから
-    }
-  }
-
-  /**
-   * メンション用のユーザー検索
-   * @param query
-   */
-  const searchUser = (query: string) => {
-    GET_USER_SEARCH(query, params.channelId)
-      .then((r) => {
-        setUserSearchResult(r.data);
-        //console.log("GET_USER_SEARCH :: r->", r);
-      })
-      .catch((e) => console.error("GET_USER_SEARCH :: e->", e));
-  }
-
-  /**
-   * ファイル選択ダイアログを開く
-   */
-  const bindFiles = () => {
-    const fileInputEl = document.getElementById("fileInput") as HTMLInputElement;
-    fileInputEl.click();
-    fileInputEl.onchange = (e) => {
-      const files = (e.target as HTMLInputElement).files;
-      if (files) {
-        console.log("ChannelTextInput :: bindFiles : files->", files);
-        setFileInput([...fileInput(), ...files]);
-        //console.log("ChannelTextInput :: bindFiles : fileInput->", fileInput());
-      }
-    }
-  }
-
-  /**
-   * ペーストイベントからのファイルを受け取る
-   * @param event
-   */
-  const receiveFiles = (event: ClipboardEvent) => {
-    const items = event.clipboardData?.items;
-    if (items) {
-      const files = [];
-      for (let i = 0; i < items.length; i++) {
-        if (items[i].kind === "file") {
-          const file = items[i].getAsFile();
-          if (file) {
-            files.push(file);
-          }
+  const InputSection = {
+    /**
+     * テキスト入力値をセクションへバインド
+     */
+    bind: (value: string, index: number) => {
+      if (inputSections()[index]?.type === "mention") {
+        if (value.length >= 2) {
+          InputSection.searchUser(value);
         }
       }
-      setFileInput([...fileInput(), ...files]);
-      //console.log("ChannelTextInput :: receiveFiles : fileInput->", fileInput());
-    }
-  }
+
+      setInputSections((prev) => {
+        const newInputs = [...prev];
+        newInputs[index] = { ...newInputs[index], value };
+        return newInputs;
+      });
+    },
+
+    /**
+     * メンション用のユーザーIDをバインド（確定）
+     */
+    bindUserId: (user: IUser) => {
+      const focusIdx = currentFocusIndex();
+      setInputSections((prev) => {
+        const newInputs = [...prev];
+        newInputs[focusIdx] = {
+          ...newInputs[focusIdx],
+          lockedUserId: user.id,
+          value: user.name,
+          isReady: true,
+        };
+        return newInputs;
+      });
+
+      const el = document.getElementById("MsgInput:" + focusIdx);
+      if (el !== null) el.innerText = user.name;
+
+      InputSection.insertBlock("text", focusIdx);
+    },
+
+    /**
+     * 指定位置の後ろに新ブロックを挿入
+     */
+    insertBlock: (type: IInputSections["type"], index: number) => {
+      setInputSections((prev) => {
+        const newInputs = [...prev];
+        const isReadyOption = type === "mention" ? false : undefined;
+        const userIdLockedOption = type === "mention" ? "" : undefined;
+        newInputs.splice(index + 1, 0, {
+          type,
+          value: "",
+          isReady: isReadyOption,
+          lockedUserId: userIdLockedOption,
+        });
+        return newInputs;
+      });
+
+      // SolidJSのFor更新後にフォーカス（DOM生成を待つ）
+      queueMicrotask(() => {
+        requestAnimationFrame(() => {
+          document.getElementById("MsgInput:" + (inputSections().length - 1))?.focus();
+        });
+      });
+    },
+
+    /**
+     * 指定位置のブロックを削除
+     */
+    removeBlock: (index: number) => {
+      if (inputSections().length > 1) {
+        setInputSections((prev) => prev.filter((_obj, _index) => _index !== index));
+
+        requestAnimationFrame(() => {
+          document.getElementById("MsgInput:" + (index - 1))?.focus();
+        });
+      }
+    },
+
+    /**
+     * メンション用ユーザー検索
+     */
+    searchUser: (query: string) => {
+      setUserList([]);
+      GET_USER_SEARCH(query, currentChannelId())
+        .then((r) => setUserList(r.data))
+        .catch((e) => console.error("searchUser :: e->", e));
+    },
+  };
+
+  const KeyHandler = {
+    /**
+     * テキスト/URLブロック用キーダウンハンドラ
+     */
+    forText: (e: KeyboardEvent, index: number) => {
+      switch (e.key) {
+        case "@": {
+          e.preventDefault();
+          InputSection.insertBlock("mention", index);
+          break;
+        }
+        case "Backspace": {
+          if ((e.currentTarget as HTMLElement).textContent === "") {
+            e.preventDefault();
+            InputSection.removeBlock(index);
+          }
+          break;
+        }
+        case "Enter": {
+          if (/Mac/.test(navigator.userAgent) && e.isComposing) break;
+          if (e.shiftKey) break;
+          if (storeClientConfig.chat.sendWithCtrlKey && !e.ctrlKey) break;
+
+          e.preventDefault();
+          Message.send();
+          break;
+        }
+      }
+    },
+
+    /**
+     * メンションブロック用キーダウンハンドラ
+     */
+    forMention: (e: KeyboardEvent, index: number) => {
+      switch (e.key) {
+        case "@": {
+          e.preventDefault();
+          break;
+        }
+        case " ": {
+          e.preventDefault();
+          InputSection.insertBlock("text", index);
+          break;
+        }
+        case "Backspace": {
+          if ((e.currentTarget as HTMLElement).textContent === "") {
+            e.preventDefault();
+            InputSection.removeBlock(index);
+          }
+          break;
+        }
+        case "Enter": {
+          e.preventDefault();
+          if (userList().length > 0) {
+            InputSection.bindUserId(userList()[0]);
+          }
+          break;
+        }
+      }
+    },
+  };
 
   /**
-   * ファイル用のデータ群から特定のファイル分を削る
-   * @param fileId
+   * セクション配列→送信用プレビュー文字列
    */
-  const removeFileId = (fileId: string, fileName: string) => {
-    setFileInput(fileInput().filter(f=>f.name!==fileName));
-    setFileIds(fileIds().filter(id => id !== fileId));
-  }
+  const previewString = createMemo(() => {
+    return inputSections()
+      .map((section) => {
+        switch (section.type) {
+          case "text":
+            return section.value;
+          case "mention":
+            if (section.isReady && section.lockedUserId) {
+              return `@<${section.lockedUserId}> `;
+            }
+            return `@${section.value}`;
+          case "channel":
+            return `#<${section.value}> `;
+          case "emoji":
+            return `:<${section.value}:> `;
+          case "newline":
+            return "\n";
+          case "url":
+            return section.value;
+          case "messageLink":
+            return `&<${section.value}> `;
+          default:
+            return section.value;
+        }
+      })
+      .join("");
+  });
+
+  const Message = {
+    /**
+     * メッセージ送信
+     */
+    send: () => {
+      const messageString = previewString();
+      if (messageString.trim() === "" && fileIds().length === 0) return;
+
+      POST_MESSAGE_SEND(
+        currentChannelId(),
+        messageString,
+        fileIds(),
+        storeReplyingMessageId[currentChannelId()] || undefined,
+      )
+        .then(() => { })
+        .catch((e) => console.error("POST_MESSAGE_SEND :: e->", e));
+
+      // 初期化
+      setInputSections([{ type: "text", value: "" }]);
+      setFileIds([]);
+      setFileInput([]);
+      setUserList([]);
+      delete storeReplyingMessageId[currentChannelId()];
+
+      // 新しいcontentEditable要素にフォーカス
+      requestAnimationFrame(() => {
+        document.getElementById("MsgInput:0")?.focus();
+      });
+    },
+  };
+
+  const FileOps = {
+    /**
+     * ファイルIDを追加
+     */
+    pushFileId: (fileId: string) => {
+      setFileIds([...fileIds(), fileId]);
+    },
+
+    /**
+     * ファイル選択ダイアログを開く
+     */
+    bindFiles: () => {
+      const fileInputEl = document.getElementById("fileInput") as HTMLInputElement;
+      fileInputEl.value = "";
+      fileInputEl.click();
+      fileInputEl.onchange = (e) => {
+        const files = (e.target as HTMLInputElement).files;
+        if (files) {
+          setFileInput([...fileInput(), ...files]);
+        }
+      };
+    },
+
+    /**
+     * ペーストイベントからファイルを受け取る
+     */
+    receiveFiles: (event: ClipboardEvent) => {
+      const items = event.clipboardData?.items;
+      if (items) {
+        const files = [];
+        for (let i = 0; i < items.length; i++) {
+          if (items[i].kind === "file") {
+            const file = items[i].getAsFile();
+            if (file) files.push(file);
+          }
+        }
+        if (files.length > 0) {
+          setFileInput([...fileInput(), ...files]);
+        }
+      }
+    },
+
+    /**
+     * ファイルID・ファイル入力から削除
+     */
+    removeFileId: (fileId: string, fileName: string) => {
+      setFileInput(fileInput().filter((f) => f.name !== fileName));
+      setFileIds(fileIds().filter((id) => id !== fileId));
+    },
+  };
+
+  // ===== JSX =====
 
   return (
-    <div class={"flex flex-col gap-2 pb-1"}>
-      {/* ファイルアップロードプレビュー表示部 */}
+    <div class={"flex flex-col gap-2 pb-1"} onPaste={(e) => FileOps.receiveFiles(e)}>
+      {/* ファイルアップロードプレビュー */}
       <Show when={fileInput().length > 0}>
         <div class={"flex items-center overflow-x-auto gap-1"}>
           <For each={fileInput()}>
-            {(file) => {
-              return (
-                <div class={"w-fit flex items-center"}>
-                  <FileUploadPreview
-                    file={file}
-                    dataSetter={pushFileIds}
-                    onRemove={(fileId, fileName)=>{ removeFileId(fileId, fileName) }}
-                  />
-                </div>
-              );
-            }}
+            {(file) => (
+              <div class={"w-fit flex items-center"}>
+                <FileUploadPreview
+                  file={file}
+                  dataSetter={FileOps.pushFileId}
+                  onRemove={(fileId, fileName) => FileOps.removeFileId(fileId, fileName)}
+                />
+              </div>
+            )}
           </For>
         </div>
         <hr />
       </Show>
 
-      {/* 返信先のメッセージデータ表示 */}
-      <Show when={storeReplyingMessageId[params.channelId] !== undefined}>
+      {/* 返信先メッセージ表示 */}
+      <Show when={storeReplyingMessageId[currentChannelId()] !== undefined}>
         <ReplyMessageDisplay
-          messageId={storeReplyingMessageId[params.channelId]}
-          onRemove={() => delete storeReplyingMessageId[params.channelId]}
-          channelId={params.channelId}
+          messageId={storeReplyingMessageId[currentChannelId()]}
+          onRemove={() => delete storeReplyingMessageId[currentChannelId()]}
+          channelId={currentChannelId()}
         />
       </Show>
 
+      {/* メッセージプレビュー */}
+      <Show when={previewString().length > 0}>
+        <div class={"border rounded-md p-2 bg-muted/30 text-sm"}>
+          <p class={"text-muted-foreground text-xs mb-1"}>プレビュー</p>
+          <MessageTextRender content={previewString()} />
+        </div>
+      </Show>
+
+      {/* 入力エリア + 送信ボタン */}
       <div class="w-full relative flex items-center gap-1">
         <input type={"file"} id={"fileInput"} class={"hidden"} />
 
-        <Button onClick={bindFiles} variant={"secondary"} size={"icon"} class="shrink-0"><IconUpload /></Button>
+        <Button onClick={FileOps.bindFiles} variant={"secondary"} size={"icon"} class="shrink-0">
+          <IconUpload />
+        </Button>
 
-        <textarea
-          id={"messageInput"}
-          class={"shrink min-w-0 grow p-2 bg-background resize-none border rounded-md break-all h-fit whitespace-pre-wrap max-h-40"}
-          rows={text().match(/\n/g)?.length===0 ? 1 : (text().match(/\n/g)?.length ?? 0) + 1}
-          value={text()}
-          onInput={(e) => {
-            cursorPosition = e.currentTarget?.selectionStart || 0;
-            setText(e.currentTarget.value);
-            checkMode();
+        {/* ブロック分割入力エリア */}
+        <div
+          class={"relative border rounded flex flex-wrap w-full p-2 cursor-text shrink min-w-0 grow bg-background min-h-[40px] max-h-40 overflow-y-auto break-all"}
+          onClick={() => {
+            document.getElementById("MsgInput:" + (inputSections().length - 1))?.focus();
+            setCurrentFocusIndex(inputSections().length - 1);
           }}
-          onKeyDown={(e) => {
-            switch(e.key) {
-              case "Enter": {
-                //検索モードが有効なら選択した情報をメッセージ文にバインド
-                if (searchOptions().isEnabled) {
-                  e.preventDefault();
-                  bindSearchedItem(userSearchResult()[searchOptions().selectIndex], "user");
-                  break;
-                }
-                //Macなら変換での勝手な送信をブロックする
-                if (/Mac/.test(navigator.userAgent) && e.isComposing) break;
-                if (e.shiftKey) break;
+        >
+          <For each={inputSections()}>
+            {(inp, index) => (
+              <>
+                <SolidSwitch>
+                  <Match when={inp.type === "text"}>
+                    <div
+                      id={"MsgInput:" + index()}
+                      contentEditable
+                      onClick={(e) => e.stopPropagation()}
+                      onInput={(e) => InputSection.bind(e.currentTarget.textContent || "", index())}
+                      onFocus={() => setCurrentFocusIndex(index())}
+                      class={"shrink min-w-[3ch] max-w-full text-wrap whitespace-pre-wrap break-all focus:outline-none"}
+                      onKeyDown={(e) => KeyHandler.forText(e, index())}
+                    />
+                  </Match>
+                  <Match when={inp.type === "mention"}>
+                    <Card class={"flex items-center bg-border"}>
+                      <p>@</p>
+                      <div
+                        id={"MsgInput:" + index()}
+                        contentEditable={!inputSections()[index()]?.isReady}
+                        onClick={(e) => !inputSections()[index()]?.isReady && e.stopPropagation()}
+                        onInput={(e) => InputSection.bind(e.currentTarget.textContent || "", index())}
+                        onFocus={() => setCurrentFocusIndex(index())}
+                        class={"shrink min-w-[3ch] max-w-full text-wrap whitespace-pre-wrap break-all focus:outline-none"}
+                        onKeyDown={(e) => KeyHandler.forMention(e, index())}
+                      />
+                    </Card>
+                  </Match>
+                  <Match when={inp.type === "url"}>
+                    <div
+                      id={"MsgInput:" + index()}
+                      contentEditable
+                      onClick={(e) => e.stopPropagation()}
+                      onInput={(e) => InputSection.bind(e.currentTarget.textContent || "", index())}
+                      onFocus={() => setCurrentFocusIndex(index())}
+                      class={"text-blue-500 underline shrink min-w-[3ch] max-w-full text-wrap whitespace-pre-wrap break-all focus:outline-none"}
+                      onKeyDown={(e) => KeyHandler.forText(e, index())}
+                    />
+                  </Match>
+                </SolidSwitch>
+              </>
+            )}
+          </For>
 
-                //設定でCtrlキーを押す必要がある場合
-                if (storeClientConfig.chat.sendWithCtrlKey) {
-                  if (!e.ctrlKey) break;
-                }
-
-                e.preventDefault();
-                //メッセージ送信
-                sendMsg();
-                break;
-              }
-              case "ArrowUp": { //検索モード用の選択移動
-                if (searchOptions().isEnabled) {
-                  e.preventDefault();
-                  if (0 < searchOptions().selectIndex)
-                    setSearchOptions({...searchOptions(), selectIndex: searchOptions().selectIndex - 1});
-                }
-                break;
-              }
-              case "ArrowDown": { //検索モード用の選択移動
-                if (searchOptions().isEnabled) {
-                  e.preventDefault();
-                  if (userSearchResult().length > searchOptions().selectIndex + 1)
-                    setSearchOptions({...searchOptions(), selectIndex: searchOptions().selectIndex + 1});
-                }
-                break;
-              }
+          {/* メンション用ユーザー検索バー */}
+          <Show
+            when={
+              inputSections()[currentFocusIndex()]?.type === "mention" &&
+              !inputSections()[currentFocusIndex()]?.isReady
             }
-          }}
-          onPaste={(e) => receiveFiles(e)}
-        />
+          >
+            <Card class={"absolute w-full rounded-b-none bottom-full left-0 m-0 p-2 overflow-y-auto max-h-40 z-10"}>
+              <Show when={userList().length === 0}>
+                <p class={"text-center"}>２文字以上でユーザーを検索</p>
+              </Show>
+              <Show when={userList().length > 0}>
+                <For each={userList()}>
+                  {(user) => (
+                    <Card
+                      onClick={() => InputSection.bindUserId(user)}
+                      class={"flex items-center border-0 gap-2 p-1 cursor-pointer hover:bg-border"}
+                    >
+                      <img src={`/api/user/icon/${user.id}`} alt={user.name} class={"w-8 h-8 rounded-full"} />
+                      <p class={"truncate"}>{user.name}</p>
+                    </Card>
+                  )}
+                </For>
+              </Show>
+            </Card>
+          </Show>
+        </div>
 
-        <Button onClick={sendMsg} size={"icon"} class={"shrink-0"}><IconSend /></Button>
-
-        {/* メンション用ユーザー検索 */}
-        <Show when={searchOptions().isEnabled && searchOptions().type === "user"}>
-          <Card class={"absolute left-0 bottom-full border-b-0 w-full p-2 overflow-y-auto max-h-40 cursor-pointer"}>
-            <Show when={userSearchResult().length === 0}>
-              <p class={"text-center"}>...</p>
-            </Show>
-            <For each={userSearchResult()}>
-              {(user, index) => {
-                return (
-                  <div
-                    onClick={()=>bindSearchedItem(user, "user")}
-                    class={`flex items-center gap-2 p-2 rounded hover:bg-border ${searchOptions().selectIndex === index()&&"bg-border"}`}
-                  >
-                    <img alt={user.name} src={`/api/user/icon/${user.id}`} class={"w-8 h-8 rounded-full"} />
-                    <div class={"flex-grow"}>
-                      <p>{user.name}</p>
-                    </div>
-                  </div>
-                );
-              }
-            }
-            </For>
-          </Card>
-        </Show>
+        <Button onClick={Message.send} size={"icon"} class={"shrink-0"}>
+          <IconSend />
+        </Button>
       </div>
     </div>
   );
