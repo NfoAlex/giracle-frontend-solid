@@ -260,6 +260,13 @@ export default function ChannelTextInput() {
                   }}
                   onFocus={() => { sectionPosition = index(); }}
                   onKeyDown={Input.keyHandler.default}
+                  onInput={(e) => {
+                    setInputSections((prev) => {
+                      const newInputs = [...prev];
+                      newInputs[sectionPosition].value = e.currentTarget.textContent;
+                      return newInputs;
+                    });
+                  }}
                 />
               </Match>
               <Match when={inp.type === "mention"}>
