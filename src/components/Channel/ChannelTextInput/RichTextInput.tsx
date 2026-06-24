@@ -249,14 +249,16 @@ export default function RichTextInput(props: {
 
   return (
     <div class="relative w-full flex flex-col">
-      <Show when={showSearch() && userList().length > 0}>
+      {/* メンションユーザー検索 */}
+      <Show when={showSearch()}>
         <Card class="absolute bottom-full left-0 w-full max-h-48 overflow-y-auto mb-1 p-1 z-50 flex flex-col gap-0.5 bg-popover text-popover-foreground border shadow-md">
           <For each={userList()}>
             {(user, index) => (
               <div
                 onClick={() => Mention.insert(user)}
-                class={`flex items-center gap-2 p-1.5 rounded cursor-pointer text-sm ${index() === searchIndex() ? "bg-accent text-accent-foreground font-medium" : "hover:bg-muted"
-                  }`}
+                class={
+                  `flex items-center gap-2 p-1.5 rounded cursor-pointer text-sm ${index() === searchIndex() ? "bg-accent text-accent-foreground font-medium" : "hover:bg-muted"}`
+                }
               >
                 <img
                   src={`/api/user/icon/${user.id}`}
@@ -267,6 +269,10 @@ export default function RichTextInput(props: {
               </div>
             )}
           </For>
+          {/* ユーザー数が０の時表示 */}
+          <Show when={userList().length === 0}>
+            <p class="text-muted">...</p>
+          </Show>
         </Card>
       </Show>
 
