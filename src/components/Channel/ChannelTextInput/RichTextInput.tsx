@@ -12,6 +12,20 @@ export interface IInputSections {
   isReady?: boolean;
 }
 
+export const parseSectionsToText = (sections: IInputSections[]): string => {
+  let result = "";
+  sections.forEach((sec) => {
+    if (sec.type === "text") {
+      result += sec.value;
+    } else if (sec.type === "mention") {
+      result += `@<${sec.lockedUserId}>`;
+    } else if (sec.type === "newline") {
+      result += "\n";
+    }
+  });
+  return result;
+}
+
 export default function RichTextInput(props: {
   value: IInputSections[];
   onInput: (value: IInputSections[]) => void;
@@ -297,17 +311,3 @@ export default function RichTextInput(props: {
     </div>
   );
 }
-
-export const parseSectionsToText = (sections: IInputSections[]): string => {
-  let result = "";
-  sections.forEach((sec) => {
-    if (sec.type === "text") {
-      result += sec.value;
-    } else if (sec.type === "mention") {
-      result += `@<${sec.lockedUserId}>`;
-    } else if (sec.type === "newline") {
-      result += "\n";
-    }
-  });
-  return result;
-};
