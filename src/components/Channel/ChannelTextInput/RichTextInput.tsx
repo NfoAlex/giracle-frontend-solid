@@ -146,11 +146,12 @@ export default function RichTextInput(props: {
 
       const match = textBeforeCaret.match(/@([^\s]*)$/);
 
+      //ここでトリガー
       if (match) {
         const query = match[1];
         setSearchQuery(query);
         setShowSearch(true);
-        Searcher.users(query);
+        if (query.length >= 1) Searcher.users(query);
       } else {
         setShowSearch(false);
       }
