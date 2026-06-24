@@ -37,7 +37,6 @@ export default function RichTextInput(props: {
 
   let editorRef: HTMLDivElement | undefined;
 
-  const [searchQuery, setSearchQuery] = createSignal("");
   const [showSearch, setShowSearch] = createSignal(false);
   const [userList, setUserList] = createSignal<IUser[]>([]);
   const [searchIndex, setSearchIndex] = createSignal(0);
@@ -163,7 +162,6 @@ export default function RichTextInput(props: {
       //ここでトリガー
       if (match) {
         const query = match[1];
-        setSearchQuery(query);
         setShowSearch(true);
         if (query.length >= 1) Searcher.users(query);
       } else {
