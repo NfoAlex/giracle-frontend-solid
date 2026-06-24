@@ -93,17 +93,41 @@ export default function RichTextInput(props: {
     renderToEditor: (sections: IInputSections[]) => {
       if (!editorRef) return;
       editorRef.textContent = "";
+
+      /**
+       * typeごとにclassと設定を適用
+       */
+      const elBinder = (type: string, sectionObj: IInputSections ) => {
+        const span = document.createElement("span");
+
+        let classString = "";
+        let contentString = "";
+
+        switch (type) {
+          case "mention": {
+            span.contentEditable = "false";
+            span.setAttribute("data-user-id", sectionObj.lockedUserId ?? "");
+            contentString = `@${sectionObj.value}`;
+            editorRef.appendChild(span);
+            break;
+          }
+          default: {
+            contentString = sectionObj.value;
+            break;
+          }
+        }
+
+        span.setAttribute("data-user-id", sectionObj.lockedUserId ?? "");
+        span.textContent = contentString;
+        span.className = classString
+        editorRef.appendChild(span);
+      };
+
       sections.forEach((sec) => {
         if (sec.type === "text") {
           editorRef.appendChild(document.createTextNode(sec.value));
         } else if (sec.type === "mention") {
-          const span = document.createElement("span");
-          span.className =
-            "inline-block bg-primary/20 text-primary px-1.5 py-0.5 rounded font-medium mx-0.5 select-none";
-          span.contentEditable = "false";
-          span.setAttribute("data-user-id", sec.lockedUserId ?? "");
-          span.textContent = `@${sec.value}`;
-          editorRef.appendChild(span);
+          elBinder("mention", sec);
         } else if (sec.type === "newline") {
           editorRef.appendChild(document.createElement("br"));
         }
@@ -253,6 +277,7 @@ export default function RichTextInput(props: {
   };
 
   createEffect(() => {
+    console.log("RichTextInput :: createEffect : effect かかった");
     const currentJSON = Parser.getSections();
     if (JSON.stringify(props.value) !== JSON.stringify(currentJSON)) {
       Renderer.renderToEditor(props.value);
