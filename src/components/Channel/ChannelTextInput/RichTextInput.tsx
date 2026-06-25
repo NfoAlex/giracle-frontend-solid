@@ -44,6 +44,9 @@ export default function RichTextInput(props: {
 
   // ===== Parser =====
   const Parser = {
+    /**
+     * 入力メッセージの要素をパースして取得
+     */
     getSections: (): IInputSections[] => {
       if (!editorRef) return [];
 
@@ -154,6 +157,7 @@ export default function RichTextInput(props: {
     trigger: () => {
       if (editorRef) {
         const parsedJSON = Parser.getSections();
+        //想定はこのonInputで親コンポーネントでprops.valueに代入している(<input type="text" />と同じ使い方)
         props.onInput(parsedJSON);
         setIsEmpty(parsedJSON.length === 0);
       }
