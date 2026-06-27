@@ -281,9 +281,11 @@ export default function RichTextInput(props: {
   };
 
   createEffect(() => {
-    console.log("RichTextInput :: createEffect : effect かかった");
-    const currentJSON = Parser.getSections();
-    if (JSON.stringify(props.value) !== JSON.stringify(currentJSON)) {
+    const sectionsToString = (sections: IInputSections[]) =>
+      JSON.stringify(sections.filter(s => s.type !== "text"));
+
+    const currentSections = Parser.getSections();
+    if (sectionsToString(props.value) !== sectionsToString(currentSections)) {
       Renderer.renderToEditor(props.value);
     }
   });
