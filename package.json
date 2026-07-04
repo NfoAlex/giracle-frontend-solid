@@ -24,6 +24,10 @@
   "dependencies": {
     "@fontsource-variable/noto-sans-jp": "^5.2.10",
     "@kobalte/core": "^0.13.12",
+    "@lexical/history": "0.46.0",
+    "@lexical/plain-text": "0.46.0",
+    "@lexical/selection": "0.46.0",
+    "@lexical/utils": "0.46.0",
     "@maxxam0n/minesweeper-engine": "^0.2.0",
     "@solidjs/router": "^0.16.1",
     "@tabler/icons-solidjs": "^3.44.0",
@@ -33,6 +37,7 @@
     "clsx": "^2.1.1",
     "dotenv": "^17.4.2",
     "emoji-picker-element": "^1.29.1",
+    "lexical": "0.46.0",
     "solid-js": "^1.9.13",
     "sortablejs": "^1.15.7",
     "tailwind-merge": "^3.6.0",

@@ -17,6 +17,18 @@ importers:
       '@kobalte/core':
         specifier: ^0.13.12
         version: 0.13.12(solid-js@1.9.13)
+      '@lexical/history':
+        specifier: 0.46.0
+        version: 0.46.0(typescript@6.0.3)
+      '@lexical/plain-text':
+        specifier: 0.46.0
+        version: 0.46.0(typescript@6.0.3)
+      '@lexical/selection':
+        specifier: 0.46.0
+        version: 0.46.0(typescript@6.0.3)
+      '@lexical/utils':
+        specifier: 0.46.0
+        version: 0.46.0(typescript@6.0.3)
       '@maxxam0n/minesweeper-engine':
         specifier: ^0.2.0
         version: 0.2.0
@@ -44,6 +56,9 @@ importers:
       emoji-picker-element:
         specifier: ^1.29.1
         version: 1.29.1
+      lexical:
+        specifier: 0.46.0
+        version: 0.46.0(typescript@6.0.3)
       solid-js:
         specifier: ^1.9.13
         version: 1.9.13
@@ -667,6 +682,86 @@ packages:
     peerDependencies:
       solid-js: ^1.8.8
 
+  '@lexical/clipboard@0.46.0':
+    resolution: {integrity: sha512-c7lQeORx5+2tfc9+xnHDPBT097t9KdWW3a/kg/ThliokHOkaYz6OeM2z53uID/OOpRGao8FRO5vw9rz5ZAhg+w==}
+    peerDependencies:
+      typescript: '>=5.2'
+    peerDependenciesMeta:
+      typescript:
+        optional: true
+
+  '@lexical/dragon@0.46.0':
+    resolution: {integrity: sha512-/PIjscXlD0jp3Bj5MWJ+y1WZsVxagsqnnzOkqdDStM3033soj/2cI7tysMU/7XAEJtMBk1bTJdDvmDHM/bn/rg==}
+    peerDependencies:
+      typescript: '>=5.2'
+    peerDependenciesMeta:
+      typescript:
+        optional: true
+
+  '@lexical/extension@0.46.0':
+    resolution: {integrity: sha512-bdO/ON5dwVwtqeTes/+My/sRU7vNuH3W8ovJ2yffXRFmAxVtzKr6/6TYJWwtUvncQjvTHEKAo5MqWUoQXp8VMw==}
+    peerDependencies:
+      typescript: '>=5.2'
+    peerDependenciesMeta:
+      typescript:
+        optional: true
+
+  '@lexical/history@0.46.0':
+    resolution: {integrity: sha512-PbbyXVfbm/RBS/hkPJrAGd6DYZ8/4E+nyPaiArwo4WGYQBoEXc2dU+dwAcIrhwVVXuOVrkm9Hp0cZYl4hKM8qQ==}
+    peerDependencies:
+      typescript: '>=5.2'
+    peerDependenciesMeta:
+      typescript:
+        optional: true
+
+  '@lexical/html@0.46.0':
+    resolution: {integrity: sha512-Rvke8FvQkjd+hFBCe39YdQxPQZZ/7W95xilY3qFxmSZaW0zakcA8pItaf7HfueG8Ja6jDu/TOMH4LUeyQPT3HQ==}
+    peerDependencies:
+      typescript: '>=5.2'
+    peerDependenciesMeta:
+      typescript:
+        optional: true
+
+  '@lexical/internal@0.46.0':
+    resolution: {integrity: sha512-OV1ePAAnVVd0K+Bq5SX7vOKE/LqJLYcDM4HD4zVCisbgVaznE+pTj/nDB2uWTidwf8o7QhPR65VhEi+KkUtyEw==}
+    peerDependencies:
+      typescript: '>=5.2'
+    peerDependenciesMeta:
+      typescript:
+        optional: true
+
+  '@lexical/list@0.46.0':
+    resolution: {integrity: sha512-nIX3k05MFAhWZvVXZBZB7LTS1DhsCF2iCFH2WDYebwJfADTnAqhE/ZCAJax84RRMjYla67JU31br9r+P6KR+hA==}
+    peerDependencies:
+      typescript: '>=5.2'
+    peerDependenciesMeta:
+      typescript:
+        optional: true
+
+  '@lexical/plain-text@0.46.0':
+    resolution: {integrity: sha512-fH1MYHrilsho6hkpGHnjw2eFBeLaJzz5PY4LT9ZVxtliPB3YRKUYZLcP23fGidzOC2it2xvTkT9D7kFo7zTQug==}
+    peerDependencies:
+      typescript: '>=5.2'
+    peerDependenciesMeta:
+      typescript:
+        optional: true
+
+  '@lexical/selection@0.46.0':
+    resolution: {integrity: sha512-iWrztXnBl9x7DthlRefUCNHfY8lHU6AzDm7pIr3o7t1hoixDtTuiZ5cCw+PkShC/hZ8v7VuV+FaDNraSaTTkHA==}
+    peerDependencies:
+      typescript: '>=5.2'
+    peerDependenciesMeta:
+      typescript:
+        optional: true
+
+  '@lexical/utils@0.46.0':
+    resolution: {integrity: sha512-s8XQDoBr1wyPKGqy3qyDeHvi+vMgOiszzcRdHvTd6AqWpXxw2MsDQzMdF3Nr56QHahcOYxMOcv+r7r2nnCcgCA==}
+    peerDependencies:
+      typescript: '>=5.2'
+    peerDependenciesMeta:
+      typescript:
+        optional: true
+
   '@maxxam0n/minesweeper-engine@0.2.0':
     resolution: {integrity: sha512-1Pn1MtUN4dBG5YCpAPwzhtoHYOKYCv8c0Fd3TY80z4Yq3X6GM6FL1s9esAMglD8J0n4ltuteVkWAdlJ5ZS5MWw==}
 
@@ -690,6 +785,9 @@ packages:
 
   '@oxc-project/types@0.138.0':
     resolution: {integrity: sha512-1a7ZKmrRTCoN1XMZ4L0PyyqrMnrNlLyPuOkdSX2MZg7IiIGRUyurNhAm73ptDOraoBcIordsIGKNPKUzy3ZmfA==}
+
+  '@preact/signals-core@1.14.3':
+    resolution: {integrity: sha512-m0K3vnbSLC5rHs2ZVfeAMvBtT1zIyq4mxx5OlNncSgMj5Iz6W5Rn3kPrDxAC+iIKmiVe0lSl6U37t5ZkEWoVAw==}
 
   '@rolldown/binding-android-arm64@1.1.4':
     resolution: {integrity: sha512-EZLpf/8y7GXkkra90ML47kzik/GMP3EMcE9bPyHmRfxLC6z9+aW5A8poCsoxjrT5GfEcNAAvWwUHjvP1pUQkfw==}
@@ -1553,6 +1651,14 @@ packages:
   leven@3.1.0:
     resolution: {integrity: sha512-qsda+H8jTaUaN/x5vzW2rzc+8Rw4TAQ/4KjB46IwK5VH+IlVeeeje/EoZRpiXvIqjFgK84QffqPztGI3VBLG1A==}
     engines: {node: '>=6'}
+
+  lexical@0.46.0:
+    resolution: {integrity: sha512-oaE7OLY/FuqGKC7ihaqLJvgn/NvvRveryKBBgOwrSe+UIpBmc9IvyXf6hVcvew9M3Vc0XavHWe/ZAL7qc5DzMw==}
+    peerDependencies:
+      typescript: '>=5.2'
+    peerDependenciesMeta:
+      typescript:
+        optional: true
 
   lightningcss-android-arm64@1.32.0:
     resolution: {integrity: sha512-YK7/ClTt4kAK0vo6w3X+Pnm0D2cf2vPHbhOXdoNti1Ga0al1P4TBZhwjATvjNwLEBCnKvjJc2jQgHXH0NEwlAg==}
@@ -3082,6 +3188,93 @@ snapshots:
       '@solid-primitives/utils': 6.4.0(solid-js@1.9.13)
       solid-js: 1.9.13
 
+  '@lexical/clipboard@0.46.0(typescript@6.0.3)':
+    dependencies:
+      '@lexical/extension': 0.46.0(typescript@6.0.3)
+      '@lexical/html': 0.46.0(typescript@6.0.3)
+      '@lexical/internal': 0.46.0(typescript@6.0.3)
+      '@lexical/list': 0.46.0(typescript@6.0.3)
+      '@lexical/selection': 0.46.0(typescript@6.0.3)
+      '@lexical/utils': 0.46.0(typescript@6.0.3)
+      '@types/trusted-types': 2.0.7
+      lexical: 0.46.0(typescript@6.0.3)
+    optionalDependencies:
+      typescript: 6.0.3
+
+  '@lexical/dragon@0.46.0(typescript@6.0.3)':
+    dependencies:
+      '@lexical/extension': 0.46.0(typescript@6.0.3)
+      lexical: 0.46.0(typescript@6.0.3)
+    optionalDependencies:
+      typescript: 6.0.3
+
+  '@lexical/extension@0.46.0(typescript@6.0.3)':
+    dependencies:
+      '@lexical/internal': 0.46.0(typescript@6.0.3)
+      '@lexical/utils': 0.46.0(typescript@6.0.3)
+      '@preact/signals-core': 1.14.3
+      lexical: 0.46.0(typescript@6.0.3)
+    optionalDependencies:
+      typescript: 6.0.3
+
+  '@lexical/history@0.46.0(typescript@6.0.3)':
+    dependencies:
+      '@lexical/extension': 0.46.0(typescript@6.0.3)
+      '@lexical/utils': 0.46.0(typescript@6.0.3)
+      lexical: 0.46.0(typescript@6.0.3)
+    optionalDependencies:
+      typescript: 6.0.3
+
+  '@lexical/html@0.46.0(typescript@6.0.3)':
+    dependencies:
+      '@lexical/extension': 0.46.0(typescript@6.0.3)
+      '@lexical/internal': 0.46.0(typescript@6.0.3)
+      '@lexical/selection': 0.46.0(typescript@6.0.3)
+      '@lexical/utils': 0.46.0(typescript@6.0.3)
+      lexical: 0.46.0(typescript@6.0.3)
+    optionalDependencies:
+      typescript: 6.0.3
+
+  '@lexical/internal@0.46.0(typescript@6.0.3)':
+    optionalDependencies:
+      typescript: 6.0.3
+
+  '@lexical/list@0.46.0(typescript@6.0.3)':
+    dependencies:
+      '@lexical/extension': 0.46.0(typescript@6.0.3)
+      '@lexical/html': 0.46.0(typescript@6.0.3)
+      '@lexical/internal': 0.46.0(typescript@6.0.3)
+      '@lexical/utils': 0.46.0(typescript@6.0.3)
+      lexical: 0.46.0(typescript@6.0.3)
+    optionalDependencies:
+      typescript: 6.0.3
+
+  '@lexical/plain-text@0.46.0(typescript@6.0.3)':
+    dependencies:
+      '@lexical/clipboard': 0.46.0(typescript@6.0.3)
+      '@lexical/dragon': 0.46.0(typescript@6.0.3)
+      '@lexical/extension': 0.46.0(typescript@6.0.3)
+      '@lexical/selection': 0.46.0(typescript@6.0.3)
+      '@lexical/utils': 0.46.0(typescript@6.0.3)
+      lexical: 0.46.0(typescript@6.0.3)
+    optionalDependencies:
+      typescript: 6.0.3
+
+  '@lexical/selection@0.46.0(typescript@6.0.3)':
+    dependencies:
+      '@lexical/internal': 0.46.0(typescript@6.0.3)
+      lexical: 0.46.0(typescript@6.0.3)
+    optionalDependencies:
+      typescript: 6.0.3
+
+  '@lexical/utils@0.46.0(typescript@6.0.3)':
+    dependencies:
+      '@lexical/internal': 0.46.0(typescript@6.0.3)
+      '@lexical/selection': 0.46.0(typescript@6.0.3)
+      lexical: 0.46.0(typescript@6.0.3)
+    optionalDependencies:
+      typescript: 6.0.3
+
   '@maxxam0n/minesweeper-engine@0.2.0': {}
 
   '@napi-rs/wasm-runtime@1.1.6(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)':
@@ -3104,6 +3297,8 @@ snapshots:
       fastq: 1.20.1
 
   '@oxc-project/types@0.138.0': {}
+
+  '@preact/signals-core@1.14.3': {}
 
   '@rolldown/binding-android-arm64@1.1.4':
     optional: true
@@ -3987,6 +4182,12 @@ snapshots:
   jsonpointer@5.0.1: {}
 
   leven@3.1.0: {}
+
+  lexical@0.46.0(typescript@6.0.3):
+    dependencies:
+      '@lexical/internal': 0.46.0(typescript@6.0.3)
+    optionalDependencies:
+      typescript: 6.0.3
 
   lightningcss-android-arm64@1.32.0:
     optional: true
