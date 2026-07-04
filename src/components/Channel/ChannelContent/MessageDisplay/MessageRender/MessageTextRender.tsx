@@ -4,13 +4,13 @@ import { getterUserinfo } from "~/stores/Userinfo.ts";
 import { storeMyUserinfo } from "~/stores/MyUserinfo.ts";
 import UserinfoModalWrapper from "~/components/unique/UserinfoModalWrapper.tsx";
 import MessageLink from "./MessageTextRender/MessageLink";
-
-const urlPattern =
-  /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/gi;
-const messageLinkPattern = /&<([a-f0-9-]+):([a-f0-9-]+)>/g;
-const mentionPattern = /@<([a-f0-9-]+)>/g;
-const channelPattern = /#<([a-f0-9-]+)>/g;
-const inlineCodePattern = /`([^`]+)`/g;
+import {
+  urlPattern,
+  messageLinkPattern,
+  mentionPattern,
+  channelPattern,
+  inlineCodePattern,
+} from "~/lib/messagePatterns.ts";
 
 type MatchType = "link" | "messageLink" | "userId" | "channel" | "inlineCode";
 interface IMatchObject {
