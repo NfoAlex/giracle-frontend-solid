@@ -16,7 +16,13 @@ export default defineConfig({
     solidPlugin(),
     VitePWA({
       registerType: 'autoUpdate',
-      devOptions: {enabled: false},
+      strategies: 'injectManifest',
+      srcDir: 'src',
+      filename: 'sw.ts',
+      injectManifest: {
+        injectionPoint: undefined,
+      },
+      devOptions: {enabled: true, type: 'module'},
       manifest: {
         lang: "ja",
         "icons": [

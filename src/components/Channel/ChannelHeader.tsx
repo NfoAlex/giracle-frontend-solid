@@ -1,8 +1,9 @@
 import { useParams } from "@solidjs/router";
 import { createEffect, createSignal, Show, Switch, Match } from "solid-js";
-import { IconLock } from "@tabler/icons-solidjs";
+import { IconBell, IconBellOff, IconLock } from "@tabler/icons-solidjs";
 import SidebarTriggerWithDot from "../unique/SidebarTriggerWithDot.tsx";
 import { Card } from "../ui/card.tsx";
+import { Button } from "../ui/button.tsx";
 import { directGetterChannelInfo, storeChannelFetchStatus } from "~/stores/ChannelInfo.ts";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "../ui/hover-card.tsx";
 import type { IChannel } from "~/types/Channel.ts";
@@ -10,6 +11,14 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader } from "../ui/di
 import { TabsList, TabsTrigger, TabsContent, Tabs } from "../ui/tabs.tsx";
 import ChannelInfo from "./ChannelHeader/ChannelManage/ChannelInfos.tsx";
 import ChannelMembers from "./ChannelHeader/ChannelManage/ChannelMembers.tsx";
+import {
+  isChannelMuted,
+  setStoreMutedChannels,
+  storeMutedChannels,
+} from "~/stores/Notification.ts";
+import POST_NOTIFICATION_MUTE_CHANNEL from "~/api/NOTIFICATION/NOTIFICATION_MUTE_CHANNEL.ts";
+import POST_NOTIFICATION_UNMUTE_CHANNEL from "~/api/NOTIFICATION/NOTIFICATION_UNMUTE_CHANNEL.ts";
+import { showToast } from "../ui/toast.tsx";
 
 export default function ChannelHeader() {
   const params = useParams();
@@ -23,6 +32,34 @@ export default function ChannelHeader() {
       setCurrentChannelInfo(directGetterChannelInfo(params.channelId));
     }
   });
+
+  const [muteBusy, setMuteBusy] = createSignal(false);
+  const toggleMute = async (e: MouseEvent) => {
+    e.stopPropagation();
+    const cid = currentChannelId();
+    if (!cid || muteBusy()) return;
+    setMuteBusy(true);
+    const currentlyMuted = isChannelMuted(cid);
+    try {
+      if (currentlyMuted) {
+        await POST_NOTIFICATION_UNMUTE_CHANNEL(cid);
+        setStoreMutedChannels("ids", (prev) => prev.filter((id) => id !== cid));
+      } else {
+        await POST_NOTIFICATION_MUTE_CHANNEL(cid);
+        setStoreMutedChannels("ids", (prev) =>
+          prev.includes(cid) ? prev : [...prev, cid],
+        );
+      }
+    } catch (err) {
+      showToast({
+        title: "ミュート状態の更新に失敗しました",
+        variant: "destructive",
+      });
+      console.error(err);
+    } finally {
+      setMuteBusy(false);
+    }
+  };
 
   return (
     <>
@@ -91,6 +128,40 @@ export default function ChannelHeader() {
             <span class={"shrink-[2] md:shrink max-w-1/2 line-clamp-1 md:max-w-full"}>
               <p class={"truncate"}>{currentChannelInfo()?.description}</p>
             </span>
+
+            {/* ミュートトグル */}
+            <div class="ml-auto shrink-0" onClick={(e) => e.stopPropagation()}>
+              <HoverCard>
+                <HoverCardTrigger>
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    onClick={toggleMute}
+                    disabled={muteBusy()}
+                    aria-label={
+                      storeMutedChannels.ids.includes(currentChannelId())
+                        ? "ミュート解除"
+                        : "ミュート"
+                    }
+                  >
+                    <Show
+                      when={storeMutedChannels.ids.includes(currentChannelId())}
+                      fallback={<IconBell size={"18"} />}
+                    >
+                      <IconBellOff size={"18"} />
+                    </Show>
+                  </Button>
+                </HoverCardTrigger>
+                <HoverCardContent>
+                  <Show
+                    when={storeMutedChannels.ids.includes(currentChannelId())}
+                    fallback={<>このチャンネルをミュート</>}
+                  >
+                    このチャンネルのミュートを解除
+                  </Show>
+                </HoverCardContent>
+              </HoverCard>
+            </div>
 
           </Card>
         </Match>

@@ -16,6 +16,12 @@ import { bindCustomEmoji } from "~/stores/CustomEmoji.ts";
 import { bindClientConfig } from "~/stores/ClientConfig.ts";
 import GET_SERVER_CONFIG from "~/api/SERVER/SERVER_CONFIG.ts";
 import { bindServerinfo } from "~/stores/Serverinfo.ts";
+import GET_NOTIFICATION_CONFIG from "~/api/NOTIFICATION/NOTIFICATION_CONFIG_GET.ts";
+import GET_NOTIFICATION_MUTED_CHANNELS from "~/api/NOTIFICATION/NOTIFICATION_MUTED_CHANNELS.ts";
+import {
+  setStoreMutedChannels,
+  setStoreNotificationConfig,
+} from "~/stores/Notification.ts";
 
 export default function InitLoad(_userId: string, initWsToo = false) {
   //クライアント設定を呼び出して適用
@@ -67,6 +73,14 @@ export default function InitLoad(_userId: string, initWsToo = false) {
     //console.log("InitLoad :: GET_SERVER_CUSTOM_EMOJI : カスタム絵文字取得r->", r);
     bindCustomEmoji(r.data);
   }).catch((e) => console.error("InitLoad :: GET_SERVER_CUSTOM_EMOJI : カスタム絵文字取得エラー", e));
+  //通知設定取得
+  GET_NOTIFICATION_CONFIG().then((r) => {
+    setStoreNotificationConfig(r.data);
+  }).catch((e) => console.error("InitLoad :: GET_NOTIFICATION_CONFIG エラー", e));
+  //ミュートチャンネル取得
+  GET_NOTIFICATION_MUTED_CHANNELS().then((r) => {
+    setStoreMutedChannels({ ids: r.data.map((m) => m.channelId) });
+  }).catch((e) => console.error("InitLoad :: GET_NOTIFICATION_MUTED_CHANNELS エラー", e));
 
   // オンラインユーザーの同期は👇のinitWS関数で行う
 
