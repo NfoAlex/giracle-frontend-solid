@@ -1,6 +1,7 @@
 node_modules
 .pnpm-store
 dist
+dev-dist
 .env
 
 #lock file

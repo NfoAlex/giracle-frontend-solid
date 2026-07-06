@@ -2,6 +2,10 @@ import { storeClientConfig } from "~/stores/ClientConfig.ts";
 import { setStoreHasNewMessage } from "~/stores/HasNewMessage.ts";
 import { addMessage, storeHistory } from "~/stores/History.ts";
 import { storeMyUserinfo } from "~/stores/MyUserinfo.ts";
+import {
+  isChannelMuted,
+  storeNotificationConfig,
+} from "~/stores/Notification.ts";
 import { setStoreMessageReadTime } from "~/stores/Readtime";
 import type { IMessage } from "~/types/Message.ts";
 import { notifyIt } from "~/utils/Notify.ts";
@@ -20,9 +24,13 @@ export default function WSSendMessage(dat: IMessage) {
       };
     });
 
-    //設定で有効になっているなら通知する
-    if (storeClientConfig.notification.notifyAll) {
-      //console.log("WSSendMessage :: notifyIt ->", dat.userId, dat.content);
+    //ミュート・通知設定を判定して通知する
+    const notifEnabled =
+      storeNotificationConfig.enabled && storeNotificationConfig.mode !== "off";
+    const wantsAll =
+      storeNotificationConfig.mode === "all" ||
+      storeClientConfig.notification.notifyAll;
+    if (notifEnabled && wantsAll && !isChannelMuted(dat.channelId)) {
       notifyIt(dat.userId, dat.content, { channelId: dat.channelId });
     }
   } else if (storeHistory[dat.channelId]?.atEnd || storeMyUserinfo.id === dat.userId) { //それ以外で履歴末端まで行ってるなら既読時間更新
