@@ -214,7 +214,7 @@ export default function ConfigNotification() {
             <IconBellRinging />
             通知モード
           </span>
-          <div class="ml-auto flex items-center gap-2 w-48">
+          <div class="ml-auto flex items-center gap-2">
             <Select<Mode>
               value={storeNotificationConfig.mode}
               onChange={(v) => v && updateMode(v)}
@@ -237,8 +237,8 @@ export default function ConfigNotification() {
         </span>
         <hr />
         <div class="text-sm">
-          <p><strong>メンションのみ</strong>: 自分宛のメンションと返信のみ通知します。</p>
-          <p><strong>全ての通知</strong>: 参加中の全チャンネルの新規メッセージも通知します。</p>
+          <div><strong>メンションのみ</strong>: 自分宛のメンションと返信のみ通知します。</div>
+          <div><strong>全ての通知</strong>: 参加中の全チャンネルの新規メッセージも通知します。</div>
         </div>
       </Card>
 

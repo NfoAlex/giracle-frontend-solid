@@ -38,23 +38,21 @@ sw.addEventListener("push", (event) => {
 
   event.waitUntil(
     (async () => {
-      // 該当チャンネルを開いているタブがフォーカスされているなら通知を出さない
+      // Giracle が開いている(フォーカスされていなくても)タブが存在するなら
+      // Web ソケット経由の通知経路がそちらで動くのでSW側は通知しない。
+      // これで「タブ開きっぱなし + 非フォーカス」で二重通知になる問題を防ぐ。
       const windowClients = await sw.clients.matchAll({
         type: "window",
         includeUncontrolled: true,
       });
-      const channelId = data?.channelId;
-      const focusedOnChannel = windowClients.find((c) => {
-        if (!c.focused) return false;
-        if (!channelId) return true;
+      const hasGiracleClient = windowClients.some((c) => {
         try {
-          const url = new URL(c.url);
-          return url.pathname.includes(`/channel/${channelId}`);
+          return new URL(c.url).origin === sw.location.origin;
         } catch {
           return false;
         }
       });
-      if (focusedOnChannel) return;
+      if (hasGiracleClient) return;
 
       await sw.registration.showNotification(title, {
         body,
