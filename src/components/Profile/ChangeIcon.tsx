@@ -1,6 +1,6 @@
 import { IconCheck, IconUserCircle } from "@tabler/icons-solidjs";
 import { Show, createSignal } from "solid-js";
-import POST_USER_CHANGE_ICON from "~/api/USER/USER_CHANGE_ICON";
+import { api } from "~/api/index.ts";
 import { Button } from "../ui/button.tsx";
 import { Callout, CalloutContent, CalloutTitle } from "../ui/callout.tsx";
 import {
@@ -26,7 +26,7 @@ export default function ChangeIcon() {
     const _file = file();
     if (_file === null) return;
     //アイコンの変更
-    POST_USER_CHANGE_ICON(_file)
+    api.user.changeIcon({ icon: _file })
       .then(() => {
         setResult("success");
       })

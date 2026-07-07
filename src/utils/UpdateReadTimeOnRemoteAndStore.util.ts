@@ -1,4 +1,4 @@
-import POST_MESSAGE_UPDATE_READTIME from "~/api/MESSAGE/MESSAGE_UPDATE_READTIME";
+import { api } from "~/api/index.ts";
 import { setStoreMessageReadTime, storeMessageReadTime } from "~/stores/Readtime";
 
 function BindToReadTimeStore(channelId: string, readTime: string, currentReadTime?: string, option?: { copyToReadTimeBefore: boolean }) {
@@ -29,10 +29,10 @@ export default async function UpdateReadTimeOnRemoteAndStore(channelId: string, 
   //既読時間が現時点で無いなら更新して終了
   if (currentReadTime === undefined) {
     BindToReadTimeStore(channelId, messageCreatedAt);
-    await POST_MESSAGE_UPDATE_READTIME(
+    await api.message.updateReadTime({
       channelId,
-      messageCreatedAt,
-    )
+      readTime: messageCreatedAt,
+    })
       .catch((err) => {
         console.error("UpdateReadTimeOnRemoteAndStore :: err->", err);
       });
@@ -46,10 +46,10 @@ export default async function UpdateReadTimeOnRemoteAndStore(channelId: string, 
   };
 
   BindToReadTimeStore(channelId, messageCreatedAt, currentReadTime, option);
-  await POST_MESSAGE_UPDATE_READTIME(
+  await api.message.updateReadTime({
     channelId,
-    messageCreatedAt,
-  )
+    readTime: messageCreatedAt,
+  })
     .catch((err) => {
       console.error("UpdateReadTimeOnRemoteAndStore :: err->", err);
     });

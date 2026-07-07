@@ -1,5 +1,5 @@
 import { createStore } from "solid-js/store";
-import { GET_ROLE } from "~/api/ROLE/ROLE_INFO.ts";
+import { api } from "~/api/index.ts";
 import type { IRole } from "~/types/Role.ts";
 
 export const [storeRoleInfo, setStoreRoleInfo] = createStore<{
@@ -42,7 +42,7 @@ export const getterRoleInfo = (
       manageEmoji: false,
     });
     //ロール情報を取得
-    GET_ROLE(roleId)
+    api.role.info({ roleId })
       .then((r) => {
         //Storeに設定
         updateRoleInfo(r.data);

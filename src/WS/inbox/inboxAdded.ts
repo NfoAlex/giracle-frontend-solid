@@ -1,4 +1,4 @@
-import POST_MESSAGE_INBOX_READ from "~/api/MESSAGE/MESSAGE_INBOX_READ.ts";
+import { api } from "~/api/index.ts";
 import { storeClientConfig } from "~/stores/ClientConfig.ts";
 import { storeHistory } from "~/stores/History.ts";
 import {setStoreInbox} from "~/stores/Inbox.ts";
@@ -39,7 +39,7 @@ export default function WSInboxAdded(dat: { type: IInbox["type"], message: IMess
 
   //今メンションされたチャンネルにいてかつ履歴にあるのなら既読処理、違うならInbox格納
   if (onSameChannel && alreadyHasMessage) {
-    POST_MESSAGE_INBOX_READ(dat.message.id).then(() => {
+    api.message.inboxRead({ messageId: dat.message.id }).then(() => {
       //console.log("MentionReadWrapper :: onMounted : message read");
     }).catch((e) => console.error("WSInboxAdded : 既読error->", e));
   } else {

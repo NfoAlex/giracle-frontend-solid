@@ -1,5 +1,5 @@
 import { Show, createSignal } from "solid-js";
-import POST_USER_REGISTER from "~/api/USER/USER_REGISTER";
+import { api } from "~/api/index.ts";
 import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
 import { Button } from "../ui/button.tsx";
 import { TextField, TextFieldInput, TextFieldLabel } from "../ui/text-field.tsx";
@@ -12,7 +12,7 @@ export default function Register() {
   const [result, setResult] = createSignal("");
 
   const signUp = async () => {
-    await POST_USER_REGISTER(username(), password(), inviteCode())
+    await api.user.register({ username: username(), password: password(), inviteCode: inviteCode() })
       .then((res) => {
         //console.log("Register :: signUp : res->", res);
         setResult("success");

@@ -1,5 +1,5 @@
 import { createEffect, createSignal, For, on } from "solid-js";
-import GET_MESSAGE_WHO_REACTED from "~/api/MESSAGE/MESSAGE_WHO_REACTED.ts";
+import { api } from "~/api/index.ts";
 import { Avatar, AvatarImage } from "~/components/ui/avatar.tsx";
 import { Dialog, DialogContent, DialogHeader } from "~/components/ui/dialog.tsx";
 import RenderEmoji from "~/components/unique/RenderEmoji.tsx";
@@ -16,7 +16,7 @@ export default function DisplayAllReactedUserModal(props: { messageId: string, e
     () => props.emojiCode,
     (emojiCode) => {
       if (props.emojiCode === "") return;
-      GET_MESSAGE_WHO_REACTED(props.messageId, emojiCode)
+      api.message.whoReacted({ messageId: props.messageId, emojiCode })
         .then((res) => {
           setReactedUserArrs(res.data);
         })

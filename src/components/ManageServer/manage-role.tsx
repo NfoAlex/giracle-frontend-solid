@@ -1,15 +1,12 @@
 import { createSignal, For, onMount } from "solid-js";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "../ui/card.tsx"
 import type { IRole } from "~/types/Role.ts";
-import { GET_ROLE_LIST } from "~/api/ROLE/ROLE_LIST.ts";
 import { Button } from "../ui/button.tsx";
 import { SidebarMenuButton } from "../ui/sidebar";
 import { TextField, TextFieldInput, TextFieldLabel } from "../ui/text-field.tsx";
 import { IconCircle, IconList, IconPlus } from "@tabler/icons-solidjs";
 import { Switch, SwitchControl, SwitchLabel, SwitchThumb } from "../ui/switch";
-import POST_ROLE_UPDATE from "~/api/ROLE/ROLE_UPDATE";
-import DELETE_ROLE_DELETE from "~/api/ROLE/ROLE_DELETE";
-import POST_ROLE_CREATE from "~/api/ROLE/ROLE_CREATE";
+import { api } from "~/api/index.ts";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "../ui/hover-card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 
@@ -35,7 +32,7 @@ export default function ManageRole() {
    * ロールの更新を保存する
    */
   const saveRole = () => {
-    POST_ROLE_UPDATE(roleEditing().id, roleEditing())
+    api.role.update({ roleId: roleEditing().id, roleData: roleEditing() })
       .then((r) => {
         //console.log("ManageRole :: saveRole :: r->", r);
         setRoles(roles().map((role) => role.id === roleEditing().id ? roleEditing() : role));
@@ -47,7 +44,7 @@ export default function ManageRole() {
    * ロールを削除する
    */
   const deleteRole = () => {
-    DELETE_ROLE_DELETE(roleEditing().id)
+    api.role.delete({ roleId: roleEditing().id })
       .then((r) => {
         //console.log("ManageRole :: deleteRole :: r->", r);
         setRoles(roles().filter((role) => role.id !== roleEditing().id));
@@ -60,7 +57,7 @@ export default function ManageRole() {
    * ロールを作成する
    */
   const createRole = () => {
-    POST_ROLE_CREATE(`ロール : ${new Date().toLocaleString()}`)
+    api.role.create({ roleName: `ロール : ${new Date().toLocaleString()}` })
       .then((r) => {
         //console.log("ManageRole :: createRole :: r->", r);
         setRoles([...roles(), r.data]);
@@ -73,7 +70,7 @@ export default function ManageRole() {
    * ロール一覧を取得する
    */
   const fetchRole = () => {
-    GET_ROLE_LIST()
+    api.role.list()
       .then((r) => {
         setRoles(r.data);
         setRoleEditing(r.data[1]);

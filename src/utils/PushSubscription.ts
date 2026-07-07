@@ -1,6 +1,4 @@
-import GET_NOTIFICATION_VAPID_PUBLIC_KEY from "~/api/NOTIFICATION/NOTIFICATION_VAPID_PUBLIC_KEY.ts";
-import POST_NOTIFICATION_DEVICE_REGISTER from "~/api/NOTIFICATION/NOTIFICATION_DEVICE_REGISTER.ts";
-import POST_NOTIFICATION_DEVICE_UNREGISTER from "~/api/NOTIFICATION/NOTIFICATION_DEVICE_UNREGISTER.ts";
+import { api } from "~/api/index.ts";
 
 const urlBase64ToUint8Array = (base64String: string): ArrayBuffer => {
   const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
@@ -58,7 +56,7 @@ export const subscribeToPush = async (): Promise<PushSubscription> => {
   const reg = await getRegistration();
   if (!reg) throw new Error("Service Worker が登録されていません");
 
-  const { data } = await GET_NOTIFICATION_VAPID_PUBLIC_KEY();
+  const { data } = await api.notification.vapidPublicKey();
   const applicationServerKey = urlBase64ToUint8Array(data.publicKey);
 
   const subscription = await reg.pushManager.subscribe({
@@ -69,7 +67,7 @@ export const subscribeToPush = async (): Promise<PushSubscription> => {
   const p256dh = arrayBufferToBase64(subscription.getKey("p256dh"));
   const auth = arrayBufferToBase64(subscription.getKey("auth"));
 
-  await POST_NOTIFICATION_DEVICE_REGISTER({
+  await api.notification.deviceRegister({
     token: subscription.endpoint,
     platform: "web",
     keys: { p256dh, auth },
@@ -83,7 +81,7 @@ export const unsubscribeFromPush = async (): Promise<boolean> => {
   const subscription = await getCurrentPushSubscription();
   if (!subscription) return false;
 
-  await POST_NOTIFICATION_DEVICE_UNREGISTER(subscription.endpoint).catch(
+  await api.notification.deviceUnregister({ token: subscription.endpoint }).catch(
     (e) => {
       console.warn("PushSubscription :: unregister API failed", e);
     },

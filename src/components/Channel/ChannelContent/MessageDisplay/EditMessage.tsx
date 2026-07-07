@@ -3,7 +3,7 @@ import {Button} from "~/components/ui/button.tsx";
 import {IconCancel, IconCheck} from "@tabler/icons-solidjs";
 import {createSignal, onMount} from "solid-js";
 import {TextField, TextFieldTextArea} from "~/components/ui/text-field.tsx";
-import POST_MESSAGE_EDIT from "~/api/MESSAGE/MESSAGE_EDIT";
+import { api } from "~/api/index.ts";
 import { storeClientConfig } from "~/stores/ClientConfig.ts";
 
 export default function EditMessage(props: { messageId: string, content: string, onCancelEdit: () => void }) {
@@ -21,7 +21,7 @@ export default function EditMessage(props: { messageId: string, content: string,
   const updateMessage = async () => {
     setProcessing(true);
     //console.log("EditMessage :: updateMessage : messageContent->", props.messageId, messageContent());
-    await POST_MESSAGE_EDIT(props.messageId, messageContent())
+    await api.message.edit({ messageId: props.messageId, message: messageContent() })
       .then(() => {
         setProcessing(false);
         //メッセージ入力部分にフォーカスする

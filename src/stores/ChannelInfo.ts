@@ -1,5 +1,5 @@
 import { createStore } from "solid-js/store";
-import GET_CHANNEL_GET_INFO from "~/api/CHANNEL/CHANNEL_GET_INFO.ts";
+import { api } from "~/api/index.ts";
 import type { IChannel } from "~/types/Channel.ts";
 
 export const [storeChannelInfo, setStoreChannelInfo] = createStore<{
@@ -44,7 +44,7 @@ export const directGetterChannelInfo = (
       ChannelViewableRole: [],
       isArchived: false,
     });
-    GET_CHANNEL_GET_INFO(channelId)
+    api.channel.getInfo({ channelId })
       .then((r) => {
         //Storeに設定
         updateChannelInfo(r.data);

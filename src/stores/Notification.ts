@@ -1,5 +1,5 @@
 import { createStore } from "solid-js/store";
-import type { INotificationConfig } from "~/api/NOTIFICATION/NOTIFICATION_CONFIG_GET.ts";
+import type { INotificationConfig } from "~/api/domains/notification.ts";
 
 export const [storeNotificationConfig, setStoreNotificationConfig] =
   createStore<INotificationConfig>({

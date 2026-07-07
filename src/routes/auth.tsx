@@ -1,6 +1,5 @@
 import { useLocation, useNavigate } from "@solidjs/router";
 import { Show, onMount } from "solid-js";
-import GET_USER_VERIFY_TOKEN from "~/api/USER/USER_VERIFY_TOKEN.ts";
 import Login from "~/components/Auth/Login.tsx";
 import Register from "~/components/Auth/Register.tsx";
 import { Card, CardContent } from "~/components/ui/card.tsx";
@@ -9,7 +8,7 @@ import { storeServerinfo } from "~/stores/Serverinfo.ts";
 import GetCookie from "~/utils/GetCookie.ts";
 import InitLoad from "~/utils/InitLoad.ts";
 import { createSignal } from "solid-js";
-import GET_SERVER_CONFIG from "~/api/SERVER/SERVER_CONFIG.ts";
+import { api } from "~/api/index.ts";
 import { Button } from "~/components/ui/button.tsx";
 
 export default function Auth() {
@@ -28,7 +27,7 @@ export default function Auth() {
     //クッキーにTokenがあれば初期処理をして移動
     const token = GetCookie("token");
     if (token !== undefined) {
-      await GET_USER_VERIFY_TOKEN()
+      await api.user.verifyToken()
         .then((r) => {
           InitLoad(r.data.userId, true);
           //もともと行こうとしていた場所を指定
@@ -52,7 +51,7 @@ export default function Auth() {
           throw new Error("timeout");
         }
       }, 3500);
-      await GET_SERVER_CONFIG().then((r) => {
+      await api.server.config().then((r) => {
         setTempServerinfo({...tempServerinfo(), ...r.data});
         setTempServerinfoLoaded(true);
         setErrorFetchingServerinfo(false);

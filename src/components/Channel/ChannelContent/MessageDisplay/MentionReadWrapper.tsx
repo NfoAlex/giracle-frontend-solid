@@ -1,6 +1,6 @@
 import {type JSX, onMount} from "solid-js";
 import {storeInbox} from "~/stores/Inbox.ts";
-import POST_MESSAGE_INBOX_READ from "~/api/MESSAGE/MESSAGE_INBOX_READ";
+import { api } from "~/api/index.ts";
 
 export default function MentionReadWrapper(props: {children: JSX.Element, messageId: string}) {
 
@@ -8,7 +8,7 @@ export default function MentionReadWrapper(props: {children: JSX.Element, messag
     const msg = storeInbox.find((inbx) => inbx.Message.id === props.messageId);
     if (msg) {
       //console.log("MentionReadWrapper :: onMount : msg->", msg);
-      POST_MESSAGE_INBOX_READ(props.messageId).then(() => {
+      api.message.inboxRead({ messageId: props.messageId }).then(() => {
         //console.log("MentionReadWrapper :: onMounted : message read");
       }).catch((e) => console.error("MentionReadWrapper :: onMounted : 既読error->", e));
     }

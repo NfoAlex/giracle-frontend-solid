@@ -3,7 +3,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogTitle, Di
 import { createSignal } from "solid-js";
 import { TextField, TextFieldInput, TextFieldLabel } from "../../ui/text-field";
 import { Button } from "~/components/ui/button.tsx";
-import PUT_SERVER_CREATE_INVITE from "~/api/SERVER/SERVER_CREATE_INVITE";
+import { api } from "~/api/index.ts";
 import type { IInvite } from "~/types/Server.ts";
 
 export default function CreateInvite(props: { inviteActionTaken: (dat: IInvite) => void }) {
@@ -14,7 +14,7 @@ export default function CreateInvite(props: { inviteActionTaken: (dat: IInvite) 
    * 招待を作成する
    */
   const createInvite = () => {
-    PUT_SERVER_CREATE_INVITE(code())
+    api.server.createInvite({ inviteCode: code() })
       .then((r) => {
         //console.log("CreateInvite :: createInvite :: r->", r);
         setCode("");

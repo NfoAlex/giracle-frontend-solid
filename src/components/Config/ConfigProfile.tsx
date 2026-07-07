@@ -1,6 +1,5 @@
 import {IconCheck, IconCircleX, IconPencil, IconPlus} from "@tabler/icons-solidjs";
 import { For, Show, createSignal } from "solid-js";
-import POST_USER_PROFILE_UPDATE from "~/api/USER/USER_PROFILE_UPDATE";
 import ChangeIcon from "~/components/Profile/ChangeIcon";
 import { Avatar, AvatarImage } from "~/components/ui/avatar.tsx";
 import { Button } from "~/components/ui/button.tsx";
@@ -10,10 +9,9 @@ import { TextField, TextFieldInput } from "~/components/ui/text-field.tsx";
 import { getRolePower, setStoreMyUserinfo, storeMyUserinfo } from "~/stores/MyUserinfo.ts";
 import ChangeBanner from "~/components/Profile/ChangeBanner";
 import RoleChip from "../unique/RoleChip";
-import POST_ROLE_UNLINK from "~/api/ROLE/ROLE_UNLINK";
+import { api } from "~/api/index.ts";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { Badge } from "../ui/badge.tsx";
-import POST_ROLE_LINK from "~/api/ROLE/ROLE_LINK";
 import { storeRoleInfo } from "~/stores/RoleInfo.ts";
 import ChangePasswordModal from "./ConfigProfile/ChangePasswordModal";
 
@@ -32,7 +30,7 @@ export default function ConfigProfile() {
    * 名前の変更
    */
   const changeName = () => {
-    POST_USER_PROFILE_UPDATE(newName(), undefined)
+    api.user.profileUpdate({ name: newName(), selfIntroduction: undefined })
       .then((r) => {
         //自分の情報を更新
         setStoreMyUserinfo({
@@ -51,7 +49,7 @@ export default function ConfigProfile() {
    * 自己紹介の変更
    */
   const changeSelfIntro = () => {
-    POST_USER_PROFILE_UPDATE(undefined, newSelfIntro())
+    api.user.profileUpdate({ name: undefined, selfIntroduction: newSelfIntro() })
       .then((r) => {
         //自分の情報を更新
         setStoreMyUserinfo({
@@ -73,7 +71,7 @@ export default function ConfigProfile() {
      * @param roleId 付与するロールのId
      */
   const linkRole = (roleId: string) => {
-    POST_ROLE_LINK(storeMyUserinfo.id, roleId)
+    api.role.link({ userId: storeMyUserinfo.id, roleId })
       .then(() => {
         //console.log("ConfigProfile :: linkRole :: r ->", r);
       })
@@ -84,7 +82,7 @@ export default function ConfigProfile() {
      * ロールを解除
      */
   const unlinkRole = (roleId: string) => {
-    POST_ROLE_UNLINK(storeMyUserinfo.id, roleId)
+    api.role.unlink({ userId: storeMyUserinfo.id, roleId })
       .then(() => {
         //console.log("ConfigProfile :: unlinkRole :: r ->", r);
       })

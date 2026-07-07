@@ -1,8 +1,6 @@
 import { IconArchiveFilled, IconReload } from "@tabler/icons-solidjs";
 import { createSignal, For, onMount, Show } from "solid-js";
-import POST_CHANNEL_JOIN from "~/api/CHANNEL/CHANNEL_JOIN.ts";
-import POST_CHANNEL_LEAVE from "~/api/CHANNEL/CHANNEL_LEAVE.ts";
-import { GET_CHANNEL_LIST } from "~/api/CHANNEL/CHANNEL_LIST.ts";
+import { api } from "~/api/index.ts";
 import CreateChannel from "~/components/ChannelBrowser/CreateChannel.tsx";
 import { Button } from "~/components/ui/button.tsx";
 import { Card } from "~/components/ui/card.tsx";
@@ -23,7 +21,7 @@ export default function ChannelBrowser() {
    * @param channelId 参加するチャンネルId
    */
   const joinChannel = (channelId: string) => {
-    POST_CHANNEL_JOIN(channelId)
+    api.channel.join({ channelId })
       .then((r) => {
         //console.log("ChannelBrowser :: joinChannel :: r ->", r);
       })
@@ -35,7 +33,7 @@ export default function ChannelBrowser() {
    * @param channelId 退出するチャンネルId
    */
   const leaveChannel = (channelId: string) => {
-    POST_CHANNEL_LEAVE(channelId)
+    api.channel.leave({ channelId })
       .then((r) => {
         //console.log("ChannelBrowser :: leaveChannel :: r ->", r);
         //StoreからチャンネルIdをを削除
@@ -52,7 +50,7 @@ export default function ChannelBrowser() {
   const fetchChannels = () => {
     setProcessing(true); //ローディング中
     setChannels([]); //初期化
-    GET_CHANNEL_LIST()
+    api.channel.list()
       .then((r) => {
         setChannels(r.data);
         setProcessing(false);

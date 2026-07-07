@@ -10,7 +10,7 @@ import { storeAppStatus } from './stores/AppStatus.ts';
 import { SidebarProvider } from './components/ui/sidebar.tsx';
 import { AppSidebar } from './components/Sidebar.tsx';
 import Channel from './routes/channel/[id].tsx';
-import GET_SERVER_CONFIG from './api/SERVER/SERVER_CONFIG.ts';
+import { api } from './api/index.ts';
 import { setStoreServerinfo, storeServerinfo } from './stores/Serverinfo.ts';
 import { ColorModeProvider, ColorModeScript, createLocalStorageManager } from "@kobalte/core";
 import AuthGuard from "~/components/AuthGuard.tsx";
@@ -27,7 +27,7 @@ if (import.meta.env.DEV && !(root instanceof HTMLElement)) {
 }
 
 //サーバー情報を取得
-GET_SERVER_CONFIG()
+api.server.config()
   .then((r) => {
     //console.log("AuthGuard : GET_SERVER_CONFIG r->", r);
     setStoreServerinfo({

@@ -3,7 +3,7 @@ import { Button } from "../ui/button.tsx";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogTitle, DialogTrigger } from "../ui/dialog.tsx";
 import { createSignal } from "solid-js";
 import { TextField, TextFieldInput, TextFieldLabel, TextFieldTextArea } from "../ui/text-field.tsx";
-import PUT_CHANNEL_CREATE from "~/api/CHANNEL/CHANNEL_CREATE.ts";
+import { api } from "~/api/index.ts";
 
 export default function CreateChannel(props: { fetchChannels: () => void }) {
   const [channelName, setChannelName] = createSignal<string>("");
@@ -14,7 +14,7 @@ export default function CreateChannel(props: { fetchChannels: () => void }) {
    * チャンネル作成
    */
   const createChannel = () => {
-    PUT_CHANNEL_CREATE(channelName(), description())
+    api.channel.create({ channelName: channelName(), description: description() })
       .then((r) => {
         //console.log("CreateChannel :: createChannel :: r ->", r);
         props.fetchChannels(); //チャンネルリストを更新する

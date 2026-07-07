@@ -8,9 +8,8 @@ import UserinfoModalWrapper from "~/components/unique/UserinfoModalWrapper.tsx";
 import { getterUserinfo } from "~/stores/Userinfo.ts";
 import type { IUser } from "~/types/User.ts";
 import InviteUserModal from "./ChannelMembers/InviteUserModal.tsx";
-import POST_CHANNEL_KICK from "~/api/CHANNEL/CHANNEL_KICK.ts";
+import { api } from "~/api/index.ts";
 import { getRolePower, storeMyUserinfo } from "~/stores/MyUserinfo.ts";
-import GET_USER_SEARCH from "~/api/USER/USER_SEARCH.ts";
 
 export default function ChannelMembers(props: {channelId: string}) {
   const [users, setUsers] = createSignal<IUser[]>([]);
@@ -19,11 +18,11 @@ export default function ChannelMembers(props: {channelId: string}) {
 
   // ユーザー一覧を取得、オプションで挿入か格納かを選択
   const fetchUsers = async (optionInsert = false) => {
-    GET_USER_SEARCH(
-      searchQuery(),
-      props.channelId,
-      cursor()
-    )
+    api.user.search({
+      username: searchQuery(),
+      channelId: props.channelId,
+      cursor: cursor(),
+    })
     .then((r) => {
       console.log(r);
 
@@ -41,7 +40,7 @@ export default function ChannelMembers(props: {channelId: string}) {
    * @param userId 
    */
   const kickIt = (userId: string) => {
-    POST_CHANNEL_KICK(userId, props.channelId)
+    api.channel.kick({ userId, channelId: props.channelId })
       .then((r) => {
         //console.log("ChannelMember :: kickIt : 招待成功 -> ", r);
         // キックしたユーザーを一覧から削除

@@ -10,7 +10,7 @@ import {
 } from "~/components/ui/table"
 import { Button } from "~/components/ui/button.tsx"
 import { Card } from "~/components/ui/card.tsx"
-import DELETE_SERVER_DELETE_INVITE from "~/api/SERVER/SERVER_DELETE_INVITE"
+import { api } from "~/api/index.ts"
 import type { IInvite } from "~/types/Server.ts"
  
 interface DataTableProps<TData, TValue> {
@@ -46,7 +46,7 @@ export function InviteTable<TData, TValue>(props: DataTableProps<TData, TValue>)
       const inviteData = row.original as IInvite;
 
       //id指定でエラーが出てますがきちんと割り当てられています。
-      DELETE_SERVER_DELETE_INVITE(inviteData.id)
+      api.server.deleteInvite({ inviteId: inviteData.id })
         .then((r) => {
           //console.log("ManageInvite :: deleteInvite :: r->", r);
           setRowSelection({}); // 選択を解除

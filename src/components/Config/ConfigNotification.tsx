@@ -24,8 +24,7 @@ import {
   storeMutedChannels,
   storeNotificationConfig,
 } from "~/stores/Notification.ts";
-import POST_NOTIFICATION_CONFIG_UPDATE from "~/api/NOTIFICATION/NOTIFICATION_CONFIG_UPDATE.ts";
-import POST_NOTIFICATION_UNMUTE_CHANNEL from "~/api/NOTIFICATION/NOTIFICATION_UNMUTE_CHANNEL.ts";
+import { api } from "~/api/index.ts";
 import {
   getCurrentPushSubscription,
   isPushSupported,
@@ -70,7 +69,7 @@ export default function ConfigNotification() {
   const updateEnabled = async (enabled: boolean) => {
     setStoreNotificationConfig("enabled", enabled);
     try {
-      const r = await POST_NOTIFICATION_CONFIG_UPDATE({ enabled });
+      const r = await api.notification.configUpdate({ enabled });
       setStoreNotificationConfig(r.data);
     } catch (e) {
       showToast({
@@ -84,7 +83,7 @@ export default function ConfigNotification() {
   const updateMode = async (mode: Mode) => {
     setStoreNotificationConfig("mode", mode);
     try {
-      const r = await POST_NOTIFICATION_CONFIG_UPDATE({ mode });
+      const r = await api.notification.configUpdate({ mode });
       setStoreNotificationConfig(r.data);
     } catch (e) {
       showToast({
@@ -123,7 +122,7 @@ export default function ConfigNotification() {
 
   const unmuteChannel = async (channelId: string) => {
     try {
-      await POST_NOTIFICATION_UNMUTE_CHANNEL(channelId);
+      await api.notification.unmuteChannel({ channelId });
       setStoreMutedChannels("ids", (prev) => prev.filter((id) => id !== channelId));
     } catch (e) {
       showToast({

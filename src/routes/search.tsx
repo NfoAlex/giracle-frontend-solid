@@ -1,7 +1,7 @@
 import { A } from "@solidjs/router";
 import { IconArrowRight, IconSearch } from "@tabler/icons-solidjs";
 import { createEffect, createMemo, createSignal, For } from "solid-js";
-import GET_MESSAGE_SEARCH from "~/api/MESSAGE/MESSAGE_SEARCH.ts";
+import { api } from "~/api/index.ts";
 import MessageRender from "~/components/Channel/ChannelContent/MessageDisplay/MessageRender.tsx";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar.tsx";
 import { Button } from "~/components/ui/button.tsx";
@@ -62,11 +62,11 @@ export default function Search() {
 
   const currentSearchCondition = createMemo(() => {
     return {
-      _content: query(),
-      _channelId:
+      content: query(),
+      channelId:
         selectedChannelId() === CHANNEL_FILTER_ALL ? undefined : selectedChannelId(),
-      _sort: sortOrder(),
-      _hasFileAttachment:
+      sort: sortOrder(),
+      hasFileAttachment:
         fileFilter() === "any" ? undefined : fileFilter() === "with_file",
     };
   });
@@ -76,7 +76,7 @@ export default function Search() {
   const buildSearchParams = (nextLoadIndex: number) => {
     return {
       ...currentSearchCondition(),
-      _loadIndex: nextLoadIndex,
+      loadIndex: nextLoadIndex,
     };
   };
 
@@ -93,7 +93,7 @@ export default function Search() {
     const nextLoadIndex = insertMode ? loadIndex() + 1 : 1;
     const searchConditionKey = currentSearchConditionKey();
     setProcessing(true);
-    GET_MESSAGE_SEARCH(buildSearchParams(nextLoadIndex))
+    api.message.search(buildSearchParams(nextLoadIndex))
       .then((r) => {
         setLastFetchedRawCount(r.data.length);
         //システムメッセージを除外

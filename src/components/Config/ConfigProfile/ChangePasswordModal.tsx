@@ -1,5 +1,5 @@
 import { createSignal, Show } from "solid-js";
-import POST_USER_CHANGE_PASSWORD from "~/api/USER/USER_CHANGE_PASSWORD";
+import { api } from "~/api/index.ts";
 import { Alert, AlertTitle } from "~/components/ui/alert";
 import { Button } from "~/components/ui/button.tsx";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTrigger } from "~/components/ui/dialog.tsx";
@@ -30,7 +30,7 @@ export default function ChangePasswordModal() {
   const changePassword = () => {
     setProcessing(true);
     setDisplayError(false);
-    POST_USER_CHANGE_PASSWORD(currentPassword(), newPassword())
+    api.user.changePassword({ currentPassword: currentPassword(), newPassword: newPassword() })
       .then((r) => {
         console.log("changePassword :: r->", r);
         setSuccess(true);

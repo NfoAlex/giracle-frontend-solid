@@ -1,4 +1,4 @@
-import GET_USER_GET_ONLINE from "~/api/USER/USER_GET_ONLINE.ts";
+import { api } from "~/api/index.ts";
 import { storeAppStatus } from "~/stores/AppStatus.ts";
 import WSSendMessage from "./Message/SendMessage.ts";
 import WSUpdateChannel from "./Channel/UpdateChannel.ts";
@@ -218,7 +218,7 @@ export const initWS = async () => {
     }, 20000);
 
     //オンラインユーザーを取得、格納
-    GET_USER_GET_ONLINE()
+    api.user.getOnline()
       .then((r) => {
         console.log("WScontroller :: initWS(.onopen) : オンラインユーザー r->", r);
         setStoreUserOnline(r.data);

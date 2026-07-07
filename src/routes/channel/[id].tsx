@@ -1,7 +1,7 @@
 import { useParams } from "@solidjs/router";
 import { IconEye, IconMail } from "@tabler/icons-solidjs";
 import { Show } from "solid-js";
-import POST_CHANNEL_JOIN from "~/api/CHANNEL/CHANNEL_JOIN.ts";
+import { api } from "~/api/index.ts";
 import ChannelContents from "~/components/Channel/ChannelContents.tsx";
 import ChannelHeader from "~/components/Channel/ChannelHeader.tsx";
 import ChannelTextInput from "~/components/Channel/ChannelTextInput.tsx";
@@ -20,7 +20,7 @@ export default function Channel() {
    */
   const joinChannel = () => {
     if (params.channelId === undefined) return;
-    POST_CHANNEL_JOIN(params.channelId)
+    api.channel.join({ channelId: params.channelId })
       .then((r) => {
         //console.log("/channel/[id] :: joinChannel :: r ->", r);
       })
