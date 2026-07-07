@@ -2,10 +2,9 @@ import {createSignal, onCleanup, onMount} from "solid-js";
 import {Picker} from "emoji-picker-element";
 import type {EmojiClickEvent} from "emoji-picker-element/shared.ts";
 import ja from 'emoji-picker-element/i18n/ja.js';
-import POST_MESSAGE_EMOJI_REACTION from "~/api/MESSAGE/MESSAGE_EMOJI_REACTION.ts";
+import { api } from "~/api/index.ts";
 import type {IMessage} from "~/types/Message.ts";
 import {getEmojiDatasetWithCustomEmoji} from "~/stores/CustomEmoji.ts";
-import DELETE_MESSAGE_DELETE_EMOJI_REACTION from "~/api/MESSAGE/MESSAGE_DELETE_EMOJI_REACTION.ts";
 
 export default function EmojiPicker(props: {message: IMessage, onClicked: () => void}) {
   let elementRef: HTMLDivElement | undefined;
@@ -39,7 +38,7 @@ export default function EmojiPicker(props: {message: IMessage, onClicked: () => 
     //もし対象メッセージに自分からの同じ絵文字コードによるリアクションがあるのなら削除、違うならリアクション
     if (currentMyReaction.some((reaction) => reaction.emojiCode === emojiCode[0])) {
       //削除
-      DELETE_MESSAGE_DELETE_EMOJI_REACTION(props.message.id, props.message.channelId, emojiCode[0])
+      api.message.deleteEmojiReaction({ messageId: props.message.id, channelId: props.message.channelId, emojiCode: emojiCode[0] })
         .catch((e) => console.error("EmojiPicker :: emojiClickHandler(DELETE_MESSAGE_DELETE_EMOJI_REACTION) : e->", e));
     } else {
 
@@ -50,7 +49,7 @@ export default function EmojiPicker(props: {message: IMessage, onClicked: () => 
       }
 
       //リアクション
-      POST_MESSAGE_EMOJI_REACTION(props.message.id, props.message.channelId, emojiCode[0])
+      api.message.emojiReaction({ messageId: props.message.id, channelId: props.message.channelId, emojiCode: emojiCode[0] })
         .catch((e) => {
           console.error("EmojiPicker :: emojiClickHandler(POST_MESSAGE_EMOJI_REACTION) : e->", e)
         });

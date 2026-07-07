@@ -7,9 +7,8 @@ import { Button } from "../ui/button.tsx";
 import { IconArrowDown } from "@tabler/icons-solidjs";
 import MessageDisplay from "./ChannelContent/MessageDisplay.tsx";
 import { setStoreMessageReadTime, storeMessageReadTime } from "~/stores/Readtime.ts";
-import POST_MESSAGE_UPDATE_READTIME from "~/api/MESSAGE/MESSAGE_UPDATE_READTIME.ts";
 import { storeMyUserinfo } from "~/stores/MyUserinfo.ts";
-import POST_CHANNEL_GET_HISTORY from "~/api/CHANNEL/CHANNEL_GET_HISTORY.ts";
+import { api } from "~/api/index.ts";
 import { produce } from "solid-js/store";
 import SkeletonLoader from "./ChannelContent/SkeletonLoader.tsx";
 import UpdateReadTimeOnRemoteAndStore from "~/utils/UpdateReadTimeOnRemoteAndStore.util.ts";
@@ -163,13 +162,13 @@ export default function ChannelContents() {
       let anchor = null;
       anchor = FnBrowserApis.captureScrollAnchor();
 
-      await POST_CHANNEL_GET_HISTORY(
-        _channelId,
-        _dat.messageIdFrom,
-        _dat.messageTimeFrom,
-        _dat.fetchLength,
-        _direction,
-      )
+      await api.channel.getHistory({
+        channelId: _channelId,
+        messageIdFrom: _dat.messageIdFrom,
+        messageTimeFrom: _dat.messageTimeFrom,
+        fetchLength: _dat.fetchLength,
+        fetchDirection: _direction,
+      })
         .then(async (r) => {
           //console.log("ChannelContent :: FnHistoryController.fetchHistory : r->", r);
           //if (r.data.history.length === 0) { console.log("ChannelContent :: fetchHistory : 履歴がありません"); return; }

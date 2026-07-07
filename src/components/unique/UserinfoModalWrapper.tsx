@@ -13,10 +13,7 @@ import RoleChip from "~/components/unique/RoleChip";
 import { Popover, PopoverContent, PopoverTrigger } from "~/components/ui/popover";
 import type { IRole } from "~/types/Role.ts";
 import { storeRoleInfo } from "~/stores/RoleInfo.ts";
-import POST_ROLE_LINK from "~/api/ROLE/ROLE_LINK";
-import POST_ROLE_UNLINK from "~/api/ROLE/ROLE_UNLINK";
-import POST_USER_BAN from "~/api/USER/USER_BAN";
-import POST_USER_UNBAN from "~/api/USER/USER_UNBAN";
+import { api } from "~/api/index.ts";
 
 export default function UserinfoModalWrapper(props: { children: JSX.Element, userId: string, class?: string }) {
   const [user] = createSignal(getterUserinfo(props.userId));
@@ -31,7 +28,7 @@ export default function UserinfoModalWrapper(props: { children: JSX.Element, use
    * @param roleId 付与するロールのId
    */
   const linkRole = (roleId: string) => {
-    POST_ROLE_LINK(props.userId, roleId)
+    api.role.link({ userId: props.userId, roleId })
       .then(() => {
         //console.log("UserName :: linkRole :: r ->", r);
       })
@@ -44,7 +41,7 @@ export default function UserinfoModalWrapper(props: { children: JSX.Element, use
   const unlinkRole = (roleId: string) => {
     if (props.userId === undefined) return;
 
-    POST_ROLE_UNLINK(props.userId, roleId)
+    api.role.unlink({ userId: props.userId, roleId })
       .then(() => {
         //console.log("RoleChip :: unlinkRole :: r ->", r);
       })
@@ -56,13 +53,13 @@ export default function UserinfoModalWrapper(props: { children: JSX.Element, use
    */
   const controlBanState = async (banState: boolean) => {
     if (banState) {
-      await POST_USER_BAN(props.userId)
+      await api.user.ban({ userId: props.userId })
         .then((r) => {
           //console.log("UserName :: controlBanState(BAN) :: r ->", r);
         })
         .catch((e) => console.error("UserName :: controlBanState :: err ->", e));
     } else {
-      await POST_USER_UNBAN(props.userId)
+      await api.user.unban({ userId: props.userId })
         .then((r) => {
           //console.log("UserName :: controlBanState(UNBAN) :: r ->", r);
         })

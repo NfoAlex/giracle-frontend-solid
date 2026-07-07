@@ -1,9 +1,8 @@
 import { createSignal, For, Show } from "solid-js";
 import { useParams } from "@solidjs/router";
 import { IconSend, IconUpload } from "@tabler/icons-solidjs";
-import POST_MESSAGE_SEND from "~/api/MESSAGE/MESSAGE_SEND.ts";
+import { api } from "~/api/index.ts";
 import storeReplyingMessageId from "~/stores/ReplyingMessageId.ts";
-import GET_USER_SEARCH from "~/api/USER/USER_SEARCH.ts";
 import ReplyMessageDisplay from "./ChannelTextInput/ReplyMessageDisplay.tsx";
 import FileUploadPreview from "./ChannelTextInput/FileUploadPreview.tsx";
 import { Button } from "../ui/button.tsx";
@@ -36,7 +35,12 @@ export default function ChannelTextInput() {
     //空メッセージは送信しない
     if (text().trim() === "" && fileIds().length === 0) return;
 
-    POST_MESSAGE_SEND(params.channelId, text(), fileIds(), storeReplyingMessageId[params.channelId] || undefined)
+    api.message.send({
+      channelId: params.channelId,
+      message: text(),
+      fileIds: fileIds(),
+      replyingMessageId: storeReplyingMessageId[params.channelId] || undefined,
+    })
       .then(() => {
         //console.log("POST_MESSAGE_SEND :: r->", r);
       })
@@ -128,7 +132,7 @@ export default function ChannelTextInput() {
    * @param query
    */
   const searchUser = (query: string) => {
-    GET_USER_SEARCH(query, params.channelId)
+    api.user.search({ username: query, channelId: params.channelId })
       .then((r) => {
         setUserSearchResult(r.data);
         //console.log("GET_USER_SEARCH :: r->", r);

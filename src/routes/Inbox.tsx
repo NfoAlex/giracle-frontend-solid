@@ -2,7 +2,7 @@ import { Card } from "~/components/ui/card.tsx";
 import { storeInbox } from "~/stores/Inbox.ts";
 import { createSignal, Show } from "solid-js";
 import { IconBed } from "@tabler/icons-solidjs";
-import POST_MESSAGE_INBOX_READ from "~/api/MESSAGE/MESSAGE_INBOX_READ";
+import { api } from "~/api/index.ts";
 import SidebarTriggerWithDot from "~/components/unique/SidebarTriggerWithDot.tsx";
 import { Switch, SwitchControl, SwitchLabel, SwitchThumb } from "~/components/ui/switch.tsx";
 import DisplayInboxByChannel from "~/components/Inbox/DisplayInboxByChannel";
@@ -16,7 +16,7 @@ export default function Inbox() {
    * @param messageId 既読にするメッセージId
    */
   const readIt = (messageId: string) => {
-    POST_MESSAGE_INBOX_READ(messageId).then((r) => {
+    api.message.inboxRead({ messageId }).then((r) => {
       //console.log("Inbox :: readIt : r->", r);
     }).catch((e) => console.error("Inbox :: readIt : e->", e));
   }

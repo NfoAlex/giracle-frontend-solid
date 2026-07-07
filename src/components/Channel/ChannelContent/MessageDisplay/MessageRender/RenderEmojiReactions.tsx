@@ -1,9 +1,7 @@
 import type { IMessage } from "~/types/Message.ts";
 import { createEffect, createSignal, For, on, Show } from "solid-js";
 import { Card } from "~/components/ui/card.tsx";
-import DELETE_MESSAGE_DELETE_EMOJI_REACTION from "~/api/MESSAGE/MESSAGE_DELETE_EMOJI_REACTION.ts";
-import POST_MESSAGE_EMOJI_REACTION from "~/api/MESSAGE/MESSAGE_EMOJI_REACTION.ts";
-import GET_MESSAGE_WHO_REACTED from "~/api/MESSAGE/MESSAGE_WHO_REACTED.ts";
+import { api } from "~/api/index.ts";
 import RenderEmoji from "~/components/unique/RenderEmoji.tsx";
 import { createMutable } from "solid-js/store";
 import { getterUserinfo } from "~/stores/Userinfo.ts";
@@ -26,7 +24,7 @@ export default function RenderEmojiReactions(props: { reaction: IMessage["reacti
    * @param emojiCode
    */
   const deleteReaction = async (emojiCode: string) => {
-    DELETE_MESSAGE_DELETE_EMOJI_REACTION(props.messageId, props.channelId, emojiCode)
+    api.message.deleteEmojiReaction({ messageId: props.messageId, channelId: props.channelId, emojiCode })
       .catch((e) => console.error("RenderEmojiReactions :: deleteReaction : e->", e));
   }
 
@@ -35,7 +33,7 @@ export default function RenderEmojiReactions(props: { reaction: IMessage["reacti
    * @param emojiCode
    */
   const addReaction = async (emojiCode: string) => {
-    POST_MESSAGE_EMOJI_REACTION(props.messageId, props.channelId, emojiCode)
+    api.message.emojiReaction({ messageId: props.messageId, channelId: props.channelId, emojiCode })
       .catch((e) => {
         console.error("EmojiPicker :: emojiClickHandler : e->", e)
       });
@@ -53,7 +51,7 @@ export default function RenderEmojiReactions(props: { reaction: IMessage["reacti
     if (reactedUserArrs[emojiCode]) return;
     //取得、格納
     statusFetchingEmojiCode[emojiCode] = true;
-    GET_MESSAGE_WHO_REACTED(props.messageId, emojiCode)
+    api.message.whoReacted({ messageId: props.messageId, emojiCode })
       .then((res) => {
         reactedUserArrs[emojiCode] = res.data;
       })

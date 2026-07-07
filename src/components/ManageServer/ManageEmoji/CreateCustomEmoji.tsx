@@ -6,7 +6,7 @@ import {Label} from "~/components/ui/label.tsx";
 import {Card} from "~/components/ui/card.tsx";
 import {createSignal, Show} from "solid-js";
 import type { DOMElement } from "solid-js/jsx-runtime";
-import PUT_SERVER_CUSTOM_EMOJI_UPLOAD from "~/api/SERVER/SERVER_CUSTOM_EMOJI_UPLOAD";
+import { api } from "~/api/index.ts";
 import {Callout, CalloutContent, CalloutTitle} from "~/components/ui/callout";
 
 export default function CreateCustomEmoji() {
@@ -22,7 +22,7 @@ export default function CreateCustomEmoji() {
     //処理中と設定
     setProcessing(true);
 
-    PUT_SERVER_CUSTOM_EMOJI_UPLOAD(customEmojiCode(), emojiFile)
+    api.server.customEmojiUpload({ emojiCode: customEmojiCode(), emoji: emojiFile })
       .then((r) => {
         //console.log("CreateCustomEmoji :: uploadEmoji :: r->", r);
         //ダイアログを閉じる

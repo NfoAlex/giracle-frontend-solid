@@ -1,6 +1,6 @@
 import { Card } from "~/components/ui/card.tsx";
 import { IconMoodHappy, IconPencil, IconTrash, IconCornerUpLeft, IconLink } from "@tabler/icons-solidjs";
-import DELETE_MESSAGE_DELETE from "~/api/MESSAGE/MESSAGE_DELETE.ts";
+import { api } from "~/api/index.ts";
 import { getRolePower, storeMyUserinfo } from "~/stores/MyUserinfo.ts";
 import type { IMessage } from "~/types/Message.ts";
 import { Button } from "~/components/ui/button.tsx";
@@ -19,7 +19,7 @@ export default function HoverMenu(props: {
    * メッセージの削除
    */
   const deleteMessage = () => {
-    DELETE_MESSAGE_DELETE(props.message.id)
+    api.message.delete({ messageId: props.message.id })
       .then(() => {
         //console.log("DELETE_MESSAGE_DELETE :: r->", r);
       })

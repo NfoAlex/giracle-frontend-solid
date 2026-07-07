@@ -1,5 +1,5 @@
 import { createStore } from "solid-js/store";
-import GET_USER_INFO from "~/api/USER/USER_INFO.ts";
+import { api } from "~/api/index.ts";
 import type { IUser } from "~/types/User.ts";
 
 export const [storeUserinfo, setStoreUserinfo] = createStore<{
@@ -27,7 +27,7 @@ export const updateUserinfo = (value: IUser) => {
  */
 export const asyncGetterUserinfo = async (userId: string) => {
   if (storeUserinfo[userId] === undefined) {
-    const userFetched = await GET_USER_INFO(userId);
+    const userFetched = await api.user.info({ userId });
     if (userFetched?.message === "User info") {
       updateUserinfo(userFetched.data);
     }
@@ -50,7 +50,7 @@ export const getterUserinfo = (userId: string): IUser => {
       RoleLink: []
     });
 
-    GET_USER_INFO(userId)
+    api.user.info({ userId })
       .then((r) => {
         //Storeに設定
         updateUserinfo(r.data);

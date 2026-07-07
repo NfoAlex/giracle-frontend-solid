@@ -1,7 +1,7 @@
 import {createSignal, For, Match, Show, Switch as SolidSwitch} from "solid-js";
 import {useParams} from "@solidjs/router";
 import { IUser } from "~/types/User.ts";
-import GET_USER_SEARCH from "~/api/USER/USER_SEARCH.ts";
+import { api } from "~/api/index.ts";
 import { Card } from "~/components/ui/card.tsx";
 
 interface IMessageInput {
@@ -98,7 +98,7 @@ export default function InputRender() {
 
   const searchUser = async (query: string) => {
     setUserList([]);
-    GET_USER_SEARCH(query, params.channelId)
+    api.user.search({ username: query, channelId: params.channelId })
       .then((r) => {
         setUserList(r.data);
       })

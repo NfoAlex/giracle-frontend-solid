@@ -1,12 +1,10 @@
 import { Card } from "../ui/card.tsx";
 import { IconPencil, IconPlus, IconReload, IconTrash } from "@tabler/icons-solidjs";
 import { createSignal, For, onMount, Show } from "solid-js";
-import GET_USER_SESSION from "~/api/USER/USER_GET_SESSION.ts";
+import { api } from "~/api/index.ts";
 import { Button } from "../ui/button.tsx";
-import DELETE_USER_SESSION from "~/api/USER/USER_DELETE_SESSION.ts";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "../ui/dialog.tsx";
 import { Badge } from "../ui/badge.tsx";
-import POST_USER_CHANGE_SESSION_NAME from "~/api/USER/USER_POST_CHANGE_SESSION_NAME.ts";
 import { TextField, TextFieldInput } from "../ui/text-field.tsx";
 
 interface ISession {
@@ -37,7 +35,7 @@ export default function ConfigSession() {
   const sessionFetcher = async (options?: { reset?: boolean }) => {
     setFlags({ ...flags(), fetching: true });
     const cursor = options?.reset ? 1 : sessionFetcherCursor;
-    await GET_USER_SESSION(cursor)
+    await api.user.getSession({ cursor })
       .then((r) => {
         if (options?.reset) {
           setSessions(r.data);
@@ -61,7 +59,7 @@ export default function ConfigSession() {
 
   const removeSession = async (sessionId: number) => {
     setFlags({ ...flags(), deleting: true });
-    await DELETE_USER_SESSION(sessionId)
+    await api.user.deleteSession({ sessionId })
       .then((r) => {
         const deletedSessionId = r.data.sessionId;
         const _sessions = sessions().filter((s) => s.id !== deletedSessionId);
@@ -81,7 +79,7 @@ export default function ConfigSession() {
     if (targetSession === undefined) throw new Error("Target session data is undefined");
     setFlags({ ...flags(), changingName: true });
 
-    await POST_USER_CHANGE_SESSION_NAME(targetSession.id, newSessionName())
+    await api.user.changeSessionName({ sessionId: targetSession.id, name: newSessionName() })
       .then((r) => {
         const sessionIndex = sessions().findIndex((s) => s.id === targetSession.id);
         setSessions((s) => {

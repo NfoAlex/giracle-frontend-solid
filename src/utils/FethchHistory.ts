@@ -1,5 +1,5 @@
 import { produce } from "solid-js/store";
-import POST_CHANNEL_GET_HISTORY from "~/api/CHANNEL/CHANNEL_GET_HISTORY.ts";
+import { api } from "~/api/index.ts";
 import { insertHistory, setStoreImageDimensions, updateHistoryPosition } from "~/stores/History.ts";
 
 let fetching = false;
@@ -21,13 +21,13 @@ export default async function FetchHistory(
 ) {
   if (fetching) return;
   fetching = true;
-  await POST_CHANNEL_GET_HISTORY(
-    _channelId,
-    _dat.messageIdFrom,
-    _dat.messageTimeFrom,
-    _dat.fetchLength,
-    _direction,
-  )
+  await api.channel.getHistory({
+    channelId: _channelId,
+    messageIdFrom: _dat.messageIdFrom,
+    messageTimeFrom: _dat.messageTimeFrom,
+    fetchLength: _dat.fetchLength,
+    fetchDirection: _direction,
+  })
     .then((r) => {
       //console.log("ChannelContent :: fetchHistory : r->", r);
       //if (r.data.history.length === 0) { console.log("ChannelContent :: fetchHistory : 履歴がありません"); return; }

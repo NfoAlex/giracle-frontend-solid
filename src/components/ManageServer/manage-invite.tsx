@@ -1,6 +1,6 @@
 import type { ColumnDef } from "@tanstack/solid-table";
 import { createSignal, onMount } from "solid-js";
-import GET_SERVER_GET_INVITE from "~/api/SERVER/SERVER_GET_INVITE";
+import { api } from "~/api/index.ts";
 import type { IInvite } from "~/types/Server.ts";
 import { InviteTable } from "./ManageInvite/InviteTable";
 import { Checkbox } from "../ui/checkbox";
@@ -43,7 +43,7 @@ export default function ManageInvite() {
   ];
 
   const fetchInvites = () => {
-    GET_SERVER_GET_INVITE()
+    api.server.getInvite()
       .then((r) => {
         //console.log("ManageInvite :: fetchInvites :: r->", r);
         setInvites(r.data);

@@ -16,8 +16,7 @@ import {
   setStoreMutedChannels,
   storeMutedChannels,
 } from "~/stores/Notification.ts";
-import POST_NOTIFICATION_MUTE_CHANNEL from "~/api/NOTIFICATION/NOTIFICATION_MUTE_CHANNEL.ts";
-import POST_NOTIFICATION_UNMUTE_CHANNEL from "~/api/NOTIFICATION/NOTIFICATION_UNMUTE_CHANNEL.ts";
+import { api } from "~/api/index.ts";
 import { showToast } from "../ui/toast.tsx";
 
 export default function ChannelHeader() {
@@ -42,10 +41,10 @@ export default function ChannelHeader() {
     const currentlyMuted = isChannelMuted(cid);
     try {
       if (currentlyMuted) {
-        await POST_NOTIFICATION_UNMUTE_CHANNEL(cid);
+        await api.notification.unmuteChannel({ channelId: cid });
         setStoreMutedChannels("ids", (prev) => prev.filter((id) => id !== cid));
       } else {
-        await POST_NOTIFICATION_MUTE_CHANNEL(cid);
+        await api.notification.muteChannel({ channelId: cid });
         setStoreMutedChannels("ids", (prev) =>
           prev.includes(cid) ? prev : [...prev, cid],
         );

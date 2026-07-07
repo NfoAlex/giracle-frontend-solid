@@ -1,5 +1,5 @@
 import { createMutable } from "solid-js/store";
-import GET_MESSAGE_GET from "~/api/MESSAGE/MESSAGE_GET";
+import { api } from "~/api/index.ts";
 import type { IMessage } from "~/types/Message.ts";
 import { storeHistory } from "./History";
 
@@ -42,7 +42,7 @@ export const fnMessageFetchCache = {
     }
 
     //表示には適用させるためにawaitしていない
-    GET_MESSAGE_GET(messageId)
+    api.message.get({ messageId })
       .then((res) => {
         storeMessageFetchCache.cache[messageId] = res.data;
       })

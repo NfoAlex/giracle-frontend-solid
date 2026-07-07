@@ -1,6 +1,5 @@
 import { createSignal, onMount } from "solid-js";
-import POST_SERVER_CHANGE_CONFIG from "~/api/SERVER/SERVER_CHANGE_CONFIG.ts";
-import POST_SERVER_CHANGE_INFO from "~/api/SERVER/SERVER_CHANGE_INFO.ts";
+import { api } from "~/api/index.ts";
 import { Button } from "~/components/ui/button.tsx";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card.tsx";
 import { Label } from "~/components/ui/label.tsx";
@@ -31,7 +30,7 @@ export default function ManageCommunity() {
    */
   const changeServerConfig = () => {
     //サーバー情報更新
-    POST_SERVER_CHANGE_INFO(serverConfig().name, serverConfig().introduction)
+    api.server.changeInfo({ name: serverConfig().name, introduction: serverConfig().introduction })
       .then((r) => {
         setStoreServerinfo(r.data);
         setServerConfig({...storeServerinfo});
@@ -39,7 +38,7 @@ export default function ManageCommunity() {
       .catch((err) => console.error("ManageServer :: changeServerConfig :: err->", err));
 
     //サーバー設定更新
-    POST_SERVER_CHANGE_CONFIG(serverConfig())
+    api.server.changeConfig(serverConfig())
       .then((r) => {
         setStoreServerinfo(r.data);
         setServerConfig({...storeServerinfo});

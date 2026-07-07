@@ -1,6 +1,6 @@
 import { IconCheck, IconX, IconPencil } from "@tabler/icons-solidjs";
 import { createEffect, createSignal, on } from "solid-js";
-import POST_CHANNEL_UPDATE from "~/api/CHANNEL/CHANNEL_UPDATE.ts";
+import { api } from "~/api/index.ts";
 import { Button } from "~/components/ui/button.tsx";
 import { Card } from "~/components/ui/card.tsx";
 import { Label } from "~/components/ui/label.tsx";
@@ -26,7 +26,7 @@ export default function ChannelInfo(props: { channelId: string }) {
    * チャンネル情報を更新する
    */
   const updateChannel = () => {
-    POST_CHANNEL_UPDATE({
+    api.channel.update({
       name: newName() !== "" ? newName() : undefined,
       description: newDescription() !== "" ? newDescription() : undefined,
       viewableRole: roleIsDiff() ? newRoles() : undefined,

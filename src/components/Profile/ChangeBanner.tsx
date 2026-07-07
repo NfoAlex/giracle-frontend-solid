@@ -11,7 +11,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "../ui/dialog.tsx";
-import POST_USER_CHANGE_BANNER from "~/api/USER/USER_CHANGE_BANNER";
+import { api } from "~/api/index.ts";
 import {TextField, TextFieldInput} from "~/components/ui/text-field.tsx";
 
 export default function ChangeBanner() {
@@ -26,7 +26,7 @@ export default function ChangeBanner() {
     const _file = file();
     if (_file === null) return;
     //バナーの変更
-    POST_USER_CHANGE_BANNER(_file)
+    api.user.changeBanner({ banner: _file })
       .then(() => {
         setResult("success");
       })
