@@ -27,8 +27,13 @@ pnpm dev            # 開発サーバー（ポート 3333）
 pnpm dev-host       # LAN 公開で開発サーバー
 pnpm build          # 本番ビルド（dist/）
 pnpm serve          # ビルド結果のプレビュー
-npx tsc --noEmit    # 型チェック（専用スクリプトは無い）
+npx tsc --noEmit --skipLibCheck   # 型チェック（専用スクリプトは無い）
 ```
+
+型チェックの注意（2026-07 時点）:
+
+- `--skipLibCheck` 必須。付けないと `@kobalte/core` の型定義が TypeScript 6 と非互換で node_modules 由来のエラーが大量に出る（tsconfig に `skipLibCheck` 未設定のため）。
+- `--skipLibCheck` を付けても **src 配下に約 20 件の既存型エラーがある**（`src/routes/channel/[id].tsx`、`src/WS/Message/ReadTimeUpdate.ts`、`ChannelTextInput` 周辺など）。「エラー 0 件」を合格基準にしないこと。**変更前後でエラー件数・内容を比較し、自分の変更で新規エラーを増やしていないこと**を確認基準にする。
 
 - テストは存在しない。テストランナーも未導入。
 - Lint 設定ファイルは無いが、コード中に `biome-ignore` コメントがあるため Biome の流儀を壊さないこと。
@@ -80,17 +85,15 @@ npx tsc --noEmit    # 型チェック（専用スクリプトは無い）
 
 ## コミット規約
 
-日本語プレフィックス方式（既存履歴に合わせる）:
+日本語プレフィックス方式:
 
-- `feat:` 新機能 / `fix:` 修正 / `change -` 変更・更新 / `remove -` 削除
+- `add - ` なにかしら新しく作成、追加 / `fix - ` 修正 / `change -` 変更・更新 / `remove -` 削除
 
-例: `feat:プッシュ通知の実装`、`fix:ポップアップ修正`
-
-ブランチは `feature/<内容>` 形式で切り、`main` に PR を出す。マイルストーンは GitHub の [milestone/1](https://github.com/NfoAlex/giracle-frontend-solid/milestone/1) で管理。
+例: `add - プッシュ通知の実装`、`fix - ポップアップ修正`
 
 ## 変更時の確認手順
 
-1. `npx tsc --noEmit` で型エラーが無いことを確認（テストが無いため型チェックが最重要の安全網）。
+1. `npx tsc --noEmit --skipLibCheck` で**自分の変更が新規の型エラーを増やしていない**ことを確認（テストが無いため型チェックが最重要の安全網。ただし既存エラーが約 20 件あるため 0 件は基準にできない。「コマンド」節の注意参照）。
 2. UI 変更はバックエンドを起動した上で `pnpm dev` → `http://localhost:3333` で動作確認。
 3. PWA / Service Worker 関連の変更は `dev-dist/` が生成される（gitignore 済み）。SW の挙動はブラウザの DevTools → Application で確認。
 4. ビルドが通るか `pnpm build` で確認。
