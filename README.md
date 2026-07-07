@@ -1,6 +1,6 @@
 # Giracle Solid
 
-Execute `bun i` then `bun dev` to launch dev-mode.
+Execute `pnpm i` then `pnpm dev` to launch dev-mode.
 
 ## ToDo
 マイルストーン 👇
