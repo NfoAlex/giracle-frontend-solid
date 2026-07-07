@@ -52,10 +52,12 @@ npx tsc --noEmit --skipLibCheck   # 型チェック（専用スクリプトは�
 ## ディレクトリ構造と役割
 
 - [src/index.tsx](src/index.tsx) — エントリポイント。全ルート定義、テーマ（Kobalte ColorMode）、サイドバー、初期のサーバー情報取得。
-- [src/api/](src/api/) — REST API ラッパー。`fetch` を直接使い、`/api/...` を叩く。
-  - ドメイン別に大文字ディレクトリ（`CHANNEL` / `MESSAGE` / `NOTIFICATION` / `ROLE` / `SERVER` / `USER`）。
-  - **命名規則**: ファイル名は `MESSAGE_SEND.ts` のようにドメイン＋操作の大文字スネークケース。エクスポート関数は `POST_MESSAGE_SEND` のように HTTP メソッドを接頭辞にした default export。
-  - 各関数は `res.ok` でなければ `throw new Error(await res.text())`。戻り値は `{ message, data }` 形式。
+- [src/api/](src/api/) — REST API ラッパー。共通 fetch 関数とドメイン別チェーン API に統一されている。
+  - [src/api/FETCH_CLIENT.ts](src/api/FETCH_CLIENT.ts) — 全エンドポイント共通の fetch 関数。JSON body / FormData body / クエリパラメータ / パスパラメータを吸収する。エラーハンドリング（`!res.ok` → `throw new Error(await res.text())`、ネットワークエラー → `{ cause }` 付き Error）もここに集約。
+  - [src/api/domains/](src/api/domains/) — `channel.ts` / `message.ts` / `notification.ts` / `role.ts` / `server.ts` / `user.ts` にドメインごとのエンドポイントを定義。各メソッドは `FETCH_CLIENT` に型・URL・body を当てはめるだけの薄い関数で、引数はオブジェクト1個に統一（例: `{ channelId: string }`）。メソッド名は camelCase（`delete`, `list`, `getHistory` など）。
+  - [src/api/index.ts](src/api/index.ts) — `export const api = { channel, message, notification, role, server, user }`。呼び出し側は `await api.channel.delete({ channelId })` のようにチェーン形式でアクセスする。
+  - **新規エンドポイント追加時**: 該当する `domains/*.ts` を開き、既存メソッドと同じ形式（`FETCH_CLIENT<戻り値型>({ url, method, body?, query?, label })`）でメソッドを追加する。URL・HTTPメソッド・body のキー名はバックエンド実装から正確に転記すること（ファイル名やメソッド名からの推測は禁止）。FormData 送信時は `Content-Type` ヘッダを設定しない（`FETCH_CLIENT` が `body instanceof FormData` で自動判定する）。
+  - 戻り値は `{ message, data }` 形式が基本。型は `~/types/` の型（`IChannel`, `IMessage` など）をそのまま参照する。
 - [src/WS/](src/WS/) — WebSocket まわり。
   - [src/WS/WScontroller.ts](src/WS/WScontroller.ts) — WS 接続の確立・再接続・受信メッセージのディスパッチ。受信 JSON は `{ signal: string, data: any }` 形式で、`signal` の値で `switch` して各ハンドラへ振り分ける。
   - サブディレクトリ（`Message` / `Channel` / `Role` / `Server` / `User` / `inbox`）に signal ごとのハンドラ。新しい WS シグナルを追加する場合はハンドラファイルを作り WScontroller の `switch` に登録する。
@@ -103,4 +105,5 @@ npx tsc --noEmit --skipLibCheck   # 型チェック（専用スクリプトは�
 - React の知識で書かない（`useState` / `useEffect` / `className` は存在しない。再レンダリングモデルが根本的に違い、コンポーネント関数は一度しか実行されない）。
 - `version` はリリース時に `package.json` で手動更新される（`0.x.y-alpha`）。UI 表示に `__VERSION__` を使用。
 - `dev-dist/` と `dist/` は生成物。編集しない。
-- API ラッパーのファイル名・関数名の命名規則（前述）を崩すと一貫性が失われるため、新規 API 追加時は既存ファイルを 1 つ開いて形式を踏襲する。
+- API 呼び出しは必ず `~/api/index.ts` の `api` オブジェクト経由で行う（`import { api } from "~/api/index.ts";`）。個別のエンドポイントファイルを直接 import する旧方式（`~/api/CHANNEL/CHANNEL_DELETE.ts` など）は 2026-07 のリファクタで廃止済み。
+- `FETCH_CLIENT` の `query` オプションは `undefined` 値のみ除外して `?key=value` を組み立てる。空文字列を除外したい・クエリ文字列を独自構築したい等、挙動を変えたくない特殊なエンドポイント（例: `message.search`）は `domains/*.ts` 内で独自にクエリ文字列を組み立てても構わない。
