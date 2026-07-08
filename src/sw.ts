@@ -24,6 +24,11 @@ sw.addEventListener("activate", (event) => {
   event.waitUntil(sw.clients.claim());
 });
 
+// PWA インストール要件を満たすための fetch ハンドラー(パススルー)
+sw.addEventListener("fetch", () => {
+  // 何もせずブラウザ既定処理に委ねる
+});
+
 sw.addEventListener("push", (event) => {
   if (!event.data) return;
 
