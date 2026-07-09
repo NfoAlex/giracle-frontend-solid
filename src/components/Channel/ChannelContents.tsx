@@ -6,7 +6,7 @@ import { storeClientConfig } from "~/stores/ClientConfig.ts";
 import { Button } from "../ui/button.tsx";
 import { IconArrowDown } from "@tabler/icons-solidjs";
 import MessageDisplay from "./ChannelContent/MessageDisplay.tsx";
-import { setStoreMessageReadTime, storeMessageReadTime } from "~/stores/Readtime.ts";
+import { storeMessageReadTime } from "~/stores/Readtime.ts";
 import { storeMyUserinfo } from "~/stores/MyUserinfo.ts";
 import { api } from "~/api/index.ts";
 import { produce } from "solid-js/store";
@@ -18,7 +18,7 @@ const channelScrollPos: Map<string, number> = new Map();
 
 export default function ChannelContents() {
   const param = useParams();
-  const [isWindowFocused, setIsWindowFocused] = createSignal(true);
+  const [_, setIsWindowFocused] = createSignal(true);
   const [currentChannelId, setCurrentChannelId] = createSignal<string>(param.channelId ?? "");
   const [editingMsgId, setEditingMsgId] = createSignal("");
 
@@ -615,9 +615,8 @@ export default function ChannelContents() {
             <MessageDisplay
               message={h}
               messageArrayIndex={index()}
+              stateEdit={[editingMsgId, setEditingMsgId]}
               displayAvatar={!sameSenderAsNext(index())}
-              triggerEdit={() => editingMsgId() === h.id}
-              onExitEdit={() => setEditingMsgId("")}
             />
           )}
         </For>

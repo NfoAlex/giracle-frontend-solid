@@ -1,4 +1,4 @@
-import { createEffect, createSignal, on, onCleanup, Show } from "solid-js";
+import { Accessor, createEffect, createSignal, on, onCleanup, Setter, Show } from "solid-js";
 import { storeHistory } from "~/stores/History.ts";
 import { IMessage } from "~/types/Message.ts";
 import { Badge } from "../../ui/badge.tsx";
@@ -17,21 +17,12 @@ export default function MessageDisplay(props: {
   messageArrayIndex: number,
   message: IMessage,
   displayAvatar: boolean,
-  triggerEdit?: () => boolean,
-  onExitEdit?: () => void,
+  stateEdit: [Accessor<string>, Setter<string>],
 }) {
   let messageRef: HTMLDivElement | undefined;
   const [hovered, setHovered] = createSignal(false);
   const [reacting, setReacting] = createSignal(false);
-  const [editing, setEditing] = createSignal(false);
-
-  //外部から編集モードをトリガーする
-  createEffect(on(
-    () => props.triggerEdit?.(),
-    (trigger) => {
-      if (trigger) setEditing(true);
-    }
-  ));
+  const editing =()=> props.stateEdit[0]() === props.message.id;
 
   //新着線表示用の既読時間取得
   const targetMessageReadTimeBefore = () => {
@@ -129,7 +120,7 @@ export default function MessageDisplay(props: {
                     <EditMessage
                       messageId={props.message.id}
                       content={props.message.content}
-                      onCancelEdit={() => { setEditing(false); props.onExitEdit?.(); }}
+                      onCancelEdit={() => { props.stateEdit[1]("") }}
                     />
                     :
                     <MentionReadWrapper messageId={props.message.id}>
@@ -145,7 +136,7 @@ export default function MessageDisplay(props: {
                   <div class={"absolute right-1 z-50"} style={"bottom:calc(100% - 15px);"}>
                     <HoverMenu
                       message={props.message}
-                      onEditMode={() => { setEditing(true); setHovered(false); }}
+                      onEditMode={(msgId) => { setHovered(false); props.stateEdit[1](msgId) }}
                       onReacting={(mode) => { setReacting(mode); }}
                     />
                   </div>

@@ -24,7 +24,7 @@ export default function DisplayInboxByChannel(props: { onReadIt: (messageId: str
     return Object.entries(grouped);
   });
 
-  console.log("DisplayInboxByChannel :: groupedInbox ->", groupedInbox());
+  // console.log("DisplayInboxByChannel :: groupedInbox ->", groupedInbox());
 
   return (
     <For each={groupedInbox()}>
