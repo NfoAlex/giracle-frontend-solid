@@ -6,7 +6,7 @@ import { storeClientConfig } from "~/stores/ClientConfig.ts";
 import { Button } from "../ui/button.tsx";
 import { IconArrowDown } from "@tabler/icons-solidjs";
 import MessageDisplay from "./ChannelContent/MessageDisplay.tsx";
-import { setStoreMessageReadTime, storeMessageReadTime } from "~/stores/Readtime.ts";
+import { storeMessageReadTime } from "~/stores/Readtime.ts";
 import { storeMyUserinfo } from "~/stores/MyUserinfo.ts";
 import { api } from "~/api/index.ts";
 import { produce } from "solid-js/store";
