@@ -18,7 +18,7 @@ const channelScrollPos: Map<string, number> = new Map();
 
 export default function ChannelContents() {
   const param = useParams();
-  const [isWindowFocused, setIsWindowFocused] = createSignal(true);
+  const [_, setIsWindowFocused] = createSignal(true);
   const [currentChannelId, setCurrentChannelId] = createSignal<string>(param.channelId ?? "");
   const [editingMsgId, setEditingMsgId] = createSignal("");
 
@@ -615,9 +615,8 @@ export default function ChannelContents() {
             <MessageDisplay
               message={h}
               messageArrayIndex={index()}
+              stateEdit={[editingMsgId, setEditingMsgId]}
               displayAvatar={!sameSenderAsNext(index())}
-              triggerEdit={() => editingMsgId() === h.id}
-              onExitEdit={() => setEditingMsgId("")}
             />
           )}
         </For>
