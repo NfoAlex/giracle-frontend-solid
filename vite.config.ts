@@ -24,25 +24,33 @@ export default defineConfig({
       },
       devOptions: {enabled: true, type: 'module'},
       manifest: {
+        name: "Giracle",
+        short_name: "Giracle",
+        description: "Giracle チャットクライアント",
         lang: "ja",
+        theme_color: "#000000",
+        background_color: "#ffffff",
+        display: "standalone",
+        start_url: "/",
+        scope: "/",
         "icons": [
           {
-            "src": "./src/assets/pwa-64x64.png",
+            "src": "/pwa-64x64.png",
             "sizes": "64x64",
             "type": "image/png"
           },
           {
-            "src": "./src/assets/pwa-192x192.png",
+            "src": "/pwa-192x192.png",
             "sizes": "192x192",
             "type": "image/png"
           },
           {
-            "src": "./src/assets/pwa-512x512.png",
+            "src": "/pwa-512x512.png",
             "sizes": "512x512",
             "type": "image/png"
           },
           {
-            "src": "./src/assets/maskable-icon-512x512.png",
+            "src": "/maskable-icon-512x512.png",
             "sizes": "512x512",
             "type": "image/png",
             "purpose": "maskable"
