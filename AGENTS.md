@@ -84,6 +84,8 @@ npx tsc --noEmit --skipLibCheck   # 型チェック（専用スクリプトは�
 - import は `~/` エイリアス＋拡張子付き（例: `import { storeMyUserinfo } from "~/stores/MyUserinfo.ts";`）。
 - Solid の反応性を壊さない: props の分割代入をトップレベルでしない、ストア更新は setter か `produce` を使う。
 - コンポーネントは基本 default export、ストア・ユーティリティは named export。
+- コンポーネントに分離する際は単一のコンポーネントでのみ使われる場合はその親コンポーネントの名前のディレクトリに配置する。共通コンポーネントの場合、`src\components\unique`に配置する。
+- Interfaceの定義は頭文字に`I`、typeの場合は頭文字に`T`、enumの場合は頭文字に`E`をつける
 
 ## コミット規約
 
