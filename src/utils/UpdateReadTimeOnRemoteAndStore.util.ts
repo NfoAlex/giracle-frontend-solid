@@ -1,13 +1,30 @@
 import { api } from "~/api/index.ts";
-import { setStoreMessageReadTime, storeMessageReadTime } from "~/stores/Readtime";
+import {
+  setStoreMessageReadTime,
+  storeMessageReadTime,
+} from "~/stores/Readtime.ts";
 
-function BindToReadTimeStore(channelId: string, readTime: string, currentReadTime?: string, option?: { copyToReadTimeBefore: boolean }) {
-  console.log("UpdateReadTimeOnRemoteAndStore :: BindToReadTimeStore : called->", channelId, readTime, currentReadTime, option);
+function BindToReadTimeStore(
+  channelId: string,
+  readTime: string,
+  currentReadTime?: string,
+  option?: { copyToReadTimeBefore: boolean },
+) {
+  // Store 更新のログを出力
+  console.log(
+    "UpdateReadTimeOnRemoteAndStore :: BindToReadTimeStore : called->",
+    channelId,
+    readTime,
+    currentReadTime,
+    option,
+  );
   setStoreMessageReadTime((prev) => {
     const newReadTime = {
       channelId: channelId,
       readTime: readTime,
-      readTimeBefore: option?.copyToReadTimeBefore ? readTime : currentReadTime ?? readTime
+      readTimeBefore: option?.copyToReadTimeBefore
+        ? readTime
+        : (currentReadTime ?? readTime),
     };
     const newStore = prev.filter((c) => c.channelId !== channelId);
     newStore.push({ ...newReadTime });
@@ -19,7 +36,11 @@ function BindToReadTimeStore(channelId: string, readTime: string, currentReadTim
  * 既読時間をローカルStoreとサーバーで更新させる
  * @param dat 更新に参照するメッセージデータ
  */
-export default async function UpdateReadTimeOnRemoteAndStore(channelId: string, messageCreatedAt: string, option?: { copyToReadTimeBefore: boolean }) {
+export default async function UpdateReadTimeOnRemoteAndStore(
+  channelId: string,
+  messageCreatedAt: string,
+  option?: { copyToReadTimeBefore: boolean },
+) {
   //console.log("UpdateReadTimeOnRemoteAndStore :: called->", { channelId, messageCreatedAt, option });
 
   const currentReadTime = storeMessageReadTime.find((readTimeJson) => {

@@ -16,45 +16,60 @@ import {
 } from "~/stores/Notification.ts";
 
 export default function InitLoad(_userId: string, initWsToo = false) {
-  //クライアント設定を呼び出して適用
+  // 不正な JSON 文字列によるアプリ起動クラッシュを回避
   const localConfig = localStorage.getItem("clientConfig");
   if (localConfig) {
-    bindClientConfig(JSON.parse(localConfig));
+    try {
+      bindClientConfig(JSON.parse(localConfig));
+    } catch (error) {
+      console.error("InitLoad :: clientConfig parse error", error);
+    }
   }
 
   //自分のユーザー情報を取得してStoreに格納
-  api.user.info({ userId: _userId }).then((r) => {
-    //console.log("Login :: loginIt : 自分の情報r->", r);
-    setStoreMyUserinfo(r.data);
-  });
+  api.user
+    .info({ userId: _userId })
+    .then((r) => setStoreMyUserinfo(r.data))
+    .catch((e) => console.error("InitLoad :: user.info error", e));
+
   //サーバー情報を取得してStoreに格納
-  api.server.config().then((r) => {
-    //console.log("InitLoad :: GET_SERVER_CONFIG : サーバー情報r->", r);
-    const { isFirstUser, ..._serverConfig } = r.data;
-    //サーバーの設定をStoreに格納
-    bindServerinfo(_serverConfig);
-  });
+  api.server
+    .config()
+    .then((r) => {
+      const { isFirstUser, ..._serverConfig } = r.data;
+      bindServerinfo(_serverConfig);
+    })
+    .catch((e) => console.error("InitLoad :: server.config error", e));
+
   //ロールリストを取得してStoreに格納
-  api.role.list().then((r) => {
-    //console.log("Login :: loginIt : ロールリストr->", r);
-    setStoreRoleInfo(() => {
-      const _value: { [key: string]: IRole } = {};
-      for (const role of r.data) {
-        _value[role.id] = role;
-      }
-      return _value;
-    });
-  });
+  api.role
+    .list()
+    .then((r) => {
+      setStoreRoleInfo(() => {
+        const _value: { [key: string]: IRole } = {};
+        for (const role of r.data) {
+          _value[role.id] = role;
+        }
+        return _value;
+      });
+    })
+    .catch((e) => console.error("InitLoad :: role.list error", e));
+
   //メッセージ既読時間を取得、格納
-  api.message.getReadTime().then((r) => {
-    //console.log("InitLoad :: GET_MESSAGE_GET_READTIME : 自分の既読時間r->", r);
-    setStoreMessageReadTime(r.data.map(r => { return { ...r, readTimeBefore: r.readTime }; }));
-  });
+  api.message
+    .getReadTime()
+    .then((r) => {
+      setStoreMessageReadTime(
+        r.data.map((r) => ({ ...r, readTimeBefore: r.readTime })),
+      );
+    })
+    .catch((e) => console.error("InitLoad :: message.getReadTime error", e));
+
   //新着メッセージの有無を取得、格納
-  api.message.getNew().then((r) => {
-    //console.log("InitLoad :: GET_MESSAGE_GET_NEW : 新着メッセージr->", r);
-    setStoreHasNewMessage(r.data);
-  });
+  api.message
+    .getNew()
+    .then((r) => setStoreHasNewMessage(r.data))
+    .catch((e) => console.error("InitLoad :: message.getNew error", e));
   //インボックス取得
   api.message.inbox().then((r) => {
     //console.log("InitLoad :: GET_MESSAGE_INBOX : インボックスr->", r);

@@ -21,31 +21,26 @@ export default async function FetchHistory(
 ) {
   if (fetching) return;
   fetching = true;
-  await api.channel.getHistory({
-    channelId: _channelId,
-    messageIdFrom: _dat.messageIdFrom,
-    messageTimeFrom: _dat.messageTimeFrom,
-    fetchLength: _dat.fetchLength,
-    fetchDirection: _direction,
-  })
-    .then((r) => {
-      //console.log("ChannelContent :: fetchHistory : r->", r);
-      //if (r.data.history.length === 0) { console.log("ChannelContent :: fetchHistory : 履歴がありません"); return; }
-      updateHistoryPosition(_channelId, {
-        atEnd: r.data.atEnd,
-        atTop: r.data.atTop,
-      });
-      new Promise((resolve) => {
-        //画像サイズを格納
-        setStoreImageDimensions(produce(prev => (Object.assign(prev, r.data.ImageDimensions))));
-        //履歴を格納
-        insertHistory(r.data.history);
-        resolve(null);
-      });
-    })
-    .catch((e) =>
-      console.error("ChannelContent :: fetchHistory : エラー->", e),
+  // エラー発生時も fetching フラグの解除を保証して重複取得ブロックの固着を防ぐ
+  try {
+    const response = await api.channel.getHistory({
+      channelId: _channelId,
+      messageIdFrom: _dat.messageIdFrom,
+      messageTimeFrom: _dat.messageTimeFrom,
+      fetchLength: _dat.fetchLength,
+      fetchDirection: _direction,
+    });
+    updateHistoryPosition(_channelId, {
+      atEnd: response.data.atEnd,
+      atTop: response.data.atTop,
+    });
+    setStoreImageDimensions(
+      produce((prev) => Object.assign(prev, response.data.ImageDimensions)),
     );
-  
-  fetching = false;
+    insertHistory(response.data.history);
+  } catch (error) {
+    console.error("ChannelContent :: fetchHistory : エラー->", error);
+  } finally {
+    fetching = false;
+  }
 }
