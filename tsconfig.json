@@ -9,16 +9,12 @@
     "esModuleInterop": true,
     "jsx": "preserve",
     "jsxImportSource": "solid-js",
-    "types": [
-      "vite/client"
-    ],
+    "types": ["vite/client"],
     "noEmit": true,
     "isolatedModules": true,
     "paths": {
-      "~/*": [
-        "./src/*"
-      ]
+      "~/*": ["./src/*"]
     },
-    "resolveJsonModule": true,
+    "resolveJsonModule": true
   }
 }

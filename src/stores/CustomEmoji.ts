@@ -1,9 +1,11 @@
-import {createStore} from "solid-js/store";
-import {Database} from "emoji-picker-element";
-import { CustomEmoji } from "emoji-picker-element/shared.js";
-import { ICustomEmoji } from "~/types/Message.ts";
+import { Database } from "emoji-picker-element";
+import type { CustomEmoji } from "emoji-picker-element/shared.js";
+import { createStore } from "solid-js/store";
+import type { ICustomEmoji } from "~/types/Message.ts";
 
-export const [storeCustomEmoji, setStoreCustomEmoji] = createStore<ICustomEmoji[]>([]);
+export const [storeCustomEmoji, setStoreCustomEmoji] = createStore<
+  ICustomEmoji[]
+>([]);
 export let emojiDB = new Database();
 
 /**
@@ -15,8 +17,8 @@ export const bindCustomEmoji = (emojis: ICustomEmoji[]) => {
   const customEmojiDataset = getEmojiDatasetWithCustomEmoji();
 
   //emojiDBを更新
-  emojiDB = new Database({customEmoji: customEmojiDataset});
-}
+  emojiDB = new Database({ customEmoji: customEmojiDataset });
+};
 
 /**
  * 単一のカスタム絵文字を更新する
@@ -27,20 +29,22 @@ export const updateCustomEmoji = (emoji: ICustomEmoji) => {
   const customEmojiDataset = getEmojiDatasetWithCustomEmoji();
 
   //emojiDBを更新
-  emojiDB = new Database({customEmoji: customEmojiDataset});
-}
+  emojiDB = new Database({ customEmoji: customEmojiDataset });
+};
 
 /**
  * カスタム絵文字をデータセットとStoreから削除する
  * @param emojiCode - 削除する絵文字コード
  */
 export const deleteCustomEmojiData = (emojiCode: string) => {
-  setStoreCustomEmoji(storeCustomEmoji.filter((emoji) => emoji.code !== emojiCode));
+  setStoreCustomEmoji(
+    storeCustomEmoji.filter((emoji) => emoji.code !== emojiCode),
+  );
   const customEmojiDataset = getEmojiDatasetWithCustomEmoji();
 
   //emojiDBを更新
-  emojiDB = new Database({customEmoji: customEmojiDataset});
-}
+  emojiDB = new Database({ customEmoji: customEmojiDataset });
+};
 
 /**
  * emoji-picker-element用にカスタム絵文字データセットをパース、渡す
@@ -50,10 +54,10 @@ export const getEmojiDatasetWithCustomEmoji = () => {
   for (const emoji of storeCustomEmoji) {
     dataset.push({
       name: emoji.code,
-      url: "/api/server/custom-emoji/" + emoji.code,
+      url: `/api/server/custom-emoji/${emoji.code}`,
       shortcodes: [emoji.code],
     });
   }
 
   return dataset;
-}
+};

@@ -1,6 +1,6 @@
-import { FETCH_CLIENT } from "../FETCH_CLIENT.ts";
 import type { IChannel } from "~/types/Channel.ts";
 import type { IInbox, IMessage, IReaciton } from "~/types/Message.ts";
+import { FETCH_CLIENT } from "../FETCH_CLIENT.ts";
 
 export const message = {
   delete: (p: { messageId: string }) =>
@@ -11,11 +11,19 @@ export const message = {
       label: "MESSAGE_DELETE",
     }),
 
-  deleteEmojiReaction: (p: { messageId: string; channelId: string; emojiCode: string }) =>
+  deleteEmojiReaction: (p: {
+    messageId: string;
+    channelId: string;
+    emojiCode: string;
+  }) =>
     FETCH_CLIENT<{ message: `Message reacted.`; data: IReaciton }>({
       url: "/api/message/delete-emoji-reaction",
       method: "DELETE",
-      body: { messageId: p.messageId, channelId: p.channelId, emojiCode: p.emojiCode },
+      body: {
+        messageId: p.messageId,
+        channelId: p.channelId,
+        emojiCode: p.emojiCode,
+      },
       label: "MESSAGE_DELETE_EMOJI_REACTION",
     }),
 
@@ -27,11 +35,19 @@ export const message = {
       label: "MESSAGE_EDIT",
     }),
 
-  emojiReaction: (p: { messageId: string; channelId: string; emojiCode: string }) =>
+  emojiReaction: (p: {
+    messageId: string;
+    channelId: string;
+    emojiCode: string;
+  }) =>
     FETCH_CLIENT<{ message: `Message reacted.`; data: IReaciton }>({
       url: "/api/message/emoji-reaction",
       method: "POST",
-      body: { messageId: p.messageId, channelId: p.channelId, emojiCode: p.emojiCode },
+      body: {
+        messageId: p.messageId,
+        channelId: p.channelId,
+        emojiCode: p.emojiCode,
+      },
       label: "MESSAGE_EMOJI_REACTION",
     }),
 
@@ -47,13 +63,16 @@ export const message = {
 
   get: (p: { messageId: string }) =>
     FETCH_CLIENT<{ message: "Fetched message"; data: IMessage }>({
-      url: "/api/message/" + p.messageId,
+      url: `/api/message/${p.messageId}`,
       method: "GET",
       label: "MESSAGE_GET",
     }),
 
   getNew: () =>
-    FETCH_CLIENT<{ message: "Fetched news"; data: { [key: IChannel["id"]]: boolean } }>({
+    FETCH_CLIENT<{
+      message: "Fetched news";
+      data: { [key: IChannel["id"]]: boolean };
+    }>({
       url: "/api/message/get-new",
       method: "GET",
       label: "MESSAGE_GET_NEW",
@@ -98,8 +117,10 @@ export const message = {
     if (p.content) query.set("content", p.content);
     if (p.channelId) query.set("channelId", p.channelId);
     if (p.userId) query.set("userId", p.userId);
-    if (p.hasUrlPreview !== undefined) query.set("hasUrlPreview", String(p.hasUrlPreview));
-    if (p.hasFileAttachment !== undefined) query.set("hasFileAttachment", String(p.hasFileAttachment));
+    if (p.hasUrlPreview !== undefined)
+      query.set("hasUrlPreview", String(p.hasUrlPreview));
+    if (p.hasFileAttachment !== undefined)
+      query.set("hasFileAttachment", String(p.hasFileAttachment));
     if (p.loadIndex !== undefined) query.set("loadIndex", String(p.loadIndex));
     if (p.sort) query.set("sort", p.sort);
 
@@ -110,7 +131,12 @@ export const message = {
     });
   },
 
-  send: (p: { channelId: string; message: string; fileIds: string[]; replyingMessageId?: string }) =>
+  send: (p: {
+    channelId: string;
+    message: string;
+    fileIds: string[];
+    replyingMessageId?: string;
+  }) =>
     FETCH_CLIENT<{ message: `Message sent`; data: IMessage }>({
       url: "/api/message/send",
       method: "POST",

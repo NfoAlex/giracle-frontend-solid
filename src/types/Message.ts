@@ -23,11 +23,11 @@ export interface ICustomEmoji {
 }
 
 export interface IReaciton {
-  id: string,
-  userId: string,
-  channelId: string,
-  messageId: string,
-  emojiCode: string
+  id: string;
+  userId: string;
+  channelId: string;
+  messageId: string;
+  emojiCode: string;
 }
 
 export interface IInbox {
@@ -61,6 +61,11 @@ export interface IMessageFileAttached {
 }
 
 export interface ISystemMessage {
-  targetUserId: string,
-  messageTerm: "WELCOME" | "CHANNEL_JOIN" | "CHANNEL_LEFT" | "CHANNEL_INVITED" | "CHANNEL_KICKED";
+  targetUserId: string;
+  messageTerm:
+    | "WELCOME"
+    | "CHANNEL_JOIN"
+    | "CHANNEL_LEFT"
+    | "CHANNEL_INVITED"
+    | "CHANNEL_KICKED";
 }

@@ -1,6 +1,10 @@
 import { produce } from "solid-js/store";
 import { api } from "~/api/index.ts";
-import { insertHistory, setStoreImageDimensions, updateHistoryPosition } from "~/stores/History.ts";
+import {
+  insertHistory,
+  setStoreImageDimensions,
+  updateHistoryPosition,
+} from "~/stores/History.ts";
 
 //履歴取得キュー:取得中のリクエストをチャンネルId＋取得方向ごとに保持する
 const fetchQueue = new Map<string, Promise<void>>();

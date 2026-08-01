@@ -1,19 +1,19 @@
 import { api } from "~/api/index.ts";
 import { storeAppStatus } from "~/stores/AppStatus.ts";
-import { setStoreHasNewMessage } from "~/stores/HasNewMessage.ts";
-import { setStoreMyUserinfo } from "~/stores/MyUserinfo.ts";
-import { setStoreMessageReadTime } from "~/stores/Readtime.ts";
-import { setStoreRoleInfo } from "~/stores/RoleInfo.ts";
-import type { IRole } from "~/types/Role.ts";
-import { initWS } from "~/WS/WScontroller.ts";
-import { setStoreInbox } from "~/stores/Inbox.ts";
-import { bindCustomEmoji } from "~/stores/CustomEmoji.ts";
 import { bindClientConfig } from "~/stores/ClientConfig.ts";
-import { bindServerinfo } from "~/stores/Serverinfo.ts";
+import { bindCustomEmoji } from "~/stores/CustomEmoji.ts";
+import { setStoreHasNewMessage } from "~/stores/HasNewMessage.ts";
+import { setStoreInbox } from "~/stores/Inbox.ts";
+import { setStoreMyUserinfo } from "~/stores/MyUserinfo.ts";
 import {
   setStoreMutedChannels,
   setStoreNotificationConfig,
 } from "~/stores/Notification.ts";
+import { setStoreMessageReadTime } from "~/stores/Readtime.ts";
+import { setStoreRoleInfo } from "~/stores/RoleInfo.ts";
+import { bindServerinfo } from "~/stores/Serverinfo.ts";
+import type { IRole } from "~/types/Role.ts";
+import { initWS } from "~/WS/WScontroller.ts";
 
 export default function InitLoad(_userId: string, initWsToo = false) {
   // 不正な JSON 文字列によるアプリ起動クラッシュを回避
@@ -71,23 +71,49 @@ export default function InitLoad(_userId: string, initWsToo = false) {
     .then((r) => setStoreHasNewMessage(r.data))
     .catch((e) => console.error("InitLoad :: message.getNew error", e));
   //インボックス取得
-  api.message.inbox().then((r) => {
-    //console.log("InitLoad :: GET_MESSAGE_INBOX : インボックスr->", r);
-    setStoreInbox(r.data);
-  }).catch((e) => console.error("InitLoad :: GET_MESSAGE_INBOX : インボックス取得エラー", e));
+  api.message
+    .inbox()
+    .then((r) => {
+      //console.log("InitLoad :: GET_MESSAGE_INBOX : インボックスr->", r);
+      setStoreInbox(r.data);
+    })
+    .catch((e) =>
+      console.error(
+        "InitLoad :: GET_MESSAGE_INBOX : インボックス取得エラー",
+        e,
+      ),
+    );
   //カスタム絵文字取得
-  api.server.customEmoji().then((r) => {
-    //console.log("InitLoad :: GET_SERVER_CUSTOM_EMOJI : カスタム絵文字取得r->", r);
-    bindCustomEmoji(r.data);
-  }).catch((e) => console.error("InitLoad :: GET_SERVER_CUSTOM_EMOJI : カスタム絵文字取得エラー", e));
+  api.server
+    .customEmoji()
+    .then((r) => {
+      //console.log("InitLoad :: GET_SERVER_CUSTOM_EMOJI : カスタム絵文字取得r->", r);
+      bindCustomEmoji(r.data);
+    })
+    .catch((e) =>
+      console.error(
+        "InitLoad :: GET_SERVER_CUSTOM_EMOJI : カスタム絵文字取得エラー",
+        e,
+      ),
+    );
   //通知設定取得
-  api.notification.configGet().then((r) => {
-    setStoreNotificationConfig(r.data);
-  }).catch((e) => console.error("InitLoad :: GET_NOTIFICATION_CONFIG エラー", e));
+  api.notification
+    .configGet()
+    .then((r) => {
+      setStoreNotificationConfig(r.data);
+    })
+    .catch((e) =>
+      console.error("InitLoad :: GET_NOTIFICATION_CONFIG エラー", e),
+    );
   //ミュートチャンネル取得
-  api.notification.mutedChannels().then((r) => {
-    setStoreMutedChannels({ ids: r.data.map((m) => m.channelId) });
-  }).catch((e) => console.error("InitLoad :: GET_NOTIFICATION_MUTED_CHANNELS エラー", e));
+  api.notification
+    .mutedChannels()
+    .then((r) => {
+      setStoreMutedChannels({ ids: r.data.map((m) => m.channelId) });
+    })
+    .catch((e) =>
+      console.error("InitLoad :: GET_NOTIFICATION_MUTED_CHANNELS エラー", e),
+    );
 
   // オンラインユーザーの同期は👇のinitWS関数で行う
 

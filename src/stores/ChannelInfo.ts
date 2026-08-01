@@ -6,9 +6,10 @@ export const [storeChannelInfo, setStoreChannelInfo] = createStore<{
   [key: string]: IChannel;
 }>({});
 
-export const [storeChannelFetchStatus, setStoreChannelFetchStatus] = createStore<{
-  [key: string]: "AVAILABLE" | "NOT_FOUND" | "LOADING" | "ERROR_INTERNAL";
-}>({});
+export const [storeChannelFetchStatus, setStoreChannelFetchStatus] =
+  createStore<{
+    [key: string]: "AVAILABLE" | "NOT_FOUND" | "LOADING" | "ERROR_INTERNAL";
+  }>({});
 
 /**
  * チャンネル情報Storeの値を更新/挿入する
@@ -28,9 +29,7 @@ export const updateChannelInfo = (value: IChannel) => {
  * チャンネル情報を同期で返す。無いなら取得しつつ返す
  * @param channelId
  */
-export const directGetterChannelInfo = (
-  channelId: string,
-): IChannel => {
+export const directGetterChannelInfo = (channelId: string): IChannel => {
   if (storeChannelInfo[channelId] === undefined) {
     setStoreChannelFetchStatus({
       ...storeChannelFetchStatus,
@@ -44,7 +43,8 @@ export const directGetterChannelInfo = (
       ChannelViewableRole: [],
       isArchived: false,
     });
-    api.channel.getInfo({ channelId })
+    api.channel
+      .getInfo({ channelId })
       .then((r) => {
         //Storeに設定
         updateChannelInfo(r.data);

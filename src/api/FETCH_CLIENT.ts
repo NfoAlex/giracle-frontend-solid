@@ -35,7 +35,12 @@ export async function FETCH_CLIENT<TResponse>(
       : body !== undefined
         ? { "Content-Type": "application/json" }
         : undefined,
-    body: body !== undefined ? (isFormData ? body : JSON.stringify(body)) : undefined,
+    body:
+      body !== undefined
+        ? isFormData
+          ? body
+          : JSON.stringify(body)
+        : undefined,
   }).catch((err) => {
     throw new Error(`${label} :: fetch failed`, { cause: err });
   });

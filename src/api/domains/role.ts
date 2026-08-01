@@ -1,5 +1,5 @@
-import { FETCH_CLIENT } from "../FETCH_CLIENT.ts";
 import type { IRole } from "~/types/Role.ts";
+import { FETCH_CLIENT } from "../FETCH_CLIENT.ts";
 
 export const role = {
   create: (p: { roleName: string }) =>

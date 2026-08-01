@@ -1,6 +1,6 @@
-import { FETCH_CLIENT } from "../FETCH_CLIENT.ts";
 import type { IChannel } from "~/types/Channel.ts";
 import type { IMessage } from "~/types/Message.ts";
+import { FETCH_CLIENT } from "../FETCH_CLIENT.ts";
 
 export const channel = {
   create: (p: { channelName: string; description: string }) =>

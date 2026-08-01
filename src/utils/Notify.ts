@@ -1,4 +1,4 @@
-import {asyncGetterUserinfo} from "~/stores/Userinfo.ts";
+import { asyncGetterUserinfo } from "~/stores/Userinfo.ts";
 import FormatMessageContent from "~/utils/FormatMessageContent.ts";
 import { ExternalNavigater } from "./ExternalNavigater.ts";
 

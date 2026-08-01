@@ -1,5 +1,5 @@
-import {asyncGetterUserinfo} from "~/stores/Userinfo.ts";
-import {directGetterChannelInfo} from "~/stores/ChannelInfo.ts";
+import { directGetterChannelInfo } from "~/stores/ChannelInfo.ts";
+import { asyncGetterUserinfo } from "~/stores/Userinfo.ts";
 
 export default async function FormatMessageContent(content: string) {
   const mentionPattern = /@<([a-f0-9-]+)>/g;
@@ -57,9 +57,7 @@ export default async function FormatMessageContent(content: string) {
       switch (obj.type) {
         case "userId": {
           try {
-            const user = await asyncGetterUserinfo(
-              obj.context.slice(2, -1),
-            );
+            const user = await asyncGetterUserinfo(obj.context.slice(2, -1));
             result.push(`@${user.name}`);
           } catch {
             result.push("@不明なユーザー");

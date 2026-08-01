@@ -81,11 +81,11 @@ export const unsubscribeFromPush = async (): Promise<boolean> => {
   const subscription = await getCurrentPushSubscription();
   if (!subscription) return false;
 
-  await api.notification.deviceUnregister({ token: subscription.endpoint }).catch(
-    (e) => {
+  await api.notification
+    .deviceUnregister({ token: subscription.endpoint })
+    .catch((e) => {
       console.warn("PushSubscription :: unregister API failed", e);
-    },
-  );
+    });
 
   return subscription.unsubscribe();
 };

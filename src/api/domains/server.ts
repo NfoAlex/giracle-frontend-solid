@@ -1,7 +1,7 @@
-import { FETCH_CLIENT } from "../FETCH_CLIENT.ts";
 import type { IChannel } from "~/types/Channel.ts";
 import type { ICustomEmoji } from "~/types/Message.ts";
 import type { IInvite, IServer } from "~/types/Server.ts";
+import { FETCH_CLIENT } from "../FETCH_CLIENT.ts";
 
 export const server = {
   changeConfig: (p: IServer) =>
@@ -45,12 +45,14 @@ export const server = {
         "Content-Type": "application/json",
       },
       signal: CONTROLLER.signal,
-    }).then((response) => {
-      FLAG_RECEIVED = true;
-      return response;
-    }).catch((err) => {
-      throw new Error("SERVER_CONFIG :: fetch failed", { cause: err });
-    });
+    })
+      .then((response) => {
+        FLAG_RECEIVED = true;
+        return response;
+      })
+      .catch((err) => {
+        throw new Error("SERVER_CONFIG :: fetch failed", { cause: err });
+      });
 
     setTimeout(() => {
       if (!FLAG_RECEIVED) {

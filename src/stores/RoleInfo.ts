@@ -24,9 +24,7 @@ export const updateRoleInfo = (value: IRole) => {
  * ロール情報を返す。無いなら取得してから返す
  * @param roleId
  */
-export const getterRoleInfo = (
-  roleId: string,
-): IRole => {
+export const getterRoleInfo = (roleId: string): IRole => {
   if (storeRoleInfo[roleId] === undefined) {
     //プレースホルダーを格納してから取得
     updateRoleInfo({
@@ -42,7 +40,8 @@ export const getterRoleInfo = (
       manageEmoji: false,
     });
     //ロール情報を取得
-    api.role.info({ roleId })
+    api.role
+      .info({ roleId })
       .then((r) => {
         //Storeに設定
         updateRoleInfo(r.data);

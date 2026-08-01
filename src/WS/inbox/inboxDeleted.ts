@@ -1,8 +1,13 @@
-import {setStoreInbox} from "~/stores/Inbox.ts";
+import { setStoreInbox } from "~/stores/Inbox.ts";
 
-export default function WSInboxDelete(dat: { type: "mention", messageId: string }) {
+export default function WSInboxDelete(dat: {
+  type: "mention";
+  messageId: string;
+}) {
   setStoreInbox((prev) => {
-    const _inbox = prev.filter((inboxItem) => inboxItem.Message.id !== dat.messageId);
+    const _inbox = prev.filter(
+      (inboxItem) => inboxItem.Message.id !== dat.messageId,
+    );
     return [..._inbox];
   });
 }

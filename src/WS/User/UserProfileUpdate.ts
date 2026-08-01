@@ -1,6 +1,6 @@
-import type {IUser} from "~/types/User.ts";
-import {updateUserinfo} from "~/stores/Userinfo.ts";
 import { setStoreMyUserinfo, storeMyUserinfo } from "~/stores/MyUserinfo.ts";
+import { updateUserinfo } from "~/stores/Userinfo.ts";
+import type { IUser } from "~/types/User.ts";
 
 export default function WSUserProfileUpdate(dat: IUser) {
   //console.log("WSProfileUpdate :: triggered dat->", dat);
@@ -11,7 +11,7 @@ export default function WSUserProfileUpdate(dat: IUser) {
     setStoreMyUserinfo((u) => {
       return {
         ...u,
-        ...dat
+        ...dat,
       };
     });
   }

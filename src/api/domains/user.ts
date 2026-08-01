@@ -1,5 +1,5 @@
-import { FETCH_CLIENT } from "../FETCH_CLIENT.ts";
 import type { IUser } from "~/types/User.ts";
+import { FETCH_CLIENT } from "../FETCH_CLIENT.ts";
 
 export const user = {
   ban: (p: { userId: string }) =>
@@ -60,7 +60,13 @@ export const user = {
   getSession: (p: { cursor?: number } = {}) =>
     FETCH_CLIENT<{
       message: "Fetched your sessions";
-      data: { id: number; name: string; userId: string; thisIsYou: boolean; createdAt: Date }[];
+      data: {
+        id: number;
+        name: string;
+        userId: string;
+        thisIsYou: boolean;
+        createdAt: Date;
+      }[];
     }>({
       url: `/api/user/session?cursor=${p.cursor ?? 1}`,
       method: "GET",
@@ -75,7 +81,10 @@ export const user = {
     }),
 
   login: (p: { username: string; password: string }) =>
-    FETCH_CLIENT<{ message: `Signed in as ${string}`; data: { userId: string } }>({
+    FETCH_CLIENT<{
+      message: `Signed in as ${string}`;
+      data: { userId: string };
+    }>({
       url: "/api/user/sign-in",
       method: "POST",
       body: { username: p.username, password: p.password },
@@ -85,7 +94,13 @@ export const user = {
   changeSessionName: (p: { sessionId: number; name: string }) =>
     FETCH_CLIENT<{
       message: "Session name updated";
-      data: { id: number; name: string; userId: string; thisIsYou: boolean; createdAt: Date };
+      data: {
+        id: number;
+        name: string;
+        userId: string;
+        thisIsYou: boolean;
+        createdAt: Date;
+      };
     }>({
       url: "/api/user/change-session-name",
       method: "POST",
@@ -108,7 +123,11 @@ export const user = {
     FETCH_CLIENT<{ message: "User created" }>({
       url: "/api/user/sign-up",
       method: "PUT",
-      body: { username: p.username, password: p.password, inviteCode: p.inviteCode },
+      body: {
+        username: p.username,
+        password: p.password,
+        inviteCode: p.inviteCode,
+      },
       label: "AUTH_REGISTER",
     }),
 

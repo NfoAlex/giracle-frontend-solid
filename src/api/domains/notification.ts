@@ -13,14 +13,20 @@ export type IMutedChannel = {
 
 export const notification = {
   configGet: () =>
-    FETCH_CLIENT<{ message: "Fetched notification config"; data: INotificationConfig }>({
+    FETCH_CLIENT<{
+      message: "Fetched notification config";
+      data: INotificationConfig;
+    }>({
       url: "/api/notification/config",
       method: "GET",
       label: "NOTIFICATION_CONFIG_GET",
     }),
 
   configUpdate: (p: { enabled?: boolean; mode?: "off" | "mention" | "all" }) =>
-    FETCH_CLIENT<{ message: "Updated notification config"; data: INotificationConfig }>({
+    FETCH_CLIENT<{
+      message: "Updated notification config";
+      data: INotificationConfig;
+    }>({
       url: "/api/notification/config",
       method: "POST",
       body: p,
@@ -41,7 +47,10 @@ export const notification = {
     }),
 
   deviceUnregister: (p: { token: string }) =>
-    FETCH_CLIENT<{ message: "Device unregistered"; data: { token: string | null } }>({
+    FETCH_CLIENT<{
+      message: "Device unregistered";
+      data: { token: string | null };
+    }>({
       url: "/api/notification/device/unregister",
       method: "POST",
       body: { token: p.token },
@@ -75,7 +84,10 @@ export const notification = {
     }),
 
   vapidPublicKey: () =>
-    FETCH_CLIENT<{ message: "Fetched VAPID public key"; data: { publicKey: string } }>({
+    FETCH_CLIENT<{
+      message: "Fetched VAPID public key";
+      data: { publicKey: string };
+    }>({
       url: "/api/notification/vapid-public-key",
       method: "GET",
       label: "NOTIFICATION_VAPID_PUBLIC_KEY",
