@@ -1,6 +1,6 @@
-import type { IMessage } from "~/types/Message.ts";
 import { setStoreHistory } from "~/stores/History.ts";
 import { fnMessageFetchCache } from "~/stores/MessageFetchCache";
+import type { IMessage } from "~/types/Message.ts";
 
 /**
  * メッセージの更新処理

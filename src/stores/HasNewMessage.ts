@@ -1,12 +1,14 @@
 import { createStore } from "solid-js/store";
 import type { IChannel } from "~/types/Channel.ts";
 
-export const [storeHasNewMessage, setStoreHasNewMessage] = createStore<{[key: IChannel["id"]]: boolean}>({});
+export const [storeHasNewMessage, setStoreHasNewMessage] = createStore<{
+  [key: IChannel["id"]]: boolean;
+}>({});
 
 /**
  * すべてのチャンネルにおいて未読メッセージがあるかどうか
- * @returns 
+ * @returns
  */
 export const HasAnythingNew = () => {
   return Object.values(storeHasNewMessage).some((v) => v);
-}
+};

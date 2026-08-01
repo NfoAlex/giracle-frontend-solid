@@ -1,5 +1,5 @@
 import { storeMyUserinfo } from "~/stores/MyUserinfo.ts";
-import {setStoreUserOnline} from "~/stores/Userinfo.ts";
+import { setStoreUserOnline } from "~/stores/Userinfo.ts";
 
 export default function WSUserDisconnected(dat: string) {
   console.log("WSUserDisconnected :: triggered dat->", dat);
@@ -15,5 +15,5 @@ export default function WSUserDisconnected(dat: string) {
     if (index !== -1) onlineUserNow.splice(index, 1);
 
     return onlineUserNow;
-  })
+  });
 }

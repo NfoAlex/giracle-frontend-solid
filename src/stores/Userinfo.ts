@@ -33,7 +33,7 @@ export const asyncGetterUserinfo = async (userId: string) => {
     }
   }
   return storeUserinfo[userId];
-}
+};
 
 /**
  * ユーザー情報を返す。無いなら取得しつつ返す
@@ -45,12 +45,14 @@ export const getterUserinfo = (userId: string): IUser => {
       id: userId,
       name: "ロード中...",
       isBanned: false,
-      selfIntroduction: "ロード中のユーザー情報です。しばらく経っても同じ表示の場合、リロードしてください。",
+      selfIntroduction:
+        "ロード中のユーザー情報です。しばらく経っても同じ表示の場合、リロードしてください。",
       ChannelJoin: [],
-      RoleLink: []
+      RoleLink: [],
     });
 
-    api.user.info({ userId })
+    api.user
+      .info({ userId })
       .then((r) => {
         //Storeに設定
         updateUserinfo(r.data);

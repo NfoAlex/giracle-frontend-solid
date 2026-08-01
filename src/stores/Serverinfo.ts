@@ -9,7 +9,7 @@ export const [storeServerinfo, setStoreServerinfo] = createStore<IServer>({
   RegisterAnnounceChannelId: "",
   MessageMaxLength: 1,
   MessageMaxFileSize: 1,
-  defaultJoinChannel: []
+  defaultJoinChannel: [],
 });
 
 export const bindServerinfo = (value: Partial<IServer>) => {

@@ -50,10 +50,11 @@ export default async function UpdateReadTimeOnRemoteAndStore(
   //既読時間が現時点で無いなら更新して終了
   if (currentReadTime === undefined) {
     BindToReadTimeStore(channelId, messageCreatedAt);
-    await api.message.updateReadTime({
-      channelId,
-      readTime: messageCreatedAt,
-    })
+    await api.message
+      .updateReadTime({
+        channelId,
+        readTime: messageCreatedAt,
+      })
       .catch((err) => {
         console.error("UpdateReadTimeOnRemoteAndStore :: err->", err);
       });
@@ -62,15 +63,18 @@ export default async function UpdateReadTimeOnRemoteAndStore(
   }
 
   //ローカルがすでに新しいなら停止
-  if (new Date(currentReadTime).valueOf() >= new Date(messageCreatedAt).valueOf()) {
+  if (
+    new Date(currentReadTime).valueOf() >= new Date(messageCreatedAt).valueOf()
+  ) {
     return;
-  };
+  }
 
   BindToReadTimeStore(channelId, messageCreatedAt, currentReadTime, option);
-  await api.message.updateReadTime({
-    channelId,
-    readTime: messageCreatedAt,
-  })
+  await api.message
+    .updateReadTime({
+      channelId,
+      readTime: messageCreatedAt,
+    })
     .catch((err) => {
       console.error("UpdateReadTimeOnRemoteAndStore :: err->", err);
     });

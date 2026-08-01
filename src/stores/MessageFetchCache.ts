@@ -14,35 +14,37 @@ const messageHolder: IMessage = {
   replyingMessageId: null,
   MessageUrlPreview: [],
   MessageFileAttached: [],
-  reactionSummary: []
+  reactionSummary: [],
 };
 
 //返信表示用のキャッシュ
-const storeMessageFetchCache = createMutable<
-  {
-    cache: {
-      [messageId: string]: IMessage
-    },
-    isDeleted: {
-      [messageId: string]: boolean
-    }
-  }
->({ cache: {}, isDeleted: {} });
+const storeMessageFetchCache = createMutable<{
+  cache: {
+    [messageId: string]: IMessage;
+  };
+  isDeleted: {
+    [messageId: string]: boolean;
+  };
+}>({ cache: {}, isDeleted: {} });
 
 export const fnMessageFetchCache = {
   getMessage: (channelId: string, messageId: string): IMessage => {
     if (storeMessageFetchCache.isDeleted[messageId]) return messageHolder;
-    if (storeMessageFetchCache.cache[messageId]) return storeMessageFetchCache.cache[messageId];
+    if (storeMessageFetchCache.cache[messageId])
+      return storeMessageFetchCache.cache[messageId];
 
     //履歴Storeから探してきてあればそれを返す
-    const msgFromStore = storeHistory[channelId]?.history.find(msg => msg.id === messageId);
+    const msgFromStore = storeHistory[channelId]?.history.find(
+      (msg) => msg.id === messageId,
+    );
     if (msgFromStore) {
       storeMessageFetchCache.cache[messageId] = msgFromStore;
       return storeMessageFetchCache.cache[messageId];
     }
 
     //表示には適用させるためにawaitしていない
-    api.message.get({ messageId })
+    api.message
+      .get({ messageId })
       .then((res) => {
         storeMessageFetchCache.cache[messageId] = res.data;
       })
@@ -51,7 +53,7 @@ export const fnMessageFetchCache = {
           ...messageHolder,
           content: "削除されたメッセージ",
           id: messageId,
-          channelId: channelId
+          channelId: channelId,
         };
         storeMessageFetchCache.isDeleted[messageId] = true;
         return storeMessageFetchCache.cache[messageId];
@@ -62,14 +64,17 @@ export const fnMessageFetchCache = {
       ...messageHolder,
       content: "取得中...",
       id: messageId,
-      channelId: channelId
+      channelId: channelId,
     };
     return storeMessageFetchCache.cache[messageId];
   },
 
   updateMessage: (message: IMessage) => {
     if (storeMessageFetchCache.isDeleted[message.id]) return;
-    storeMessageFetchCache.cache[message.id] = { ...storeMessageFetchCache.cache[message.id], ...message };
+    storeMessageFetchCache.cache[message.id] = {
+      ...storeMessageFetchCache.cache[message.id],
+      ...message,
+    };
   },
 
   getIsDeleted: (messageId: string) => {
@@ -88,5 +93,5 @@ export const fnMessageFetchCache = {
   clearCache: () => {
     storeMessageFetchCache.cache = {};
     storeMessageFetchCache.isDeleted = {};
-  }
-}
+  },
+};

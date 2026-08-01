@@ -1,4 +1,4 @@
-import {setStoreUserOnline, storeUserOnline} from "~/stores/Userinfo.ts";
+import { setStoreUserOnline, storeUserOnline } from "~/stores/Userinfo.ts";
 
 export default function WSUserConnected(dat: string) {
   //console.log("WSUserConnected :: triggered dat->", dat);
@@ -9,5 +9,5 @@ export default function WSUserConnected(dat: string) {
   //オンラインユーザーを追加
   setStoreUserOnline((prev) => {
     return [...prev, dat];
-  })
+  });
 }

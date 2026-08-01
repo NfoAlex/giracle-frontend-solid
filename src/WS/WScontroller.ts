@@ -1,33 +1,33 @@
+import { produce } from "solid-js/store";
 import { api } from "~/api/index.ts";
 import { storeAppStatus } from "~/stores/AppStatus.ts";
-import WSSendMessage from "./Message/SendMessage.ts";
-import WSUpdateChannel from "./Channel/UpdateChannel.ts";
-import WSRoleUpdated from "./Role/RoleUpdatede.ts";
-import WSRoleLinked from "./Role/RoleLinked.ts";
-import WSRoleUnlinked from "./Role/RoleUnlinked.ts";
-import WSChannelDeleted from "./Channel/ChannelDeleted.ts";
-import WSMessageDeleted from "./Message/MessageDelete.ts";
-import WSUpdateMessage from "~/WS/Message/UpdateMessage.ts";
-import { setStoreUserOnline } from "~/stores/Userinfo.ts";
-import WSUserConnected from "~/WS/User/UserConnected.ts";
-import WSUserDisconnected from "~/WS/User/UserDisconnected.ts";
-import WSInboxDelete from "~/WS/inbox/inboxDeleted.ts";
-import WSInboxAdded from "~/WS/inbox/inboxAdded.ts";
-import InitLoad from "~/utils/InitLoad.ts";
-import { storeMyUserinfo } from "~/stores/MyUserinfo.ts";
-import WSUserProfileUpdate from "~/WS/User/UserProfileUpdate.ts";
-import WSReadTimeUpdate from "~/WS/Message/ReadTimeUpdate.ts";
 import { setStoreHistory } from "~/stores/History.ts";
-import { produce } from "solid-js/store";
+import { fnMessageFetchCache } from "~/stores/MessageFetchCache.ts";
+import { storeMyUserinfo } from "~/stores/MyUserinfo.ts";
+import { storeMessageReadTime } from "~/stores/Readtime.ts";
+import { setStoreUserOnline } from "~/stores/Userinfo.ts";
+import FetchHistory from "~/utils/FethchHistory.ts";
+import InitLoad from "~/utils/InitLoad.ts";
+import WSInboxAdded from "~/WS/inbox/inboxAdded.ts";
+import WSInboxDelete from "~/WS/inbox/inboxDeleted.ts";
 import WSMessageAddReaction from "~/WS/Message/MessageAddReaction.ts";
 import WSMessageDeleteReaction from "~/WS/Message/MessageDeleteReaction.ts";
-import WSCustomEmojiUploaded from "~/WS/Server/CustomEmojiUploaded.ts";
+import WSReadTimeUpdate from "~/WS/Message/ReadTimeUpdate.ts";
+import WSUpdateMessage from "~/WS/Message/UpdateMessage.ts";
 import WSCustomEmojiDeleted from "~/WS/Server/CustomEmojiDeleted.ts";
-import WSChannelLeft from "./Channel/ChannelLeft.ts";
+import WSCustomEmojiUploaded from "~/WS/Server/CustomEmojiUploaded.ts";
+import WSUserConnected from "~/WS/User/UserConnected.ts";
+import WSUserDisconnected from "~/WS/User/UserDisconnected.ts";
+import WSUserProfileUpdate from "~/WS/User/UserProfileUpdate.ts";
+import WSChannelDeleted from "./Channel/ChannelDeleted.ts";
 import WSChannelJoined from "./Channel/ChannelJoined.ts";
-import FetchHistory from "~/utils/FethchHistory.ts";
-import { storeMessageReadTime } from "~/stores/Readtime.ts";
-import { fnMessageFetchCache } from "~/stores/MessageFetchCache.ts";
+import WSChannelLeft from "./Channel/ChannelLeft.ts";
+import WSUpdateChannel from "./Channel/UpdateChannel.ts";
+import WSMessageDeleted from "./Message/MessageDelete.ts";
+import WSSendMessage from "./Message/SendMessage.ts";
+import WSRoleLinked from "./Role/RoleLinked.ts";
+import WSRoleUnlinked from "./Role/RoleUnlinked.ts";
+import WSRoleUpdated from "./Role/RoleUpdatede.ts";
 
 //WSインスタンス
 export let ws: WebSocket | undefined = undefined;
@@ -49,7 +49,7 @@ export const initWS = async () => {
     //console.log("WScontroller :: initWS(.onmessage) : triggered", await JSON.parse(event.data));
     try {
       // biome-ignore lint/suspicious/noExplicitAny: バックエンド次第
-      const json: { signal: string, data: any } = JSON.parse(event.data);
+      const json: { signal: string; data: any } = JSON.parse(event.data);
 
       //トークンが無効な場合のフラグ設定
       if (json.signal === "ERROR" && json.data === "token not valid") {
@@ -57,7 +57,6 @@ export const initWS = async () => {
       }
 
       switch (json.signal) {
-
         //カスタム絵文字作成の受け取り
         case "server::CustomEmojiUploaded":
           WSCustomEmojiUploaded(json.data);
@@ -162,7 +161,12 @@ export const initWS = async () => {
           break;
       }
     } catch (e) {
-      console.error("WScontroller :: initWS(.onmessage) : error->", e, " \ndata->", event.data);
+      console.error(
+        "WScontroller :: initWS(.onmessage) : error->",
+        e,
+        " \ndata->",
+        event.data,
+      );
     }
   };
 
@@ -178,15 +182,17 @@ export const initWS = async () => {
       //初期処理
       InitLoad(storeMyUserinfo.id);
       //履歴を初期化してアクセスしたときに履歴を取得できるようにする
-      setStoreHistory(produce((prev) => {
-        const keys = Object.keys(prev);
-        for (const channelId of keys) {
-          prev[channelId].history = [];
-          prev[channelId].atTop = false;
-          prev[channelId].atEnd = false;
-        }
-        return prev;
-      }));
+      setStoreHistory(
+        produce((prev) => {
+          const keys = Object.keys(prev);
+          for (const channelId of keys) {
+            prev[channelId].history = [];
+            prev[channelId].atTop = false;
+            prev[channelId].atEnd = false;
+          }
+          return prev;
+        }),
+      );
       //メッセージキャッシュStoreを初期化
       fnMessageFetchCache.clearCache();
 
@@ -196,12 +202,14 @@ export const initWS = async () => {
       const channelId = paramMatch ? paramMatch[1] : null;
       //もしチャンネルページにいるならその履歴を既読時間から取得取得する
       if (channelId) {
-        const latestReadTime = storeMessageReadTime.find((mrt) => mrt.channelId === channelId)?.readTime;
+        const latestReadTime = storeMessageReadTime.find(
+          (mrt) => mrt.channelId === channelId,
+        )?.readTime;
         FetchHistory(
           channelId,
           {
             messageTimeFrom: latestReadTime ? latestReadTime : undefined,
-            fetchLength: 10
+            fetchLength: 10,
           },
           "newer",
         );
@@ -218,13 +226,20 @@ export const initWS = async () => {
     }, 20000);
 
     //オンラインユーザーを取得、格納
-    api.user.getOnline()
+    api.user
+      .getOnline()
       .then((r) => {
-        console.log("WScontroller :: initWS(.onopen) : オンラインユーザー r->", r);
+        console.log(
+          "WScontroller :: initWS(.onopen) : オンラインユーザー r->",
+          r,
+        );
         setStoreUserOnline(r.data);
       })
       .catch((e) => {
-        console.error("WScontroller :: initWS(.onopen) : オンラインユーザー error->", e);
+        console.error(
+          "WScontroller :: initWS(.onopen) : オンラインユーザー error->",
+          e,
+        );
       });
   };
 
@@ -263,4 +278,4 @@ export const initWS = async () => {
       }
     }
   });
-}
+};
