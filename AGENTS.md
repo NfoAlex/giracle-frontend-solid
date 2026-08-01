@@ -45,7 +45,6 @@ npx tsc --noEmit --skipLibCheck   # 型チェック（専用スクリプトは�
 - `VITE_CORS_ORIGIN` — バックエンドの URL（プロキシ先）
 - `VITE_PROD_PORT` — `serve-host` 時のポート
 - `VITE_PROD_DOMAIN` — プレビュー時に許可するドメイン
-- `VITE_FRONTEND_URL` — フロントエンドの URL（内部リンク判定用）
 
 `__VERSION__` はビルド時に `package.json` の `version` が埋め込まれるグローバル定数。
 

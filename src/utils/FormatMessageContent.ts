@@ -55,16 +55,28 @@ export default async function FormatMessageContent(content: string) {
     if (i < ObjectIndex.length) {
       const obj = ObjectIndex[i];
       switch (obj.type) {
-        case "userId":
-          const user = await asyncGetterUserinfo(obj.context.slice(2, -1));
-          result.push(`@${user.name}`);
+        case "userId": {
+          try {
+            const user = await asyncGetterUserinfo(
+              obj.context.slice(2, -1),
+            );
+            result.push(`@${user.name}`);
+          } catch {
+            result.push("@不明なユーザー");
+          }
           break;
+        }
         case "breakLine":
           result.push("\n");
           break;
-        case "channel":
-          result.push(`#${directGetterChannelInfo(obj.context.slice(2, -1)).name}`);
+        case "channel": {
+          const channelId = obj.context.slice(2, -1);
+          // チャンネル情報がストア未読み込みの場合のTypeErrorを防止
+          const channelInfo = directGetterChannelInfo(channelId);
+          const channelName = channelInfo?.name ?? "不明なチャンネル";
+          result.push(`#${channelName}`);
           break;
+        }
       }
     }
   }
