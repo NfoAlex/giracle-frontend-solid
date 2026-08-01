@@ -31,7 +31,7 @@ export default function WSMessageDeleted(dat: {
           history: newHistory,
         },
       };
-    } catch (e) {
+    } catch (_) {
       return prev;
     }
   });

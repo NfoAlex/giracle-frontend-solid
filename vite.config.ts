@@ -11,7 +11,7 @@ console.log(
 
 //.envの変数、説明については.env.sampleファイル参照
 const apiURI = process.env.VITE_CORS_ORIGIN || "http://localhost:3000";
-const prodPort: number = parseInt(process.env.VITE_PROD_PORT || "4173");
+const prodPort: number = parseInt(process.env.VITE_PROD_PORT || "4173", 10);
 const prodDomain: string[] = [process.env.VITE_PROD_DOMAIN || ""];
 
 export default defineConfig({

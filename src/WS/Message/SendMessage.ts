@@ -6,7 +6,6 @@ import {
   isChannelMuted,
   storeNotificationConfig,
 } from "~/stores/Notification.ts";
-import { setStoreMessageReadTime } from "~/stores/Readtime";
 import type { IMessage } from "~/types/Message.ts";
 import { notifyIt } from "~/utils/Notify.ts";
 import UpdateReadTimeOnRemoteAndStore from "~/utils/UpdateReadTimeOnRemoteAndStore.util";

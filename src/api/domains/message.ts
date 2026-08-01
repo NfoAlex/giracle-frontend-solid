@@ -63,7 +63,7 @@ export const message = {
 
   get: (p: { messageId: string }) =>
     FETCH_CLIENT<{ message: "Fetched message"; data: IMessage }>({
-      url: "/api/message/" + p.messageId,
+      url: `/api/message/${p.messageId}`,
       method: "GET",
       label: "MESSAGE_GET",
     }),
