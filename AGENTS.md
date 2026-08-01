@@ -28,6 +28,8 @@ pnpm dev-host       # LAN 公開で開発サーバー
 pnpm build          # 本番ビルド（dist/）
 pnpm serve          # ビルド結果のプレビュー
 npx tsc --noEmit --skipLibCheck   # 型チェック（専用スクリプトは無い）
+npx biome check .                 # lint + format チェック（専用スクリプトは無い）
+npx biome check --write .         # lint + format 自動修正
 ```
 
 型チェックの注意（2026-07 時点）:
@@ -36,7 +38,7 @@ npx tsc --noEmit --skipLibCheck   # 型チェック（専用スクリプトは�
 - `--skipLibCheck` を付けても **src 配下に約 20 件の既存型エラーがある**（`src/routes/channel/[id].tsx`、`src/WS/Message/ReadTimeUpdate.ts`、`ChannelTextInput` 周辺など）。「エラー 0 件」を合格基準にしないこと。**変更前後でエラー件数・内容を比較し、自分の変更で新規エラーを増やしていないこと**を確認基準にする。
 
 - テストは存在しない。テストランナーも未導入。
-- Lint 設定ファイルは無いが、コード中に `biome-ignore` コメントがあるため Biome の流儀を壊さないこと。
+- Lint/format は Biome（[biome.json](biome.json)）。対象 `**/*.ts`（`src/components/ui` 除外）。ダブルクォート・スペース2幅・行幅80・import 自動整理（`organizeImports`）。`biome-ignore` コメントで個別除外可。npm script 未定義のため `npx biome check .` / `npx biome check --write .` を直接叩く。
 
 ## 環境変数
 
@@ -97,6 +99,7 @@ npx tsc --noEmit --skipLibCheck   # 型チェック（専用スクリプトは�
 ## 変更時の確認手順
 
 1. `npx tsc --noEmit --skipLibCheck` で**自分の変更が新規の型エラーを増やしていない**ことを確認（テストが無いため型チェックが最重要の安全網。ただし既存エラーが約 20 件あるため 0 件は基準にできない。「コマンド」節の注意参照）。
+   `npx biome check .` で lint/format 違反も確認（`--write` で自動修正可）。
 2. UI 変更はバックエンドを起動した上で `pnpm dev` → `http://localhost:3333` で動作確認。
 3. PWA / Service Worker 関連の変更は `dev-dist/` が生成される（gitignore 済み）。SW の挙動はブラウザの DevTools → Application で確認。
 4. ビルドが通るか `pnpm build` で確認。
