@@ -36,7 +36,11 @@ Giracle フロントエンド（SolidJS）テスト導入用 全コンテキス�
 
 `package.json` = vite `^8.2.0` / typescript `^7.0.2` と かなり新しい。
 Vitest は Vite メジャーに peer 依存 → `pnpm add -D vitest@latest` 後、peer warning 出たら Vitest 側 対応 Vite バージョン確認。
+Vite 8 対応 = Vitest 4.1 以降。3系混入時（lockfile 都合等）は peer エラー → `vitest@^4.1` 明示指定。
 **このファイルにバージョン固定値を書かない理由 = この不整合回避。**
+
+vite-plugin-solid 側 既知バグあり: 一部バージョンで `config.resolve.conditions is not iterable` 落ち（spread 元 undefined チェック漏れ）。
+§2-8 手順1 実行時 いきなり落ちたら vite-plugin-solid バージョン疑う。
 
 ---
 
@@ -80,6 +84,13 @@ export default defineConfig({
     // vite-plugin-solid をテストで動かすのに必須
     conditions: ["development", "browser"],
   },
+  // Vitest 既定 = node 環境でモジュール解決 → jsdom 環境下でも実際に効くのは ssr.resolve.conditions 側。
+  // ここが無いと vite-plugin-solid が SSR ビルドを解決 → リアクティビティ壊れる（resolve.conditions だけでは不十分）
+  ssr: {
+    resolve: {
+      conditions: ["browser"],
+    },
+  },
   test: {
     environment: "jsdom",
     globals: true,
@@ -105,6 +116,7 @@ export default defineConfig({
 重要ポイント:
 
 - `resolve.conditions: ["development", "browser"]` — **無いと Solid のリアクティビティがテスト内で壊れる**。vite-plugin-solid 必須設定
+- `ssr.resolve.conditions: ["browser"]` — **これも必須。片方だけだと同じ症状で壊れる**。Vitest 既定は node 環境扱い → jsdom 指定時も内部的に ssr 解決パス通る。vite-plugin-solid アップデートで options.ssr 時に browser 条件を注入しなくなった経緯あり → 両方書かないと再発
 - `alias` キー = `~/`（末尾スラッシュ付き）。本体 vite.config と同形。値は絶対パス（`"/src/"` でも動くが Vitest 側 root 解決依存 → 絶対パスが確実）
 - `globals: true` — `@solidjs/testing-library` が afterEach で自動 cleanup を登録するための条件。ただし §2-3 の setup.ts で `cleanup()` を明示的に呼んでいるため保険（cleanup は冪等なので二重呼び出しでも安全）。`describe`/`it`/`expect` は **明示 import する方針**（Biome organizeImports と相性良、出所が読んで分かる）→ globals はテスト記述側では使わない
 - `define.__VERSION__` — 忘れると `__VERSION__` 参照コンポーネントのテスト 落ちる
