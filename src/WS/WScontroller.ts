@@ -54,6 +54,8 @@ export const initWS = async () => {
       //トークンが無効な場合のフラグ設定
       if (json.signal === "ERROR" && json.data === "token not valid") {
         FLAGwsError = true;
+        //認証状態を無効化して AuthGuard による /auth へのリダイレクトを促す
+        storeAppStatus.loggedIn = false;
       }
 
       switch (json.signal) {
