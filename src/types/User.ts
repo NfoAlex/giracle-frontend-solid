@@ -10,11 +10,6 @@ export interface IResponseUserinfo {
   data: IUser;
 }
 
-export interface IResponseUserList {
-  message: string;
-  data: IUser[];
-}
-
 export interface IUser {
   id: string;
   name: string;
