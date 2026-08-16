@@ -72,7 +72,7 @@ export function AppSidebar() {
             </SidebarMenuButton>
             <SidebarMenuButton as={A} href="/app/members" variant={loc.pathname === "/app/members" ? "outline" : "default"}>
               <IconUser />
-              メンバー一覧
+              メンバーリスト
             </SidebarMenuButton>
             <SidebarMenuButton as={A} href="/app/search" variant={loc.pathname === "/app/search" ? "outline" : "default"}>
               <IconSearch />
