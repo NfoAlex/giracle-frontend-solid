@@ -1,4 +1,4 @@
-import { IconCircleFilled, IconReload } from "@tabler/icons-solidjs";
+import { IconCircleFilled, IconReload, IconSearch } from "@tabler/icons-solidjs";
 import { useSearchParams } from "@solidjs/router";
 import { createMemo, createSignal, For, onMount, Show } from "solid-js";
 import { api } from "~/api/index.ts";
@@ -40,6 +40,7 @@ export default function Members() {
       const r = await api.user.list({
         length: PAGE_LENGTH,
         cursorUserId: cursorUserId(),
+        username: query().trim() || undefined,
       });
 
       // 詳細モーダル表示用にユーザー情報をStoreへ格納
@@ -64,17 +65,11 @@ export default function Members() {
     fetchUsers();
   });
 
-  // クライアント側で名前検索とオンラインフィルター
+  // オンラインのみ表示フィルター（クライアント側）
   const filteredUsers = createMemo(() => {
-    const q = query().trim().toLowerCase();
+    if (!onlineOnly()) return users();
 
-    const nameMatched = q
-      ? users().filter((user) => user.name.toLowerCase().includes(q))
-      : users();
-
-    if (!onlineOnly()) return nameMatched;
-
-    return nameMatched.filter((user) => storeUserOnline.includes(user.id));
+    return users().filter((user) => storeUserOnline.includes(user.id));
   });
 
   return (
@@ -97,11 +92,29 @@ export default function Members() {
       </Card>
 
       <TextField class="shrink-0">
-        <TextFieldInput
-          placeholder="ユーザー名で検索"
-          value={query()}
-          onInput={(e) => setQuery(e.currentTarget.value)}
-        />
+        <span class="flex items-center gap-2">
+          <TextFieldInput
+            placeholder="ユーザー名で検索"
+            value={query()}
+            onInput={(e) => setQuery(e.currentTarget.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                setCursorUserId(undefined);
+                fetchUsers();
+              }
+            }}
+          />
+          <Button
+            onClick={() => {
+              setCursorUserId(undefined);
+              fetchUsers();
+            }}
+            size="icon"
+            class="shrink-0"
+          >
+            <IconSearch />
+          </Button>
+        </span>
       </TextField>
 
       <Switch
