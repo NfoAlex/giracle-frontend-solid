@@ -80,7 +80,14 @@ export const user = {
       label: "USER_INFO",
     }),
 
-  list: (p: { length?: number; cursorUserId?: string, username?: string, joinedChannel?: string }) =>
+  list: (
+    p: {
+      length?: number;
+      cursorUserId?: string,
+      username?: string,
+      joinedChannel?: string
+    }
+  ) =>
     FETCH_CLIENT<{
       message: "",
       data: IUser[]
