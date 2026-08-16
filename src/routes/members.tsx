@@ -1,10 +1,12 @@
 import { IconCircleFilled, IconReload } from "@tabler/icons-solidjs";
+import { useSearchParams } from "@solidjs/router";
 import { createMemo, createSignal, For, onMount, Show } from "solid-js";
 import { api } from "~/api/index.ts";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar.tsx";
 import { Badge } from "~/components/ui/badge.tsx";
 import { Button } from "~/components/ui/button.tsx";
 import { Card } from "~/components/ui/card.tsx";
+import { Switch, SwitchControl, SwitchLabel, SwitchThumb } from "~/components/ui/switch.tsx";
 import { TextField, TextFieldInput } from "~/components/ui/text-field.tsx";
 import RoleChip from "~/components/unique/RoleChip.tsx";
 import SidebarTriggerWithDot from "~/components/unique/SidebarTriggerWithDot.tsx";
@@ -21,6 +23,10 @@ export default function Members() {
   const [hasMore, setHasMore] = createSignal(false);
   const [processing, setProcessing] = createSignal(false);
   const [query, setQuery] = createSignal("");
+
+  // URLクエリ（?online=1）でオンラインのみ表示のフィルター状態を保持する
+  const [searchParams, setSearchParams] = useSearchParams();
+  const onlineOnly = () => searchParams.online === "1";
 
   /**
    * ユーザー一覧を取得する
@@ -58,12 +64,17 @@ export default function Members() {
     fetchUsers();
   });
 
-  // クライアント側で名前検索
+  // クライアント側で名前検索とオンラインフィルター
   const filteredUsers = createMemo(() => {
     const q = query().trim().toLowerCase();
-    if (!q) return users();
 
-    return users().filter((user) => user.name.toLowerCase().includes(q));
+    const nameMatched = q
+      ? users().filter((user) => user.name.toLowerCase().includes(q))
+      : users();
+
+    if (!onlineOnly()) return nameMatched;
+
+    return nameMatched.filter((user) => storeUserOnline.includes(user.id));
   });
 
   return (
@@ -92,6 +103,19 @@ export default function Members() {
           onInput={(e) => setQuery(e.currentTarget.value)}
         />
       </TextField>
+
+      <Switch
+        class="flex items-center gap-2 shrink-0"
+        checked={onlineOnly()}
+        onChange={(checked) =>
+          setSearchParams({ online: checked ? "1" : undefined })
+        }
+      >
+        <SwitchControl>
+          <SwitchThumb />
+        </SwitchControl>
+        <SwitchLabel>オンラインユーザーのみ表示</SwitchLabel>
+      </Switch>
 
       <div class="grow overflow-y-auto flex flex-col gap-1 pb-2">
         <Show when={processing() && users().length === 0}>
