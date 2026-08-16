@@ -41,7 +41,7 @@ export function AppSidebar() {
           {
             storeAppStatus.wsConnected ?
               <span class={"w-full"}>
-                <A href="/app/online-user">
+                <A href="/app/members?online=1">
                   <Badge variant={"secondary"} class={"w-full flex items-center px-3 py-2"}>
                     <p class="font-bold">オンラインユーザー : </p>
                     <span class={"ml-auto flex items-center gap-1"}>
