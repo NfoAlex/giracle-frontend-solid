@@ -15,7 +15,7 @@ import { storeUserOnline } from "~/stores/Userinfo.ts";
 import { storeServerinfo } from "~/stores/Serverinfo.ts";
 import { Avatar, AvatarImage } from "./ui/avatar.tsx";
 import { storeAppStatus } from "~/stores/AppStatus.ts";
-import { IconBell, IconCircleFilled, IconDatabaseCog, IconList, IconSearch, IconSettings } from "@tabler/icons-solidjs";
+import { IconBell, IconCircleFilled, IconDatabaseCog, IconList, IconSearch, IconSettings, IconUser } from "@tabler/icons-solidjs";
 import {storeInbox} from "~/stores/Inbox.ts";
 import {Badge} from "~/components/ui/badge.tsx";
 import ChannelButtons from "./Sidebar/ChannelButtons.tsx";
@@ -41,7 +41,7 @@ export function AppSidebar() {
           {
             storeAppStatus.wsConnected ?
               <span class={"w-full"}>
-                <A href="/app/online-user">
+                <A href="/app/members?online=1">
                   <Badge variant={"secondary"} class={"w-full flex items-center px-3 py-2"}>
                     <p class="font-bold">オンラインユーザー : </p>
                     <span class={"ml-auto flex items-center gap-1"}>
@@ -69,6 +69,10 @@ export function AppSidebar() {
             <SidebarMenuButton as={A} href="/app/channel-browser" variant={loc.pathname === "/app/channel-browser" ? "outline" : "default"}>
               <IconList />
               チャンネル一覧
+            </SidebarMenuButton>
+            <SidebarMenuButton as={A} href="/app/members" variant={loc.pathname === "/app/members" ? "outline" : "default"}>
+              <IconUser />
+              メンバーリスト
             </SidebarMenuButton>
             <SidebarMenuButton as={A} href="/app/search" variant={loc.pathname === "/app/search" ? "outline" : "default"}>
               <IconSearch />

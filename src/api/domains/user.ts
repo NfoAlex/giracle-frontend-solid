@@ -80,6 +80,29 @@ export const user = {
       label: "USER_INFO",
     }),
 
+  list: (
+    p: {
+      length?: number;
+      cursorUserId?: string,
+      username?: string,
+      joinedChannel?: string
+    }
+  ) =>
+    FETCH_CLIENT<{
+      message: "",
+      data: IUser[]
+    }>({
+      url: `/api/user/list`,
+      method: "GET",
+      label: "USER_LIST",
+      query: {
+        length: p.length,
+        cursorUserId: p.cursorUserId,
+        username: p.username,
+        joinedChannel: p.joinedChannel
+      },
+    }),
+
   login: (p: { username: string; password: string }) =>
     FETCH_CLIENT<{
       message: `Signed in as ${string}`;
