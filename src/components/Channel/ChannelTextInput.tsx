@@ -132,7 +132,7 @@ export default function ChannelTextInput() {
    * @param query
    */
   const searchUser = (query: string) => {
-    api.user.search({ username: query, channelId: params.channelId })
+    api.user.list({ username: query, joinedChannel: params.channelId })
       .then((r) => {
         setUserSearchResult(r.data);
         //console.log("GET_USER_SEARCH :: r->", r);
