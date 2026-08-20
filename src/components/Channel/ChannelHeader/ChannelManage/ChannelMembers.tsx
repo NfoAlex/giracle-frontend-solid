@@ -14,14 +14,14 @@ import { getRolePower, storeMyUserinfo } from "~/stores/MyUserinfo.ts";
 export default function ChannelMembers(props: {channelId: string}) {
   const [users, setUsers] = createSignal<IUser[]>([]);
   const [searchQuery, setSearchQuery] = createSignal<string>("");
-  const [cursor, setCursor] = createSignal<number>(0);
+  const [cursorUserId, setCursorUserId] = createSignal<IUser["id"] | undefined>(undefined);
 
   // ユーザー一覧を取得、オプションで挿入か格納かを選択
   const fetchUsers = async (optionInsert = false) => {
-    api.user.search({
+    api.user.list({
       username: searchQuery(),
-      channelId: props.channelId,
-      cursor: cursor(),
+      joinedChannel: props.channelId,
+      cursorUserId: cursorUserId(),
     })
     .then((r) => {
       console.log(r);
@@ -31,13 +31,19 @@ export default function ChannelMembers(props: {channelId: string}) {
       } else {
         setUsers(r.data);
       }
+
+      if (r.data.length >= 30) {
+        setCursorUserId(r.data.at(-1)?.id);
+      } else {
+        setCursorUserId(undefined);
+      }
     })
     .catch((e) => console.error("ChannelMembers :: fetchUsers : e", e));
   };
 
   /**
    * ユーザーをチャンネルからキック
-   * @param userId 
+   * @param userId
    */
   const kickIt = (userId: string) => {
     api.channel.kick({ userId, channelId: props.channelId })
@@ -55,7 +61,7 @@ export default function ChannelMembers(props: {channelId: string}) {
   onMount(() => {
     fetchUsers();
   });
-  
+
   return (
     <div class="max-h-[400px] flex flex-col gap-3 mt-2">
 
@@ -108,9 +114,9 @@ export default function ChannelMembers(props: {channelId: string}) {
           }
         </For>
 
-        <Show when={users().length === cursor() * 30 + 30}>
+        <Show when={cursorUserId() !== undefined}>
           <Button
-            onClick={() => { setCursor(((c) => c+1)); fetchUsers(true); } }
+            onClick={() => fetchUsers(true) }
             class="w-full mt-2"
             variant={"secondary"}
           >さらに読み込む</Button>

@@ -13,9 +13,9 @@ import { IUser } from "~/types/User.ts";
 export default function InviteUserModal(props: { channelId: string, onInvite?: (user: IUser) => void }) {
   const [searchQuery, setSearchQuery] = createSignal("");
   const [userList, setUserList] = createSignal<IUser[]>([]);
-  const [cursor, setCursor] = createSignal<number>(0);
+  const [cursorUserId, setCursorUserId] = createSignal<IUser["id"] | undefined>(undefined);
   const [status, setStatus] = createSignal<"waiting"|"success"|"fail">("waiting");
-  
+
   //招待時の結果、状態管理
   const inviteJson = createMutable({
     processing: false,
@@ -27,13 +27,23 @@ export default function InviteUserModal(props: { channelId: string, onInvite?: (
    * @param optionInsert 結果に追加挿入する形で検索するかどうか（cursorを進めて検索）
    */
   const searchIt = (optionInsert = false) => {
-    api.user.search({ username: searchQuery(), channelId: "", cursor: cursor() })
+    api.user.list({
+      username: searchQuery(),
+      cursorUserId: cursorUserId()
+    })
       .then((r) => {
         setStatus("success");
         if (optionInsert) {
           setUserList((u) => [...u, ...r.data]);
         } else {
           setUserList(r.data);
+        }
+
+        //取得個数がデフォルトの個数(30)と一緒ならカーソル設定
+        if (r.data.length >= 30) {
+          setCursorUserId(r.data.at(-1)?.id);
+        } else {
+          setCursorUserId(undefined);
         }
       })
       .catch((e) => {
@@ -44,7 +54,7 @@ export default function InviteUserModal(props: { channelId: string, onInvite?: (
 
   /**
    * ユーザーをチャンネルへ招待する
-   * @param userId 
+   * @param userId
    */
   const inviteIt = (user: IUser) => {
     //招待中のユーザーIDと処理中状態をセット
@@ -135,9 +145,9 @@ export default function InviteUserModal(props: { channelId: string, onInvite?: (
           }
         </For>
 
-        <Show when={userList().length === cursor() * 30 + 30}>
+        <Show when={cursorUserId() !== undefined && userList().length !== 0}>
           <Button
-            onClick={() => { setCursor(((c) => c+1)); searchIt(true); } }
+            onClick={() => searchIt(true) }
             class="w-full mt-2"
             variant={"secondary"}
           >さらに読み込む</Button>
