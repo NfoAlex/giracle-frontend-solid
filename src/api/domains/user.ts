@@ -154,13 +154,6 @@ export const user = {
       label: "AUTH_REGISTER",
     }),
 
-  search: (p: { username: string; channelId: string; cursor?: number }) =>
-    FETCH_CLIENT<{ message: "User search result"; data: IUser[] }>({
-      url: `/api/user/search?username=${p.username}&joinedChannel=${p.channelId}&cursor=${p.cursor ?? 0}`,
-      method: "GET",
-      label: "USER_SEARCH",
-    }),
-
   unban: (p: { userId: string }) =>
     FETCH_CLIENT<{ message: `User unbanned`; data: string }>({
       url: "/api/user/unban",
