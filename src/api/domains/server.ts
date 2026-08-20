@@ -65,11 +65,11 @@ export const server = {
     return res.json();
   },
 
-  createInvite: (p: { inviteCode: string; expireDate?: Date }) =>
+  createInvite: (p: { inviteCode: string; maxUsage?: number }) =>
     FETCH_CLIENT<{ message: "Server invite created"; data: IInvite }>({
       url: "/api/server/create-invite",
       method: "PUT",
-      body: { inviteCode: p.inviteCode, expireDate: p.expireDate },
+      body: { inviteCode: p.inviteCode, maxUsage: p.maxUsage },
       label: "SERVER_CREATE_INVITE",
     }),
 
