@@ -34,7 +34,7 @@
     "clsx": "^2.1.1",
     "dotenv": "^17.4.2",
     "emoji-picker-element": "^1.29.1",
-    "solid-js": "^1.9.14",
+    "solid-js": "^1.9.15",
     "sortablejs": "^1.15.7",
     "tailwind-merge": "^3.6.0",
     "tailwindcss-animate": "^1.0.7",
