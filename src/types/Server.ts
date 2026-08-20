@@ -17,4 +17,5 @@ export interface IInvite {
   isActive: boolean;
   createdUserId: string;
   usedCount: number;
+  maxUsage: number;
 }

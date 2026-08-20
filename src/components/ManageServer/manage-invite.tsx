@@ -36,6 +36,14 @@ export default function ManageInvite() {
       header: "招待コード",
     },
     {
+      accessorKey: "maxUsage",
+      id: "maxUsage",
+      header: "上限",
+      cell: (props) => (
+        <span>{props.getValue() === -1 ? "無限" : (props.renderValue() as number)}</span>
+      ),
+    },
+    {
       accessorKey: "usedCount",
       id: "usedCount",
       header: "使用回数",
@@ -55,9 +63,9 @@ export default function ManageInvite() {
 
   /**
    * 招待に対し操作されたあとにリストを再取得する
-   * @param dat 
+   * @param _dat
    */
-  const inviteActionTaken = (dat: IInvite) => {
+  const inviteActionTaken = (_dat: IInvite) => {
     //console.log("ManageInvite :: sig : dat->", dat);
 
     fetchInvites();
