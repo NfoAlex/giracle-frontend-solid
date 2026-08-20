@@ -18,10 +18,13 @@ export default function ChannelMembers(props: {channelId: string}) {
 
   // ユーザー一覧を取得、オプションで挿入か格納かを選択
   const fetchUsers = async (optionInsert = false) => {
+    // 新規検索時はカーソルをリセット（古いカーソルで先頭が欠損するのを防ぐ）
+    const cursor = optionInsert ? cursorUserId() : undefined;
+    if (!optionInsert) setCursorUserId(undefined);
     api.user.list({
       username: searchQuery(),
       joinedChannel: props.channelId,
-      cursorUserId: cursorUserId(),
+      cursorUserId: cursor,
     })
     .then((r) => {
       console.log(r);

@@ -27,9 +27,12 @@ export default function InviteUserModal(props: { channelId: string, onInvite?: (
    * @param optionInsert 結果に追加挿入する形で検索するかどうか（cursorを進めて検索）
    */
   const searchIt = (optionInsert = false) => {
+    // 新規検索時はカーソルをリセット（古いカーソルで先頭が欠損するのを防ぐ）
+    const cursor = optionInsert ? cursorUserId() : undefined;
+    if (!optionInsert) setCursorUserId(undefined);
     api.user.list({
       username: searchQuery(),
-      cursorUserId: cursorUserId()
+      cursorUserId: cursor
     })
       .then((r) => {
         setStatus("success");
