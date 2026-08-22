@@ -14,6 +14,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "~/components/ui/popover
 import type { IRole } from "~/types/Role.ts";
 import { storeRoleInfo } from "~/stores/RoleInfo.ts";
 import { api } from "~/api/index.ts";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 
 export default function UserinfoModalWrapper(props: { children: JSX.Element, userId: string, class?: string }) {
   const [user] = createSignal(getterUserinfo(props.userId));
@@ -113,70 +114,83 @@ export default function UserinfoModalWrapper(props: { children: JSX.Element, use
               }
             </span>
 
-            {/* 自己紹介 */}
-            <div>
-              <Label>自己紹介</Label>
-              <Card class="px-4 py-2">{storeUserinfo[user().id].selfIntroduction}</Card>
-            </div>
+            {/* タブ */}
+            <Tabs defaultValue="overview">
+              <TabsList class="w-full">
+                <TabsTrigger value="overview">概要</TabsTrigger>
+                <Show when={getRolePower("manageUser")}>
+                  <TabsTrigger value="manage">管理</TabsTrigger>
+                </Show>
+              </TabsList>
 
-            {/* ロール */}
-            <div>
-              <Label>ロール</Label>
-              <div class="flex flex-wrap gap-1">
-                <For each={storeUserinfo[user().id].RoleLink}>
-                  {(role) =>
-                    <RoleChip
-                      deletable={getRolePower("manageRole")}
-                      roleId={role.roleId}
-                      userId={props.userId}
-                      onDelete={(roleId) => unlinkRole(roleId)}
-                    />
-                  }
-                </For>
-              </div>
-              <Show when={getRolePower("manageRole")}>
-                {/* ロール追加ボタン */}
-                <Popover onOpenChange={setOpenRoleList}>
-                  <PopoverTrigger>
-                    <Badge
-                      variant={"outline"}
-                      class="cursor-pointer h-full mt-1"
-                    >
-                      <IconPlus size={16} />
-                    </Badge>
-                  </PopoverTrigger>
-                  <PopoverContent class="w-fit">
-                    <div class="max-h-[25vh] max-w-[75vw] overflow-y-auto flex flex-col gap-1">
-                      <For each={roles}>
-                        {(role) => //ロールリンクされていないものだけ表示
-                          !storeUserinfo[user().id].RoleLink.some((rl) => rl.roleId === role.id)
-                          &&
-                          <span onclick={() => linkRole(role.id)} class="cursor-pointer pr-2">
-                            <RoleChip deletable={false} roleId={role.id} />
-                          </span>
-                        }
-                      </For>
-                    </div>
-                  </PopoverContent>
-                </Popover>
-              </Show>
-            </div>
+              {/* 概要 */}
+              <TabsContent value="overview" class="flex flex-col gap-2">
+                {/* 自己紹介 */}
+                <div>
+                  <Label>自己紹介</Label>
+                  <Card class="px-4 py-2">{storeUserinfo[user().id].selfIntroduction}</Card>
+                </div>
 
-            {/* 管理 */}
-            <Show when={getRolePower("manageUser")}>
-              <div>
-                <Label>管理</Label>
-                <Card class="p-2 flex flex-col gap-1">
-                  {
-                    !storeUserinfo[user().id].isBanned ?
-                      <Button ondblclick={() => controlBanState(true)} class={"w-full"} variant={"destructive"}>BANする</Button>
-                      :
-                      <Button ondblclick={() => controlBanState(false)} class={"w-full"} variant={"default"}>BANを解除する</Button>
-                  }
-                  <Label class={"text-border"}>ダブルクリックで操作</Label>
-                </Card>
-              </div>
-            </Show>
+                {/* ロール */}
+                <div>
+                  <Label>ロール</Label>
+                  <div class="flex flex-wrap gap-1">
+                    <For each={storeUserinfo[user().id].RoleLink}>
+                      {(role) =>
+                        <RoleChip
+                          deletable={getRolePower("manageRole")}
+                          roleId={role.roleId}
+                          userId={props.userId}
+                          onDelete={(roleId) => unlinkRole(roleId)}
+                        />
+                      }
+                    </For>
+                  </div>
+                  <Show when={getRolePower("manageRole")}>
+                    {/* ロール追加ボタン */}
+                    <Popover onOpenChange={setOpenRoleList}>
+                      <PopoverTrigger>
+                        <Badge
+                          variant={"outline"}
+                          class="cursor-pointer h-full mt-1"
+                        >
+                          <IconPlus size={16} />
+                        </Badge>
+                      </PopoverTrigger>
+                      <PopoverContent class="w-fit">
+                        <div class="max-h-[25vh] max-w-[75vw] overflow-y-auto flex flex-col gap-1">
+                          <For each={roles}>
+                            {(role) => //ロールリンクされていないものだけ表示
+                              !storeUserinfo[user().id].RoleLink.some((rl) => rl.roleId === role.id)
+                              &&
+                              <span onclick={() => linkRole(role.id)} class="cursor-pointer pr-2">
+                                <RoleChip deletable={false} roleId={role.id} />
+                              </span>
+                            }
+                          </For>
+                        </div>
+                      </PopoverContent>
+                    </Popover>
+                  </Show>
+                </div>
+              </TabsContent>
+
+              {/* 管理 */}
+              <TabsContent value="manage" class="flex flex-col gap-2">
+                <div>
+                  <Label>管理</Label>
+                  <Card class="p-2 flex flex-col gap-1">
+                    {
+                      !storeUserinfo[user().id].isBanned ?
+                        <Button ondblclick={() => controlBanState(true)} class={"w-full"} variant={"destructive"}>BANする</Button>
+                        :
+                        <Button ondblclick={() => controlBanState(false)} class={"w-full"} variant={"default"}>BANを解除する</Button>
+                    }
+                    <Label class={"text-border"}>ダブルクリックで操作</Label>
+                  </Card>
+                </div>
+              </TabsContent>
+            </Tabs>
           </div>
         </Show>
       </DialogContent>
