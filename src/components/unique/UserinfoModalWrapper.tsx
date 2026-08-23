@@ -116,12 +116,12 @@ export default function UserinfoModalWrapper(props: { children: JSX.Element, use
 
             {/* タブ */}
             <Tabs defaultValue="overview">
-              <TabsList class="w-full">
-                <TabsTrigger value="overview">概要</TabsTrigger>
-                <Show when={getRolePower("manageUser")}>
-                  <TabsTrigger value="manage">管理</TabsTrigger>
-                </Show>
-              </TabsList>
+              <Show when={getRolePower("manageUser")}>
+                <TabsList class="w-full">
+                  <TabsTrigger value="overview" class="w-full">概要</TabsTrigger>
+                  <TabsTrigger value="manage" class="w-full">管理</TabsTrigger>
+                </TabsList>
+              </Show>
 
               {/* 概要 */}
               <TabsContent value="overview" class="flex flex-col gap-2">
@@ -176,19 +176,16 @@ export default function UserinfoModalWrapper(props: { children: JSX.Element, use
               </TabsContent>
 
               {/* 管理 */}
-              <TabsContent value="manage" class="flex flex-col gap-2">
-                <div>
-                  <Label>管理</Label>
-                  <Card class="p-2 flex flex-col gap-1">
-                    {
-                      !storeUserinfo[user().id].isBanned ?
-                        <Button ondblclick={() => controlBanState(true)} class={"w-full"} variant={"destructive"}>BANする</Button>
-                        :
-                        <Button ondblclick={() => controlBanState(false)} class={"w-full"} variant={"default"}>BANを解除する</Button>
-                    }
-                    <Label class={"text-border"}>ダブルクリックで操作</Label>
-                  </Card>
-                </div>
+              <TabsContent value="manage">
+                <Card class="p-2 flex flex-col gap-1">
+                  {
+                    !storeUserinfo[user().id].isBanned ?
+                      <Button ondblclick={() => controlBanState(true)} class={"w-full"} variant={"destructive"}>BANする</Button>
+                      :
+                      <Button ondblclick={() => controlBanState(false)} class={"w-full"} variant={"default"}>BANを解除する</Button>
+                  }
+                  <Label class={"text-border"}>ダブルクリックで操作</Label>
+                </Card>
               </TabsContent>
             </Tabs>
           </div>
