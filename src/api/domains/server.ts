@@ -115,4 +115,29 @@ export const server = {
       method: "GET",
       label: "SERVER_GET_INVITE",
     }),
+
+  getLogs: (p: {
+    type?: "success" | "error";
+    userId?: string;
+    cursorLogDate?: Date;
+  }) =>
+    FETCH_CLIENT<
+      {
+        date: string;
+        successCount: number;
+        errorCount: number;
+        otherCount: number;
+      }[]
+    >({
+      url: "/api/server/log",
+      method: "GET",
+      label: "SERVER_GET_LOGS",
+      query: {
+        type: p.type,
+        userId: p.userId,
+        cursorLogDate: p.cursorLogDate
+          ? new Date(p.cursorLogDate).toISOString()
+          : undefined,
+      },
+    }),
 };
