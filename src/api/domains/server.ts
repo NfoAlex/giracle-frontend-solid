@@ -121,14 +121,18 @@ export const server = {
     userId?: string;
     cursorLogDate?: Date;
   }) =>
-    FETCH_CLIENT<
-      {
+    // バックエンドは { message, data: LogEntry[] } を返す想定。
+    // （旧実装は裸配列を想定していたが、他エンドポイントと同様のラップ形式に統一）
+    // 裸配列が返る場合は呼び出し側（manage-logs）の Array.isArray 分岐で吸収する。
+    FETCH_CLIENT<{
+      message: string;
+      data: {
         date: string;
         successCount: number;
         errorCount: number;
         otherCount: number;
-      }[]
-    >({
+      }[];
+    }>({
       url: "/api/server/log",
       method: "GET",
       label: "SERVER_GET_LOGS",

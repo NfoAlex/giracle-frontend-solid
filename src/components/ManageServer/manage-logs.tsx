@@ -22,6 +22,8 @@ type FilterType = "all" | "success" | "error";
 const PAGE_LIMIT_HINT = 20;
 
 export default function ManageLogs() {
+  // リクエストID: 連続リクエストの古い応答を破棄する（後勝ちレース防止）
+  let requestId = 0;
   const [logs, setLogs] = createSignal<LogEntry[]>([]);
   const [filterType, setFilterType] = createSignal<FilterType>("all");
   const [filterUserId, setFilterUserId] = createSignal("");
@@ -43,6 +45,7 @@ export default function ManageLogs() {
 
   const fetchLogs = async (mode: "reset" | "more") => {
     const isMore = mode === "more";
+    const currentRequestId = ++requestId;
     if (isMore) setLoadingMore(true);
     else setLoading(true);
     setError(null);
@@ -59,6 +62,8 @@ export default function ManageLogs() {
         cursorLogDate: cursor,
       });
       const data = (Array.isArray(res) ? res : (res as { data: LogEntry[] }).data ?? []) as LogEntry[];
+      // 古い応答（最新でないリクエストID）は破棄
+      if (currentRequestId !== requestId) return;
       if (isMore) {
         if (data.length === 0) setHasMore(false);
         else setLogs((prev) => [...prev, ...data]);
@@ -66,20 +71,16 @@ export default function ManageLogs() {
         if (data.length < PAGE_LIMIT_HINT) setHasMore(false);
       } else {
         setLogs(data);
-        setHasMore(data.length >= PAGE_LIMIT_HINT || data.length > 0);
-        // 空なら終端
-        if (data.length === 0) setHasMore(false);
-        // 少ない場合でも続きがある可能性はあるため hasMore は維持するが、
-        // 明確に0件なら false。厳密なページング情報がないため楽観的に true のまま
-        if (data.length > 0 && data.length < PAGE_LIMIT_HINT) {
-          // 一旦 true のまま、次回 more で 0件なら止まる
-        }
+        setHasMore(data.length >= PAGE_LIMIT_HINT);
       }
     } catch (e) {
+      if (currentRequestId !== requestId) return;
       setError(e instanceof Error ? e.message : String(e));
     } finally {
-      setLoading(false);
-      setLoadingMore(false);
+      if (currentRequestId === requestId) {
+        setLoading(false);
+        setLoadingMore(false);
+      }
     }
   };
 
@@ -92,8 +93,7 @@ export default function ManageLogs() {
     setFilterType("all");
     setFilterUserId("");
     setHasMore(true);
-    // state更新後に取得
-    setTimeout(() => fetchLogs("reset"), 0);
+    fetchLogs("reset");
   };
 
   onMount(() => fetchLogs("reset"));
