@@ -1,11 +1,12 @@
+import { IconSearch, IconX } from "@tabler/icons-solidjs";
 import { createSignal, For, onMount, Show } from "solid-js";
 import { api } from "~/api/index.ts";
 import { Badge } from "~/components/ui/badge.tsx";
 import { Button } from "~/components/ui/button.tsx";
 import { Callout } from "~/components/ui/callout.tsx";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card.tsx";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~/components/ui/select.tsx";
 import { Skeleton } from "~/components/ui/skeleton.tsx";
+import { Tabs, TabsList, TabsTrigger } from "~/components/ui/tabs.tsx";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "~/components/ui/table.tsx";
 import { TextField, TextFieldInput } from "~/components/ui/text-field.tsx";
 import { Label } from "~/components/ui/label.tsx";
@@ -84,9 +85,15 @@ export default function ManageLogs() {
     }
   };
 
-  const handleSearch = () => {
+  const applyFilter = () => {
     setHasMore(true);
     fetchLogs("reset");
+  };
+
+  const handleTypeChange = (v: string) => {
+    if (v === filterType()) return;
+    setFilterType(v as FilterType);
+    applyFilter();
   };
 
   const handleReset = () => {
@@ -102,78 +109,73 @@ export default function ManageLogs() {
     <div class="flex flex-col h-full gap-2 overflow-y-auto">
       {/* フィルタ */}
       <Card class="shrink-0">
-        <CardHeader class="pb-3">
+        <CardHeader class="pb-3 flex-row items-center justify-between gap-3 space-y-0">
           <CardTitle class="text-base">リクエストログ</CardTitle>
         </CardHeader>
+
         <CardContent class="flex flex-col gap-3">
           <div class="flex flex-col md:flex-row gap-3 md:items-end">
-            <div class="flex flex-col gap-1 min-w-[160px]">
+            <div class="flex flex-col gap-1">
               <Label>タイプ</Label>
-              <Select
-                value={filterType()}
-                onChange={(v) => v && setFilterType(v as FilterType)}
-                options={["all", "success", "error"] as FilterType[]}
-                itemComponent={(props) => (
-                  <SelectItem item={props.item}>
-                    {props.item.rawValue === "all" && "すべて"}
-                    {props.item.rawValue === "success" && "success"}
-                    {props.item.rawValue === "error" && "error"}
-                  </SelectItem>
-                )}
-              >
-                <SelectTrigger>
-                  <SelectValue<FilterType>>
-                    {(state) => (
-                      <span>
-                        {state.selectedOption() === "all" && "すべて"}
-                        {state.selectedOption() === "success" && "success"}
-                        {state.selectedOption() === "error" && "error"}
-                        {!state.selectedOption() && "すべて"}
-                      </span>
-                    )}
-                  </SelectValue>
-                </SelectTrigger>
-                <SelectContent />
-              </Select>
+              <Tabs value={filterType()} onChange={handleTypeChange} class="w-full">
+                <TabsList class="grid w-full grid-cols-3">
+                  <TabsTrigger value="all">すべて</TabsTrigger>
+                  <TabsTrigger value="success">success</TabsTrigger>
+                  <TabsTrigger value="error">error</TabsTrigger>
+                </TabsList>
+              </Tabs>
             </div>
 
             <TextField class="flex-1 max-w-sm">
               <Label>ユーザーID（任意）</Label>
-              <TextFieldInput
-                type="text"
-                placeholder="userId で絞り込み"
-                value={filterUserId()}
-                onInput={(e) => setFilterUserId(e.currentTarget.value)}
-                onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-              />
+              <div class="relative">
+                <TextFieldInput
+                  type="text"
+                  placeholder="userId で絞り込み"
+                  value={filterUserId()}
+                  onInput={(e) => setFilterUserId(e.currentTarget.value)}
+                  onKeyDown={(e) => e.key === "Enter" && applyFilter()}
+                  class="pr-8"
+                />
+                <Show when={filterUserId()}>
+                  <button
+                    type="button"
+                    aria-label="クリア"
+                    onClick={() => {
+                      setFilterUserId("");
+                      applyFilter();
+                    }}
+                    class="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  >
+                    <IconX class="size-4" />
+                  </button>
+                </Show>
+              </div>
             </TextField>
 
             <div class="flex gap-2 md:ml-auto">
-              <Button onClick={handleSearch} disabled={loading() || loadingMore()}>
+              <Button onClick={applyFilter} disabled={loading() || loadingMore()}>
+                <IconSearch class="size-4 mr-2" />
                 絞り込み
               </Button>
               <Button variant="outline" onClick={handleReset} disabled={loading() || loadingMore()}>
                 リセット
               </Button>
-              <Button variant="outline" onClick={() => fetchLogs("reset")} disabled={loading() || loadingMore()}>
-                再取得
-              </Button>
             </div>
           </div>
-
-          {/* サマリ */}
-          <Show when={!loading() && logs().length > 0}>
-            <div class="flex flex-wrap gap-2 text-sm">
-              <Badge variant="secondary">合計 {logs().length} 日分</Badge>
-              <Badge variant="success">success {totals().success}</Badge>
-              <Badge variant="error">error {totals().error}</Badge>
-              <Badge variant="outline">other {totals().other}</Badge>
-            </div>
-          </Show>
 
           <Show when={error()}>
             <Callout variant="error">{error()}</Callout>
           </Show>
+
+          <hr />
+
+          <div class="flex flex-row items-center justify-around gap-2 text-lg font-bold">
+            <span>合計 {logs().length} 日分</span>
+            <span>通過: <span class="text-success">{totals().success}</span></span>
+            <span>エラー: <span class="text-error">{totals().error}</span></span>
+            <span>その他: <span class="text-warning">{totals().other}</span></span>
+          </div>
         </CardContent>
       </Card>
 
