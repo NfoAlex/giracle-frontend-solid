@@ -95,6 +95,20 @@ export default function ManageLogs() {
 
   return (
     <div class="flex flex-col h-full w-full gap-2 overflow-y-auto">
+      <Card class="p-2">
+        <span>
+          {
+            (() => { //日程範囲表示
+              const dStart = new Date();
+              dStart.setDate(dStart.getDate() - dStart.getDay());
+              const dEnd = new Date();
+              dEnd.setDate(dEnd.getDate() + (6 - dEnd.getDay()));
+              return <span>{dStart.toLocaleDateString()} ~ {dEnd.toLocaleDateString()}</span>
+            })()
+          }
+        </span>
+      </Card>
+
       <Card class="basis-[30%] grow-0 shrink-0 min-h-0 flex flex-col overflow-hidden p-4">
         <div class="w-full h-full grow flex gap-2">
           <div class="h-[90%] shrink-0 flex flex-col justify-between w-10">
