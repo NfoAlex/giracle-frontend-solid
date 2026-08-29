@@ -3,6 +3,7 @@ import { api } from "~/api/index.ts";
 import { Badge } from "~/components/ui/badge.tsx";
 import { Button } from "~/components/ui/button.tsx";
 import { Card } from "~/components/ui/card.tsx";
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "~/components/ui/hover-card.tsx";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "~/components/ui/table.tsx";
 import { IRequestLog, IRequestLogCount } from "~/types/Server";
 import { getterUserinfo } from "~/stores/Userinfo";
@@ -117,8 +118,10 @@ export default function ManageLogs() {
         <Button size={"icon"} variant={"ghost"} onClick={() => moveWeek("forward")}><IconArrowRight /></Button>
       </Card>
 
+      {/* ログ棒グラフ */}
       <Card class="basis-[30%] grow-0 shrink-0 min-h-0 flex flex-col overflow-hidden p-4">
         <div class="w-full h-full grow flex gap-2">
+          {/* グラフの段階表示 */}
           <div class="h-[90%] shrink-0 flex flex-col justify-between w-10">
             <span>{ getCeiling() }</span>
             <span>{ getCeiling() * 0.75 }</span>
@@ -126,6 +129,7 @@ export default function ManageLogs() {
             <span>0</span>
           </div>
 
+          {/* 棒表示 */}
           <div class="grow h-full flex flex-col gap-2">
             <div class="h-[90%] border-l-2 border-b-2 relative flex items-end justify-evenly">
               {
@@ -133,16 +137,30 @@ export default function ManageLogs() {
                   const total = count.errorCount + count.otherCount + count.successCount;
                   const containerHeight = Math.ceil(total / getCeiling() * 100);
                   return (
-                    <div style={`height: ${containerHeight}%`} class="w-14 text-center mt-auto flex flex-col">
-                      { total }
-                      <div class={`bg-green-300`} style={`height: ${count.successCount / total * 100}%`} />
-                      <div class={`bg-error`} style={`height: ${count.errorCount / total * 100}%`} />
-                      <div class={`bg-white`} style={`height: ${count.otherCount / total * 100}%`} />
-                    </div>
+                    <HoverCard openDelay={0}>
+                      <HoverCardTrigger
+                        as="div"
+                        class="w-14 text-center mt-auto flex flex-col"
+                        style={`height: ${containerHeight}%`}
+                      >
+                        { total }
+                        <div class="bg-green-300" style={`height: ${count.successCount / total * 100}%`} />
+                        <div class="bg-error" style={`height: ${count.errorCount / total * 100}%`} />
+                        <div class="bg-white" style={`height: ${count.otherCount / total * 100}%`} />
+                      </HoverCardTrigger>
+                      <HoverCardContent class="w-40 text-sm">
+                        <p class="font-bold">{ new Date(count.date).toLocaleDateString() }</p>
+                        <hr class="my-2" />
+                        <div>成功: <span class="text-success ml-auto">{count.successCount}</span></div>
+                        <div>エラー: <span class="text-error ml-auto">{count.errorCount}</span></div>
+                        <div>その他: <span class="ml-auto">{count.otherCount}</span></div>
+                      </HoverCardContent>
+                    </HoverCard>
                   );
                 })
               }
             </div>
+            {/* 日付表示 */}
             <div class="flex justify-evenly items-center">
               {
                 dailyCount().map((count) => (
@@ -156,6 +174,7 @@ export default function ManageLogs() {
         </div>
       </Card>
 
+      {/* ログ表示 */}
       <Card class="flex-1 min-h-0 flex flex-col">
         <div class="grow overflow-y-auto">
           <Show
