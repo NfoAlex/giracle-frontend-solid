@@ -6,8 +6,7 @@ import { Card } from "~/components/ui/card.tsx";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "~/components/ui/table.tsx";
 import { IRequestLog, IRequestLogCount } from "~/types/Server";
 import { getterUserinfo } from "~/stores/Userinfo";
-
-type FilterType = "all" | "success" | "error";
+import { IconArrowLeft, IconArrowRight } from "@tabler/icons-solidjs";
 
 const LOG_PAGE_SIZE = 50;
 
@@ -19,7 +18,7 @@ export default function ManageLogs() {
   const [loadingMore, setLoadingMore] = createSignal(false);
   const [error, setError] = createSignal<string | null>(null);
   const [hasMore, setHasMore] = createSignal(true);
-  const [targetDate, setTargetDate] = createSignal<Date | null>(null);
+  const [currentPosDate, setCurrentPosDate] = createSignal<Date>(new Date());
 
   const methodVariant = (m: string) =>
     m === "GET" ? "success" : m === "DELETE" ? "error" : m === "POST" ? "warning" : "outline";
@@ -40,9 +39,8 @@ export default function ManageLogs() {
     });
 
     setDailyCount(res.data.group);
-    if (res.data.firstDayLog && res.data.firstDayLog.length > 0) {
-      setLogs(res.data.firstDayLog);
-      setTargetDate(new Date(res.data.firstDayLog[0].createdAt));
+    if (res.data.firstDayLog) {
+      setLogs(res.data.firstDayLog ?? []);
       setHasMore(res.data.firstDayLog.length >= LOG_PAGE_SIZE);
     }
   };
@@ -60,14 +58,14 @@ export default function ManageLogs() {
       setLogs([...logs(), ...res.data]);
     } else {
       setLogs(res.data);
-      setTargetDate(options.targetDate);
+      setCurrentPosDate(options.targetDate);
     }
 
     setHasMore(res.data.length >= LOG_PAGE_SIZE);
   };
 
   const loadMore = async () => {
-    const t = targetDate();
+    const t = currentPosDate();
     const last = logs()[logs().length - 1];
     if (!t || !last) return;
 
@@ -91,22 +89,32 @@ export default function ManageLogs() {
     return nice;
   });
 
+  const moveWeek = (direction: "forward" | "before") => {
+    const d = new Date(currentPosDate());
+    const weeks = direction === "before" ? -1 : 1;
+    d.setDate(d.getDate() + weeks * 7);
+    setCurrentPosDate(d);
+    fetchLogCount(d);
+  };
+
   onMount(() => fetchLogCount());
 
   return (
     <div class="flex flex-col h-full w-full gap-2 overflow-y-auto">
-      <Card class="p-2">
+      <Card class="p-2 flex items-center justify-center gap-2">
+        <Button size={"icon"} variant={"ghost"} onClick={() => moveWeek("before")}><IconArrowLeft /></Button>
         <span>
           {
             (() => { //日程範囲表示
-              const dStart = new Date();
+              const dStart = structuredClone(currentPosDate());
               dStart.setDate(dStart.getDate() - dStart.getDay());
-              const dEnd = new Date();
+              const dEnd = structuredClone(currentPosDate());
               dEnd.setDate(dEnd.getDate() + (6 - dEnd.getDay()));
               return <span>{dStart.toLocaleDateString()} ~ {dEnd.toLocaleDateString()}</span>
             })()
           }
         </span>
+        <Button size={"icon"} variant={"ghost"} onClick={() => moveWeek("forward")}><IconArrowRight /></Button>
       </Card>
 
       <Card class="basis-[30%] grow-0 shrink-0 min-h-0 flex flex-col overflow-hidden p-4">
