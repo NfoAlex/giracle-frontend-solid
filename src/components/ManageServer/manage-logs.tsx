@@ -21,24 +21,11 @@ export default function ManageLogs() {
   const [hasMore, setHasMore] = createSignal(true);
   const [targetDate, setTargetDate] = createSignal<Date | null>(null);
 
-  const totalCount = (e: IRequestLogCount) => e.successCount + e.errorCount + e.otherCount;
-
   const methodVariant = (m: string) =>
     m === "GET" ? "success" : m === "DELETE" ? "error" : m === "POST" ? "warning" : "outline";
 
   const statusVariant = (s: number) =>
     s >= 200 && s < 300 ? "success" : s >= 400 ? "error" : "outline";
-
-  const formatDate = (d: Date) => new Date(d).toLocaleString();
-
-  const totals = () => {
-    const l = dailyCount();
-    return {
-      success: l.reduce((a, c) => a + c.successCount, 0),
-      error: l.reduce((a, c) => a + c.errorCount, 0),
-      other: l.reduce((a, c) => a + c.otherCount, 0),
-    };
-  };
 
   const fetchLogCount = async (cursorDate?: Date) => {
     const userIdParam = filterUserId().trim() || undefined;
@@ -182,7 +169,7 @@ export default function ManageLogs() {
                         </span>
                       </TableCell>
                       <TableCell class="whitespace-nowrap text-muted-foreground">
-                        {formatDate(log.createdAt)}
+                        {new Date(log.createdAt).toLocaleString()}
                       </TableCell>
                     </TableRow>
                   )}
