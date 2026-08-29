@@ -1,6 +1,6 @@
 import type { IChannel } from "~/types/Channel.ts";
 import type { ICustomEmoji } from "~/types/Message.ts";
-import type { IInvite, IServer } from "~/types/Server.ts";
+import type { IInvite, IRequestLog, IRequestLogCount, IServer } from "~/types/Server.ts";
 import { FETCH_CLIENT } from "../FETCH_CLIENT.ts";
 
 export const server = {
@@ -116,32 +116,48 @@ export const server = {
       label: "SERVER_GET_INVITE",
     }),
 
-  getLogs: (p: {
-    type?: "success" | "error";
-    userId?: string;
-    cursorLogDate?: Date;
+  getLog: (p: {
+    targetDate: Date,
+    cursorLogId?: string
   }) =>
-    // バックエンドは { message, data: LogEntry[] } を返す想定。
-    // （旧実装は裸配列を想定していたが、他エンドポイントと同様のラップ形式に統一）
-    // 裸配列が返る場合は呼び出し側（manage-logs）の Array.isArray 分岐で吸収する。
     FETCH_CLIENT<{
       message: string;
-      data: {
-        date: string;
-        successCount: number;
-        errorCount: number;
-        otherCount: number;
-      }[];
+      data: IRequestLog[]; //最高50件
     }>({
       url: "/api/server/log",
       method: "GET",
-      label: "SERVER_GET_LOGS",
+      label: "SERVER_GET_LOG",
+      query: {
+        targetDate: p.targetDate
+          ? new Date(p.targetDate).toLocaleDateString("sv-SE", { timeZone: "Asia/Tokyo" })
+          : undefined,
+        cursorLogId: p.cursorLogId
+      },
+    }),
+
+  getLogGroup: (p: {
+    type?: "success" | "error";
+    userId?: string;
+    cursorLogDate?: Date;
+    includeFirstLogs?: boolean
+  }) =>
+    FETCH_CLIENT<{
+      message: string;
+      data: {
+        group: IRequestLogCount[],
+        firstDayLog: IRequestLog[] | undefined
+      };
+    }>({
+      url: "/api/server/log-group",
+      method: "GET",
+      label: "SERVER_GET_LOG_GROUP",
       query: {
         type: p.type,
         userId: p.userId,
         cursorLogDate: p.cursorLogDate
-          ? new Date(p.cursorLogDate).toISOString()
+          ? new Date(p.cursorLogDate).toLocaleDateString("sv-SE", { timeZone: "Asia/Tokyo" })
           : undefined,
+        includeFirstLogs: p.includeFirstLogs
       },
     }),
 };
