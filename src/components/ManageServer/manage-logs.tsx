@@ -28,6 +28,9 @@ export default function ManageLogs() {
   const [hasMore, setHasMore] = createSignal(true);
   const [currentPosDate, setCurrentPosDate] = createSignal<Date>(new Date());
 
+  // 古い非同期応答を捨てるための世代カウンタ（await 後のガード専用。リアクティブ不要）
+  let reqSeq = 0;
+
   const methodVariant = (m: string) =>
     m === "GET" ? "success" : m === "DELETE" ? "error" : m === "POST" ? "warning" : "outline";
 
@@ -35,6 +38,7 @@ export default function ManageLogs() {
     s >= 200 && s < 300 ? "success" : s >= 400 ? "error" : "outline";
 
   const fetchLogCount = async (cursorDate?: Date) => {
+    const seq = ++reqSeq; // このリクエストの世代。後に新しいのが発行されたら破棄する
     setError(null);
     try {
       const userIdParam = filterUserId().trim() || undefined;
@@ -46,18 +50,21 @@ export default function ManageLogs() {
         includeFirstLogs: true
       });
 
+      // 週を連打して後続リクエストが発行済みなら、古い応答を反映しない
+      if (seq !== reqSeq) return;
+
       setDailyCount(res.data.group);
-      if (res.data.firstDayLog) {
-        setLogs(res.data.firstDayLog ?? []);
-        setHasMore(res.data.firstDayLog.length >= LOG_PAGE_SIZE);
-      }
+      setLogs(res.data.firstDayLog ?? []);
+      setHasMore((res.data.firstDayLog?.length ?? 0) >= LOG_PAGE_SIZE);
     } catch (e) {
+      if (seq !== reqSeq) return;
       setError(e instanceof Error ? e.message : String(e));
     }
   };
 
   //ログ取得。cursorLogIdが指定されていると継続取得扱い
   const fetchLogs = async (options: { targetDate: Date, cursorLogId?: string }) => {
+    const seq = ++reqSeq; // このリクエストの世代。週移動と続き読み込みで共有する
     setError(null);
 
     try {
@@ -65,6 +72,9 @@ export default function ManageLogs() {
         targetDate: options.targetDate,
         cursorLogId: options.cursorLogId
       });
+
+      // 古い応答を破棄（週移動中なら続き読み込み結果を混ぜない）
+      if (seq !== reqSeq) return;
 
       if (options.cursorLogId) {
         setLogs([...logs(), ...res.data]);
@@ -75,6 +85,7 @@ export default function ManageLogs() {
 
       setHasMore(res.data.length >= LOG_PAGE_SIZE);
     } catch (e) {
+      if (seq !== reqSeq) return;
       setError(e instanceof Error ? e.message : String(e));
     }
   };
@@ -92,11 +103,22 @@ export default function ManageLogs() {
     }
   };
 
+  // 棒グラフ描画用: 日付パースと合計を一度に事前計算する
+  const chartData = createMemo(() =>
+    dailyCount().map((count) => ({
+      count,
+      total: count.successCount + count.errorCount + count.otherCount,
+      date: new Date(count.date),
+    })),
+  );
+
   const getCeiling = createMemo(() => {
-    const totalArr = dailyCount().map(c => c.successCount + c.errorCount + c.otherCount);
+    const totalArr = chartData().map((c) => c.total);
     if (totalArr.length === 0) return 0;
 
     const maxVal = Math.max(...totalArr);
+    if (maxVal === 0) return 0;
+
     const pow = 10 ** Math.floor(Math.log10(maxVal));
     const base = maxVal / pow;
     const nice = (base > 5 ? 10 : base > 2 ? 5 : 2) * pow;
@@ -130,7 +152,7 @@ export default function ManageLogs() {
           {
             (() => { //日程範囲表示
               const dStart = weekStart(currentPosDate());
-              const dEnd = structuredClone(currentPosDate());
+              const dEnd = new Date(currentPosDate());
               dEnd.setDate(dEnd.getDate() + (6 - dEnd.getDay()));
               return <span>{dStart.toLocaleDateString()} ~ {dEnd.toLocaleDateString()}</span>
             })()
@@ -154,9 +176,11 @@ export default function ManageLogs() {
           <div class="grow h-full flex flex-col gap-2">
             <div class="h-[90%] border-l-2 border-b-2 relative flex items-end justify-evenly">
               {
-                dailyCount().map((count) => {
-                  const total = count.errorCount + count.otherCount + count.successCount;
-                  const containerHeight = Math.ceil(total / getCeiling() * 100);
+                chartData().map(({ count, total, date }) => {
+                  const ceiling = getCeiling();
+                  const containerHeight = ceiling === 0 ? 0 : Math.ceil((total / ceiling) * 100);
+                  // total が 0 の日は除算ゼロになるため 0 を返す
+                  const pct = (n: number) => (total === 0 ? 0 : (n / total) * 100);
                   return (
                     <HoverCard openDelay={0}>
                       <HoverCardTrigger
@@ -165,12 +189,12 @@ export default function ManageLogs() {
                         style={`height: ${containerHeight}%`}
                       >
                         { total }
-                        <div class="bg-green-300" style={`height: ${count.successCount / total * 100}%`} />
-                        <div class="bg-error" style={`height: ${count.errorCount / total * 100}%`} />
-                        <div class="bg-white" style={`height: ${count.otherCount / total * 100}%`} />
+                        <div class="bg-green-300" style={`height: ${pct(count.successCount)}%`} />
+                        <div class="bg-error" style={`height: ${pct(count.errorCount)}%`} />
+                        <div class="bg-white" style={`height: ${pct(count.otherCount)}%`} />
                       </HoverCardTrigger>
                       <HoverCardContent class="w-40 text-sm">
-                        <p class="font-bold">{ new Date(count.date).toLocaleDateString() }</p>
+                        <p class="font-bold">{ date.toLocaleDateString() }</p>
                         <hr class="my-2" />
                         <div>成功: <span class="text-success ml-auto">{count.successCount}</span></div>
                         <div>エラー: <span class="text-error ml-auto">{count.errorCount}</span></div>
@@ -184,9 +208,9 @@ export default function ManageLogs() {
             {/* 日付表示 */}
             <div class="flex justify-evenly items-center">
               {
-                dailyCount().map((count) => (
+                chartData().map(({ date }) => (
                   <span>
-                    { new Date(count.date).getMonth() + 1 }/{ new Date(count.date).getDate() }
+                    { date.getMonth() + 1 }/{ date.getDate() }
                   </span>
                 ))
               }
