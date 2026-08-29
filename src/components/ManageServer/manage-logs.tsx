@@ -1,5 +1,5 @@
 import { IconSearch, IconX } from "@tabler/icons-solidjs";
-import { createSignal, For, onMount, Show } from "solid-js";
+import { createMemo, createSignal, For, onMount, Show } from "solid-js";
 import { api } from "~/api/index.ts";
 import { Badge } from "~/components/ui/badge.tsx";
 import { Button } from "~/components/ui/button.tsx";
@@ -100,29 +100,58 @@ export default function ManageLogs() {
     }
   };
 
+  const getCeiling = createMemo(() => {
+    const totalArr = dailyCount().map(c => c.successCount + c.errorCount + c.otherCount);
+    if (totalArr.length === 0) return 0;
+
+    const maxVal = Math.max(...totalArr);
+    const pow = 10 ** Math.floor(Math.log10(maxVal));
+    const base = maxVal / pow;
+    const nice = (base > 5 ? 10 : base > 2 ? 5 : 2) * pow;
+
+    return nice;
+  });
+
   onMount(() => fetchLogCount());
 
   return (
     <div class="flex flex-col h-full w-full gap-2 overflow-y-auto">
       <Card class="basis-[30%] grow-0 shrink-0 min-h-0 flex flex-col overflow-hidden p-4">
-        <p>ここでグラフ表示予定</p>
-        <div class="border-l-2 border-b-2 relative grow flex items-end justify-evenly">
-          {
-            dailyCount().map((count) => (
-              <div>
-                { count.successCount }
-              </div>
-            ))
-          }
-        </div>
-        <div class="flex justify-evenly items-center gap-4">
-          {
-            dailyCount().map((count) => (
-              <span>
-                { new Date(count.date).getMonth() + 1 }/{ new Date(count.date).getDate() }
-              </span>
-            ))
-          }
+        <div class="w-full h-full grow flex gap-2">
+          <div class="h-[90%] shrink-0 flex flex-col justify-between w-10">
+            <span>{ getCeiling() }</span>
+            <span>{ getCeiling() * 0.75 }</span>
+            <span>{ getCeiling() * 0.25 }</span>
+            <span>0</span>
+          </div>
+
+          <div class="grow h-full flex flex-col gap-2">
+            <div class="h-[90%] border-l-2 border-b-2 relative flex items-end justify-evenly">
+              {
+                dailyCount().map((count) => {
+                  const total = count.errorCount + count.otherCount + count.successCount;
+                  const containerHeight = Math.ceil(total / getCeiling() * 100);
+                  return (
+                    <div style={`height: ${containerHeight}%`} class="w-14 text-center mt-auto flex flex-col">
+                      { total }
+                      <div class={`bg-green-300`} style={`height: ${count.successCount / total * 100}%`} />
+                      <div class={`bg-error`} style={`height: ${count.errorCount / total * 100}%`} />
+                      <div class={`bg-white`} style={`height: ${count.otherCount / total * 100}%`} />
+                    </div>
+                  );
+                })
+              }
+            </div>
+            <div class="flex justify-evenly items-center">
+              {
+                dailyCount().map((count) => (
+                  <span>
+                    { new Date(count.date).getMonth() + 1 }/{ new Date(count.date).getDate() }
+                  </span>
+                ))
+              }
+            </div>
+          </div>
         </div>
       </Card>
 
