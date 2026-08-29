@@ -1,5 +1,6 @@
 import { createMemo, createSignal, For, onMount, Show } from "solid-js";
 import { api } from "~/api/index.ts";
+import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert.tsx";
 import { Badge } from "~/components/ui/badge.tsx";
 import { Button } from "~/components/ui/button.tsx";
 import { Card } from "~/components/ui/card.tsx";
@@ -7,15 +8,14 @@ import { HoverCard, HoverCardContent, HoverCardTrigger } from "~/components/ui/h
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "~/components/ui/table.tsx";
 import { IRequestLog, IRequestLogCount } from "~/types/Server";
 import { getterUserinfo } from "~/stores/Userinfo";
-import { IconArrowLeft, IconArrowRight } from "@tabler/icons-solidjs";
+import { IconAlertCircle, IconArrowLeft, IconArrowRight } from "@tabler/icons-solidjs";
 
 const LOG_PAGE_SIZE = 50;
 
 export default function ManageLogs() {
   const [logs, setLogs] = createSignal<IRequestLog[]>([]);
   const [dailyCount, setDailyCount] = createSignal<IRequestLogCount[]>([]);
-  const [filterUserId, setFilterUserId] = createSignal("");
-  const [loading, setLoading] = createSignal(false);
+  const [filterUserId] = createSignal("");
   const [loadingMore, setLoadingMore] = createSignal(false);
   const [error, setError] = createSignal<string | null>(null);
   const [hasMore, setHasMore] = createSignal(true);
@@ -28,21 +28,26 @@ export default function ManageLogs() {
     s >= 200 && s < 300 ? "success" : s >= 400 ? "error" : "outline";
 
   const fetchLogCount = async (cursorDate?: Date) => {
-    const userIdParam = filterUserId().trim() || undefined;
-    const d = cursorDate ? new Date(cursorDate) : new Date();
-    const day = d.getDay();
-    d.setDate(d.getDate() - day);
+    setError(null);
+    try {
+      const userIdParam = filterUserId().trim() || undefined;
+      const d = cursorDate ? new Date(cursorDate) : new Date();
+      const day = d.getDay();
+      d.setDate(d.getDate() - day);
 
-    const res = await api.server.getLogGroup({
-      userId: userIdParam,
-      cursorLogDate: d,
-      includeFirstLogs: true
-    });
+      const res = await api.server.getLogGroup({
+        userId: userIdParam,
+        cursorLogDate: d,
+        includeFirstLogs: true
+      });
 
-    setDailyCount(res.data.group);
-    if (res.data.firstDayLog) {
-      setLogs(res.data.firstDayLog ?? []);
-      setHasMore(res.data.firstDayLog.length >= LOG_PAGE_SIZE);
+      setDailyCount(res.data.group);
+      if (res.data.firstDayLog) {
+        setLogs(res.data.firstDayLog ?? []);
+        setHasMore(res.data.firstDayLog.length >= LOG_PAGE_SIZE);
+      }
+    } catch (e) {
+      setError(e instanceof Error ? e.message : String(e));
     }
   };
 
@@ -50,19 +55,23 @@ export default function ManageLogs() {
   const fetchLogs = async (options: { targetDate: Date, cursorLogId?: string }) => {
     setError(null);
 
-    const res = await api.server.getLog({
-      targetDate: options.targetDate,
-      cursorLogId: options.cursorLogId
-    });
+    try {
+      const res = await api.server.getLog({
+        targetDate: options.targetDate,
+        cursorLogId: options.cursorLogId
+      });
 
-    if (options.cursorLogId) {
-      setLogs([...logs(), ...res.data]);
-    } else {
-      setLogs(res.data);
-      setCurrentPosDate(options.targetDate);
+      if (options.cursorLogId) {
+        setLogs([...logs(), ...res.data]);
+      } else {
+        setLogs(res.data);
+        setCurrentPosDate(options.targetDate);
+      }
+
+      setHasMore(res.data.length >= LOG_PAGE_SIZE);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : String(e));
     }
-
-    setHasMore(res.data.length >= LOG_PAGE_SIZE);
   };
 
   const loadMore = async () => {
@@ -102,6 +111,14 @@ export default function ManageLogs() {
 
   return (
     <div class="flex flex-col h-full w-full gap-2 overflow-y-auto">
+      <Show when={error()}>
+        <Alert variant="destructive">
+          <IconAlertCircle class="size-6" />
+          <AlertTitle>エラー</AlertTitle>
+          <AlertDescription>内容: {error()}</AlertDescription>
+        </Alert>
+      </Show>
+
       <Card class="p-2 flex items-center justify-center gap-2">
         <Button size={"icon"} variant={"ghost"} onClick={() => moveWeek("before")}><IconArrowLeft /></Button>
         <span>
