@@ -1,27 +1,19 @@
-import { IconSearch, IconX } from "@tabler/icons-solidjs";
 import { createMemo, createSignal, For, onMount, Show } from "solid-js";
 import { api } from "~/api/index.ts";
 import { Badge } from "~/components/ui/badge.tsx";
 import { Button } from "~/components/ui/button.tsx";
-import { Callout } from "~/components/ui/callout.tsx";
-import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card.tsx";
-import { Skeleton } from "~/components/ui/skeleton.tsx";
-import { Tabs, TabsList, TabsTrigger } from "~/components/ui/tabs.tsx";
+import { Card } from "~/components/ui/card.tsx";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "~/components/ui/table.tsx";
-import { TextField, TextFieldInput } from "~/components/ui/text-field.tsx";
-import { Label } from "~/components/ui/label.tsx";
 import { IRequestLog, IRequestLogCount } from "~/types/Server";
 import { getterUserinfo } from "~/stores/Userinfo";
 
 type FilterType = "all" | "success" | "error";
 
-const PAGE_LIMIT_HINT = 20;
 const LOG_PAGE_SIZE = 50;
 
 export default function ManageLogs() {
   const [logs, setLogs] = createSignal<IRequestLog[]>([]);
   const [dailyCount, setDailyCount] = createSignal<IRequestLogCount[]>([]);
-  const [filterType, setFilterType] = createSignal<FilterType>("all");
   const [filterUserId, setFilterUserId] = createSignal("");
   const [loading, setLoading] = createSignal(false);
   const [loadingMore, setLoadingMore] = createSignal(false);
