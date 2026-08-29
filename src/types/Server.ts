@@ -19,3 +19,19 @@ export interface IInvite {
   usedCount: number;
   maxUsage: number;
 }
+
+export interface IRequestLogCount {
+  date: string;
+  successCount: number;
+  errorCount: number;
+  otherCount: number;
+}
+
+export interface IRequestLog {
+  id: string;
+  method: string;
+  path: string;
+  status: number;
+  userId: string | null;
+  createdAt: Date;
+}
