@@ -12,6 +12,13 @@ import { IconAlertCircle, IconArrowLeft, IconArrowRight } from "@tabler/icons-so
 
 const LOG_PAGE_SIZE = 50;
 
+// 週頭(日曜)へスナップしたコピーを返す
+const weekStart = (d: Date) => {
+  const w = new Date(d);
+  w.setDate(w.getDate() - w.getDay());
+  return w;
+};
+
 export default function ManageLogs() {
   const [logs, setLogs] = createSignal<IRequestLog[]>([]);
   const [dailyCount, setDailyCount] = createSignal<IRequestLogCount[]>([]);
@@ -31,9 +38,7 @@ export default function ManageLogs() {
     setError(null);
     try {
       const userIdParam = filterUserId().trim() || undefined;
-      const d = cursorDate ? new Date(cursorDate) : new Date();
-      const day = d.getDay();
-      d.setDate(d.getDate() - day);
+      const d = weekStart(cursorDate ?? new Date());
 
       const res = await api.server.getLogGroup({
         userId: userIdParam,
@@ -124,8 +129,7 @@ export default function ManageLogs() {
         <span>
           {
             (() => { //日程範囲表示
-              const dStart = structuredClone(currentPosDate());
-              dStart.setDate(dStart.getDate() - dStart.getDay());
+              const dStart = weekStart(currentPosDate());
               const dEnd = structuredClone(currentPosDate());
               dEnd.setDate(dEnd.getDate() + (6 - dEnd.getDay()));
               return <span>{dStart.toLocaleDateString()} ~ {dEnd.toLocaleDateString()}</span>
