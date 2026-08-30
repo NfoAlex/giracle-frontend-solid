@@ -7,3 +7,14 @@ dev-dist
 #lock file
 bun.lock
 deno.lock
+
+#harness tools
+.agents
+.claude
+.commandcode
+.cursor
+.copilot
+.codeium
+.continue
+.gemini
+.aider
