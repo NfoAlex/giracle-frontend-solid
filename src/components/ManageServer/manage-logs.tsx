@@ -110,7 +110,8 @@ export default function ManageLogs() {
     dailyCount().map((count) => ({
       count,
       total: count.successCount + count.errorCount + count.otherCount,
-      date: new Date(count.date),
+      // "YYYY-MM-DD" を UTC でなくローカル日付としてパース（タイムゾーンずれ防止）
+      date: new Date(count.date + "T00:00:00"),
     })),
   );
 
