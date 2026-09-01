@@ -80,17 +80,15 @@ export const user = {
       label: "USER_INFO",
     }),
 
-  list: (
-    p: {
-      length?: number;
-      cursorUserId?: string,
-      username?: string,
-      joinedChannel?: string
-    }
-  ) =>
+  list: (p: {
+    length?: number;
+    cursorUserId?: string;
+    username?: string;
+    joinedChannel?: string;
+  }) =>
     FETCH_CLIENT<{
-      message: "",
-      data: IUser[]
+      message: "";
+      data: IUser[];
     }>({
       url: `/api/user/list`,
       method: "GET",
@@ -99,7 +97,7 @@ export const user = {
         length: p.length,
         cursorUserId: p.cursorUserId,
         username: p.username,
-        joinedChannel: p.joinedChannel
+        joinedChannel: p.joinedChannel,
       },
     }),
 

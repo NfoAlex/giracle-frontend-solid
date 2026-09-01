@@ -1,6 +1,6 @@
 import type { IChannel } from "~/types/Channel.ts";
 import type { ICustomEmoji } from "~/types/Message.ts";
-import type { IInvite, IServer } from "~/types/Server.ts";
+import type { IInvite, IRequestLog, IRequestLogCount, IServer } from "~/types/Server.ts";
 import { FETCH_CLIENT } from "../FETCH_CLIENT.ts";
 
 export const server = {
@@ -114,5 +114,50 @@ export const server = {
       url: "/api/server/get-invite",
       method: "GET",
       label: "SERVER_GET_INVITE",
+    }),
+
+  getLog: (p: {
+    targetDate: Date,
+    cursorLogId?: string
+  }) =>
+    FETCH_CLIENT<{
+      message: string;
+      data: IRequestLog[]; //最高50件
+    }>({
+      url: "/api/server/log",
+      method: "GET",
+      label: "SERVER_GET_LOG",
+      query: {
+        targetDate: p.targetDate
+          ? new Date(p.targetDate).toLocaleDateString("sv-SE", { timeZone: "Asia/Tokyo" })
+          : undefined,
+        cursorLogId: p.cursorLogId
+      },
+    }),
+
+  getLogGroup: (p: {
+    type?: "success" | "error";
+    userId?: string;
+    cursorLogDate?: Date;
+    includeFirstLogs?: boolean
+  }) =>
+    FETCH_CLIENT<{
+      message: string;
+      data: {
+        group: IRequestLogCount[],
+        firstDayLog: IRequestLog[] | undefined
+      };
+    }>({
+      url: "/api/server/log-group",
+      method: "GET",
+      label: "SERVER_GET_LOG_GROUP",
+      query: {
+        type: p.type,
+        userId: p.userId,
+        cursorLogDate: p.cursorLogDate
+          ? new Date(p.cursorLogDate).toLocaleDateString("sv-SE", { timeZone: "Asia/Tokyo" })
+          : undefined,
+        includeFirstLogs: p.includeFirstLogs
+      },
     }),
 };

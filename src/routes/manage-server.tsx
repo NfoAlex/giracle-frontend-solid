@@ -8,9 +8,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~
 import { getRolePower } from "~/stores/MyUserinfo.ts";
 import SidebarTriggerWithDot from "~/components/unique/SidebarTriggerWithDot.tsx";
 import ManageEmoji from "~/components/ManageServer/manage-emoji.tsx";
+import ManageLogs from "~/components/ManageServer/manage-logs";
 
 export default function ManageServer() {
-  const [displayMode, setDisplayMode] = createSignal<"community" | "role" | "invite" | "customEmoji">("community");
+  const [displayMode, setDisplayMode] = createSignal<"community" | "role" | "invite" | "customEmoji" | "logs">("community");
 
   return (
     <div class="p-2 flex flex-col h-full">
@@ -25,6 +26,7 @@ export default function ManageServer() {
           <Button onclick={()=>setDisplayMode("role")} variant={ displayMode()==="role" ? "default" : "outline" }>ロール</Button>
           <Button onclick={()=>setDisplayMode("invite")} variant={ displayMode()==="invite" ? "default" : "outline" }>招待</Button>
           <Button onclick={()=>setDisplayMode("customEmoji")} variant={ displayMode()==="customEmoji" ? "default" : "outline" }>カスタム絵文字</Button>
+          <Button onclick={()=>setDisplayMode("logs")} variant={ displayMode()==="logs" ? "default" : "outline" }>ログ</Button>
         </div>
 
         {/* スマホ用 */}
@@ -60,11 +62,12 @@ export default function ManageServer() {
           </Select>
         </div>
       </Card>
-      
+
       { displayMode() === "community" && (getRolePower("manageServer") ? <ManageCommunity /> : <p>サーバーの管理権限がありません</p>) }
       { displayMode() === "role" && (getRolePower("manageRole") ? <ManageRole /> : <p>ロールの管理権限がありません</p>) }
-      { displayMode() === "invite" && (getRolePower("manageServer") ? <ManageInvite /> : <p>サーバーの管理権限がありません</p>) }
       { displayMode() === "customEmoji" && (getRolePower("manageEmoji") ? <ManageEmoji /> : <p>カスタム絵文字の管理権限がありません</p>) }
+      { displayMode() === "invite" && (getRolePower("manageServer") ? <ManageInvite /> : <p>サーバーの管理権限がありません</p>) }
+      { displayMode() === "logs" && (getRolePower("manageServer") ? <ManageLogs /> : <p>ログ取得の管理権限がありません</p>) }
     </div>
   );
 }
