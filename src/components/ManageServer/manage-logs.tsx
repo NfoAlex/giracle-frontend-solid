@@ -22,7 +22,6 @@ const weekStart = (d: Date) => {
 export default function ManageLogs() {
   const [logs, setLogs] = createSignal<IRequestLog[]>([]);
   const [dailyCount, setDailyCount] = createSignal<IRequestLogCount[]>([]);
-  const [filterUserId] = createSignal("");
   const [loadingMore, setLoadingMore] = createSignal(false);
   const [error, setError] = createSignal<string | null>(null);
   const [hasMore, setHasMore] = createSignal(true);
@@ -42,11 +41,9 @@ export default function ManageLogs() {
     const seq = ++reqSeq; // このリクエストの世代。後に新しいのが発行されたら破棄する
     setError(null);
     try {
-      const userIdParam = filterUserId().trim() || undefined;
       const d = weekStart(cursorDate ?? new Date());
 
       const res = await api.server.getLogGroup({
-        userId: userIdParam,
         cursorLogDate: d,
         includeFirstLogs: true
       });
