@@ -195,7 +195,7 @@ export default function ManageLogs() {
                           `w-14 text-center mt-auto flex flex-col
                           ${ compareDate(date, currentPosDate()) ? "font-bold ring-2 ring-gray-600 rounded " : undefined }`
                         }
-                        style={`height: ${containerHeight}%`}
+                        style={`height: ${containerHeight}%; min-height: 24px;`}
                         onClick={()=>moveDay(date)}
                       >
                         { total }
