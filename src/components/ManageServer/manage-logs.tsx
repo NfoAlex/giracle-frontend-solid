@@ -56,7 +56,7 @@ export default function ManageLogs() {
 
       setDailyCount(res.data.group);
       setLogs(res.data.firstDayLog ?? []);
-      setCurrentPosDate(d); // 表示・続き読みのアンカーを取得週の日曜へ揃える
+      setCurrentPosDate(new Date(res.data.group[0].date)); // 表示・続き読みのアンカーを取得週の日曜へ揃える
       setHasMore((res.data.firstDayLog?.length ?? 0) >= LOG_PAGE_SIZE);
     } catch (e) {
       if (seq !== reqSeq) return;
@@ -82,7 +82,7 @@ export default function ManageLogs() {
         setLogs([...logs(), ...res.data]);
       } else {
         setLogs(res.data);
-        setCurrentPosDate(weekStart(options.targetDate));
+        setCurrentPosDate(options.targetDate);
       }
 
       setHasMore(res.data.length >= LOG_PAGE_SIZE);
@@ -137,6 +137,10 @@ export default function ManageLogs() {
     fetchLogCount(d);
   };
 
+  const moveDay = (targetDate: Date) => {
+    fetchLogs({ targetDate });
+  };
+
   onMount(() => fetchLogCount());
 
   return (
@@ -184,12 +188,18 @@ export default function ManageLogs() {
                   const containerHeight = ceiling === 0 ? 0 : Math.ceil((total / ceiling) * 100);
                   // total が 0 の日は除算ゼロになるため 0 を返す
                   const pct = (n: number) => (total === 0 ? 0 : (n / total) * 100);
+                  // 同じ日であるかどうか確認するだけ
+                  const compareDate = (d1: Date, d2: Date) => d1.getFullYear()+":"+d1.getMonth()+":"+d1.getDay() === d2.getFullYear()+":"+d2.getMonth()+":"+d2.getDay();
                   return (
                     <HoverCard openDelay={0}>
                       <HoverCardTrigger
                         as="div"
-                        class="w-14 text-center mt-auto flex flex-col"
+                        class={
+                          `w-14 text-center mt-auto flex flex-col
+                          ${ compareDate(date, currentPosDate()) ? "font-bold ring-2 ring-gray-600 rounded " : undefined }`
+                        }
                         style={`height: ${containerHeight}%`}
+                        onClick={()=>moveDay(date)}
                       >
                         { total }
                         <div class="bg-green-300" style={`height: ${pct(count.successCount)}%`} />
