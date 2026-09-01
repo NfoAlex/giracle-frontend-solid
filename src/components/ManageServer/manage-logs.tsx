@@ -189,7 +189,7 @@ export default function ManageLogs() {
                   // total が 0 の日は除算ゼロになるため 0 を返す
                   const pct = (n: number) => (total === 0 ? 0 : (n / total) * 100);
                   // 同じ日であるかどうか確認するだけ
-                  const compareDate = (d1: Date, d2: Date) => d1.getFullYear()+":"+d1.getMonth()+":"+d1.getDay() === d2.getFullYear()+":"+d2.getMonth()+":"+d2.getDay();
+                  const compareDate = (d1: Date, d2: Date) => d1.getFullYear()+":"+d1.getMonth()+":"+d1.getDate() === d2.getFullYear()+":"+d2.getMonth()+":"+d2.getDate();
                   return (
                     <HoverCard openDelay={0}>
                       <HoverCardTrigger
