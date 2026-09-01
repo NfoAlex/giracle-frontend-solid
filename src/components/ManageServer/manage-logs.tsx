@@ -26,7 +26,8 @@ export default function ManageLogs() {
   const [loadingMore, setLoadingMore] = createSignal(false);
   const [error, setError] = createSignal<string | null>(null);
   const [hasMore, setHasMore] = createSignal(true);
-  const [currentPosDate, setCurrentPosDate] = createSignal<Date>(new Date());
+  // 常に週頭(日曜)へ正規化して保持。表の表示日(=firstDayLog)と続き読みの targetDate を一致させる
+  const [currentPosDate, setCurrentPosDate] = createSignal<Date>(weekStart(new Date()));
 
   // 古い非同期応答を捨てるための世代カウンタ（await 後のガード専用。リアクティブ不要）
   let reqSeq = 0;
@@ -55,6 +56,7 @@ export default function ManageLogs() {
 
       setDailyCount(res.data.group);
       setLogs(res.data.firstDayLog ?? []);
+      setCurrentPosDate(d); // 表示・続き読みのアンカーを取得週の日曜へ揃える
       setHasMore((res.data.firstDayLog?.length ?? 0) >= LOG_PAGE_SIZE);
     } catch (e) {
       if (seq !== reqSeq) return;
@@ -80,7 +82,7 @@ export default function ManageLogs() {
         setLogs([...logs(), ...res.data]);
       } else {
         setLogs(res.data);
-        setCurrentPosDate(options.targetDate);
+        setCurrentPosDate(weekStart(options.targetDate));
       }
 
       setHasMore(res.data.length >= LOG_PAGE_SIZE);
@@ -130,7 +132,7 @@ export default function ManageLogs() {
     const d = new Date(currentPosDate());
     const weeks = direction === "before" ? -1 : 1;
     d.setDate(d.getDate() + weeks * 7);
-    setCurrentPosDate(d);
+    setCurrentPosDate(weekStart(d));
     fetchLogCount(d);
   };
 
