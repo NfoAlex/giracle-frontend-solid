@@ -53,7 +53,7 @@ export default function URLPreview(props: { urlPreview: IMessageUrlPreview }) {
           <div class="z-10 relative h-28 md:h-52 rounded-t flex flex-col items-center justify-center">
             <ImageWithModal
               class={"rounded z-20 mx-auto my-auto max-w-full max-h-full"}
-              src={"/api/message/url-thumbnail?targetUrl=" + props.urlPreview.imageLink}
+              src={props.urlPreview.imageLink}
             />
 
             <div
@@ -74,7 +74,11 @@ export default function URLPreview(props: { urlPreview: IMessageUrlPreview }) {
             {
               props.urlPreview.faviconLink
                 ?
-                <img class={"w-5 h-fit shrink-0 truncate"} src={props.urlPreview.faviconLink} alt="favicon" />
+                <img
+                  class={"w-5 h-fit shrink-0 truncate"}
+                  src={"/api/message/url-thumbnail?forFavicon=true&targetUrl=" + props.urlPreview.faviconLink}
+                  alt="favicon"
+                />
                 :
                 <IconLink />
             }

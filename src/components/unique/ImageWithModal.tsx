@@ -18,7 +18,7 @@ export default function ImageWithModal(props: { class?: string, src: string | nu
       {/* サムネ表示 */}
       <img
         onClick={() => setIsOpen(true)}
-        src={srcUrl}
+        src={"/api/message/url-thumbnail?targetUrl=" + srcUrl}
         class={`${props.class} cursor-pointer object-contain`}
         style={`height: ${props.height}px;`}
         alt={srcUrl.length > 30 ? srcUrl.slice(0, 15) + "..." : srcUrl}
