@@ -5,7 +5,13 @@ import { Dialog as KDialog } from "@kobalte/core/dialog";
  * img要素として使うことができクリックするとモーダルとして拡大もできるコンポーネント。
  * @param props - `{class: 適用したいCSSのクラス, src: 画像のURL}`
  */
-export default function ImageWithModal(props: { class?: string, src: string | null, height?: number, width?: number }) {
+export default function ImageWithModal(props: {
+  class?: string,
+  src: string | null,
+  height?: number,
+  width?: number,
+  useThumbnail?: boolean
+}) {
   const [isOpen, setIsOpen] = createSignal(false);
 
   //URL
@@ -18,7 +24,8 @@ export default function ImageWithModal(props: { class?: string, src: string | nu
       {/* サムネ表示 */}
       <img
         onClick={() => setIsOpen(true)}
-        src={"/api/message/url-thumbnail?targetUrl=" + srcUrl}
+        src={
+          props.useThumbnail ? "/api/message/url-thumbnail?targetUrl=" + srcUrl : srcUrl}
         class={`${props.class} cursor-pointer object-contain`}
         style={`height: ${props.height}px;`}
         alt={srcUrl.length > 30 ? srcUrl.slice(0, 15) + "..." : srcUrl}

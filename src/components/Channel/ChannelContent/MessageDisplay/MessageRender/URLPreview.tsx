@@ -54,6 +54,7 @@ export default function URLPreview(props: { urlPreview: IMessageUrlPreview }) {
             <ImageWithModal
               class={"rounded z-20 mx-auto my-auto max-w-full max-h-full"}
               src={props.urlPreview.imageLink}
+              useThumbnail={true}
             />
 
             <div
