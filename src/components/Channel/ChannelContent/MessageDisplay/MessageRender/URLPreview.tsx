@@ -20,7 +20,10 @@ export default function URLPreview(props: { urlPreview: IMessageUrlPreview }) {
             {
               props.urlPreview.imageLink
               &&
-              <ImageWithModal class={"border rounded w-full h-52 object-cover"} src={props.urlPreview.imageLink} />
+              <ImageWithModal
+                class={"border rounded w-full h-52 object-cover"}
+                src={props.urlPreview.imageLink}
+              />
             }
             <div class="flex items-center gap-2 w-5 h-5">
               {
@@ -48,11 +51,14 @@ export default function URLPreview(props: { urlPreview: IMessageUrlPreview }) {
         <div class={"border-b-2 grow relative"}>
           {/* 画像URLがある場合の表示 */}
           <div class="z-10 relative h-28 md:h-52 rounded-t flex flex-col items-center justify-center">
-            <ImageWithModal class={"rounded z-20 mx-auto my-auto max-w-full max-h-full"} src={props.urlPreview.imageLink} />
+            <ImageWithModal
+              class={"rounded z-20 mx-auto my-auto max-w-full max-h-full"}
+              src={props.urlPreview.imageLink}
+            />
 
             <div
               class={"z-0 absolute inset-0 bg-cover bg-center filter blur-sm w-full h-full rounded-t"}
-              style={`background-image: url(${props.urlPreview.imageLink});`}
+              style={`background-image: url(${"/api/message/url-thumbnail?targetUrl=" + props.urlPreview.imageLink});`}
             ></div>
 
             {/* 動画URLがある場合の表示 */}
@@ -68,7 +74,11 @@ export default function URLPreview(props: { urlPreview: IMessageUrlPreview }) {
             {
               props.urlPreview.faviconLink
                 ?
-                <img class={"w-5 h-fit shrink-0 truncate"} src={props.urlPreview.faviconLink} alt="favicon" />
+                <img
+                  class={"w-5 h-fit shrink-0 truncate"}
+                  src={"/api/message/url-thumbnail?forFavicon=true&targetUrl=" + props.urlPreview.faviconLink}
+                  alt="favicon"
+                />
                 :
                 <IconLink />
             }

@@ -1,6 +1,6 @@
 {
   "name": "giracle-front-solid",
-  "version": "0.23.4-alpha",
+  "version": "0.24.0-alpha",
   "description": "",
   "type": "module",
   "scripts": {
@@ -14,7 +14,7 @@
   "license": "MIT",
   "devDependencies": {
     "@biomejs/biome": "2.5.6",
-    "@types/node": "^26.4.0",
+    "@types/node": "^26.4.1",
     "autoprefixer": "^10.5.4",
     "postcss": "^8.5.26",
     "tailwindcss": "^3.4.19",
