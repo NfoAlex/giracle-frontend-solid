@@ -1,4 +1,4 @@
-import { setStoreChannelInfo } from "~/stores/ChannelInfo.ts";
+import { setStoreChannelInfo } from "~/stores/ChannelInfo.store.ts";
 import type { IChannel } from "~/types/Channel.ts";
 
 export default function WSUpdateChannel(dat: IChannel) {

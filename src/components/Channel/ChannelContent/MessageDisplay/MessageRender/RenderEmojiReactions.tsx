@@ -4,7 +4,7 @@ import { Card } from "~/components/ui/card.tsx";
 import { api } from "~/api/index.ts";
 import RenderEmoji from "~/components/unique/RenderEmoji.tsx";
 import { createMutable } from "solid-js/store";
-import { getterUserinfo } from "~/stores/Userinfo.ts";
+import { useStoreUserinfo } from "~/stores/Userinfo.store.ts";
 import DisplayAllReactedUserModal from "./RenderEmojiReactions/DisplayAllReactedUserModal.tsx";
 import { Button } from "~/components/ui/button.tsx";
 import { Badge } from "~/components/ui/badge.tsx";
@@ -119,7 +119,7 @@ export default function RenderEmojiReactions(props: { reaction: IMessage["reacti
                                 return (
                                   <span class="text-sm text-primary">
                                     <Badge variant={"secondary"}>
-                                      {getterUserinfo(userId)?.name ?? userId}
+                                      {useStoreUserinfo.getterUserinfo(userId)?.name ?? userId}
                                     </Badge>
                                   </span>
                                 )

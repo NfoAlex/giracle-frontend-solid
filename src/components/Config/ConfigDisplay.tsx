@@ -1,4 +1,4 @@
-import { storeClientConfig } from "~/stores/ClientConfig.ts";
+import { storeClientConfig } from "~/stores/ClientConfig.store.ts";
 import { Card } from "../ui/card.tsx";
 import { Slider, SliderFill, SliderThumb, SliderTrack } from "../ui/slider";
 import { useColorMode } from "@kobalte/core/color-mode";

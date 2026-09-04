@@ -1,11 +1,11 @@
 import { Card } from "~/components/ui/card.tsx";
 import { IconMoodHappy, IconPencil, IconTrash, IconCornerUpLeft, IconLink } from "@tabler/icons-solidjs";
 import { api } from "~/api/index.ts";
-import { getRolePower, storeMyUserinfo } from "~/stores/MyUserinfo.ts";
+import { useStoreMyUserinfo, storeMyUserinfo } from "~/stores/MyUserinfo.store.ts";
 import type { IMessage } from "~/types/Message.ts";
 import { Button } from "~/components/ui/button.tsx";
 import { createSignal } from "solid-js";
-import storeReplyingMessageId from "~/stores/ReplyingMessageId.ts";
+import storeReplyingMessageId from "~/stores/ReplyingMessageId.store.ts";
 import EmojiPicker from "./HoverMenu/EmojiPicker.tsx";
 
 export default function HoverMenu(props: {
@@ -89,7 +89,7 @@ export default function HoverMenu(props: {
         <Button onclick={enterEditMode} variant={"ghost"} class={"w-8 h-8"}><IconPencil /></Button>
       }
       { //削除ボタン
-        (getRolePower("manageUser") || storeMyUserinfo.id === props.message.userId)
+        (useStoreMyUserinfo.getRolePower("manageUser") || storeMyUserinfo.id === props.message.userId)
         &&
         <Button ondblclick={deleteMessage} variant={"ghost"} class={"w-8 h-8"}><IconTrash color={"hsl(var(--destructive))"} /></Button>
       }

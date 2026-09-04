@@ -5,7 +5,7 @@ import ManageRole from "~/components/ManageServer/manage-role.tsx";
 import { Button } from "~/components/ui/button.tsx";
 import { Card } from "~/components/ui/card.tsx";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~/components/ui/select.tsx";
-import { getRolePower } from "~/stores/MyUserinfo.ts";
+import { useStoreMyUserinfo } from "~/stores/MyUserinfo.store.ts";
 import SidebarTriggerWithDot from "~/components/unique/SidebarTriggerWithDot.tsx";
 import ManageEmoji from "~/components/ManageServer/manage-emoji.tsx";
 import ManageLogs from "~/components/ManageServer/manage-logs";
@@ -63,11 +63,11 @@ export default function ManageServer() {
         </div>
       </Card>
 
-      { displayMode() === "community" && (getRolePower("manageServer") ? <ManageCommunity /> : <p>サーバーの管理権限がありません</p>) }
-      { displayMode() === "role" && (getRolePower("manageRole") ? <ManageRole /> : <p>ロールの管理権限がありません</p>) }
-      { displayMode() === "customEmoji" && (getRolePower("manageEmoji") ? <ManageEmoji /> : <p>カスタム絵文字の管理権限がありません</p>) }
-      { displayMode() === "invite" && (getRolePower("manageServer") ? <ManageInvite /> : <p>サーバーの管理権限がありません</p>) }
-      { displayMode() === "logs" && (getRolePower("manageServer") ? <ManageLogs /> : <p>ログ取得の管理権限がありません</p>) }
+      { displayMode() === "community" && (useStoreMyUserinfo.getRolePower("manageServer") ? <ManageCommunity /> : <p>サーバーの管理権限がありません</p>) }
+      { displayMode() === "role" && (useStoreMyUserinfo.getRolePower("manageRole") ? <ManageRole /> : <p>ロールの管理権限がありません</p>) }
+      { displayMode() === "customEmoji" && (useStoreMyUserinfo.getRolePower("manageEmoji") ? <ManageEmoji /> : <p>カスタム絵文字の管理権限がありません</p>) }
+      { displayMode() === "invite" && (useStoreMyUserinfo.getRolePower("manageServer") ? <ManageInvite /> : <p>サーバーの管理権限がありません</p>) }
+      { displayMode() === "logs" && (useStoreMyUserinfo.getRolePower("manageServer") ? <ManageLogs /> : <p>ログ取得の管理権限がありません</p>) }
     </div>
   );
 }

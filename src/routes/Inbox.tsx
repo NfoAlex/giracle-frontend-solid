@@ -1,5 +1,5 @@
 import { Card } from "~/components/ui/card.tsx";
-import { storeInbox } from "~/stores/Inbox.ts";
+import { storeInbox } from "~/stores/Inbox.store.ts";
 import { createSignal, Show } from "solid-js";
 import { IconBed } from "@tabler/icons-solidjs";
 import { api } from "~/api/index.ts";

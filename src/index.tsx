@@ -6,12 +6,12 @@ import '@fontsource-variable/noto-sans-jp';
 import './index.css';
 
 import { lazy, onCleanup, onMount, Show, Suspense } from 'solid-js';
-import { storeAppStatus } from './stores/AppStatus.ts';
+import { storeAppStatus } from './stores/AppStatus.store.ts';
 import { SidebarProvider } from './components/ui/sidebar.tsx';
 import { AppSidebar } from './components/Sidebar.tsx';
 import Channel from './routes/channel/[id].tsx';
 import { api } from './api/index.ts';
-import { setStoreServerinfo, storeServerinfo } from './stores/Serverinfo.ts';
+import { setStoreServerinfo, storeServerinfo } from './stores/Serverinfo.store.ts';
 import { ColorModeProvider, ColorModeScript, createLocalStorageManager } from "@kobalte/core";
 import AuthGuard from "~/components/AuthGuard.tsx";
 import SwipeToOpenSidebarWrapper from "~/components/unique/SwipeToOpenSidebarWrapper.tsx";

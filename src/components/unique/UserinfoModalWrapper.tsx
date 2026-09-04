@@ -1,10 +1,10 @@
 import { createSignal, For, JSX, Show } from "solid-js";
 import { Dialog, DialogContent, DialogTrigger } from "~/components/ui/dialog.tsx";
-import { getterUserinfo, storeUserinfo, storeUserOnline } from "~/stores/Userinfo.ts";
+import { useStoreUserinfo, storeUserinfo, storeUserOnline } from "~/stores/Userinfo.store.ts";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar.tsx";
 import { Badge } from "~/components/ui/badge.tsx";
 import { IconCircleFilled, IconPencil, IconPlus } from "@tabler/icons-solidjs";
-import { getRolePower, storeMyUserinfo } from "~/stores/MyUserinfo.ts";
+import { useStoreMyUserinfo, storeMyUserinfo } from "~/stores/MyUserinfo.store.ts";
 import { Button } from "~/components/ui/button.tsx";
 import { A } from "@solidjs/router";
 import { Label } from "~/components/ui/label.tsx";
@@ -12,12 +12,12 @@ import { Card } from "~/components/ui/card.tsx";
 import RoleChip from "~/components/unique/RoleChip";
 import { Popover, PopoverContent, PopoverTrigger } from "~/components/ui/popover";
 import type { IRole } from "~/types/Role.ts";
-import { storeRoleInfo } from "~/stores/RoleInfo.ts";
+import { storeRoleInfo } from "~/stores/RoleInfo.store.ts";
 import { api } from "~/api/index.ts";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 
 export default function UserinfoModalWrapper(props: { children: JSX.Element, userId: string, class?: string }) {
-  const [user] = createSignal(getterUserinfo(props.userId));
+  const [user] = createSignal(useStoreUserinfo.getterUserinfo(props.userId));
   const [open, setOpen] = createSignal(false);
 
   // ロールリスト用
@@ -116,7 +116,7 @@ export default function UserinfoModalWrapper(props: { children: JSX.Element, use
 
             {/* タブ */}
             <Tabs defaultValue="overview">
-              <Show when={getRolePower("manageUser")}>
+              <Show when={useStoreMyUserinfo.getRolePower("manageUser")}>
                 <TabsList class="w-full">
                   <TabsTrigger value="overview" class="w-full">概要</TabsTrigger>
                   <TabsTrigger value="manage" class="w-full">管理</TabsTrigger>
@@ -138,7 +138,7 @@ export default function UserinfoModalWrapper(props: { children: JSX.Element, use
                     <For each={storeUserinfo[user().id].RoleLink}>
                       {(role) =>
                         <RoleChip
-                          deletable={getRolePower("manageRole")}
+                          deletable={useStoreMyUserinfo.getRolePower("manageRole")}
                           roleId={role.roleId}
                           userId={props.userId}
                           onDelete={(roleId) => unlinkRole(roleId)}
@@ -146,7 +146,7 @@ export default function UserinfoModalWrapper(props: { children: JSX.Element, use
                       }
                     </For>
                   </div>
-                  <Show when={getRolePower("manageRole")}>
+                  <Show when={useStoreMyUserinfo.getRolePower("manageRole")}>
                     {/* ロール追加ボタン */}
                     <Popover onOpenChange={setOpenRoleList}>
                       <PopoverTrigger>

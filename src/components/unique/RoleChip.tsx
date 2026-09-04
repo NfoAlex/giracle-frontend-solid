@@ -1,6 +1,6 @@
 import { IconCircleFilled, IconX } from "@tabler/icons-solidjs";
 import { Badge } from "../ui/badge.tsx";
-import { getterRoleInfo } from "~/stores/RoleInfo.ts";
+import { useStoreRoleInfo } from "~/stores/RoleInfo.store.ts";
 import { createSignal, Show } from "solid-js";
 
 export default function RoleChip(props: {
@@ -27,19 +27,19 @@ export default function RoleChip(props: {
         <Show when={!hovered()}>
           <IconCircleFilled
             size={12}
-            color={ getterRoleInfo(props.roleId).color }
+            color={ useStoreRoleInfo.getterRoleInfo(props.roleId).color }
             onMouseEnter={()=>{if(props.deletable) setHovered(true)}}
           />
         </Show>
         <Show when={hovered()}>
           <IconX
             size={12}
-            color={ getterRoleInfo(props.roleId).color }
+            color={ useStoreRoleInfo.getterRoleInfo(props.roleId).color }
             onMouseLeave={()=>setHovered(false)}
             onclick={deleteIt}
           />
         </Show>
-        <p>{ getterRoleInfo(props.roleId).name }</p>
+        <p>{ useStoreRoleInfo.getterRoleInfo(props.roleId).name }</p>
       </span>
     </Badge>
   )

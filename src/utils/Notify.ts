@@ -1,4 +1,4 @@
-import { asyncGetterUserinfo } from "~/stores/Userinfo.ts";
+import { useStoreUserinfo } from "~/stores/Userinfo.store.ts";
 import FormatMessageContent from "~/utils/FormatMessageContent.ts";
 import { ExternalNavigater } from "./ExternalNavigater.ts";
 
@@ -19,7 +19,7 @@ export const notifyIt = async (
   }
 
   const body = await FormatMessageContent(content);
-  const fromUser = await asyncGetterUserinfo(from);
+  const fromUser = await useStoreUserinfo.asyncGetterUserinfo(from);
 
   // モジュール変数の競合・誤動作を防ぐためローカル変数化
   const notificationInstance = new Notification(fromUser.name, {

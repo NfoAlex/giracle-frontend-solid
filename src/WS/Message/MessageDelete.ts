@@ -1,11 +1,11 @@
 import {
   setStoreHasNewMessage,
   storeHasNewMessage,
-} from "~/stores/HasNewMessage.ts";
-import { setStoreHistory, storeHistory } from "~/stores/History.ts";
-import { setStoreInbox } from "~/stores/Inbox.ts";
-import { fnMessageFetchCache } from "~/stores/MessageFetchCache";
-import { storeMessageReadTime } from "~/stores/Readtime.ts";
+} from "~/stores/HasNewMessage.store.ts";
+import { setStoreHistory, storeHistory } from "~/stores/History.store.ts";
+import { setStoreInbox } from "~/stores/Inbox.store.ts";
+import { useStoreMessageFetchCache } from "~/stores/MessageFetchCache.store";
+import { storeMessageReadTime } from "~/stores/Readtime.store.ts";
 import type { IMessage } from "~/types/Message.ts";
 
 export default function WSMessageDeleted(dat: {
@@ -41,7 +41,7 @@ export default function WSMessageDeleted(dat: {
   });
 
   //削除通知受け取り用Storeに格納
-  fnMessageFetchCache.setAsDeleted(dat.messageId);
+  useStoreMessageFetchCache.setAsDeleted(dat.messageId);
 
   // ------------------- ここから未読が削除された時用の新着削除判別👇 ------------------- //
 

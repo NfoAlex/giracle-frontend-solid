@@ -1,11 +1,11 @@
 import { produce } from "solid-js/store";
 import { api } from "~/api/index.ts";
-import { storeAppStatus } from "~/stores/AppStatus.ts";
-import { setStoreHistory } from "~/stores/History.ts";
-import { fnMessageFetchCache } from "~/stores/MessageFetchCache.ts";
-import { storeMyUserinfo } from "~/stores/MyUserinfo.ts";
-import { storeMessageReadTime } from "~/stores/Readtime.ts";
-import { setStoreUserOnline } from "~/stores/Userinfo.ts";
+import { storeAppStatus } from "~/stores/AppStatus.store.ts";
+import { setStoreHistory } from "~/stores/History.store.ts";
+import { useStoreMessageFetchCache } from "~/stores/MessageFetchCache.store.ts";
+import { storeMyUserinfo } from "~/stores/MyUserinfo.store.ts";
+import { storeMessageReadTime } from "~/stores/Readtime.store.ts";
+import { setStoreUserOnline } from "~/stores/Userinfo.store.ts";
 import FetchHistory from "~/utils/FethchHistory.ts";
 import InitLoad from "~/utils/InitLoad.ts";
 import WSInboxAdded from "~/WS/inbox/inboxAdded.ts";
@@ -201,7 +201,7 @@ export const initWS = async () => {
         }),
       );
       //メッセージキャッシュStoreを初期化
-      fnMessageFetchCache.clearCache();
+      useStoreMessageFetchCache.clearCache();
 
       //チャンネルIdをlocationから取得
       const path = document.location.pathname;

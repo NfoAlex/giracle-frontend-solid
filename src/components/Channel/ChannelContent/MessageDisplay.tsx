@@ -1,11 +1,11 @@
 import { Accessor, createEffect, createSignal, on, onCleanup, Setter, Show } from "solid-js";
-import { storeHistory } from "~/stores/History.ts";
+import { storeHistory } from "~/stores/History.store.ts";
 import { IMessage } from "~/types/Message.ts";
 import { Badge } from "../../ui/badge.tsx";
 import UserinfoModalWrapper from "../../unique/UserinfoModalWrapper.tsx";
 import { Avatar, AvatarFallback, AvatarImage } from "../../ui/avatar.tsx";
-import { storeMyUserinfo } from "~/stores/MyUserinfo.ts";
-import { storeMessageReadTime } from "~/stores/Readtime.ts";
+import { storeMyUserinfo } from "~/stores/MyUserinfo.store.ts";
+import { storeMessageReadTime } from "~/stores/Readtime.store.ts";
 import DisplayReply from "./MessageDisplay/DisplayReply.tsx";
 import EditMessage from "./MessageDisplay/EditMessage.tsx";
 import MentionReadWrapper from "./MessageDisplay/MentionReadWrapper.tsx";

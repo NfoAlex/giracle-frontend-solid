@@ -1,0 +1,76 @@
+import { createStore } from "solid-js/store";
+import { api } from "~/api/index.ts";
+import type { IChannel } from "~/types/Channel.ts";
+
+export const [storeChannelInfo, setStoreChannelInfo] = createStore<{
+  [key: string]: IChannel;
+}>({});
+
+export const [storeChannelFetchStatus, setStoreChannelFetchStatus] =
+  createStore<{
+    [key: string]: "AVAILABLE" | "NOT_FOUND" | "LOADING" | "ERROR_INTERNAL";
+  }>({});
+
+export namespace useStoreChannelInfo {
+  /**
+   * チャンネル情報Storeの値を更新/挿入する
+   * @param value 挿入/更新するチャンネルデータ。
+   */
+  export const updateChannelInfo = (value: IChannel) => {
+    //チャンネル情報をコピーして追記or書き換え
+    const _channelInfo = { ...storeChannelInfo };
+    _channelInfo[value.id] = value;
+    //storeへ格納
+    setStoreChannelInfo({
+      ..._channelInfo,
+    });
+  };
+
+  /**
+   * チャンネル情報を同期で返す。無いなら取得しつつ返す
+   * @param channelId
+   */
+  export const directGetterChannelInfo = (channelId: string): IChannel => {
+    if (storeChannelInfo[channelId] === undefined) {
+      setStoreChannelFetchStatus({
+        ...storeChannelFetchStatus,
+        [channelId]: "LOADING",
+      });
+      updateChannelInfo({
+        name: "ロード中...",
+        id: channelId,
+        description: "このチャンネルはロード中です",
+        createdUserId: "",
+        ChannelViewableRole: [],
+        isArchived: false,
+      });
+      api.channel
+        .getInfo({ channelId })
+        .then((r) => {
+          //Storeに設定
+          updateChannelInfo(r.data);
+          setStoreChannelFetchStatus({
+            ...storeChannelFetchStatus,
+            [channelId]: "AVAILABLE",
+          });
+        })
+        .catch((e) => {
+          console.error("ChannelInfo :: getterChannelInfo : エラー -> ", e);
+          updateChannelInfo({
+            name: "存在しないチャンネル",
+            id: channelId,
+            description: "存在しないチャンネル",
+            createdUserId: "",
+            ChannelViewableRole: [],
+            isArchived: false,
+          });
+          setStoreChannelFetchStatus({
+            ...storeChannelFetchStatus,
+            [channelId]: "NOT_FOUND",
+          });
+        });
+    }
+
+    return storeChannelInfo[channelId];
+  };
+}

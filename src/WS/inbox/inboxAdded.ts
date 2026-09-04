@@ -1,11 +1,11 @@
 import { api } from "~/api/index.ts";
-import { storeClientConfig } from "~/stores/ClientConfig.ts";
-import { storeHistory } from "~/stores/History.ts";
-import { setStoreInbox } from "~/stores/Inbox.ts";
+import { storeClientConfig } from "~/stores/ClientConfig.store.ts";
+import { storeHistory } from "~/stores/History.store.ts";
+import { setStoreInbox } from "~/stores/Inbox.store.ts";
 import {
-  isChannelMuted,
   storeNotificationConfig,
-} from "~/stores/Notification.ts";
+  useStoreNotification,
+} from "~/stores/Notification.store.ts";
 import type { IInbox, IMessage } from "~/types/Message.ts";
 import { notifyIt } from "~/utils/Notify.ts";
 
@@ -31,7 +31,11 @@ export default function WSInboxAdded(dat: {
     notifEnabled ||
     (storeClientConfig.notification.notifyInbox &&
       !storeClientConfig.notification.notifyAll);
-  if (!hasFocus && wantsInbox && !isChannelMuted(dat.message.channelId)) {
+  if (
+    !hasFocus &&
+    wantsInbox &&
+    !useStoreNotification.isChannelMuted(dat.message.channelId)
+  ) {
     //通知内容
     let notifyingContent = dat.message.content;
     //返信なら特別表示に装飾

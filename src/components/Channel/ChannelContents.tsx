@@ -1,13 +1,13 @@
 import { useBeforeLeave, useParams } from "@solidjs/router";
 import { Show, createEffect, createSignal, onCleanup, onMount, on, For } from "solid-js";
-import { insertHistory, setStoreHistory, setStoreImageDimensions, storeHistory, updateHistoryPosition } from "~/stores/History.ts";
+import { setStoreHistory, setStoreImageDimensions, storeHistory, useStoreHistory } from "~/stores/History.store.ts";
 import type { IMessage } from "~/types/Message.tsx";
-import { storeClientConfig } from "~/stores/ClientConfig.ts";
+import { storeClientConfig } from "~/stores/ClientConfig.store.ts";
 import { Button } from "../ui/button.tsx";
 import { IconArrowDown } from "@tabler/icons-solidjs";
 import MessageDisplay from "./ChannelContent/MessageDisplay.tsx";
-import { storeMessageReadTime } from "~/stores/Readtime.ts";
-import { storeMyUserinfo } from "~/stores/MyUserinfo.ts";
+import { storeMessageReadTime } from "~/stores/Readtime.store.ts";
+import { storeMyUserinfo } from "~/stores/MyUserinfo.store.ts";
 import { api } from "~/api/index.ts";
 import { produce } from "solid-js/store";
 import SkeletonLoader from "./ChannelContent/SkeletonLoader.tsx";
@@ -172,7 +172,7 @@ export default function ChannelContents() {
         .then(async (r) => {
           //console.log("ChannelContent :: FnHistoryController.fetchHistory : r->", r);
           //if (r.data.history.length === 0) { console.log("ChannelContent :: fetchHistory : 履歴がありません"); return; }
-          updateHistoryPosition(_channelId, {
+          useStoreHistory.updateHistoryPosition(_channelId, {
             atEnd: r.data.atEnd,
             atTop: r.data.atTop,
           });
@@ -180,7 +180,7 @@ export default function ChannelContents() {
           //スクロール位置記憶
           let anchor = null;
           anchor = FnBrowserApis.captureScrollAnchor();
-          insertHistory(r.data.history);
+          useStoreHistory.insertHistory(r.data.history);
 
           await FnBrowserApis.waitForDomToSettle();
           FnBrowserApis.restoreScrollFromAnchor(anchor);

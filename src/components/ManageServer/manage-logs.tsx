@@ -7,7 +7,7 @@ import { Card } from "~/components/ui/card.tsx";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "~/components/ui/hover-card.tsx";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "~/components/ui/table.tsx";
 import { IRequestLog, IRequestLogCount } from "~/types/Server";
-import { getterUserinfo } from "~/stores/Userinfo";
+import { useStoreUserinfo } from "~/stores/Userinfo.store";
 import { IconAlertCircle, IconArrowLeft, IconArrowRight } from "@tabler/icons-solidjs";
 
 const LOG_PAGE_SIZE = 50;
@@ -261,7 +261,7 @@ export default function ManageLogs() {
                       </TableCell>
                       <TableCell class="text-muted-foreground">
                         <span class="block max-w-[180px] truncate">
-                          { log.userId ? getterUserinfo(log.userId).name : "-" }
+                          { log.userId ? useStoreUserinfo.getterUserinfo(log.userId).name : "-" }
                         </span>
                       </TableCell>
                       <TableCell class="whitespace-nowrap text-muted-foreground">

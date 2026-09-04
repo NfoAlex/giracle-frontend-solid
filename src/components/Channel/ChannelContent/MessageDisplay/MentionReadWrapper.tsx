@@ -1,5 +1,5 @@
 import {type JSX, onMount} from "solid-js";
-import {storeInbox} from "~/stores/Inbox.ts";
+import {storeInbox} from "~/stores/Inbox.store.ts";
 import { api } from "~/api/index.ts";
 
 export default function MentionReadWrapper(props: {children: JSX.Element, messageId: string}) {

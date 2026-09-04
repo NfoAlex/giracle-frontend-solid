@@ -1,8 +1,8 @@
 import {Card} from "~/components/ui/card.tsx";
 import {For, Show} from "solid-js";
-import {storeCustomEmoji} from "~/stores/CustomEmoji.ts";
+import {storeCustomEmoji} from "~/stores/CustomEmoji.store.ts";
 import CreateCustomEmoji from "~/components/ManageServer/ManageEmoji/CreateCustomEmoji";
-import {getterUserinfo} from "~/stores/Userinfo.ts";
+import {useStoreUserinfo} from "~/stores/Userinfo.store.ts";
 import { api } from "~/api/index.ts";
 import {Table, TableBody, TableHead, TableHeader, TableRow} from "~/components/ui/table";
 import {IconTrash} from "@tabler/icons-solidjs";
@@ -53,7 +53,7 @@ export default function ManageEmoji() {
                       <img src={"/api/server/custom-emoji/" + emoji.code} alt={emoji.code} class={"my-1 w-8 h-8"}/>
                     </td>
                     <td><code>{emoji.code}</code></td>
-                    <td class={"overflow-x-auto"}>{getterUserinfo(emoji.uploadedUserId).name}</td>
+                    <td class={"overflow-x-auto"}>{useStoreUserinfo.getterUserinfo(emoji.uploadedUserId).name}</td>
                     <td class={"text-right"}>
                       <Button ondblclick={() => deleteEmoji(emoji.code)} class={"text-red-500 my-1"} size={"sm"} variant={"outline"}>
                         <IconTrash />

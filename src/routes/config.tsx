@@ -9,8 +9,8 @@ import { Card } from "~/components/ui/card.tsx";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~/components/ui/select.tsx";
 import { SidebarMenuButton } from "~/components/ui/sidebar.tsx";
 import SidebarTriggerWithDot from "~/components/unique/SidebarTriggerWithDot.tsx";
-import { storeAppStatus } from "~/stores/AppStatus.ts";
-import { storeClientConfig } from "~/stores/ClientConfig.ts";
+import { storeAppStatus } from "~/stores/AppStatus.store.ts";
+import { storeClientConfig } from "~/stores/ClientConfig.store.ts";
 
 export default function Config() {
   const [displayMode, setDisplayMode] = createSignal<"profile" | "session" | "chat" | "notification" | "display">("profile");

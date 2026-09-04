@@ -10,13 +10,13 @@ import {
   SidebarMenuButton,
 } from "~/components/ui/sidebar.tsx";
 import { Popover, PopoverTrigger } from "~/components/ui/popover.tsx";
-import { getRolePower, storeMyUserinfo } from "~/stores/MyUserinfo.ts";
-import { storeUserOnline } from "~/stores/Userinfo.ts";
-import { storeServerinfo } from "~/stores/Serverinfo.ts";
+import { useStoreMyUserinfo, storeMyUserinfo } from "~/stores/MyUserinfo.store.ts";
+import { storeUserOnline } from "~/stores/Userinfo.store.ts";
+import { storeServerinfo } from "~/stores/Serverinfo.store.ts";
 import { Avatar, AvatarImage } from "./ui/avatar.tsx";
-import { storeAppStatus } from "~/stores/AppStatus.ts";
+import { storeAppStatus } from "~/stores/AppStatus.store.ts";
 import { IconBell, IconCircleFilled, IconDatabaseCog, IconList, IconSearch, IconSettings, IconUser } from "@tabler/icons-solidjs";
-import {storeInbox} from "~/stores/Inbox.ts";
+import {storeInbox} from "~/stores/Inbox.store.ts";
 import {Badge} from "~/components/ui/badge.tsx";
 import ChannelButtons from "./Sidebar/ChannelButtons.tsx";
 import MinesweeperPopup from "./Minesweeper/MinesweeperPopup.tsx";
@@ -94,7 +94,7 @@ export function AppSidebar() {
       </SidebarContent>
 
       <hr class="pb-2" />
-      <Show when={getRolePower("manageRole") || getRolePower("manageServer") || getRolePower("manageEmoji")}>
+      <Show when={useStoreMyUserinfo.getRolePower("manageRole") || useStoreMyUserinfo.getRolePower("manageServer") || useStoreMyUserinfo.getRolePower("manageEmoji")}>
         <SidebarFooter class="py-2">
           <SidebarMenuButton
             as={A}

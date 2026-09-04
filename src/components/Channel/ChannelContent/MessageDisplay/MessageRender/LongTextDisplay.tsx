@@ -5,9 +5,9 @@ import { Button } from "~/components/ui/button.tsx";
 import { Badge } from "~/components/ui/badge.tsx";
 import UserinfoModalWrapper from "~/components/unique/UserinfoModalWrapper.tsx";
 import { Avatar, AvatarImage } from "~/components/ui/avatar.tsx";
-import { getterUserinfo } from "~/stores/Userinfo.ts";
+import { useStoreUserinfo } from "~/stores/Userinfo.store.ts";
 import { IconBrowserMaximize } from "@tabler/icons-solidjs";
-import { storeMyUserinfo } from "~/stores/MyUserinfo.ts";
+import { storeMyUserinfo } from "~/stores/MyUserinfo.store.ts";
 import MessageTextRender from "./MessageTextRender.tsx";
 import URLPreview from "./URLPreview.tsx";
 import { Dialog, DialogContent } from "~/components/ui/dialog.tsx";
@@ -38,7 +38,7 @@ export default function LongTextDisplay(props: { message: IMessage }) {
                 <AvatarImage src={`/api/user/icon/${props.message.userId}`} />
               </Avatar>
             </UserinfoModalWrapper>
-            <p class={"line-clamp-1 truncate"}>{getterUserinfo(props.message.userId).name}</p>
+            <p class={"line-clamp-1 truncate"}>{useStoreUserinfo.getterUserinfo(props.message.userId).name}</p>
             <Badge variant={"secondary"} class={"ml-auto"}>{new Date(props.message.createdAt).toLocaleString()}</Badge>
           </span>
           <hr />

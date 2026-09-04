@@ -7,7 +7,7 @@ import { Button } from "~/components/ui/button.tsx";
 import { Dialog, DialogContent, DialogHeader, DialogTrigger } from "~/components/ui/dialog.tsx";
 import { TextField, TextFieldInput } from "~/components/ui/text-field.tsx";
 import UserinfoModalWrapper from "~/components/unique/UserinfoModalWrapper.tsx";
-import { getterUserinfo } from "~/stores/Userinfo.ts";
+import { useStoreUserinfo } from "~/stores/Userinfo.store.ts";
 import { IUser } from "~/types/User.ts";
 
 export default function InviteUserModal(props: { channelId: string, onInvite?: (user: IUser) => void }) {
@@ -126,7 +126,7 @@ export default function InviteUserModal(props: { channelId: string, onInvite?: (
                   <AvatarImage src={"/api/user/icon/" + user.id} alt={user.id} />
                 </Avatar>
                 <UserinfoModalWrapper userId={user.id}>
-                  <p class="hover:underline">{ getterUserinfo(user.id).name }</p>
+                  <p class="hover:underline">{ useStoreUserinfo.getterUserinfo(user.id).name }</p>
                 </UserinfoModalWrapper>
 
                 {

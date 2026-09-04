@@ -3,7 +3,7 @@ import { api } from "~/api/index.ts";
 import { Avatar, AvatarImage } from "~/components/ui/avatar.tsx";
 import { Dialog, DialogContent, DialogHeader } from "~/components/ui/dialog.tsx";
 import RenderEmoji from "~/components/unique/RenderEmoji.tsx";
-import { getterUserinfo } from "~/stores/Userinfo.ts";
+import { useStoreUserinfo } from "~/stores/Userinfo.store.ts";
 
 // ToDo :: 指定した人数しかとれない
 export default function DisplayAllReactedUserModal(props: { messageId: string, emojiCode: string, onOpen: boolean, onOpenChange: (open: boolean) => void }) {
@@ -42,11 +42,11 @@ export default function DisplayAllReactedUserModal(props: { messageId: string, e
                 <div class="px-2 flex items-center gap-2">
                   <Avatar class="w-8 h-8">
                     <AvatarImage
-                      src={"/api/user/icon/" + getterUserinfo(userId)?.id}
+                      src={"/api/user/icon/" + useStoreUserinfo.getterUserinfo(userId)?.id}
                       alt={userId}
                     />
                   </Avatar>
-                  <p>{ getterUserinfo(userId)?.name || "..." }</p>
+                  <p>{ useStoreUserinfo.getterUserinfo(userId)?.name || "..." }</p>
                 </div>
               )
             }}

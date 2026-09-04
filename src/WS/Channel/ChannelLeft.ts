@@ -2,9 +2,12 @@ import { produce } from "solid-js/store";
 import {
   setStoreHasNewMessage,
   storeHasNewMessage,
-} from "~/stores/HasNewMessage.ts";
-import { setStoreHistory, storeHistory } from "~/stores/History.ts";
-import { setStoreMyUserinfo, storeMyUserinfo } from "~/stores/MyUserinfo.ts";
+} from "~/stores/HasNewMessage.store.ts";
+import { setStoreHistory, storeHistory } from "~/stores/History.store.ts";
+import {
+  setStoreMyUserinfo,
+  storeMyUserinfo,
+} from "~/stores/MyUserinfo.store.ts";
 
 export default function WSChannelLeft(dat: { channelId: string }) {
   //console.log("WSChannelLeft :: triggered dat->", dat);

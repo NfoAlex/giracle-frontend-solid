@@ -1,11 +1,11 @@
 import { createMemo } from "solid-js";
 import { IconCornerUpLeft, IconX } from "@tabler/icons-solidjs";
 import { IMessage } from "~/types/Message.ts";
-import { storeHistory } from "~/stores/History.ts";
-import storeReplyingMessageId from "~/stores/ReplyingMessageId.ts";
+import { storeHistory } from "~/stores/History.store.ts";
+import storeReplyingMessageId from "~/stores/ReplyingMessageId.store.ts";
 import { Card } from "~/components/ui/card.tsx";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar.tsx";
-import { getterUserinfo } from "~/stores/Userinfo.ts";
+import { useStoreUserinfo } from "~/stores/Userinfo.store.ts";
 import { Badge } from "~/components/ui/badge.tsx";
 
 export default function ReplyMessageDisplay(props: {messageId: string, channelId: string, onRemove: () => void}) {
@@ -49,7 +49,7 @@ export default function ReplyMessageDisplay(props: {messageId: string, channelId
           <AvatarFallback class="w-full h-full">{getReplyingMessage().userId}</AvatarFallback>
         </Avatar>
         <p class="truncate shrink-0 font-bold" style="max-width: 25%">
-          { getterUserinfo(getReplyingMessage().userId).name || "不明なユーザー" }
+          { useStoreUserinfo.getterUserinfo(getReplyingMessage().userId).name || "不明なユーザー" }
         </p>
         {
           getReplyingMessage().MessageFileAttached.length > 0

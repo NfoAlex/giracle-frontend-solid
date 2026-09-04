@@ -2,7 +2,7 @@ import { api } from "~/api/index.ts";
 import {
   setStoreMessageReadTime,
   storeMessageReadTime,
-} from "~/stores/Readtime.ts";
+} from "~/stores/Readtime.store.ts";
 
 function BindToReadTimeStore(
   channelId: string,

@@ -6,8 +6,8 @@ import { Card } from "~/components/ui/card.tsx";
 import { Label } from "~/components/ui/label.tsx";
 import { TextField, TextFieldInput, TextFieldTextArea } from "~/components/ui/text-field.tsx";
 import RoleLinker from "~/components/unique/RoleLinker.tsx";
-import { directGetterChannelInfo } from "~/stores/ChannelInfo.ts";
-import { getRolePower } from "~/stores/MyUserinfo.ts";
+import { useStoreChannelInfo } from "~/stores/ChannelInfo.store.ts";
+import { useStoreMyUserinfo } from "~/stores/MyUserinfo.store.ts";
 
 export default function ChannelInfo(props: { channelId: string }) {
   const [editName, setEditName] = createSignal(false);
@@ -18,7 +18,7 @@ export default function ChannelInfo(props: { channelId: string }) {
 
   //閲覧可能ロールが変更されたかどうか
   const roleIsDiff = () => {
-    const oldRoles = directGetterChannelInfo(props.channelId).ChannelViewableRole.map((r) => r.roleId).join(",");
+    const oldRoles = useStoreChannelInfo.directGetterChannelInfo(props.channelId).ChannelViewableRole.map((r) => r.roleId).join(",");
     return oldRoles !== newRoles().join(",");
   }
 
@@ -37,7 +37,7 @@ export default function ChannelInfo(props: { channelId: string }) {
         setEditDescription(false);
         setEditName(false);
         //更新後の閲覧可能ロールを格納
-        const roleIdArr = [...directGetterChannelInfo(props.channelId).ChannelViewableRole];
+        const roleIdArr = [...useStoreChannelInfo.directGetterChannelInfo(props.channelId).ChannelViewableRole];
         setNewRoles(roleIdArr.map((r) => r.roleId));
       })
       .catch((e) => {
@@ -47,7 +47,7 @@ export default function ChannelInfo(props: { channelId: string }) {
 
   //チャンネルを移動するごとに閲覧可能ロールを更新
   createEffect(on(() => props.channelId, () => {
-    const roleIdArr = [...directGetterChannelInfo(props.channelId).ChannelViewableRole];
+    const roleIdArr = [...useStoreChannelInfo.directGetterChannelInfo(props.channelId).ChannelViewableRole];
     setNewRoles(roleIdArr.map((r) => r.roleId));
   }));
 
@@ -63,7 +63,7 @@ export default function ChannelInfo(props: { channelId: string }) {
                 <TextField class={"grow"}>
                   <TextFieldInput
                     placeholder={"チャンネル名"}
-                    value={directGetterChannelInfo(props.channelId).name}
+                    value={useStoreChannelInfo.directGetterChannelInfo(props.channelId).name}
                     onInput={(e) => setNewName(e.currentTarget.value)}
                   />
                 </TextField>
@@ -73,10 +73,10 @@ export default function ChannelInfo(props: { channelId: string }) {
               :
               <div class={"flex items-center overflow-x-scroll gap-1"}>
                 <span class={"shrink max-w-48 md:max-w-80 overflow-x-scroll"}>
-                  <p class={"text-2xl truncate"}>{directGetterChannelInfo(props.channelId).name ?? "ロード中..."}</p>
+                  <p class={"text-2xl truncate"}>{useStoreChannelInfo.directGetterChannelInfo(props.channelId).name ?? "ロード中..."}</p>
                 </span>
                 { //権限ある場合の編集ボタン
-                  getRolePower("manageChannel")
+                  useStoreMyUserinfo.getRolePower("manageChannel")
                   &&
                   <Button onClick={() => setEditName(true)} variant={"outline"} class={"ml-auto border rounded-md h-10 w-10"}><IconPencil /></Button>
                 }
@@ -91,11 +91,11 @@ export default function ChannelInfo(props: { channelId: string }) {
           !editDescription()
             ?
             <div class={"grow py-3 relative max-h-64 overflow-y-auto whitespace-pre-wrap break-words"}>
-              <p>{directGetterChannelInfo(props.channelId).description}</p>
-              {directGetterChannelInfo(props.channelId).description === "" && <p class={"text-muted-foreground"}>概要が空です。</p>}
+              <p>{useStoreChannelInfo.directGetterChannelInfo(props.channelId).description}</p>
+              {useStoreChannelInfo.directGetterChannelInfo(props.channelId).description === "" && <p class={"text-muted-foreground"}>概要が空です。</p>}
 
               { //権限ある場合の編集ボタン
-                getRolePower("manageChannel")
+                useStoreMyUserinfo.getRolePower("manageChannel")
                 &&
                 <Button
                   onClick={() => setEditDescription(true)}
@@ -110,7 +110,7 @@ export default function ChannelInfo(props: { channelId: string }) {
             <div class={"flex flex-col gap-1"}>
               <TextField class={"max-h-64 overflow-y-auto"}>
                 <TextFieldTextArea
-                  value={directGetterChannelInfo(props.channelId).description}
+                  value={useStoreChannelInfo.directGetterChannelInfo(props.channelId).description}
                   onInput={(e) => setNewDescription(e.currentTarget.value)}
                 />
               </TextField>
@@ -130,7 +130,7 @@ export default function ChannelInfo(props: { channelId: string }) {
         onUpdate={(roles) => setNewRoles(roles)}
       />
       { //権限がある場合のロール更新ボタン
-        getRolePower("manageChannel")
+        useStoreMyUserinfo.getRolePower("manageChannel")
         &&
         <Button
           onClick={updateChannel}

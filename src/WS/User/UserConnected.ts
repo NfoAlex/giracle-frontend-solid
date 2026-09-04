@@ -1,4 +1,7 @@
-import { setStoreUserOnline, storeUserOnline } from "~/stores/Userinfo.ts";
+import {
+  setStoreUserOnline,
+  storeUserOnline,
+} from "~/stores/Userinfo.store.ts";
 
 export default function WSUserConnected(dat: string) {
   //console.log("WSUserConnected :: triggered dat->", dat);

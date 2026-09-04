@@ -7,9 +7,9 @@ import ChannelHeader from "~/components/Channel/ChannelHeader.tsx";
 import ChannelTextInput from "~/components/Channel/ChannelTextInput.tsx";
 import { Button } from "~/components/ui/button.tsx";
 import { Card } from "~/components/ui/card.tsx";
-import { storeAppStatus } from "~/stores/AppStatus.ts";
-import { storeChannelFetchStatus } from "~/stores/ChannelInfo.ts";
-import { storeMyUserinfo } from "~/stores/MyUserinfo.ts";
+import { storeAppStatus } from "~/stores/AppStatus.store.ts";
+import { storeChannelFetchStatus } from "~/stores/ChannelInfo.store.ts";
+import { storeMyUserinfo } from "~/stores/MyUserinfo.store.ts";
 
 export default function Channel() {
   const params = useParams();
