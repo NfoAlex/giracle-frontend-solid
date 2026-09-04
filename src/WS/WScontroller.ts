@@ -37,6 +37,8 @@ export let ws: WebSocket | undefined = undefined;
 let FLAGwsError = false;
 //再接続フラグ
 let FLAGwsReconnect = false;
+//PING送信タイマー（再接続毎に蓄積しないようmodule変数化）
+let pingInterval: ReturnType<typeof setInterval> | undefined;
 
 export const initWS = async () => {
   //既に接続済みの場合は再接続しない
@@ -221,12 +223,14 @@ export const initWS = async () => {
       }
     }
 
-    //PING
-    const pingInterval = setInterval(() => {
+    //PING（多重生成防止のため既存タイマーがあれば先に解除）
+    if (pingInterval !== undefined) clearInterval(pingInterval);
+    pingInterval = setInterval(() => {
       if (ws && ws.readyState === WebSocket.OPEN) {
         ws.send(JSON.stringify({ signal: "ping", data: "ping" }));
       } else {
         clearInterval(pingInterval);
+        pingInterval = undefined;
       }
     }, 20000);
 
@@ -257,6 +261,12 @@ export const initWS = async () => {
 
     //接続状態を更新
     storeAppStatus.wsConnected = false;
+    //PINGタイマーを解除しないと旧socket向けpingが蓄積する
+    if (pingInterval !== undefined) {
+      clearInterval(pingInterval);
+      pingInterval = undefined;
+    }
+
     //エラーで閉じられた場合は再接続しない
     if (FLAGwsError) return;
 
@@ -269,18 +279,19 @@ export const initWS = async () => {
       Math.random() * 500 + 1000,
     );
   };
-
-  // スマホ用のブラウザ可視状態が変更されたときのイベントリスナー
-  document.addEventListener("visibilitychange", () => {
-    if (ws === undefined) return;
-    if (document.visibilityState === "visible") {
-      // ブラウザがアクティブになったときに WebSocket の接続状態を確認
-      if (
-        ws.readyState !== WebSocket.OPEN &&
-        ws.readyState !== WebSocket.CONNECTING
-      ) {
-        initWS();
-      }
-    }
-  });
 };
+
+// スマホ用のブラウザ可視状態が変更されたときのイベントリスナー
+//再接続毎に登録すると重複するためinitWS外で一度だけ登録
+document.addEventListener("visibilitychange", () => {
+  if (ws === undefined) return;
+  if (document.visibilityState === "visible") {
+    // ブラウザがアクティブになったときに WebSocket の接続状態を確認
+    if (
+      ws.readyState !== WebSocket.OPEN &&
+      ws.readyState !== WebSocket.CONNECTING
+    ) {
+      initWS();
+    }
+  }
+});
