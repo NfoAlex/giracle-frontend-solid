@@ -9,12 +9,75 @@ export const [storeHistory, setStoreHistory] = createStore<{
   };
 }>({});
 
-export const [storeImageDimensions, setStoreImageDimensions] = createStore<{
+const [storeImageDimensions, setStoreImageDimensions] = createStore<{
   [fileId: string]: {
     width: number;
     height: number;
   };
 }>({});
+
+export { storeImageDimensions };
+
+//総メッセージ数の上限。超過分は訪問順が古いチャンネルから削除し、表示中チャンネルを保護する
+const MAX_TOTAL_HISTORY = 750;
+
+//訪問順管理。ストア外変数で良く、反応性は不要
+const visitOrder = new Set<string>();
+
+/** 表示中チャンネルが削除対象にならないよう末尾へ移動 */
+export const recordVisit = (channelId: string) => {
+  visitOrder.delete(channelId);
+  visitOrder.add(channelId);
+};
+
+/**
+ * 総メッセージ数が上限を超えている間、訪問順の古いチャンネルからエントリごと削除
+ * @param target 書き換え対象(ストアのコピー / produceのドラフト)
+ */
+const trimToCap = (target: {
+  [key: string]: { history: IMessage[]; atTop: boolean; atEnd: boolean };
+}) => {
+  let total = Object.values(target).reduce(
+    (sum, e) => sum + e.history.length,
+    0,
+  );
+
+  //visitOrderに無いチャンネルも削除対象に含める
+  for (const id of [...visitOrder, ...Object.keys(target)]) {
+    if (total < MAX_TOTAL_HISTORY) return;
+    const entry = target[id];
+    if (entry === undefined) continue;
+    total -= entry.history.length;
+    delete target[id];
+  }
+};
+
+const MAX_IMAGE_DIMENSIONS = 300;
+const imageDimOrder = new Set<string>();
+
+export const putImageDimensions = (batchImageDims: {
+  [fileId: string]: { width: number; height: number };
+}) => {
+  //バックエンドのフィールド欠損対策(Object.keysがundefinedで落ちるため)
+  if (!batchImageDims) return;
+
+  setStoreImageDimensions(produce((prev) => Object.assign(prev, batchImageDims)));
+  for (const fileId of Object.keys(batchImageDims)) imageDimOrder.add(fileId);
+
+  const expired: string[] = [];
+  while (imageDimOrder.size + expired.length > MAX_IMAGE_DIMENSIONS) {
+    const oldest = imageDimOrder.values().next().value as string;
+    imageDimOrder.delete(oldest);
+    expired.push(oldest);
+  }
+  if (expired.length > 0) {
+    setStoreImageDimensions(
+      produce((prev) => {
+        for (const fileId of expired) delete prev[fileId];
+      }),
+    );
+  }
+};
 
 /**
  * 履歴Storeに挿入する
@@ -92,7 +155,10 @@ export const insertHistory = (history: IMessage[]) => {
     }
   }
 
-  setTimeout(() => setStoreHistory(currentHistory), 0);
+  setTimeout(() => {
+    trimToCap(currentHistory);
+    setStoreHistory(currentHistory);
+  }, 0);
 
   //console.log("History :: insertHistory : current store->", storeHistory);
 };
@@ -130,6 +196,7 @@ export const addMessage = (message: IMessage) => {
         ...messageTemplate,
         ...message,
       });
+      trimToCap(history);
     }),
   );
 };

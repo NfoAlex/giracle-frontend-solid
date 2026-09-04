@@ -1,8 +1,7 @@
-import { produce } from "solid-js/store";
 import { api } from "~/api/index.ts";
 import {
   insertHistory,
-  setStoreImageDimensions,
+  putImageDimensions,
   updateHistoryPosition,
 } from "~/stores/History.ts";
 
@@ -44,9 +43,7 @@ export default function FetchHistory(
         atEnd: response.data.atEnd,
         atTop: response.data.atTop,
       });
-      setStoreImageDimensions(
-        produce((prev) => Object.assign(prev, response.data.ImageDimensions)),
-      );
+      putImageDimensions(response.data.ImageDimensions);
       insertHistory(response.data.history);
     } catch (error) {
       console.error("ChannelContent :: fetchHistory : エラー->", error);
