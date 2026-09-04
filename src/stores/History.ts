@@ -18,7 +18,7 @@ const [storeImageDimensions, setStoreImageDimensions] = createStore<{
 
 export { storeImageDimensions };
 
-//上記上限を超えた分は訪問順が古いチャンネルから削除し、表示中チャンネルを保護する
+//総メッセージ数の上限。超過分は訪問順が古いチャンネルから削除し、表示中チャンネルを保護する
 const MAX_TOTAL_HISTORY = 750;
 
 //訪問順管理。ストア外変数で良く、反応性は不要
@@ -53,17 +53,20 @@ const trimToCap = (target: {
 };
 
 const MAX_IMAGE_DIMENSIONS = 300;
-const imageDimOrder = new Map<string, true>();
+const imageDimOrder = new Set<string>();
 
-export const putImageDimensions = (batch: {
+export const putImageDimensions = (batchImageDims: {
   [fileId: string]: { width: number; height: number };
 }) => {
-  setStoreImageDimensions(produce((prev) => Object.assign(prev, batch)));
-  for (const fileId of Object.keys(batch)) imageDimOrder.set(fileId, true);
+  //バックエンドのフィールド欠損対策(Object.keysがundefinedで落ちるため)
+  if (!batchImageDims) return;
+
+  setStoreImageDimensions(produce((prev) => Object.assign(prev, batchImageDims)));
+  for (const fileId of Object.keys(batchImageDims)) imageDimOrder.add(fileId);
 
   const expired: string[] = [];
   while (imageDimOrder.size + expired.length > MAX_IMAGE_DIMENSIONS) {
-    const oldest = imageDimOrder.keys().next().value as string;
+    const oldest = imageDimOrder.values().next().value as string;
     imageDimOrder.delete(oldest);
     expired.push(oldest);
   }
