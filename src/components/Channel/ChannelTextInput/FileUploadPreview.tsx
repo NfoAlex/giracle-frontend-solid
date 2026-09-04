@@ -25,6 +25,7 @@ export default function FileUploadPreview(
   const [previewUrl, setPreviewUrl] = createSignal<string>("");
   const [open, setOpen] = createSignal(false); //エラー表示ダイアログ用
   let fileIdBinded = "";
+  let xhr = new XMLHttpRequest(); //onCleanupでのabort用に外スコープへ保持
 
   /**
    * ファイルをアップロードする
@@ -47,12 +48,12 @@ export default function FileUploadPreview(
     //アップロードするデータフォームオブジェクト生成
     const formData = new FormData();
     //送信者情報とディレクトリを付与
-    formData.append("channelId", params.channelId);
+    formData.append("channelId", params.channelId!);
     //ファイルそのものを内包
     formData.append("file", props.file);
 
-    //アップロード用のXHRインスタンス
-    const xhr = new XMLHttpRequest();
+    //アップロード用のXHRを置き換え
+    xhr = new XMLHttpRequest();
     //アップロード状況追跡用
     xhr.upload.addEventListener("progress", (event) => {
       if (event.lengthComputable) {
@@ -67,6 +68,9 @@ export default function FileUploadPreview(
 
     //アップロードの結果用
     xhr.addEventListener("load", () => {
+      //削除でabortされた後の応答は無視（送信データに混入させない）
+      if (xhr.status === 0) return;
+
       if (xhr.status === 200) {
         //console.log("FileUploadPreview :: uploadFile : 成功!->", xhr.responseText);
         const result: { result: string; data: { fileId: { id: string } } } = JSON.parse(
@@ -101,6 +105,8 @@ export default function FileUploadPreview(
 
   onMount(() => uploadFile());
   onCleanup(() => {
+    //完了前削除ならアップロード中断（応答時にIDが親へ渡るのを防ぐ）
+    xhr?.abort();
     if (previewUrl()) {
       URL.revokeObjectURL(previewUrl());
     }
