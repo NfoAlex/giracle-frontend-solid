@@ -100,7 +100,7 @@ npx biome check --write .         # lint + format 自動修正
 
 ## 変更時の確認手順
 
-1. `npx tsc --noEmit --skipLibCheck` で**自分の変更が新規型エラー増やしていない**こと確認（テスト無しのため型チェックが最重要安全網。既存エラー約16件あり0件は基準不可。「コマンド」節注意参照）。
+1. `npx tsc --noEmit --skipLibCheck` で**自分の変更が新規型エラー増やしていない**こと確認（テスト無しのため型チェックが最重要安全網。既存エラーあり・0件は基準不可、件数は「コマンド」節注意参照）。
    `npx biome check .` で lint/format 違反も確認（`--write` で自動修正可）。
 2. UI 変更はバックエンド起動した上で `pnpm dev` → `http://localhost:3333` で動作確認。
 3. PWA / Service Worker 関連変更は `dev-dist/` 生成（gitignore 済み）。SW 挙動はブラウザ DevTools → Application で確認。
