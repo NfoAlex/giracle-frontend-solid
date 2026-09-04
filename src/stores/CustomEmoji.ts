@@ -6,7 +6,15 @@ import type { ICustomEmoji } from "~/types/Message.ts";
 export const [storeCustomEmoji, setStoreCustomEmoji] = createStore<
   ICustomEmoji[]
 >([]);
-export let emojiDB = new Database();
+export const emojiDB = new Database();
+
+/**
+ * emojiDBへカスタム絵文字データセットを差分適用する
+ * （new Database()での全件インデックス再構築を避ける）
+ */
+const applyEmojiDataset = () => {
+  emojiDB.customEmoji = getEmojiDatasetWithCustomEmoji();
+};
 
 /**
  * カスタム絵文字を丸ごとバインドする
@@ -14,10 +22,9 @@ export let emojiDB = new Database();
  */
 export const bindCustomEmoji = (emojis: ICustomEmoji[]) => {
   setStoreCustomEmoji(emojis);
-  const customEmojiDataset = getEmojiDatasetWithCustomEmoji();
 
   //emojiDBを更新
-  emojiDB = new Database({ customEmoji: customEmojiDataset });
+  applyEmojiDataset();
 };
 
 /**
@@ -26,10 +33,9 @@ export const bindCustomEmoji = (emojis: ICustomEmoji[]) => {
  */
 export const updateCustomEmoji = (emoji: ICustomEmoji) => {
   setStoreCustomEmoji([...storeCustomEmoji, emoji]);
-  const customEmojiDataset = getEmojiDatasetWithCustomEmoji();
 
   //emojiDBを更新
-  emojiDB = new Database({ customEmoji: customEmojiDataset });
+  applyEmojiDataset();
 };
 
 /**
@@ -40,10 +46,9 @@ export const deleteCustomEmojiData = (emojiCode: string) => {
   setStoreCustomEmoji(
     storeCustomEmoji.filter((emoji) => emoji.code !== emojiCode),
   );
-  const customEmojiDataset = getEmojiDatasetWithCustomEmoji();
 
   //emojiDBを更新
-  emojiDB = new Database({ customEmoji: customEmojiDataset });
+  applyEmojiDataset();
 };
 
 /**
