@@ -61,7 +61,9 @@ export const putImageDimensions = (batchImageDims: {
   //バックエンドのフィールド欠損対策(Object.keysがundefinedで落ちるため)
   if (!batchImageDims) return;
 
-  setStoreImageDimensions(produce((prev) => Object.assign(prev, batchImageDims)));
+  setStoreImageDimensions(
+    produce((prev) => Object.assign(prev, batchImageDims)),
+  );
   for (const fileId of Object.keys(batchImageDims)) imageDimOrder.add(fileId);
 
   const expired: string[] = [];
@@ -155,10 +157,10 @@ export const insertHistory = (history: IMessage[]) => {
     }
   }
 
-  setTimeout(() => {
-    trimToCap(currentHistory);
-    setStoreHistory(currentHistory);
-  }, 0);
+  //setTimeout遅延をやめ、同期的に書き込む。遅延中に次のinsertHistoryが走ると
+  //古いstoreHistoryをコピーして先の挿入結果が上書きされる(lost update)ため
+  trimToCap(currentHistory);
+  setStoreHistory(currentHistory);
 
   //console.log("History :: insertHistory : current store->", storeHistory);
 };
@@ -184,8 +186,10 @@ export const addMessage = (message: IMessage) => {
     replyingMessageId: null,
   };
 
-  if (message === undefined)
+  if (message === undefined) {
     console.error("History :: addMessage : message is undefined");
+    return;
+  }
   if (storeHistory[message.channelId] === undefined) return;
   if (storeHistory[message.channelId].atEnd === false) return;
 
@@ -219,12 +223,8 @@ export const updateHistoryPosition = (
     };
   } else {
     currentHistory[_channelId] = {
-      atTop: !currentHistory[_channelId].atTop
-        ? dat.atTop
-        : currentHistory[_channelId].atTop,
-      atEnd: !currentHistory[_channelId].atEnd
-        ? dat.atEnd
-        : currentHistory[_channelId].atEnd,
+      atTop: dat.atTop,
+      atEnd: dat.atEnd,
       history: [...currentHistory[_channelId].history],
     };
   }
