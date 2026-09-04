@@ -129,15 +129,22 @@ export default function ChannelTextInput() {
 
   /**
    * メンション用のユーザー検索
+   * 入力毎のAPI発火を避けるため200msでdebounceする
    * @param query
    */
+  let searchUserTimer: ReturnType<typeof setTimeout>; //検索debounce用タイマー
   const searchUser = (query: string) => {
-    api.user.list({ username: query, joinedChannel: params.channelId })
-      .then((r) => {
-        setUserSearchResult(r.data);
-        //console.log("GET_USER_SEARCH :: r->", r);
-      })
-      .catch((e) => console.error("GET_USER_SEARCH :: e->", e));
+    clearTimeout(searchUserTimer);
+    searchUserTimer = setTimeout(() => {
+      api.user.list({ username: query, joinedChannel: params.channelId })
+        .then((r) => {
+          // 古いクエリの応答で新しい結果を上書きしない
+          if (searchOptions().query !== query) return;
+          setUserSearchResult(r.data);
+          //console.log("GET_USER_SEARCH :: r->", r);
+        })
+        .catch((e) => console.error("GET_USER_SEARCH :: e->", e));
+    }, 200);
   }
 
   /**
