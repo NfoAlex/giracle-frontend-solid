@@ -22,12 +22,12 @@ export { storeImageDimensions };
 const MAX_TOTAL_HISTORY = 750;
 
 //訪問順管理。ストア外変数で良く、反応性は不要
-let visitOrder: string[] = [];
+const visitOrder = new Set<string>();
 
 /** 表示中チャンネルが削除対象にならないよう末尾へ移動 */
 export const recordVisit = (channelId: string) => {
-  visitOrder = visitOrder.filter((id) => id !== channelId);
-  visitOrder.push(channelId);
+  visitOrder.delete(channelId);
+  visitOrder.add(channelId);
 };
 
 /**
