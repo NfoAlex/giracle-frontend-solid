@@ -4,7 +4,7 @@ import Login from "~/components/Auth/Login.tsx";
 import Register from "~/components/Auth/Register.tsx";
 import { Card, CardContent } from "~/components/ui/card.tsx";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs.tsx";
-import { storeServerinfo } from "~/stores/Serverinfo.ts";
+import { storeServerinfo } from "~/stores/Serverinfo.store.ts";
 import GetCookie from "~/utils/GetCookie.ts";
 import InitLoad from "~/utils/InitLoad.ts";
 import { createSignal } from "solid-js";

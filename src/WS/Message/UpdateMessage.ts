@@ -1,5 +1,5 @@
-import { setStoreHistory } from "~/stores/History.ts";
-import { fnMessageFetchCache } from "~/stores/MessageFetchCache";
+import { setStoreHistory } from "~/stores/History.store.ts";
+import { useStoreMessageFetchCache } from "~/stores/MessageFetchCache.store";
 import type { IMessage } from "~/types/Message.ts";
 
 /**
@@ -35,5 +35,5 @@ export default function WSUpdateMessage(dat: IMessage) {
   });
 
   //キャッシュ更新
-  fnMessageFetchCache.updateMessage(dat);
+  useStoreMessageFetchCache.updateMessage(dat);
 }

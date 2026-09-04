@@ -3,9 +3,9 @@ import {IconPlus} from "@tabler/icons-solidjs";
 import {Popover, PopoverContent, PopoverTrigger} from "~/components/ui/popover";
 import {Badge} from "~/components/ui/badge.tsx";
 import RoleChip from "~/components/unique/RoleChip";
-import {storeRoleInfo} from "~/stores/RoleInfo.ts";
+import {storeRoleInfo} from "~/stores/RoleInfo.store.ts";
 import {Card} from "~/components/ui/card.tsx";
-import { getRolePower } from "~/stores/MyUserinfo.ts";
+import { useStoreMyUserinfo } from "~/stores/MyUserinfo.store.ts";
 
 export default function RoleLinker(props: { roles: string[], onUpdate?: (roles: string[])=>void }) {
   const [newRoles, setNewRoles] = createSignal(props.roles);
@@ -47,7 +47,7 @@ export default function RoleLinker(props: { roles: string[], onUpdate?: (roles: 
       <Popover>
         <PopoverTrigger class={"w-fit"}>
           { //チャンネル編集権限がある時のロール追加ボタン表示
-            getRolePower("manageChannel")
+            useStoreMyUserinfo.getRolePower("manageChannel")
             &&
             <Badge
               variant={"outline"}

@@ -1,11 +1,11 @@
 import { For } from "solid-js";
 import { Card } from "../ui/card.tsx";
-import { directGetterChannelInfo } from "~/stores/ChannelInfo.ts";
+import { useStoreChannelInfo } from "~/stores/ChannelInfo.store.ts";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar.tsx";
-import { getterUserinfo } from "~/stores/Userinfo.ts";
+import { useStoreUserinfo } from "~/stores/Userinfo.store.ts";
 import { Button } from "../ui/button.tsx";
 import { IconCheck, IconCornerUpRight, IconAt } from "@tabler/icons-solidjs";
-import { storeInbox } from "~/stores/Inbox.ts";
+import { storeInbox } from "~/stores/Inbox.store.ts";
 import MessageRender from "../Channel/ChannelContent/MessageDisplay/MessageRender.tsx";
 import DisplayReply from "../Channel/ChannelContent/MessageDisplay/DisplayReply.tsx";
 
@@ -16,7 +16,7 @@ export default function DisplayInboxByDate(props: { onReadIt: (messageId: string
         <Card class={"p-2 flex flex-col gap-2 mt-1"}>
           <span class={"flex items-center gap-1"}>
             <p class={"font-bold text-xl"}>#</p>
-            <p>{ directGetterChannelInfo(inboxItem.Message.channelId).name }</p>
+            <p>{ useStoreChannelInfo.directGetterChannelInfo(inboxItem.Message.channelId).name }</p>
             { inboxItem.type === "mention" && <IconAt class="ml-auto w-4 h-4" /> }
             { inboxItem.type === "reply" && <IconCornerUpRight class="ml-auto w-4 h-4" /> }
           </span>
@@ -30,7 +30,7 @@ export default function DisplayInboxByDate(props: { onReadIt: (messageId: string
             <Avatar>
               <AvatarImage src={"/api/user/icon/" + inboxItem.Message.userId} />
               <AvatarFallback>
-                { getterUserinfo(inboxItem.Message.userId).name.slice(0,1) }
+                { useStoreUserinfo.getterUserinfo(inboxItem.Message.userId).name.slice(0,1) }
               </AvatarFallback>
             </Avatar>
             <span class={"grow border-e-2"}>

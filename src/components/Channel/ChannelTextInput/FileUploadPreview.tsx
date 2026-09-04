@@ -7,7 +7,7 @@ import { HoverCard, HoverCardContent, HoverCardTrigger } from "~/components/ui/h
 import { Button } from "~/components/ui/button.tsx";
 import { Tooltip,TooltipContent,TooltipTrigger } from "~/components/ui/tooltip.tsx";
 import { Dialog,DialogDescription,DialogHeader,DialogContent,DialogTitle } from "~/components/ui/dialog.tsx";
-import { storeServerinfo } from "~/stores/Serverinfo.ts";
+import { storeServerinfo } from "~/stores/Serverinfo.store.ts";
 import ConvertSizeToHumanSize from "~/utils/ConvertSizeToHumanSize.ts";
 import { Alert,AlertDescription,AlertTitle } from "~/components/ui/alert.tsx";
 

@@ -1,7 +1,7 @@
 import { createMutable } from "solid-js/store";
 import { api } from "~/api/index.ts";
 import type { IMessage } from "~/types/Message.ts";
-import { storeHistory } from "./History";
+import { storeHistory } from "./History.store.ts";
 
 const messageHolder: IMessage = {
   channelId: "",
@@ -27,8 +27,11 @@ const storeMessageFetchCache = createMutable<{
   };
 }>({ cache: {}, isDeleted: {} });
 
-export const fnMessageFetchCache = {
-  getMessage: (channelId: string, messageId: string): IMessage => {
+export namespace useStoreMessageFetchCache {
+  export const getMessage = (
+    channelId: string,
+    messageId: string,
+  ): IMessage => {
     if (storeMessageFetchCache.isDeleted[messageId]) return messageHolder;
     if (storeMessageFetchCache.cache[messageId])
       return storeMessageFetchCache.cache[messageId];
@@ -67,31 +70,31 @@ export const fnMessageFetchCache = {
       channelId: channelId,
     };
     return storeMessageFetchCache.cache[messageId];
-  },
+  };
 
-  updateMessage: (message: IMessage) => {
+  export const updateMessage = (message: IMessage) => {
     if (storeMessageFetchCache.isDeleted[message.id]) return;
     storeMessageFetchCache.cache[message.id] = {
       ...storeMessageFetchCache.cache[message.id],
       ...message,
     };
-  },
+  };
 
-  getIsDeleted: (messageId: string) => {
+  export const getIsDeleted = (messageId: string) => {
     return storeMessageFetchCache.isDeleted[messageId];
-  },
+  };
 
-  setAsDeleted: (messageId: string) => {
+  export const setAsDeleted = (messageId: string) => {
     storeMessageFetchCache.cache[messageId] = {
       ...messageHolder,
       content: "削除されたメッセージ",
       id: messageId,
     };
     storeMessageFetchCache.isDeleted[messageId] = true;
-  },
+  };
 
-  clearCache: () => {
+  export const clearCache = () => {
     storeMessageFetchCache.cache = {};
     storeMessageFetchCache.isDeleted = {};
-  },
-};
+  };
+}

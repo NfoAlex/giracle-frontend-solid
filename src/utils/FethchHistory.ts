@@ -1,10 +1,9 @@
 import { produce } from "solid-js/store";
 import { api } from "~/api/index.ts";
 import {
-  insertHistory,
   setStoreImageDimensions,
-  updateHistoryPosition,
-} from "~/stores/History.ts";
+  useStoreHistory,
+} from "~/stores/History.store.ts";
 
 //履歴取得キュー:取得中のリクエストをチャンネルId＋取得方向ごとに保持する
 const fetchQueue = new Map<string, Promise<void>>();
@@ -40,14 +39,14 @@ export default function FetchHistory(
         fetchLength: _dat.fetchLength,
         fetchDirection: _direction,
       });
-      updateHistoryPosition(_channelId, {
+      useStoreHistory.updateHistoryPosition(_channelId, {
         atEnd: response.data.atEnd,
         atTop: response.data.atTop,
       });
       setStoreImageDimensions(
         produce((prev) => Object.assign(prev, response.data.ImageDimensions)),
       );
-      insertHistory(response.data.history);
+      useStoreHistory.insertHistory(response.data.history);
     } catch (error) {
       console.error("ChannelContent :: fetchHistory : エラー->", error);
     } finally {

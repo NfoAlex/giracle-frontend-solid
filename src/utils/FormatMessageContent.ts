@@ -1,5 +1,5 @@
-import { directGetterChannelInfo } from "~/stores/ChannelInfo.ts";
-import { asyncGetterUserinfo } from "~/stores/Userinfo.ts";
+import { useStoreChannelInfo } from "~/stores/ChannelInfo.store.ts";
+import { useStoreUserinfo } from "~/stores/Userinfo.store.ts";
 
 export default async function FormatMessageContent(content: string) {
   const mentionPattern = /@<([a-f0-9-]+)>/g;
@@ -57,7 +57,9 @@ export default async function FormatMessageContent(content: string) {
       switch (obj.type) {
         case "userId": {
           try {
-            const user = await asyncGetterUserinfo(obj.context.slice(2, -1));
+            const user = await useStoreUserinfo.asyncGetterUserinfo(
+              obj.context.slice(2, -1),
+            );
             result.push(`@${user.name}`);
           } catch {
             result.push("@不明なユーザー");
@@ -70,7 +72,8 @@ export default async function FormatMessageContent(content: string) {
         case "channel": {
           const channelId = obj.context.slice(2, -1);
           // チャンネル情報がストア未読み込みの場合のTypeErrorを防止
-          const channelInfo = directGetterChannelInfo(channelId);
+          const channelInfo =
+            useStoreChannelInfo.directGetterChannelInfo(channelId);
           const channelName = channelInfo?.name ?? "不明なチャンネル";
           result.push(`#${channelName}`);
           break;

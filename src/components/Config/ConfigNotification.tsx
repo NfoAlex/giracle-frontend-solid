@@ -17,13 +17,13 @@ import {
 import { Button } from "../ui/button.tsx";
 import { showToast } from "../ui/toast.tsx";
 import { For, Show, createSignal, onMount } from "solid-js";
-import { directGetterChannelInfo, storeChannelInfo } from "~/stores/ChannelInfo.ts";
+import { useStoreChannelInfo, storeChannelInfo } from "~/stores/ChannelInfo.store.ts";
 import {
   setStoreMutedChannels,
   setStoreNotificationConfig,
   storeMutedChannels,
   storeNotificationConfig,
-} from "~/stores/Notification.ts";
+} from "~/stores/Notification.store.ts";
 import { api } from "~/api/index.ts";
 import {
   getCurrentPushSubscription,
@@ -264,7 +264,7 @@ export default function ConfigNotification() {
           <div class="flex flex-col gap-2">
             <For each={storeMutedChannels.ids}>
               {(channelId) => {
-                const info = directGetterChannelInfo(channelId);
+                const info = useStoreChannelInfo.directGetterChannelInfo(channelId);
                 return (
                   <div class="flex items-center justify-between gap-2 py-1">
                     <span class="flex items-center gap-2">

@@ -1,7 +1,7 @@
 import { Show } from "solid-js";
 import { useLocation, useNavigate } from "@solidjs/router";
-import { directGetterChannelInfo } from "~/stores/ChannelInfo";
-import { fnMessageFetchCache } from "~/stores/MessageFetchCache";
+import { useStoreChannelInfo } from "~/stores/ChannelInfo.store";
+import { useStoreMessageFetchCache } from "~/stores/MessageFetchCache.store";
 
 /**
  * メッセージリンクを表示するコンポーネント
@@ -29,17 +29,17 @@ export default function MessageLink(props: { channelId: string, messageId: strin
 
   return (
     <Show
-      when={!fnMessageFetchCache.getIsDeleted(props.messageId)}
+      when={!useStoreMessageFetchCache.getIsDeleted(props.messageId)}
       fallback={<span class={classesMessageDeletedLink}>削除されたメッセージ</span>}
     >
       <span onClick={jump} class={classesMessageLink}>
         #
         {
-          directGetterChannelInfo(props.channelId).name.length > 18
+          useStoreChannelInfo.directGetterChannelInfo(props.channelId).name.length > 18
             ?
-            directGetterChannelInfo(props.channelId).name.slice(0, 18) + "..."
+            useStoreChannelInfo.directGetterChannelInfo(props.channelId).name.slice(0, 18) + "..."
             :
-            directGetterChannelInfo(props.channelId).name
+            useStoreChannelInfo.directGetterChannelInfo(props.channelId).name
         } のメッセージ
       </span>
     </Show>

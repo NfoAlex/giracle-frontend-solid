@@ -1,11 +1,11 @@
-import { storeClientConfig } from "~/stores/ClientConfig.ts";
-import { setStoreHasNewMessage } from "~/stores/HasNewMessage.ts";
-import { addMessage, storeHistory } from "~/stores/History.ts";
-import { storeMyUserinfo } from "~/stores/MyUserinfo.ts";
+import { storeClientConfig } from "~/stores/ClientConfig.store.ts";
+import { setStoreHasNewMessage } from "~/stores/HasNewMessage.store.ts";
+import { storeHistory, useStoreHistory } from "~/stores/History.store.ts";
+import { storeMyUserinfo } from "~/stores/MyUserinfo.store.ts";
 import {
-  isChannelMuted,
   storeNotificationConfig,
-} from "~/stores/Notification.ts";
+  useStoreNotification,
+} from "~/stores/Notification.store.ts";
 import type { IMessage } from "~/types/Message.ts";
 import { notifyIt } from "~/utils/Notify.ts";
 import UpdateReadTimeOnRemoteAndStore from "~/utils/UpdateReadTimeOnRemoteAndStore.util";
@@ -32,7 +32,11 @@ export default function WSSendMessage(dat: IMessage) {
     const wantsAll =
       storeNotificationConfig.mode === "all" ||
       storeClientConfig.notification.notifyAll;
-    if (notifEnabled && wantsAll && !isChannelMuted(dat.channelId)) {
+    if (
+      notifEnabled &&
+      wantsAll &&
+      !useStoreNotification.isChannelMuted(dat.channelId)
+    ) {
       notifyIt(dat.userId, dat.content, { channelId: dat.channelId });
     }
   } else if (
@@ -48,5 +52,5 @@ export default function WSSendMessage(dat: IMessage) {
   }
 
   //履歴に追加
-  addMessage(dat);
+  useStoreHistory.addMessage(dat);
 }

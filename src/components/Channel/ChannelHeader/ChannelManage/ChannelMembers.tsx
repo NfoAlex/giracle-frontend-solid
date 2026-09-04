@@ -5,11 +5,11 @@ import { Button } from "~/components/ui/button.tsx";
 import { Card } from "~/components/ui/card.tsx";
 import { TextField, TextFieldInput, TextFieldLabel } from "~/components/ui/text-field.tsx";
 import UserinfoModalWrapper from "~/components/unique/UserinfoModalWrapper.tsx";
-import { getterUserinfo } from "~/stores/Userinfo.ts";
+import { useStoreUserinfo } from "~/stores/Userinfo.store.ts";
 import type { IUser } from "~/types/User.ts";
 import InviteUserModal from "./ChannelMembers/InviteUserModal.tsx";
 import { api } from "~/api/index.ts";
-import { getRolePower, storeMyUserinfo } from "~/stores/MyUserinfo.ts";
+import { useStoreMyUserinfo, storeMyUserinfo } from "~/stores/MyUserinfo.store.ts";
 
 export default function ChannelMembers(props: {channelId: string}) {
   const [users, setUsers] = createSignal<IUser[]>([]);
@@ -69,7 +69,7 @@ export default function ChannelMembers(props: {channelId: string}) {
     <div class="max-h-[400px] flex flex-col gap-3 mt-2">
 
       { //チャンネル招待ボタン
-        getRolePower("manageChannel")
+        useStoreMyUserinfo.getRolePower("manageChannel")
         &&
         <InviteUserModal
           channelId={props.channelId}
@@ -103,12 +103,12 @@ export default function ChannelMembers(props: {channelId: string}) {
                       <AvatarFallback >{ user.id.slice(0,2) }</AvatarFallback>
                       <AvatarImage src={"/api/user/icon/" + user.id} alt={user.id} />
                     </Avatar>
-                    { getterUserinfo(user.id).name }
+                    { useStoreUserinfo.getterUserinfo(user.id).name }
                   </span>
                 </UserinfoModalWrapper>
 
                 {
-                  (getRolePower("manageChannel") && storeMyUserinfo.id !== user.id)
+                  (useStoreMyUserinfo.getRolePower("manageChannel") && storeMyUserinfo.id !== user.id)
                   &&
                   <Button onClick={()=>kickIt(user.id)} class="ml-auto" size={"icon"} variant={"outline"}><IconKarate /></Button>
                 }

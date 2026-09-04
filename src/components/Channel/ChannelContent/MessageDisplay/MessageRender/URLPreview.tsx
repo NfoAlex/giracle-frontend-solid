@@ -4,7 +4,7 @@ import { createSignal, Show } from "solid-js";
 import ImageWithModal from "~/components/unique/ImageWithModal.tsx";
 import VideoPlayerModal from "./URLPreview/VideoPlayerModal.tsx";
 import { IconLink } from "@tabler/icons-solidjs";
-import { storeClientConfig } from "~/stores/ClientConfig.ts";
+import { storeClientConfig } from "~/stores/ClientConfig.store.ts";
 import { Button } from "~/components/ui/button.tsx";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "~/components/ui/dialog.tsx";
 

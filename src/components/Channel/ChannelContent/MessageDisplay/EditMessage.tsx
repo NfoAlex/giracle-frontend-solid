@@ -4,7 +4,7 @@ import {IconCancel, IconCheck} from "@tabler/icons-solidjs";
 import {createSignal, onMount} from "solid-js";
 import {TextField, TextFieldTextArea} from "~/components/ui/text-field.tsx";
 import { api } from "~/api/index.ts";
-import { storeClientConfig } from "~/stores/ClientConfig.ts";
+import { storeClientConfig } from "~/stores/ClientConfig.store.ts";
 
 export default function EditMessage(props: { messageId: string, content: string, onCancelEdit: () => void }) {
   const [messageContent, setMessageContent] = createSignal(props.content);

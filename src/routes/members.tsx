@@ -11,7 +11,7 @@ import { TextField, TextFieldInput } from "~/components/ui/text-field.tsx";
 import RoleChip from "~/components/unique/RoleChip.tsx";
 import SidebarTriggerWithDot from "~/components/unique/SidebarTriggerWithDot.tsx";
 import UserinfoModalWrapper from "~/components/unique/UserinfoModalWrapper.tsx";
-import { storeUserOnline, updateUserinfo } from "~/stores/Userinfo.ts";
+import { storeUserOnline, useStoreUserinfo } from "~/stores/Userinfo.store.ts";
 import type { IUser } from "~/types/User.ts";
 
 // 1回の取得で読み込むユーザー数
@@ -45,7 +45,7 @@ export default function Members() {
 
       // 詳細モーダル表示用にユーザー情報をStoreへ格納
       for (const user of r.data) {
-        updateUserinfo(user);
+        useStoreUserinfo.updateUserinfo(user);
       }
 
       setUsers((prev) => (insert ? [...prev, ...r.data] : r.data));

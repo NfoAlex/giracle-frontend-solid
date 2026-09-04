@@ -5,7 +5,7 @@ import CreateChannel from "~/components/ChannelBrowser/CreateChannel.tsx";
 import { Button } from "~/components/ui/button.tsx";
 import { Card } from "~/components/ui/card.tsx";
 import { Switch, SwitchControl, SwitchLabel, SwitchThumb } from "~/components/ui/switch.tsx";
-import { getRolePower, setStoreMyUserinfo, storeMyUserinfo } from "~/stores/MyUserinfo.ts";
+import { useStoreMyUserinfo, setStoreMyUserinfo, storeMyUserinfo } from "~/stores/MyUserinfo.store.ts";
 import type { IChannel } from "~/types/Channel.ts";
 import DeleteChannel from "~/components/ChannelBrowser/DeleteChannel.tsx";
 import SidebarTriggerWithDot from "~/components/unique/SidebarTriggerWithDot.tsx";
@@ -120,7 +120,7 @@ export default function ChannelBrowser() {
                       <Button onclick={() => joinChannel(channel.id)}>参加</Button>
                   }
 
-                  {getRolePower("manageChannel") && <DeleteChannel fetchChannels={fetchChannels} channel={channel} />}
+                  {useStoreMyUserinfo.getRolePower("manageChannel") && <DeleteChannel fetchChannels={fetchChannels} channel={channel} />}
                 </div>
               </Card>
             </Show>
@@ -130,7 +130,7 @@ export default function ChannelBrowser() {
       </div>
 
       {/* チャンネル作成FAB */}
-      {getRolePower("manageChannel") && <CreateChannel fetchChannels={fetchChannels} />}
+      {useStoreMyUserinfo.getRolePower("manageChannel") && <CreateChannel fetchChannels={fetchChannels} />}
     </div>
   )
 }

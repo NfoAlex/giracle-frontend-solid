@@ -1,4 +1,4 @@
-import { setStoreInbox } from "~/stores/Inbox.ts";
+import { setStoreInbox } from "~/stores/Inbox.store.ts";
 
 export default function WSInboxDelete(dat: {
   type: "mention";

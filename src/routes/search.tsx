@@ -10,9 +10,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~
 import { TextField, TextFieldInput } from "~/components/ui/text-field.tsx";
 import SidebarTriggerWithDot from "~/components/unique/SidebarTriggerWithDot.tsx";
 import UserinfoModalWrapper from "~/components/unique/UserinfoModalWrapper.tsx";
-import { directGetterChannelInfo } from "~/stores/ChannelInfo.ts";
-import { storeMyUserinfo } from "~/stores/MyUserinfo.ts";
-import { getterUserinfo } from "~/stores/Userinfo.ts";
+import { useStoreChannelInfo } from "~/stores/ChannelInfo.store.ts";
+import { storeMyUserinfo } from "~/stores/MyUserinfo.store.ts";
+import { useStoreUserinfo } from "~/stores/Userinfo.store.ts";
 import type { IMessage } from "~/types/Message.ts";
 
 const SEARCH_PAGE_SIZE = 30;
@@ -57,7 +57,7 @@ export default function Search() {
 
   const getChannelFilterLabel = (channelId: string): string => {
     if (channelId === CHANNEL_FILTER_ALL) return "すべてのチャンネル";
-    return directGetterChannelInfo(channelId).name;
+    return useStoreChannelInfo.directGetterChannelInfo(channelId).name;
   };
 
   const currentSearchCondition = createMemo(() => {
@@ -209,9 +209,9 @@ export default function Search() {
                   <UserinfoModalWrapper userId={message.userId} class="flex flex-row items-center gap-2 hover:underline">
                     <Avatar class="w-10 h-10">
                       <AvatarImage src={"/api/user/icon/" + message.userId} />
-                      <AvatarFallback>{getterUserinfo(message.userId).name[0]}</AvatarFallback>
+                      <AvatarFallback>{useStoreUserinfo.getterUserinfo(message.userId).name[0]}</AvatarFallback>
                     </Avatar>
-                    <p>{getterUserinfo(message.userId).name}</p>
+                    <p>{useStoreUserinfo.getterUserinfo(message.userId).name}</p>
                   </UserinfoModalWrapper>
                 </span>
                 <span class={"grow"}>
@@ -221,7 +221,7 @@ export default function Search() {
                 <div class="flex flex-row gap-2 items-center">
                   <span class="shrink-0 text-sm text-gray-500">{new Date(message.createdAt).toLocaleString()}</span>
                   <span>・</span>
-                  <span class="shrink text-sm text-gray-500 truncate">#{directGetterChannelInfo(message.channelId).name}</span>
+                  <span class="shrink text-sm text-gray-500 truncate">#{useStoreChannelInfo.directGetterChannelInfo(message.channelId).name}</span>
 
                   <Button
                     as={A}

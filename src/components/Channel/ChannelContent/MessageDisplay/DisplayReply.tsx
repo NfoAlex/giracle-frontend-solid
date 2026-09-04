@@ -1,12 +1,12 @@
 import { createMemo, Match, Switch } from "solid-js";
 import { Avatar, AvatarImage, AvatarFallback } from "~/components/ui/avatar.tsx";
 import UserinfoModalWrapper from "~/components/unique/UserinfoModalWrapper.tsx";
-import { getterUserinfo } from "~/stores/Userinfo.ts";
+import { useStoreUserinfo } from "~/stores/Userinfo.store.ts";
 import { IconCornerUpRight } from "@tabler/icons-solidjs";
-import { storeMyUserinfo } from "~/stores/MyUserinfo.ts";
+import { storeMyUserinfo } from "~/stores/MyUserinfo.store.ts";
 import MessageTextRender from "./MessageRender/MessageTextRender.tsx";
 import { useLocation, useNavigate } from "@solidjs/router";
-import { fnMessageFetchCache } from "~/stores/MessageFetchCache.ts";
+import { useStoreMessageFetchCache } from "~/stores/MessageFetchCache.store.ts";
 
 export default function DisplayReply(props: { replyingMessageId?: string | null, channelId?: string | null }) {
   if (props.replyingMessageId === null || props.replyingMessageId === undefined || !props.channelId) {
@@ -16,9 +16,9 @@ export default function DisplayReply(props: { replyingMessageId?: string | null,
   const loc = useLocation();
 
   const message = createMemo(() => {
-    if (props.channelId && props.replyingMessageId) return fnMessageFetchCache.getMessage(props.channelId, props.replyingMessageId)
+    if (props.channelId && props.replyingMessageId) return useStoreMessageFetchCache.getMessage(props.channelId, props.replyingMessageId)
   });
-  const isDeleted = createMemo(() => props.replyingMessageId ? fnMessageFetchCache.getIsDeleted(props.replyingMessageId) : false);
+  const isDeleted = createMemo(() => props.replyingMessageId ? useStoreMessageFetchCache.getIsDeleted(props.replyingMessageId) : false);
 
   const jumpToMessage = () => {
     if (props.replyingMessageId === null || props.replyingMessageId === undefined) return;
@@ -55,7 +55,7 @@ export default function DisplayReply(props: { replyingMessageId?: string | null,
                 <AvatarFallback class="w-5 h-5">{message()!.userId.slice(0, 2)}</AvatarFallback>
               </Avatar>
               <span class="font-bold">
-                {getterUserinfo(message()!.userId).name}
+                {useStoreUserinfo.getterUserinfo(message()!.userId).name}
               </span>
             </UserinfoModalWrapper>
             <span onClick={jumpToMessage} class="shrink truncate line-clamp-1 cursor-pointer">

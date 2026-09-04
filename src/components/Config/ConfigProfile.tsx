@@ -6,13 +6,13 @@ import { Button } from "~/components/ui/button.tsx";
 import { Card, CardContent, CardHeader } from "~/components/ui/card.tsx";
 import { Label } from "~/components/ui/label.tsx";
 import { TextField, TextFieldInput } from "~/components/ui/text-field.tsx";
-import { getRolePower, setStoreMyUserinfo, storeMyUserinfo } from "~/stores/MyUserinfo.ts";
+import { useStoreMyUserinfo, setStoreMyUserinfo, storeMyUserinfo } from "~/stores/MyUserinfo.store.ts";
 import ChangeBanner from "~/components/Profile/ChangeBanner";
 import RoleChip from "../unique/RoleChip";
 import { api } from "~/api/index.ts";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { Badge } from "../ui/badge.tsx";
-import { storeRoleInfo } from "~/stores/RoleInfo.ts";
+import { storeRoleInfo } from "~/stores/RoleInfo.store.ts";
 import ChangePasswordModal from "./ConfigProfile/ChangePasswordModal";
 
 export default function ConfigProfile() {
@@ -218,14 +218,14 @@ export default function ConfigProfile() {
                 <For each={storeMyUserinfo.RoleLink}>
                   {(role) =>
                     <RoleChip
-                      deletable={getRolePower("manageRole")}
+                      deletable={useStoreMyUserinfo.getRolePower("manageRole")}
                       roleId={role.roleId}
                       onDelete={(roleId) => unlinkRole(roleId)}
                     />
                   }
                 </For>
                 {/* ロール追加ボタン */}
-                <Show when={getRolePower("manageRole")}>
+                <Show when={useStoreMyUserinfo.getRolePower("manageRole")}>
                   <Popover onOpenChange={setOpenRoleList}>
                     <PopoverTrigger>
                       <Badge

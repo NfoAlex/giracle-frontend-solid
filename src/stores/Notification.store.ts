@@ -12,6 +12,8 @@ export const [storeMutedChannels, setStoreMutedChannels] = createStore<{
   ids: string[];
 }>({ ids: [] });
 
-export const isChannelMuted = (channelId: string): boolean => {
-  return storeMutedChannels.ids.includes(channelId);
-};
+export namespace useStoreNotification {
+  export const isChannelMuted = (channelId: string): boolean => {
+    return storeMutedChannels.ids.includes(channelId);
+  };
+}

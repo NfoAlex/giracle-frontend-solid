@@ -1,6 +1,6 @@
 import { produce } from "solid-js/store";
-import { setStoreHistory } from "~/stores/History.ts";
-import { storeMyUserinfo } from "~/stores/MyUserinfo.ts";
+import { setStoreHistory } from "~/stores/History.store.ts";
+import { storeMyUserinfo } from "~/stores/MyUserinfo.store.ts";
 import type { IReaciton } from "~/types/Message.ts";
 
 export default function WSMessageDeleteReaction(dat: IReaciton) {

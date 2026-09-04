@@ -1,6 +1,9 @@
 import { produce } from "solid-js/store";
-import { setStoreMyUserinfo, storeMyUserinfo } from "~/stores/MyUserinfo.ts";
-import { setStoreUserinfo } from "~/stores/Userinfo.ts";
+import {
+  setStoreMyUserinfo,
+  storeMyUserinfo,
+} from "~/stores/MyUserinfo.store.ts";
+import { setStoreUserinfo } from "~/stores/Userinfo.store.ts";
 
 export default function WSRoleUnlinked(dat: {
   roleId: string;

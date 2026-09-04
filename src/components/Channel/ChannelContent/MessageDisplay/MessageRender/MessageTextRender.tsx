@@ -1,7 +1,7 @@
 import { createMemo, For, type JSX } from "solid-js";
-import { directGetterChannelInfo } from "~/stores/ChannelInfo.ts";
-import { getterUserinfo } from "~/stores/Userinfo.ts";
-import { storeMyUserinfo } from "~/stores/MyUserinfo.ts";
+import { useStoreChannelInfo } from "~/stores/ChannelInfo.store.ts";
+import { useStoreUserinfo } from "~/stores/Userinfo.store.ts";
+import { storeMyUserinfo } from "~/stores/MyUserinfo.store.ts";
 import UserinfoModalWrapper from "~/components/unique/UserinfoModalWrapper.tsx";
 import MessageLink from "./MessageTextRender/MessageLink";
 
@@ -108,7 +108,7 @@ export default function MessageTextRender(props: { content: string }) {
 
         case "userId":
           // createMemo 内でリアクティブな値を参照すると、その値の変更時にメモが再計算される
-          const userInfo = getterUserinfo(obj.idOrValue);
+          const userInfo = useStoreUserinfo.getterUserinfo(obj.idOrValue);
           const isMe = () => storeMyUserinfo.id === obj.idOrValue; // storeMyUserinfo.id もリアクティブに追跡
           messageRenderingFinal.push(
             <UserinfoModalWrapper userId={userInfo.id} class="cursor-pointer">
@@ -120,7 +120,7 @@ export default function MessageTextRender(props: { content: string }) {
           break;
 
         case "channel":
-          const channelInfo = directGetterChannelInfo(obj.idOrValue);
+          const channelInfo = useStoreChannelInfo.directGetterChannelInfo(obj.idOrValue);
           messageRenderingFinal.push(
             <span class="font-medium cursor-pointer hover:underline mx-px">
               #{channelInfo?.name ?? obj.idOrValue} {/* fallback */}

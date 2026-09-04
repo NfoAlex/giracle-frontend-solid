@@ -1,11 +1,11 @@
 import { createMemo, For } from "solid-js";
 import { Card } from "../ui/card.tsx";
-import { directGetterChannelInfo } from "~/stores/ChannelInfo.ts";
+import { useStoreChannelInfo } from "~/stores/ChannelInfo.store.ts";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar.tsx";
-import { getterUserinfo } from "~/stores/Userinfo.ts";
+import { useStoreUserinfo } from "~/stores/Userinfo.store.ts";
 import { Button } from "../ui/button.tsx";
 import { IconCheck } from "@tabler/icons-solidjs";
-import { storeInbox } from "~/stores/Inbox.ts";
+import { storeInbox } from "~/stores/Inbox.store.ts";
 import type { IInbox } from "~/types/Message.ts";
 import MessageRender from "../Channel/ChannelContent/MessageDisplay/MessageRender.tsx";
 import DisplayReply from "../Channel/ChannelContent/MessageDisplay/DisplayReply.tsx";
@@ -31,7 +31,7 @@ export default function DisplayInboxByChannel(props: { onReadIt: (messageId: str
       {(inboxGroup) =>
         <span>
           <span class="truncate text-xl flex items-center gap-1 mt-4 mb-2">
-            <p># { directGetterChannelInfo(inboxGroup[0]).name }</p>
+            <p># { useStoreChannelInfo.directGetterChannelInfo(inboxGroup[0]).name }</p>
           </span>
           <For each={inboxGroup[1]} fallback={<p>No messages</p>}>
             {(inboxItem) =>
@@ -45,7 +45,7 @@ export default function DisplayInboxByChannel(props: { onReadIt: (messageId: str
                   <Avatar>
                     <AvatarImage src={"/api/user/icon/" + inboxItem.Message.userId} />
                     <AvatarFallback>
-                      { getterUserinfo(inboxItem.Message.userId).name.slice(0,1) }
+                      { useStoreUserinfo.getterUserinfo(inboxItem.Message.userId).name.slice(0,1) }
                     </AvatarFallback>
                   </Avatar>
                   <span class={"grow border-e-2"}>

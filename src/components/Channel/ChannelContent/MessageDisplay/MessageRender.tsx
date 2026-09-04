@@ -1,7 +1,7 @@
 import { For, Show } from "solid-js";
 import type { IMessage } from "~/types/Message.ts";
 import MessageTextRender from "./MessageRender/MessageTextRender.tsx";
-import { getterUserinfo } from "~/stores/Userinfo.ts";
+import { useStoreUserinfo } from "~/stores/Userinfo.store.ts";
 import UserinfoModalWrapper from "~/components/unique/UserinfoModalWrapper.tsx";
 import SystemMessageRender from "./MessageRender/SystemMessageRender.tsx";
 import FilePreview from "./MessageRender/FilePreview.tsx";
@@ -62,7 +62,7 @@ export default function MessageRender(props: {
       <Show when={props.displayUserName}>
         <UserinfoModalWrapper userId={props.message.userId}>
           <span class={"flex items-center gap-2"}>
-            <p class="font-bold hover:underline">{getterUserinfo(props.message.userId).name}</p>
+            <p class="font-bold hover:underline">{useStoreUserinfo.getterUserinfo(props.message.userId).name}</p>
             <p class="text-sm text-muted-foreground">{displayDate(props.message.createdAt)}</p>
           </span>
         </UserinfoModalWrapper>

@@ -6,7 +6,7 @@ import { Label } from "~/components/ui/label.tsx";
 import { NumberField, NumberFieldDecrementTrigger, NumberFieldErrorMessage, NumberFieldGroup, NumberFieldIncrementTrigger, NumberFieldInput } from "~/components/ui/number-field.tsx";
 import { Switch, SwitchControl, SwitchLabel, SwitchThumb } from "~/components/ui/switch.tsx";
 import { TextFieldInput, TextField } from "~/components/ui/text-field.tsx";
-import { setStoreServerinfo, storeServerinfo } from "~/stores/Serverinfo.ts";
+import { setStoreServerinfo, storeServerinfo } from "~/stores/Serverinfo.store.ts";
 import type { IServer } from "~/types/Server.ts";
 import ConvertSizeToHumanSize from "~/utils/ConvertSizeToHumanSize.ts";
 

@@ -1,6 +1,6 @@
 import type { Emoji } from "emoji-picker-element/shared.ts";
 import { createSignal, createMemo, onMount } from "solid-js";
-import { emojiDB } from "~/stores/CustomEmoji.ts";
+import { emojiDB } from "~/stores/CustomEmoji.store.ts";
 
 export default function RenderEmoji(props: { emojiCode: string }) {
   const [emojiData, setEmojiData] = createSignal<Emoji | null>(null);

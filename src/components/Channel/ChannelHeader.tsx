@@ -4,7 +4,7 @@ import { IconBell, IconBellOff, IconLock } from "@tabler/icons-solidjs";
 import SidebarTriggerWithDot from "../unique/SidebarTriggerWithDot.tsx";
 import { Card } from "../ui/card.tsx";
 import { Button } from "../ui/button.tsx";
-import { directGetterChannelInfo, storeChannelFetchStatus } from "~/stores/ChannelInfo.ts";
+import { useStoreChannelInfo, storeChannelFetchStatus } from "~/stores/ChannelInfo.store.ts";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "../ui/hover-card.tsx";
 import type { IChannel } from "~/types/Channel.ts";
 import { Dialog, DialogContent, DialogDescription, DialogHeader } from "../ui/dialog.tsx";
@@ -12,10 +12,10 @@ import { TabsList, TabsTrigger, TabsContent, Tabs } from "../ui/tabs.tsx";
 import ChannelInfo from "./ChannelHeader/ChannelManage/ChannelInfos.tsx";
 import ChannelMembers from "./ChannelHeader/ChannelManage/ChannelMembers.tsx";
 import {
-  isChannelMuted,
   setStoreMutedChannels,
   storeMutedChannels,
-} from "~/stores/Notification.ts";
+  useStoreNotification,
+} from "~/stores/Notification.store.ts";
 import { api } from "~/api/index.ts";
 import { showToast } from "../ui/toast.tsx";
 
@@ -28,7 +28,7 @@ export default function ChannelHeader() {
   createEffect(() => {
     if (params.channelId !== undefined) {
       setCurrentChannelId(params.channelId);
-      setCurrentChannelInfo(directGetterChannelInfo(params.channelId));
+      setCurrentChannelInfo(useStoreChannelInfo.directGetterChannelInfo(params.channelId));
     }
   });
 
@@ -38,7 +38,7 @@ export default function ChannelHeader() {
     const cid = currentChannelId();
     if (!cid || muteBusy()) return;
     setMuteBusy(true);
-    const currentlyMuted = isChannelMuted(cid);
+    const currentlyMuted = useStoreNotification.isChannelMuted(cid);
     try {
       if (currentlyMuted) {
         await api.notification.unmuteChannel({ channelId: cid });

@@ -1,5 +1,8 @@
-import { setStoreMyUserinfo, storeMyUserinfo } from "~/stores/MyUserinfo.ts";
-import { updateUserinfo } from "~/stores/Userinfo.ts";
+import {
+  setStoreMyUserinfo,
+  storeMyUserinfo,
+} from "~/stores/MyUserinfo.store.ts";
+import { useStoreUserinfo } from "~/stores/Userinfo.store.ts";
 import type { IUser } from "~/types/User.ts";
 
 export default function WSUserProfileUpdate(dat: IUser) {
@@ -17,5 +20,5 @@ export default function WSUserProfileUpdate(dat: IUser) {
   }
 
   //ユーザー情報を格納
-  updateUserinfo(dat);
+  useStoreUserinfo.updateUserinfo(dat);
 }

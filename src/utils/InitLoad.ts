@@ -1,17 +1,17 @@
 import { api } from "~/api/index.ts";
-import { storeAppStatus } from "~/stores/AppStatus.ts";
-import { bindClientConfig } from "~/stores/ClientConfig.ts";
-import { bindCustomEmoji } from "~/stores/CustomEmoji.ts";
-import { setStoreHasNewMessage } from "~/stores/HasNewMessage.ts";
-import { setStoreInbox } from "~/stores/Inbox.ts";
-import { setStoreMyUserinfo } from "~/stores/MyUserinfo.ts";
+import { storeAppStatus } from "~/stores/AppStatus.store.ts";
+import { useStoreClientConfig } from "~/stores/ClientConfig.store.ts";
+import { useStoreCustomEmoji } from "~/stores/CustomEmoji.store.ts";
+import { setStoreHasNewMessage } from "~/stores/HasNewMessage.store.ts";
+import { setStoreInbox } from "~/stores/Inbox.store.ts";
+import { setStoreMyUserinfo } from "~/stores/MyUserinfo.store.ts";
 import {
   setStoreMutedChannels,
   setStoreNotificationConfig,
-} from "~/stores/Notification.ts";
-import { setStoreMessageReadTime } from "~/stores/Readtime.ts";
-import { setStoreRoleInfo } from "~/stores/RoleInfo.ts";
-import { bindServerinfo } from "~/stores/Serverinfo.ts";
+} from "~/stores/Notification.store.ts";
+import { setStoreMessageReadTime } from "~/stores/Readtime.store.ts";
+import { setStoreRoleInfo } from "~/stores/RoleInfo.store.ts";
+import { useStoreServerinfo } from "~/stores/Serverinfo.store.ts";
 import type { IRole } from "~/types/Role.ts";
 import { initWS } from "~/WS/WScontroller.ts";
 
@@ -20,7 +20,7 @@ export default function InitLoad(_userId: string, initWsToo = false) {
   const localConfig = localStorage.getItem("clientConfig");
   if (localConfig) {
     try {
-      bindClientConfig(JSON.parse(localConfig));
+      useStoreClientConfig.bindClientConfig(JSON.parse(localConfig));
     } catch (error) {
       console.error("InitLoad :: clientConfig parse error", error);
     }
@@ -37,7 +37,7 @@ export default function InitLoad(_userId: string, initWsToo = false) {
     .config()
     .then((r) => {
       const { isFirstUser, ..._serverConfig } = r.data;
-      bindServerinfo(_serverConfig);
+      useStoreServerinfo.bindServerinfo(_serverConfig);
     })
     .catch((e) => console.error("InitLoad :: server.config error", e));
 
@@ -88,7 +88,7 @@ export default function InitLoad(_userId: string, initWsToo = false) {
     .customEmoji()
     .then((r) => {
       //console.log("InitLoad :: GET_SERVER_CUSTOM_EMOJI : カスタム絵文字取得r->", r);
-      bindCustomEmoji(r.data);
+      useStoreCustomEmoji.bindCustomEmoji(r.data);
     })
     .catch((e) =>
       console.error(

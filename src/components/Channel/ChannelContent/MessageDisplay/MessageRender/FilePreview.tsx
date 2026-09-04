@@ -4,7 +4,7 @@ import {IconDownload} from "@tabler/icons-solidjs";
 import ConvertSizeToHumanSize from "~/utils/ConvertSizeToHumanSize.ts";
 import {Button} from "~/components/ui/button.tsx";
 import ImageWithModal from "~/components/unique/ImageWithModal.tsx";
-import { storeImageDimensions } from "~/stores/History.ts";
+import { storeImageDimensions } from "~/stores/History.store.ts";
 import { createSignal, onCleanup, onMount } from "solid-js";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "~/components/ui/hover-card.tsx";
 

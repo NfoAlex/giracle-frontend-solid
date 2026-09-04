@@ -4,7 +4,7 @@ import type {EmojiClickEvent} from "emoji-picker-element/shared.ts";
 import ja from 'emoji-picker-element/i18n/ja.js';
 import { api } from "~/api/index.ts";
 import type {IMessage} from "~/types/Message.ts";
-import {getEmojiDatasetWithCustomEmoji} from "~/stores/CustomEmoji.ts";
+import {useStoreCustomEmoji} from "~/stores/CustomEmoji.store.ts";
 
 export default function EmojiPicker(props: {message: IMessage, onClicked: () => void}) {
   let elementRef: HTMLDivElement | undefined;
@@ -18,7 +18,7 @@ export default function EmojiPicker(props: {message: IMessage, onClicked: () => 
     },
     locale: "ja",
     i18n: ja,
-    customEmoji: [...getEmojiDatasetWithCustomEmoji()],
+    customEmoji: [...useStoreCustomEmoji.getEmojiDatasetWithCustomEmoji()],
   });
 
   /**

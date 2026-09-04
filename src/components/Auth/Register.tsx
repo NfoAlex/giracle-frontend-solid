@@ -3,7 +3,7 @@ import { api } from "~/api/index.ts";
 import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
 import { Button } from "../ui/button.tsx";
 import { TextField, TextFieldInput, TextFieldLabel } from "../ui/text-field.tsx";
-import {storeServerinfo} from "~/stores/Serverinfo.ts";
+import {storeServerinfo} from "~/stores/Serverinfo.store.ts";
 
 export default function Register() {
   const [inviteCode, setInviteCode] = createSignal("");
