@@ -1,5 +1,6 @@
 import { produce } from "solid-js/store";
 import { setStoreHasNewMessage } from "~/stores/HasNewMessage.ts";
+import { storeMyUserinfo } from "~/stores/MyUserinfo.ts";
 import { setStoreMessageReadTime } from "~/stores/Readtime.ts";
 
 /**
@@ -14,6 +15,9 @@ export default function WSReadTimeUpdate(dat: {
 }) {
   //console.log("WSReadTimeUpdate :: triggered dat->", dat);
 
+  //他人の既読なら自未読を消さないため何もしない
+  if (dat.userId !== storeMyUserinfo.id) return;
+
   //Storeを更新する
   setStoreMessageReadTime(
     produce((prev) => {
@@ -25,6 +29,8 @@ export default function WSReadTimeUpdate(dat: {
         prev.push({
           channelId: dat.channelId,
           readTime: dat.readTime,
+          //既存エントリ無しのため前回値は空
+          readTimeBefore: "",
         });
       }
 
