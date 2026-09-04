@@ -109,6 +109,8 @@ export default function ChannelTextInput() {
    * @param type バインドする情報の種類
    */
   const bindSearchedItem = (item: IChannel | IUser, type: "user" | "channel") => {
+    //検索結果未取得の状態（debounce中など）ではバインドしない
+    if (type === "user" && !item) return;
     if (type === "user") {
       //メッセージ文にバインド
       setText(text().replace(searchOptions().query, `<${item.id}> `));
