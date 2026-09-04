@@ -94,7 +94,7 @@ npx biome check --write .         # lint + format 自動修正
 
 日本語プレフィックス方式:
 
-- `add -` 新規作成・追加 / `fix -` 修正 / `change -` 変更・更新 / `remove -` 削除
+- `add - ` 新規作成・追加 / `fix - ` 修正 / `change - ` 変更・更新 / `remove - ` 削除
 
 例: `add - プッシュ通知の実装`、`fix - ポップアップ修正`
 
