@@ -1,5 +1,17 @@
 type HttpMethod = "GET" | "POST" | "PUT" | "DELETE";
 
+/**
+ * HTTPステータス付きのAPIエラー。
+ * 呼び出し側で一時的な失敗(500等)と本物の404(存在しない)を区別するために用いる
+ */
+export class HttpError extends Error {
+  status: number;
+  constructor(message: string, status: number) {
+    super(message);
+    this.status = status;
+  }
+}
+
 interface FetchClientOptions {
   url: string;
   method: HttpMethod;
@@ -45,6 +57,6 @@ export async function FETCH_CLIENT<TResponse>(
     throw new Error(`${label} :: fetch failed`, { cause: err });
   });
 
-  if (!res.ok) throw new Error(await res.text());
+  if (!res.ok) throw new HttpError(await res.text(), res.status);
   return res.json();
 }
