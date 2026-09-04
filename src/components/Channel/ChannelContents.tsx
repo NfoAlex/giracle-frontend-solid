@@ -1,6 +1,13 @@
 import { useBeforeLeave, useParams } from "@solidjs/router";
 import { Show, createEffect, createSignal, onCleanup, onMount, on, For } from "solid-js";
-import { insertHistory, setStoreHistory, setStoreImageDimensions, storeHistory, updateHistoryPosition } from "~/stores/History.ts";
+import {
+  insertHistory,
+  putImageDimensions,
+  recordVisit,
+  setStoreHistory,
+  storeHistory,
+  updateHistoryPosition,
+} from "~/stores/History.ts";
 import type { IMessage } from "~/types/Message.tsx";
 import { storeClientConfig } from "~/stores/ClientConfig.ts";
 import { Button } from "../ui/button.tsx";
@@ -176,7 +183,7 @@ export default function ChannelContents() {
             atEnd: r.data.atEnd,
             atTop: r.data.atTop,
           });
-          setStoreImageDimensions(produce(prev => (Object.assign(prev, r.data.ImageDimensions))));
+          putImageDimensions(r.data.ImageDimensions);
           //スクロール位置記憶
           let anchor = null;
           anchor = FnBrowserApis.captureScrollAnchor();
@@ -542,6 +549,7 @@ export default function ChannelContents() {
       if (currentChId === undefined) return;
 
       setCurrentChannelId(currentChId);
+      recordVisit(currentChId);
 
       //メッセージId指定があれば移動して完了
       if (currentMsgId) {
