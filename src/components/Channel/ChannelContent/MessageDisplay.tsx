@@ -37,7 +37,8 @@ export default function MessageDisplay(props: {
 
     const prevDate = new Date(previousMessage.createdAt);
     const currDate = new Date(props.message.createdAt);
-    return prevDate.getDate() !== currDate.getDate() && prevDate.getDay() !== currDate.getDay();
+    //日付線は日単位の比較（getDate/getDayだけだと月を跨ぐ境界で誤判定）
+    return prevDate.toDateString() !== currDate.toDateString();
   };
 
   //要素の外クリック処理、ホバーを解除する
