@@ -57,6 +57,8 @@ export const initWS = async () => {
         FLAGwsError = true;
         //認証状態を無効化して AuthGuard による /auth へのリダイレクトを促す
         storeAppStatus.loggedIn = false;
+        //旧socketを閉じないとinitWSがCLOSED判定できず再利用されてしまう
+        ws?.close();
       }
 
       switch (json.signal) {
