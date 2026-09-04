@@ -25,6 +25,7 @@ import WSChannelLeft from "./Channel/ChannelLeft.ts";
 import WSUpdateChannel from "./Channel/UpdateChannel.ts";
 import WSMessageDeleted from "./Message/MessageDelete.ts";
 import WSSendMessage from "./Message/SendMessage.ts";
+import WSRoleDeleted from "./Role/RoleDeleted.ts";
 import WSRoleLinked from "./Role/RoleLinked.ts";
 import WSRoleUnlinked from "./Role/RoleUnlinked.ts";
 import WSRoleUpdated from "./Role/RoleUpdatede.ts";
@@ -144,9 +145,9 @@ export const initWS = async () => {
           WSRoleUnlinked(json.data);
           break;
 
-        //ロールの解削除、やること一緒なので同じ関数を使う
+        //ロールの削除
         case "role::Deleted":
-          WSRoleUnlinked(json.data);
+          WSRoleDeleted(json.data);
           break;
 
         //ユーザーのプロフィール更新受け取り
