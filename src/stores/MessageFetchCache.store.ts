@@ -72,10 +72,13 @@ export namespace useStoreMessageFetchCache {
     return storeMessageFetchCache.cache[messageId];
   };
 
-  export const updateMessage = (message: IMessage) => {
+  //部分更新受信の合体用。id必須、他任意
+  export const updateMessage = (
+    message: Pick<IMessage, "id"> & Partial<IMessage>,
+  ) => {
     if (storeMessageFetchCache.isDeleted[message.id]) return;
     storeMessageFetchCache.cache[message.id] = {
-      ...storeMessageFetchCache.cache[message.id],
+      ...(storeMessageFetchCache.cache[message.id] ?? messageHolder),
       ...message,
     };
   };

@@ -6,34 +6,24 @@ import {
 import { setStoreUserinfo } from "~/stores/Userinfo.store.ts";
 
 export default function WSRoleLinked(dat: { roleId: string; userId: string }) {
-  //console.log("WSRoleLinked :: triggered dat->", dat);
-
-  //自分に対する付与なら自分のStoreを更新
+  //自分への付与なら自Store更新（setter内判定で再送・連続受信の二重登録防止）
   if (storeMyUserinfo.id === dat.userId) {
-    setStoreMyUserinfo(
-      produce((prev) => {
-        prev.RoleLink.push({ roleId: dat.roleId });
-        return prev;
-      }),
+    setStoreMyUserinfo("RoleLink", (prev) =>
+      prev.some((rl) => rl.roleId === dat.roleId)
+        ? prev
+        : [...prev, { roleId: dat.roleId }],
     );
   }
 
-  //ユーザー情報Storeを更新
+  //ユーザー情報Store更新
   setStoreUserinfo(
     produce((prev) => {
-      //もしユーザー情報Storeにこの人が無いなら停止
-      if (prev[dat.userId] === undefined) return prev;
-      //ユーザー情報をコピー
-      const _user = { ...prev[dat.userId] };
-      //すでにロールがリンクされているなら停止
-      if (_user.RoleLink.some((rl) => rl.roleId === dat.roleId)) return prev;
-      //リンク
-      _user.RoleLink.push({ roleId: dat.roleId });
-      //Store更新
-      prev[dat.userId] = _user;
-
-      //console.log("WSRoleLinked :: setStoreUserinfo :: prev[dat.userId] ->", prev[dat.userId]);
-      return prev;
+      const user = prev[dat.userId];
+      //未取得ユーザーへの付与は初期取得時に反映されるため何もしない
+      if (user === undefined) return;
+      //再送時の二重登録防止
+      if (user.RoleLink.some((rl) => rl.roleId === dat.roleId)) return;
+      user.RoleLink.push({ roleId: dat.roleId });
     }),
   );
 }
