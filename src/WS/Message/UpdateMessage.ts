@@ -1,13 +1,20 @@
 import { setStoreHistory } from "~/stores/History.store.ts";
 import { useStoreMessageFetchCache } from "~/stores/MessageFetchCache.store";
-import type { IMessage } from "~/types/Message.ts";
+import type { IMessage } from "~/types/Message";
 
 /**
  * メッセージの更新処理
  * @param dat
  * @constructor
  */
-export default function WSUpdateMessage(dat: IMessage) {
+export default function WSUpdateMessage(dat: {
+  id: string,
+  content: string,
+  channelId: string,
+  userId: string,
+  isEdited: boolean,
+  MessageUrlPreview?: IMessage["MessageUrlPreview"]
+}) {
   //console.log("WSUpdateMessage :: triggered dat->", dat);
 
   //履歴に追加
