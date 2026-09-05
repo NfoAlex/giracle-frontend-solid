@@ -1,4 +1,4 @@
-import {createEffect, JSX, on, onMount} from "solid-js";
+import {createEffect, JSX, on} from "solid-js";
 import {useNavigate} from "@solidjs/router";
 import {storeAppStatus} from "~/stores/AppStatus.store.ts";
 import {useStoreHasNewMessage} from "~/stores/HasNewMessage.store.ts";
@@ -7,35 +7,22 @@ export default function AuthGuard(props: {children?: JSX.Element}) {
   const navi = useNavigate();
 
   const checkAuth = () => {
-    if (!storeAppStatus.loggedIn) navi(`/auth?redirect=${location.pathname}`);
-  }
+    //searchも含めて元の場所へ戻せるように
+    if (!storeAppStatus.loggedIn)
+      navi(`/auth?redirect=${location.pathname}${location.search}`);
+  };
 
-  onMount(checkAuth);
-
-  //ページの移動監視用
-  createEffect(() => {
-    //console.log("index :: wrapper : createEffect");
-    checkAuth();
-  });
+  //loggedIn監視(WSのtoken not valid → falseで/authへ)。マウント時にも実行される
+  createEffect(() => checkAuth());
 
   //新着状態監視用
   createEffect(
-    on(() => useStoreHasNewMessage.HasAnythingNew(),
-      () => {
-        //タブのテキストとfaviconを変更
-        if (useStoreHasNewMessage.HasAnythingNew()) {
-          document.title = "(*) Giracle"
-          const link = document.getElementById("favicon") as HTMLLinkElement;
-          if (link)
-            link.href = "/favicon_dot.svg";
-        } else {
-          document.title = "Giracle";
-          const link = document.getElementById("favicon") as HTMLLinkElement;
-          if (link)
-            link.href = "/favicon.svg";
-        }
-      }
-    )
+    on(() => useStoreHasNewMessage.HasAnythingNew(), (hasNew) => {
+      //タブのテキストとfaviconを変更
+      document.title = hasNew ? "(*) Giracle" : "Giracle";
+      const link = document.getElementById("favicon") as HTMLLinkElement;
+      if (link) link.href = hasNew ? "/favicon_dot.svg" : "/favicon.svg";
+    })
   );
 
   return (
