@@ -28,7 +28,7 @@ import WSSendMessage from "./Message/SendMessage.ts";
 import WSRoleDeleted from "./Role/RoleDeleted.ts";
 import WSRoleLinked from "./Role/RoleLinked.ts";
 import WSRoleUnlinked from "./Role/RoleUnlinked.ts";
-import WSRoleUpdated from "./Role/RoleUpdatede.ts";
+import WSRoleUpdated from "./Role/RoleUpdated.ts";
 
 //WSインスタンス（外部参照あり、公開維持）
 export let ws: WebSocket | undefined = undefined;
