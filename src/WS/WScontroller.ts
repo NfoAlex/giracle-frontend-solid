@@ -30,143 +30,168 @@ import WSRoleLinked from "./Role/RoleLinked.ts";
 import WSRoleUnlinked from "./Role/RoleUnlinked.ts";
 import WSRoleUpdated from "./Role/RoleUpdatede.ts";
 
-//WSインスタンス
+//WSインスタンス（外部参照あり、公開維持）
 export let ws: WebSocket | undefined = undefined;
 
 //WS接続がエラーで閉じられた場合のフラグ
 let FLAGwsError = false;
-//再接続フラグ
+//再接続フラグ（onopenで消費）
 let FLAGwsReconnect = false;
 //PING送信タイマー（再接続毎に蓄積しないようmodule変数化）
 let pingInterval: ReturnType<typeof setInterval> | undefined;
 
-export const initWS = async () => {
+// バックエンド仕様値
+const WS_ENDPOINT = "/ws";
+const WS_AUTH_ERROR_SIGNAL = "ERROR";
+const WS_TOKEN_INVALID = "token not valid";
+const PING_MSG = "ping";
+const PING_INTERVAL_MS = 20_000;
+const RECONNECT_BASE_DELAY_MS = 1_000;
+const RECONNECT_JITTER_MS = 500;
+const RECONNECT_FETCH_LENGTH = 10;
+
+// チャンネルパス抽出（/:channelId/:messageId? 対応）
+const CHANNEL_PATH_RE = /^\/app\/channel\/([A-Za-z0-9_-]+)(?:\/[^/]+)?$/;
+
+// 受信signal（バックエンド仕様）
+enum EWsSignal {
+  CustomEmojiUploaded = "server::CustomEmojiUploaded",
+  CustomEmojiDeleted = "server::CustomEmojiDeleted",
+  SendMessage = "message::SendMessage",
+  MessageDeleted = "message::MessageDeleted",
+  UpdateMessage = "message::UpdateMessage",
+  ReadTimeUpdated = "message::ReadTimeUpdated",
+  AddReaction = "message::AddReaction",
+  DeleteReaction = "message::DeleteReaction",
+  InboxDeleted = "inbox::Deleted",
+  InboxAdded = "inbox::Added",
+  UpdateChannel = "channel::UpdateChannel",
+  ChannelDeleted = "channel::Deleted",
+  ChannelLeft = "channel::Left",
+  ChannelJoin = "channel::Join",
+  RoleUpdated = "role::Updated",
+  RoleLinked = "role::Linked",
+  RoleUnlinked = "role::Unlinked",
+  RoleDeleted = "role::Deleted",
+  ProfileUpdate = "user::ProfileUpdate",
+  Connected = "user::Connected",
+  Disconnected = "user::Disconnected",
+}
+
+// payload型はハンドラ毎に異なるため境界1箇所に集約
+// biome-ignore lint/suspicious/noExplicitAny: バックエンド次第
+type TWsHandler = (data: any) => void;
+
+// signal追加時はここ1行で登録
+const HANDLERS: Record<EWsSignal, TWsHandler> = {
+  [EWsSignal.CustomEmojiUploaded]: WSCustomEmojiUploaded,
+  [EWsSignal.CustomEmojiDeleted]: WSCustomEmojiDeleted,
+  [EWsSignal.SendMessage]: WSSendMessage,
+  [EWsSignal.MessageDeleted]: WSMessageDeleted,
+  [EWsSignal.UpdateMessage]: WSUpdateMessage,
+  [EWsSignal.ReadTimeUpdated]: WSReadTimeUpdate,
+  [EWsSignal.AddReaction]: WSMessageAddReaction,
+  [EWsSignal.DeleteReaction]: WSMessageDeleteReaction,
+  [EWsSignal.InboxDeleted]: WSInboxDelete,
+  [EWsSignal.InboxAdded]: WSInboxAdded,
+  [EWsSignal.UpdateChannel]: WSUpdateChannel,
+  [EWsSignal.ChannelDeleted]: WSChannelDeleted,
+  [EWsSignal.ChannelLeft]: WSChannelLeft,
+  [EWsSignal.ChannelJoin]: WSChannelJoined,
+  [EWsSignal.RoleUpdated]: WSRoleUpdated,
+  [EWsSignal.RoleLinked]: WSRoleLinked,
+  [EWsSignal.RoleUnlinked]: WSRoleUnlinked,
+  [EWsSignal.RoleDeleted]: WSRoleDeleted,
+  [EWsSignal.ProfileUpdate]: WSUserProfileUpdate,
+  [EWsSignal.Connected]: WSUserConnected,
+  [EWsSignal.Disconnected]: WSUserDisconnected,
+};
+
+// PING多重生成防止のため既存タイマー解除して開始
+const startPing = () => {
+  stopPing();
+  pingInterval = setInterval(() => {
+    if (ws?.readyState !== WebSocket.OPEN) {
+      stopPing();
+      return;
+    }
+    ws.send(JSON.stringify({ signal: PING_MSG, data: PING_MSG }));
+  }, PING_INTERVAL_MS);
+};
+
+const stopPing = () => {
+  if (pingInterval === undefined) return;
+  clearInterval(pingInterval);
+  pingInterval = undefined;
+};
+
+// オンラインユーザー取得・格納
+const fetchOnlineUsers = () => {
+  api.user
+    .getOnline()
+    .then((r) => setStoreUserOnline(r.data))
+    .catch((e) => console.error("WScontroller :: fetchOnlineUsers :", e));
+};
+
+// 再接続時の再同期（履歴初期化＋表示中チャンネル再取得）
+const resyncAfterReconnect = () => {
+  InitLoad(storeMyUserinfo.id);
+  useStoreMessageFetchCache.clearCache();
+
+  setStoreHistory(
+    produce((prev) => {
+      for (const channelId of Object.keys(prev)) {
+        prev[channelId].history = [];
+        prev[channelId].atTop = false;
+        prev[channelId].atEnd = false;
+      }
+    }),
+  );
+
+  // /:channelId/:messageId? 両対応
+  const channelId = document.location.pathname.match(CHANNEL_PATH_RE)?.[1];
+  if (channelId === undefined) return;
+
+  const readTime = storeMessageReadTime.find(
+    (mrt) => mrt.channelId === channelId,
+  )?.readTime;
+  FetchHistory(
+    channelId,
+    { messageTimeFrom: readTime, fetchLength: RECONNECT_FETCH_LENGTH },
+    "newer",
+  );
+};
+
+export const initWS = (): void => {
   //既に接続済みの場合は再接続しない
   if (ws === undefined || ws.readyState === WebSocket.CLOSED) {
-    ws = new WebSocket("/ws");
+    ws = new WebSocket(WS_ENDPOINT);
   }
 
-  //console.log("WScontroller :: initWS : triggered");
+  ws.onmessage = (event) => {
+    if (typeof event.data !== "string") return;
 
-  ws.onmessage = async (event) => {
-    //console.log("WScontroller :: initWS(.onmessage) : triggered", await JSON.parse(event.data));
     try {
-      // biome-ignore lint/suspicious/noExplicitAny: バックエンド次第
-      const json: { signal: string; data: any } = JSON.parse(event.data);
+      const json: { signal: string; data: unknown } = JSON.parse(event.data);
 
       //トークンが無効な場合のフラグ設定
-      if (json.signal === "ERROR" && json.data === "token not valid") {
+      if (
+        json.signal === WS_AUTH_ERROR_SIGNAL &&
+        json.data === WS_TOKEN_INVALID
+      ) {
         FLAGwsError = true;
         //認証状態を無効化して AuthGuard による /auth へのリダイレクトを促す
         storeAppStatus.loggedIn = false;
         //旧socketを閉じないとinitWSがCLOSED判定できず再利用されてしまう
         ws?.close();
+
+        return;
       }
 
-      switch (json.signal) {
-        //カスタム絵文字作成の受け取り
-        case "server::CustomEmojiUploaded":
-          WSCustomEmojiUploaded(json.data);
-          break;
+      const handler = HANDLERS[json.signal as EWsSignal];
+      if (handler === undefined) return;
 
-        //カスタム絵文字削除の受け取り
-        case "server::CustomEmojiDeleted":
-          WSCustomEmojiDeleted(json.data);
-          break;
-
-        //メッセージの受け取り
-        case "message::SendMessage":
-          WSSendMessage(json.data);
-          break;
-
-        //メッセージ削除の通知受け取り
-        case "message::MessageDeleted":
-          WSMessageDeleted(json.data);
-          break;
-
-        //メッセージ更新の通知受け取り
-        case "message::UpdateMessage":
-          WSUpdateMessage(json.data);
-          break;
-
-        //既読時間更新の受け取り
-        case "message::ReadTimeUpdated":
-          WSReadTimeUpdate(json.data);
-          break;
-
-        //リアクションの受け取り
-        case "message::AddReaction":
-          WSMessageAddReaction(json.data);
-          break;
-
-        //リアクション削除の受け取り
-        case "message::DeleteReaction":
-          WSMessageDeleteReaction(json.data);
-          break;
-
-        //インボックス項目の削除（既読）受け取り
-        case "inbox::Deleted":
-          WSInboxDelete(json.data);
-          break;
-
-        //新規インボックス項目の受け取り
-        case "inbox::Added":
-          WSInboxAdded(json.data);
-          break;
-
-        //チャンネル情報の受け取り
-        case "channel::UpdateChannel":
-          WSUpdateChannel(json.data);
-          break;
-
-        //チャンネル削除通知の受け取り
-        case "channel::Deleted":
-          WSChannelDeleted(json.data);
-          break;
-
-        //チャンネル退出の受け取り(個人)
-        case "channel::Left":
-          WSChannelLeft(json.data);
-          break;
-
-        //チャンネル参加の受け取り(個人)
-        case "channel::Join":
-          WSChannelJoined(json.data);
-          break;
-
-        //ロール情報の受け取り
-        case "role::Updated":
-          WSRoleUpdated(json.data);
-          break;
-
-        //ロールのリンク
-        case "role::Linked":
-          WSRoleLinked(json.data);
-          break;
-
-        //ロールの解除
-        case "role::Unlinked":
-          WSRoleUnlinked(json.data);
-          break;
-
-        //ロールの削除
-        case "role::Deleted":
-          WSRoleDeleted(json.data);
-          break;
-
-        //ユーザーのプロフィール更新受け取り
-        case "user::ProfileUpdate":
-          WSUserProfileUpdate(json.data);
-          break;
-
-        //オンラインユーザーの登録、削除
-        case "user::Connected":
-          WSUserConnected(json.data);
-          break;
-        case "user::Disconnected":
-          WSUserDisconnected(json.data);
-          break;
-      }
+      handler(json.data);
     } catch (e) {
       console.error(
         "WScontroller :: initWS(.onmessage) : error->",
@@ -177,95 +202,29 @@ export const initWS = async () => {
     }
   };
 
-  ws.onopen = (event) => {
-    console.log("WScontroller :: initWS(.onopen) : open->", event);
-    //エラーフラグをリセット
+  ws.onopen = () => {
     FLAGwsError = false;
-    //接続状態を更新
     storeAppStatus.wsConnected = true;
 
-    //再接続フラグが立っていた場合は初期処理を再実行
-    if (FLAGwsReconnect) {
-      //初期処理
-      InitLoad(storeMyUserinfo.id);
-      //履歴を初期化してアクセスしたときに履歴を取得できるようにする
-      setStoreHistory(
-        produce((prev) => {
-          const keys = Object.keys(prev);
-          for (const channelId of keys) {
-            prev[channelId].history = [];
-            prev[channelId].atTop = false;
-            prev[channelId].atEnd = false;
-          }
-          return prev;
-        }),
-      );
-      //メッセージキャッシュStoreを初期化
-      useStoreMessageFetchCache.clearCache();
+    startPing();
+    fetchOnlineUsers();
 
-      //チャンネルIdをlocationから取得
-      const path = document.location.pathname;
-      const paramMatch = path.match(/^\/app\/channel\/([a-zA-Z0-9_-]+)$/);
-      const channelId = paramMatch ? paramMatch[1] : null;
-      //もしチャンネルページにいるならその履歴を既読時間から取得取得する
-      if (channelId) {
-        const latestReadTime = storeMessageReadTime.find(
-          (mrt) => mrt.channelId === channelId,
-        )?.readTime;
-        FetchHistory(
-          channelId,
-          {
-            messageTimeFrom: latestReadTime ? latestReadTime : undefined,
-            fetchLength: 10,
-          },
-          "newer",
-        );
-      }
-    }
+    //初回接続時は再同期不要
+    if (!FLAGwsReconnect) return;
+    //消費しないと再接続毎に再同期が走る
+    FLAGwsReconnect = false;
 
-    //PING（多重生成防止のため既存タイマーがあれば先に解除）
-    if (pingInterval !== undefined) clearInterval(pingInterval);
-    pingInterval = setInterval(() => {
-      if (ws && ws.readyState === WebSocket.OPEN) {
-        ws.send(JSON.stringify({ signal: "ping", data: "ping" }));
-      } else {
-        clearInterval(pingInterval);
-        pingInterval = undefined;
-      }
-    }, 20000);
-
-    //オンラインユーザーを取得、格納
-    api.user
-      .getOnline()
-      .then((r) => {
-        console.log(
-          "WScontroller :: initWS(.onopen) : オンラインユーザー r->",
-          r,
-        );
-        setStoreUserOnline(r.data);
-      })
-      .catch((e) => {
-        console.error(
-          "WScontroller :: initWS(.onopen) : オンラインユーザー error->",
-          e,
-        );
-      });
+    resyncAfterReconnect();
   };
 
   ws.onerror = (event) => {
     console.error("WScontroller :: initWS(.onerror) : error->", event);
   };
 
-  ws.onclose = (event) => {
-    console.log("INIT.ws :: initWS : close->", event);
-
-    //接続状態を更新
+  ws.onclose = () => {
     storeAppStatus.wsConnected = false;
-    //PINGタイマーを解除しないと旧socket向けpingが蓄積する
-    if (pingInterval !== undefined) {
-      clearInterval(pingInterval);
-      pingInterval = undefined;
-    }
+    //旧socket向けping蓄積防止
+    stopPing();
 
     //エラーで閉じられた場合は再接続しない
     if (FLAGwsError) return;
@@ -276,7 +235,7 @@ export const initWS = async () => {
         FLAGwsReconnect = true;
         initWS();
       },
-      Math.random() * 500 + 1000,
+      Math.random() * RECONNECT_JITTER_MS + RECONNECT_BASE_DELAY_MS,
     );
   };
 };
