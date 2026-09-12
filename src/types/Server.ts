@@ -9,6 +9,8 @@ export interface IServer {
   MessageMaxLength: number;
   MessageMaxFileSize: number;
   defaultJoinChannel: IChannel[];
+  BotEnabled: boolean;
+  BotAutoApprove: boolean;
 }
 
 export interface IBot {

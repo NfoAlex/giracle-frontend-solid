@@ -34,6 +34,8 @@ export const server = {
       RegisterInviteOnly?: boolean | undefined;
       RegisterAnnounceChannelId?: string | undefined;
       MessageMaxLength?: number | undefined;
+      BotEnabled?: boolean;
+      BotAutoApprove?: boolean;
     };
   }> => {
     let FLAG_RECEIVED = false;
