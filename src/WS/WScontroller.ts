@@ -7,6 +7,7 @@ import { storeMyUserinfo } from "~/stores/MyUserinfo.store.ts";
 import { storeMessageReadTime } from "~/stores/Readtime.store.ts";
 import { setStoreUserOnline } from "~/stores/Userinfo.store.ts";
 import FetchHistory from "~/utils/FethchHistory.ts";
+import GetCurrentChannelId from "~/utils/GetCurrentChannelId.ts";
 import InitLoad from "~/utils/InitLoad.ts";
 import WSInboxAdded from "~/WS/inbox/inboxAdded.ts";
 import WSInboxDelete from "~/WS/inbox/inboxDeleted.ts";
@@ -49,9 +50,6 @@ const PING_INTERVAL_MS = 20_000;
 const RECONNECT_BASE_DELAY_MS = 1_000;
 const RECONNECT_JITTER_MS = 500;
 const RECONNECT_FETCH_LENGTH = 10;
-
-// チャンネルパス抽出（/:channelId/:messageId? 対応）
-const CHANNEL_PATH_RE = /^\/app\/channel\/([A-Za-z0-9_-]+)(?:\/[^/]+)?$/;
 
 // 受信signal（バックエンド仕様）
 enum EWsSignal {
@@ -148,8 +146,7 @@ const resyncAfterReconnect = () => {
     }),
   );
 
-  // /:channelId/:messageId? 両対応
-  const channelId = document.location.pathname.match(CHANNEL_PATH_RE)?.[1];
+  const channelId = GetCurrentChannelId();
   if (channelId === undefined) return;
 
   const readTime = storeMessageReadTime.find(
