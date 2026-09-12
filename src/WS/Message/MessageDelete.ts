@@ -50,24 +50,36 @@ export default function WSMessageDeleted(dat: {
   )
     return;
 
-  //比較に使う既読時間を取得する
-  const readTimeHere = storeMessageReadTime.find(
-    (m) => m.channelId === dat.channelId,
-  )?.readTime;
-  if (!readTimeHere) return;
-  //既読時間をDate型に変換
-  const readTimeHereDateObj = new Date(readTimeHere);
-
-  //履歴の最新メッセージが既読時間よりも前なら新着表示を削除
-  if (
-    readTimeHereDateObj.valueOf() >=
-    new Date(storeHistory[dat.channelId].history[0]?.createdAt).valueOf()
-  ) {
+  //新着表示を消す
+  const clearNewMessage = () => {
     setStoreHasNewMessage((prev) => {
       return {
         ...prev,
         [dat.channelId]: false,
       };
     });
+  };
+
+  //削除後に履歴が空なら未読は残らないため新着表示を消す
+  const latestMessage = storeHistory[dat.channelId].history[0];
+  if (latestMessage === undefined) {
+    clearNewMessage();
+    return;
+  }
+
+  //比較に使う既読時間を取得する
+  const readTimeHere = storeMessageReadTime.find(
+    (m) => m.channelId === dat.channelId,
+  )?.readTime;
+  if (!readTimeHere) return;
+
+  const readTimeDate = new Date(readTimeHere).valueOf();
+  const latestDate = new Date(latestMessage.createdAt).valueOf();
+  //時刻が不正で比較不能なら判定しない（新着を消し残す）
+  if (Number.isNaN(readTimeDate) || Number.isNaN(latestDate)) return;
+
+  //履歴の最新メッセージが既読時間よりも前なら新着表示を削除
+  if (readTimeDate >= latestDate) {
+    clearNewMessage();
   }
 }
