@@ -1,6 +1,6 @@
 import type { IChannel } from "~/types/Channel.ts";
 import type { ICustomEmoji } from "~/types/Message.ts";
-import type { IInvite, IRequestLog, IRequestLogCount, IServer } from "~/types/Server.ts";
+import type { IBot, IInvite, IRequestLog, IRequestLogCount, IServer } from "~/types/Server.ts";
 import { FETCH_CLIENT } from "../FETCH_CLIENT.ts";
 
 export const server = {
@@ -64,6 +64,104 @@ export const server = {
     if (!res.ok) throw new Error(await res.text());
     return res.json();
   },
+
+  getBot: () =>
+    FETCH_CLIENT<{
+      message: "Fetched my bots",
+      data: Pick<
+        IBot, "id" | "botName" | "approveStatus" | "createdAt" | "createdBy"
+      >[]
+    }>({
+      url: "/api/server/bot/me",
+      method: "GET",
+      label: "SERVER_GET_BOT_ME"
+    }),
+
+  putBot: (p: {
+    name: string,
+    description: string,
+    permissionChannelIds?: string[],
+    useAllChannel?: boolean,
+    canFetchUserinfo?: boolean,
+    canFetchRoleinfo?: boolean,
+    canManageUser?: boolean,
+    canManageServerConfig?: boolean,
+    canReadMessage?: boolean,
+    canSendMessage?: boolean,
+  }) =>
+    FETCH_CLIENT<{
+      message: "Bot created",
+      data: IBot,
+    }>({
+      url: "/api/server/bot",
+      method: "PUT",
+      label: "SERVER_PUT_BOT",
+      body: p
+    }),
+
+  getBotById: (p: { botId: string }) =>
+    FETCH_CLIENT<{
+      message: "Fetched my bot info",
+      data: IBot
+    }>({
+      url: `/api/server/bot/${p.botId}`,
+      method: "GET",
+      label: "SERVER_GET_BOT_ME_ID"
+    }),
+
+  deleteBotById: (p: { botId: string }) =>
+    FETCH_CLIENT<{
+      message: "Bot deleted",
+    }>({
+      url: `/api/server/bot/${p.botId}`,
+      method: "DELETE",
+      label: "SERVER_DELETE_BOT"
+    }),
+
+  patchBot: (p: {
+    botId: string,
+    name?: string,
+    description?: string,
+    permissionChannelIds?: string[],
+    useAllChannel?: boolean,
+    canFetchUserinfo?: boolean,
+    canFetchRoleinfo?: boolean,
+    canManageUser?: boolean,
+    canManageServerConfig?: boolean,
+    canReadMessage?: boolean,
+    canSendMessage?: boolean,
+  }) =>
+    FETCH_CLIENT<{
+      message: "Bot updated",
+      data: IBot
+    }>({
+      url: `/server/bot`,
+      method: "PATCH",
+      label: "SERVER_PATCH_BOT",
+      body: p
+    }),
+
+  getBotAll: (q: { cursorBotId?: string }) =>
+    FETCH_CLIENT<{
+      message: "",
+      data: Omit<IBot, "user" | "channelPermissions">
+    }>({
+      url: `/api/server/bot/all`,
+      method: "GET",
+      label: "SERVER_GET_BOT_ALL",
+      query: q
+    }),
+
+  patchBotApproval: (p: { botId: string, approvalStatus: IBot["approveStatus"] }) =>
+    FETCH_CLIENT<{
+      message: "Bot approval updated",
+      data: string
+    }>({
+      url: `/api/server/bot/approval`,
+      method: "GET",
+      label: "SERVER_GET_BOT_ALL",
+      body: p
+    }),
 
   createInvite: (p: { inviteCode: string; maxUsage?: number }) =>
     FETCH_CLIENT<{ message: "Server invite created"; data: IInvite }>({
