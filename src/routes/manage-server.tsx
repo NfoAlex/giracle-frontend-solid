@@ -10,8 +10,10 @@ import SidebarTriggerWithDot from "~/components/unique/SidebarTriggerWithDot.tsx
 import ManageEmoji from "~/components/ManageServer/manage-emoji.tsx";
 import ManageLogs from "~/components/ManageServer/manage-logs";
 
+type TManageServerTab = "community" | "role" | "bot" | "invite" | "customEmoji" | "logs";
+
 export default function ManageServer() {
-  const [displayMode, setDisplayMode] = createSignal<"community" | "role" | "invite" | "customEmoji" | "logs">("community");
+  const [displayMode, setDisplayMode] = createSignal<TManageServerTab>("community");
 
   return (
     <div class="p-2 flex flex-col h-full">
@@ -24,6 +26,7 @@ export default function ManageServer() {
         <div class="md:flex items-center gap-2 hidden">
           <Button onclick={()=>setDisplayMode("community")} variant={ displayMode()==="community" ? "default" : "outline" }>コミュニティ設定</Button>
           <Button onclick={()=>setDisplayMode("role")} variant={ displayMode()==="role" ? "default" : "outline" }>ロール</Button>
+          <Button onclick={()=>setDisplayMode("bot")} variant={ displayMode()==="bot" ? "default" : "outline" }>Bot管理</Button>
           <Button onclick={()=>setDisplayMode("invite")} variant={ displayMode()==="invite" ? "default" : "outline" }>招待</Button>
           <Button onclick={()=>setDisplayMode("customEmoji")} variant={ displayMode()==="customEmoji" ? "default" : "outline" }>カスタム絵文字</Button>
           <Button onclick={()=>setDisplayMode("logs")} variant={ displayMode()==="logs" ? "default" : "outline" }>ログ</Button>
@@ -35,25 +38,29 @@ export default function ManageServer() {
             value={displayMode()}
             defaultValue={"community"}
             onChange={setDisplayMode}
-            options={["community", "role", "invite"]}
+            options={["community", "role", "bot", "invite", "customEmoji", "logs"]}
             itemComponent={(props) =>
               <SelectItem item={props.item}>
                 {props.item.textValue === "community" && "コミュニティ設定"}
                 {props.item.textValue === "role" && "ロール"}
+                {props.item.textValue === "bot" && "ボット管理"}
                 {props.item.textValue === "invite" && "招待"}
                 {props.item.textValue === "customEmoji" && "カスタム絵文字"}
+                {props.item.textValue === "logs" && "ログ"}
               </SelectItem>
             }
           >
             <SelectTrigger aria-label="manage-display-mode">
-              <SelectValue<"community" | "role" | "invite" | "customEmoji">>
+              <SelectValue<TManageServerTab>>
                 {
                   (state) =>
                   <span class="flex items-center">
                     { state.selectedOption() === "community" && <p>コミュニティ設定</p> }
                     { state.selectedOption() === "role" && <p>ロール設定</p> }
                     { state.selectedOption() === "invite" && <p>招待</p> }
+                    { state.selectedOption() === "bot" && <p>ボット管理</p> }
                     { state.selectedOption() === "customEmoji" && <p>カスタム絵文字</p> }
+                    { state.selectedOption() === "logs" && <p>ログ</p> }
                   </span>
                 }
               </SelectValue>
@@ -65,8 +72,9 @@ export default function ManageServer() {
 
       { displayMode() === "community" && (useStoreMyUserinfo.getRolePower("manageServer") ? <ManageCommunity /> : <p>サーバーの管理権限がありません</p>) }
       { displayMode() === "role" && (useStoreMyUserinfo.getRolePower("manageRole") ? <ManageRole /> : <p>ロールの管理権限がありません</p>) }
-      { displayMode() === "customEmoji" && (useStoreMyUserinfo.getRolePower("manageEmoji") ? <ManageEmoji /> : <p>カスタム絵文字の管理権限がありません</p>) }
+      { displayMode() === "bot" && (useStoreMyUserinfo.getRolePower("manageServer") ? <ManageRole /> : <p>サーバーの管理権限がありません</p>) }
       { displayMode() === "invite" && (useStoreMyUserinfo.getRolePower("manageServer") ? <ManageInvite /> : <p>サーバーの管理権限がありません</p>) }
+      { displayMode() === "customEmoji" && (useStoreMyUserinfo.getRolePower("manageEmoji") ? <ManageEmoji /> : <p>カスタム絵文字の管理権限がありません</p>) }
       { displayMode() === "logs" && (useStoreMyUserinfo.getRolePower("manageServer") ? <ManageLogs /> : <p>ログ取得の管理権限がありません</p>) }
     </div>
   );
