@@ -9,6 +9,9 @@ export default function WSMessageAddReaction(dat: IReaciton) {
   //履歴Storeのメッセージデータ更新
   setStoreHistory(
     produce((prev) => {
+      //履歴未取得のチャンネルは更新不要
+      if (prev[dat.channelId] === undefined) return;
+
       const his = prev[dat.channelId].history;
       const index = his.findIndex((m) => m.id === dat.messageId);
       if (index === -1) return;
@@ -30,14 +33,6 @@ export default function WSMessageAddReaction(dat: IReaciton) {
           includingYou: storeMyUserinfo.id === dat.userId,
         });
       }
-
-      return {
-        ...prev,
-        [dat.channelId]: {
-          ...prev[dat.channelId],
-          history: his,
-        },
-      };
     }),
   );
 }

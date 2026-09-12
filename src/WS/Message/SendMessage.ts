@@ -7,6 +7,7 @@ import {
   useStoreNotification,
 } from "~/stores/Notification.store.ts";
 import type { IMessage } from "~/types/Message.ts";
+import GetCurrentChannelId from "~/utils/GetCurrentChannelId.ts";
 import { notifyIt } from "~/utils/Notify.ts";
 import UpdateReadTimeOnRemoteAndStore from "~/utils/UpdateReadTimeOnRemoteAndStore.util";
 
@@ -15,7 +16,7 @@ export default function WSSendMessage(dat: IMessage) {
 
   //もし受け取ったメッセージのチャンネルにいない、あるいはフォーカスしていないなら新着設定
   if (
-    (!location.pathname.includes(dat.channelId) || !document.hasFocus()) &&
+    (GetCurrentChannelId() !== dat.channelId || !document.hasFocus()) &&
     storeMyUserinfo.id !== dat.userId
   ) {
     //console.log("SendMessage :: WSSendMessage : 新着登録");
