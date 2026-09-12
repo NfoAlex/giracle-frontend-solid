@@ -7,14 +7,19 @@ import SubmitBotCreation from "./ConfigBotList/SubmitBotCreation";
 
 export default function ConfigBotList() {
   const [myBots, setMyBots] = createSignal<Pick<IBot, "id" | "botName" | "approveStatus" | "createdAt" | "createdBy">[]>([]);
+  const [processing, setProcessing] = createSignal(false);
 
   const fetchList = async () => {
+    setProcessing(true);
     api.server.getBot()
       .then((res) => {
         setMyBots(res.data);
       })
       .catch(e => {
         console.error("ConfigBotList :: fetchList : ", e);
+      })
+      .finally(() => {
+        setProcessing(false);
       });
   };
 
@@ -37,8 +42,15 @@ export default function ConfigBotList() {
       </div>
 
       <Card class="grow p-2">
+        { //取得中表示
+          processing()
+          &&
+          <div class="mt-5 text-center">
+            取得中...
+          </div>
+        }
         { //ボットが無いときの表示
-          myBots().length === 0
+          (myBots().length === 0 && !processing())
           &&
           <div class="mt-5 text-center">
             ボットがありません。
