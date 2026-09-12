@@ -9,6 +9,9 @@ export default function WSMessageDeleteReaction(dat: IReaciton) {
   //履歴Storeのメッセージデータ更新
   setStoreHistory(
     produce((prev) => {
+      //履歴未取得のチャンネルは更新不要
+      if (prev[dat.channelId] === undefined) return;
+
       const his = prev[dat.channelId].history;
       const index = his.findIndex((m) => m.id === dat.messageId);
       if (index === -1) return;
@@ -25,27 +28,11 @@ export default function WSMessageDeleteReaction(dat: IReaciton) {
         his[index].reactionSummary = his[index].reactionSummary.filter(
           (r) => r.emojiCode !== dat.emojiCode,
         );
-
-        return {
-          ...prev,
-          [dat.channelId]: {
-            ...prev[dat.channelId],
-            history: his,
-          },
-        };
       } else {
         reactionNow.count--;
         //自分による削除なら自分はしていないと設定
         reactionNow.includingYou =
           reactionNow.includingYou && storeMyUserinfo.id !== dat.userId;
-
-        return {
-          ...prev,
-          [dat.channelId]: {
-            ...prev[dat.channelId],
-            history: his,
-          },
-        };
       }
     }),
   );

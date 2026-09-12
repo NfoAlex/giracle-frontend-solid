@@ -18,22 +18,18 @@ export default function WSMessageDeleted(dat: {
   setStoreHistory((prev) => {
     //console.log("WSMessageDeleted :: setStoreHistory : 削除するメッセ->", prev[dat.channelId].history.find((m) => m.id === dat.messageId));
 
-    try {
-      // 新しいオブジェクトを作成して返す
-      const newHistory = prev[dat.channelId].history.filter(
-        (m) => m.id !== dat.messageId,
-      );
+    //履歴未取得のチャンネルは更新不要
+    if (prev[dat.channelId] === undefined) return prev;
 
-      return {
-        ...prev,
-        [dat.channelId]: {
-          ...prev[dat.channelId],
-          history: newHistory,
-        },
-      };
-    } catch (_) {
-      return prev;
-    }
+    return {
+      ...prev,
+      [dat.channelId]: {
+        ...prev[dat.channelId],
+        history: prev[dat.channelId].history.filter(
+          (m) => m.id !== dat.messageId,
+        ),
+      },
+    };
   });
   //Inboxから該当メッセージIdを持つものを削除
   setStoreInbox((prev) => {
