@@ -106,7 +106,7 @@ export const server = {
       message: "Fetched my bot info",
       data: IBot
     }>({
-      url: `/api/server/bot/${p.botId}`,
+      url: `/api/server/bot/me/${p.botId}`,
       method: "GET",
       label: "SERVER_GET_BOT_ME_ID"
     }),
