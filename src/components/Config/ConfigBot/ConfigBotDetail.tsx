@@ -1,0 +1,113 @@
+import { createSignal, onMount, Show } from "solid-js";
+import { api } from "~/api";
+import { Button } from "~/components/ui/button";
+import { Card } from "~/components/ui/card";
+import { Switch, SwitchControl, SwitchThumb } from "~/components/ui/switch";
+import { TextField, TextFieldInput, TextFieldTextArea } from "~/components/ui/text-field";
+import type { IBot } from "~/types/Server";
+
+export default function ConfigBotDetail(props: { returnToListProxy: () => void; botId?: string }) {
+  const [bot, setBot] = createSignal<IBot | undefined>();
+  const [processing, setProcessing] = createSignal(false);
+  let currentBot: IBot | undefined;
+
+  const botId = props.botId;
+
+  if (botId === undefined) {
+    return (
+      <p class="text-center">Bot情報が見つかりません。</p>
+    )
+  }
+
+  const fetchBot = () => {
+    setProcessing(true);
+    api.server.getBotById({ botId: botId })
+      .then((res) => {
+        setBot(res.data);
+        currentBot = { ...res.data };
+      })
+      .catch((e) => console.error("ConfigBotDetail :: fetchBot : e", e))
+      .finally(() => {
+        setProcessing(false);
+      });
+  };
+
+  onMount(fetchBot);
+
+  return (
+    <div class="grow h-full flex flex-col gap-2">
+      <div class="flex items-center gap-2">
+        <Button onClick={props.returnToListProxy} variant={"outline"}>戻る</Button>
+      </div>
+
+      <div class="grow overflow-y-auto flex flex-col gap-2">
+        <Show
+          when={bot()}
+          fallback={<p class="text-center">Bot取得中...</p>}
+        >
+          <Card class="shrink-0 p-4 flex flex-col gap-4">
+            <div class="flex items-center w-full">
+              <p>Bot名</p>
+              <TextField class="ml-auto text-lg max-w-[50%]">
+                <TextFieldInput
+                  value={bot()!.botName}
+                  onInput={e => setBot({...bot()!, botName: e.currentTarget.value })}
+                />
+              </TextField>
+            </div>
+            <hr />
+            <div class="flex items-center w-full">
+              <p>概要</p>
+              <TextField class="ml-auto text-lg max-w-[50%]">
+                <TextFieldTextArea
+                  value={bot()!.botDescription ?? ""}
+                  onInput={(e) => setBot({ ...bot()!, botDescription: e.currentTarget.value })}
+                  rows={3}
+                />
+              </TextField>
+            </div>
+          </Card>
+
+          <Card class="shrink-0 p-4 flex flex-col gap-4">
+            <div class="flex items-center w-full">
+              <p>メッセージを取得できる</p>
+              <Switch
+                checked={bot()!.canReadMessage ?? false}
+                onChange={(v) => setBot(b => ({ ...b!, canReadMessage: v }))}
+                class="ml-auto"
+              >
+                <SwitchControl>
+                  <SwitchThumb />
+                </SwitchControl>
+              </Switch>
+            </div>
+            <hr />
+            <div class="flex items-center w-full">
+              <p>メッセージを送信できる</p>
+              <Switch
+                checked={bot()!.canSendMessage ?? false}
+                onChange={(v) => setBot(b => ({ ...b!, canSendMessage: v }))}
+                class="ml-auto"
+              >
+                <SwitchControl>
+                  <SwitchThumb />
+                </SwitchControl>
+              </Switch>
+            </div>
+          </Card>
+
+          <Card class="shrink-0 p-4 flex flex-col gap-4">
+            <div class="flex items-center w-full">
+              <p>利用できるチャンネル</p>
+              <p>ここでチャンネルを選択できるようにする</p>
+            </div>
+          </Card>
+        </Show>
+      </div>
+
+      <Card class="shrink-0 mt-2 w-full p-4 sticky bottom-4 mx-auto">
+        ここで変更適用
+      </Card>
+    </div>
+  );
+}
