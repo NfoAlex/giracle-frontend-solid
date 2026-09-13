@@ -5,7 +5,7 @@ import { Card } from "~/components/ui/card";
 import { IBot } from "~/types/Server";
 import SubmitBotCreation from "./ConfigBotList/SubmitBotCreation";
 
-export default function ConfigBotList() {
+export default function ConfigBotList(props: { setActiveBot: (botId: string) => void }) {
   const [myBots, setMyBots] = createSignal<Pick<IBot, "id" | "botName" | "approveStatus" | "createdAt" | "createdBy">[]>([]);
   const [processing, setProcessing] = createSignal(false);
 
@@ -60,7 +60,7 @@ export default function ConfigBotList() {
         <For each={myBots()}>
           {
             (bot) => (
-              <div>
+              <div onClick={()=>props.setActiveBot(bot.id)}>
                 { bot.botName }
               </div>
             )

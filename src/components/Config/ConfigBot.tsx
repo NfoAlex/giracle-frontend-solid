@@ -1,3 +1,4 @@
+import ConfigBotDetail from "./ConfigBot/ConfigBotDetail.tsx";
 import ConfigBotList from "./ConfigBot/ConfigBotList.tsx";
 import { createSignal } from "solid-js";
 
@@ -12,7 +13,15 @@ export default function ConfigBot() {
         <p class="font-bold text-2xl my-2">Bot管理</p>
       </span>
 
-      <ConfigBotList />
+      {
+        displayMode() === "list"
+        ?
+        <ConfigBotList
+          setActiveBot={botId => { setActiveBotId(botId); setDisplayMode("detail"); }}
+        />
+        :
+        <ConfigBotDetail returnToListProxy={() => setDisplayMode("list") } botId={activeBotId()} />
+      }
 
     </div>
   )
