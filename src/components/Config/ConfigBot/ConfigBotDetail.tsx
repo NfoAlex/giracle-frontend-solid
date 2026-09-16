@@ -1,4 +1,4 @@
-import { createSignal, onMount, Show } from "solid-js";
+import { createMemo, createSignal, onMount, Show } from "solid-js";
 import { api } from "~/api";
 import { Button } from "~/components/ui/button";
 import { Card } from "~/components/ui/card";
@@ -9,9 +9,11 @@ import type { IBot } from "~/types/Server";
 export default function ConfigBotDetail(props: { returnToListProxy: () => void; botId?: string }) {
   const [bot, setBot] = createSignal<IBot | undefined>();
   const [processing, setProcessing] = createSignal(false);
-  let currentBot: IBot | undefined;
+  const [currentBot, setCurrentBot] = createSignal<IBot | undefined>();
 
   const botId = props.botId;
+  // 変更検知: 比較元 (currentBot) と編集値 (bot) を毎回文字列化して比較
+  const botInfoChanged = createMemo(() => JSON.stringify(currentBot()) !== JSON.stringify(bot()));
 
   if (botId === undefined) {
     return (
@@ -24,7 +26,7 @@ export default function ConfigBotDetail(props: { returnToListProxy: () => void; 
     api.server.getBotById({ botId: botId })
       .then((res) => {
         setBot(res.data);
-        currentBot = { ...res.data };
+        setCurrentBot({ ...res.data });
       })
       .catch((e) => console.error("ConfigBotDetail :: fetchBot : e", e))
       .finally(() => {
@@ -106,7 +108,7 @@ export default function ConfigBotDetail(props: { returnToListProxy: () => void; 
       </div>
 
       <Card class="shrink-0 mt-2 w-full p-4 sticky bottom-4 mx-auto">
-        ここで変更適用
+        ここで変更適用 : { botInfoChanged() }
       </Card>
     </div>
   );
