@@ -1,3 +1,4 @@
+import { IconArrowLeft } from "@tabler/icons-solidjs";
 import { createMemo, createSignal, onMount, Show } from "solid-js";
 import { api } from "~/api";
 import { Button } from "~/components/ui/button";
@@ -60,12 +61,15 @@ export default function ConfigBotDetail(props: { returnToListProxy: () => void; 
   onMount(fetchBot);
 
   return (
-    <div class="grow h-full flex flex-col gap-2">
+    <div class="grow h-full flex flex-col overflow-y-hidden">
       <div class="flex items-center gap-2">
-        <Button onClick={props.returnToListProxy} variant={"outline"}>戻る</Button>
+        <Button onClick={props.returnToListProxy} variant={"ghost"}>
+          <IconArrowLeft /> 戻る</Button>
       </div>
 
-      <div class="grow overflow-y-auto flex flex-col gap-2">
+      <hr />
+
+      <div class="grow overflow-y-auto flex flex-col gap-2 py-2">
         <Show
           when={bot()}
           fallback={<p class="text-center">Bot取得中...</p>}
