@@ -100,6 +100,15 @@ export const channel = {
       label: "CHANNEL_LIST",
     }),
 
+  //バックエンド側で query は minLength:1 のため空文字は送れない（全件は list を使う）
+  search: (p: { query: string }) =>
+    FETCH_CLIENT<{ message: "Searched channels"; data: IChannel[] }>({
+      url: "/api/channel/search",
+      method: "GET",
+      query: { query: p.query },
+      label: "CHANNEL_SEARCH",
+    }),
+
   update: (p: {
     name?: string;
     description?: string;
