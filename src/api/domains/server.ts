@@ -137,7 +137,7 @@ export const server = {
       message: "Bot updated",
       data: IBot
     }>({
-      url: `/server/bot`,
+      url: `/api/server/bot`,
       method: "PATCH",
       label: "SERVER_PATCH_BOT",
       body: p
