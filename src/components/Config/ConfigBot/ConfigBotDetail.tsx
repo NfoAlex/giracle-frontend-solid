@@ -34,6 +34,29 @@ export default function ConfigBotDetail(props: { returnToListProxy: () => void; 
       });
   };
 
+  const updateBot = () => {
+    const botNow = bot();
+    if (botNow === undefined) return;
+
+    const { user, remoteUserId, approveStatus, id, ...rest } = botNow;
+
+    api.server.patchBot({ botId: botId, ...rest })
+      .then((res) => {
+        setBot(res.data);
+        setCurrentBot({ ...res.data });
+      })
+      .catch((e) => console.error("ConfigBotDetail :: updateBot : e", e))
+      .finally(() => {
+        setProcessing(false);
+      });
+  };
+
+  const restore = () => {
+    const currentBotNow = currentBot();
+    if (currentBotNow === undefined) return;
+    setBot({ ...currentBotNow });
+  };
+
   onMount(fetchBot);
 
   return (
@@ -47,6 +70,7 @@ export default function ConfigBotDetail(props: { returnToListProxy: () => void; 
           when={bot()}
           fallback={<p class="text-center">Bot取得中...</p>}
         >
+          <p class="mt-4 font-medium">基本情報</p>
           <Card class="shrink-0 p-4 flex flex-col gap-4">
             <div class="flex items-center w-full">
               <p>Bot名</p>
@@ -70,6 +94,7 @@ export default function ConfigBotDetail(props: { returnToListProxy: () => void; 
             </div>
           </Card>
 
+          <p class="mt-4 font-medium">権限</p>
           <Card class="shrink-0 p-4 flex flex-col gap-4">
             <div class="flex items-center w-full">
               <p>メッセージを取得できる</p>
@@ -107,8 +132,18 @@ export default function ConfigBotDetail(props: { returnToListProxy: () => void; 
         </Show>
       </div>
 
-      <Card class="shrink-0 mt-2 w-full p-4 sticky bottom-4 mx-auto">
-        ここで変更適用 : { botInfoChanged() }
+      <Card class="flex items-center justify-end gap-2 shrink-0 mb-0 w-full p-4 sticky bottom-0 mx-auto">
+        <Button
+          onClick={updateBot}
+          class="px-8 w-1/2 md:w-fit"
+          disabled={!botInfoChanged()}
+        >適用する</Button>
+        <Button
+          onClick={restore}
+          variant={"ghost"}
+          class="px-8 w-1/2 md:w-fit"
+          disabled={!botInfoChanged()}
+        >復元する</Button>
       </Card>
     </div>
   );
