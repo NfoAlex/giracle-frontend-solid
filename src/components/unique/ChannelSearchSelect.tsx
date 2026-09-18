@@ -24,23 +24,47 @@ export default function ChannelSearchSelect(props: {
   //複数インスタンスでキャッシュが混ざる
   let cachedQuery: string | undefined;
   let cachedAll: IChannel[] = [];
+  //取得中の query と Promise。同一 query の並行呼び出しを1回の取得にまとめる
+  let inflightQuery: string | undefined;
+  let inflight: Promise<IChannel[]> | undefined;
 
   const fetchPage: TSearchSelectPageFetcher<IChannel> = async ({
     query,
     page,
     pageSize,
   }) => {
+    let all = cachedAll;
+
     if (cachedQuery !== query) {
-      cachedAll =
-        query === ""
-          ? (await api.channel.list()).data
-          : (await api.channel.search({ query })).data;
-      cachedQuery = query;
+      const request =
+        inflightQuery === query && inflight !== undefined
+          ? inflight
+          : (query === ""
+                ? api.channel.list()
+                : api.channel.search({ query })
+              ).then((res) => res.data);
+      inflightQuery = query;
+      inflight = request;
+
+      try {
+        all = await request;
+        //取得中に別 query が始まっていたらキャッシュを上書きしない
+        if (inflightQuery === query) {
+          cachedAll = all;
+          cachedQuery = query;
+        }
+      } finally {
+        //成功・失敗どちらでも解放する。失敗時は cachedQuery を進めず次回に再取得させる
+        if (inflight === request) {
+          inflight = undefined;
+          inflightQuery = undefined;
+        }
+      }
     }
 
     const start = page * pageSize;
-    const items = cachedAll.slice(start, start + pageSize);
-    return { items, hasMore: cachedAll.length > start + items.length };
+    const items = all.slice(start, start + pageSize);
+    return { items, hasMore: all.length > start + items.length };
   };
 
   /** 事前に value で渡された id の実体を引く */

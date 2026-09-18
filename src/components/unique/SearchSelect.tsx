@@ -131,8 +131,16 @@ export default function SearchSelect<T extends ISearchSelectOption>(
     const size = props.pageSize ?? DEFAULT_PAGE_SIZE;
 
     setCurrentQuery(query);
-    if (nextPage === 0) setStatus("loading");
-    else setLoadingMore(true);
+    if (nextPage === 0) {
+      setStatus("loading");
+      //新 query の先頭ページ取得中は (query, page, hasMore) を一致させる。
+      //古い query の page / hasMore のまま「さらに読み込む」が押されると、
+      //新 query と古い page の組み合わせでリストが汚染されるため
+      setPage(0);
+      setHasMore(false);
+    } else {
+      setLoadingMore(true);
+    }
 
     try {
       const result = await props.fetchPage({
