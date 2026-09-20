@@ -100,6 +100,14 @@ export const channel = {
       label: "CHANNEL_LIST",
     }),
 
+  search: (q: { query: string, cursorChannelId?: string }) =>
+    FETCH_CLIENT<{ message: "Searched channels", data: Omit<IChannel, "ChannelViewableRole">[] }>({
+      url: "/api/channel/search",
+      method: "GET",
+      label: "CHANNEL_SEARCH",
+      query: q
+    }),
+
   update: (p: {
     name?: string;
     description?: string;
