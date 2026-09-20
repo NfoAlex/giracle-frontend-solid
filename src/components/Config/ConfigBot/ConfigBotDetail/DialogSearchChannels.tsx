@@ -1,4 +1,4 @@
-import { IconPlus, IconSearch } from "@tabler/icons-solidjs";
+import { IconHash, IconPlus, IconSearch, IconX } from "@tabler/icons-solidjs";
 import { Accessor, createSignal, For } from "solid-js";
 import { api } from "~/api";
 import { Badge } from "~/components/ui/badge";
@@ -134,8 +134,16 @@ export default function DialogSearchChannels(props: {
                 <For each={selectedChannelIds()}>
                   {
                     channelId => (
-                      <Badge variant={"secondary"}>
-                        { useStoreChannelInfo.directGetterChannelInfo(channelId).name }
+                      <Badge
+                        variant={"secondary"}
+                        class="group flex items-center gap-1 cursor-pointer"
+                        onClick={() => setSelectedChannelIds(prev => prev.filter(id => id !== channelId))}
+                      >
+                        <span class="relative size-4 shrink-0">
+                          <IconHash size={16} class="absolute inset-0 transition-opacity group-hover:opacity-0" />
+                          <IconX size={16} class="absolute inset-0 opacity-0 transition-opacity group-hover:opacity-100" />
+                        </span>
+                        <p>{ useStoreChannelInfo.directGetterChannelInfo(channelId).name }</p>
                       </Badge>
                     )
                   }
