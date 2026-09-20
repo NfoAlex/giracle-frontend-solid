@@ -51,13 +51,14 @@ export default function ConfigBotDetail(props: { returnToListProxy: () => void; 
 
     api.server.patchBot({
       botId: botId,
-      permissionChannelIds: usingChannelIds(), ...rest
+      permissionChannelIds: usingChannelIds(),
+      ...rest
     })
       .then((res) => {
         setBot(res.data);
         setCurrentBot({ ...res.data });
         //保存できたので現在値もサーバー応答に合わせて更新(未保存差分を消す)
-        const savedChannelIds = res.data.channelPermissions.map(c => c.channelId);
+        const savedChannelIds = res.data.channelPermissions.map(c => c.channelId) ?? [];
         setUsingChannelIds(savedChannelIds);
         setCurrentUsingChannelIds([...savedChannelIds]);
       })
