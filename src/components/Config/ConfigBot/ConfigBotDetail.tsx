@@ -1,20 +1,26 @@
 import { IconArrowLeft } from "@tabler/icons-solidjs";
-import { createMemo, createSignal, onMount, Show } from "solid-js";
+import { createMemo, createSignal, For, onMount, Show } from "solid-js";
 import { api } from "~/api";
 import { Button } from "~/components/ui/button";
 import { Card } from "~/components/ui/card";
 import { Switch, SwitchControl, SwitchThumb } from "~/components/ui/switch";
 import { TextField, TextFieldInput, TextFieldTextArea } from "~/components/ui/text-field";
 import type { IBot } from "~/types/Server";
+import DialogSearchChannels from "./ConfigBotDetail/DialogSearchChannels";
+import type { IChannel } from "~/types/Channel";
+import { useStoreChannelInfo } from "~/stores/ChannelInfo.store";
 
 export default function ConfigBotDetail(props: { returnToListProxy: () => void; botId?: string }) {
   const [bot, setBot] = createSignal<IBot | undefined>();
+  const [usingChannelIds, setUsingChannelIds] = createSignal<IChannel["id"][]>([]);
   const [processing, setProcessing] = createSignal(false);
   const [currentBot, setCurrentBot] = createSignal<IBot | undefined>();
+  const [currentUsingChannelIds, setCurrentUsingChannelIds] = createSignal<IChannel["id"][]>([]);
 
   const botId = props.botId;
   // 変更検知: 比較元 (currentBot) と編集値 (bot) を毎回文字列化して比較
   const botInfoChanged = createMemo(() => JSON.stringify(currentBot()) !== JSON.stringify(bot()));
+  const usingChannelsChanged = createMemo(() => JSON.stringify(currentUsingChannelIds()) !== JSON.stringify(usingChannelIds()));
 
   if (botId === undefined) {
     return (
@@ -28,6 +34,8 @@ export default function ConfigBotDetail(props: { returnToListProxy: () => void; 
       .then((res) => {
         setBot(res.data);
         setCurrentBot({ ...res.data });
+        setUsingChannelIds(res.data.channelPermissions.map(c => c.channelId));
+        setCurrentUsingChannelIds(res.data.channelPermissions.map(c => c.channelId));
       })
       .catch((e) => console.error("ConfigBotDetail :: fetchBot : e", e))
       .finally(() => {
@@ -41,10 +49,17 @@ export default function ConfigBotDetail(props: { returnToListProxy: () => void; 
 
     const { user, remoteUserId, approveStatus, id, ...rest } = botNow;
 
-    api.server.patchBot({ botId: botId, ...rest })
+    api.server.patchBot({
+      botId: botId,
+      permissionChannelIds: usingChannelIds(), ...rest
+    })
       .then((res) => {
         setBot(res.data);
         setCurrentBot({ ...res.data });
+        //保存できたので現在値もサーバー応答に合わせて更新(未保存差分を消す)
+        const savedChannelIds = res.data.channelPermissions.map(c => c.channelId);
+        setUsingChannelIds(savedChannelIds);
+        setCurrentUsingChannelIds([...savedChannelIds]);
       })
       .catch((e) => console.error("ConfigBotDetail :: updateBot : e", e))
       .finally(() => {
@@ -56,6 +71,7 @@ export default function ConfigBotDetail(props: { returnToListProxy: () => void; 
     const currentBotNow = currentBot();
     if (currentBotNow === undefined) return;
     setBot({ ...currentBotNow });
+    setUsingChannelIds([...currentUsingChannelIds()]);
   };
 
   onMount(fetchBot);
@@ -132,6 +148,26 @@ export default function ConfigBotDetail(props: { returnToListProxy: () => void; 
               <p>利用できるチャンネル</p>
               <p>ここでチャンネルを選択できるようにする</p>
             </div>
+            <DialogSearchChannels
+              currentChannelIdsSignal={usingChannelIds}
+              applyChannelIds={
+                (channels) => setUsingChannelIds(channels)
+              }
+            />
+            <div class="w-full flex flex-wrap">
+              <For
+                each={usingChannelIds()}
+                fallback={<p class="text-secondary mx-auto">チャンネルがありません</p>}
+              >
+                {
+                  (channelId) => (
+                    <div class="w-fit p-2 border rounded">
+                      { useStoreChannelInfo.directGetterChannelInfo(channelId).name }
+                    </div>
+                  )
+                }
+              </For>
+            </div>
           </Card>
         </Show>
       </div>
@@ -140,13 +176,13 @@ export default function ConfigBotDetail(props: { returnToListProxy: () => void; 
         <Button
           onClick={updateBot}
           class="px-8 w-1/2 md:w-fit"
-          disabled={!botInfoChanged()}
+          disabled={(!botInfoChanged() && !usingChannelsChanged()) || processing()}
         >適用する</Button>
         <Button
           onClick={restore}
           variant={"ghost"}
           class="px-8 w-1/2 md:w-fit"
-          disabled={!botInfoChanged()}
+          disabled={(!botInfoChanged() && !usingChannelsChanged()) || processing()}
         >復元する</Button>
       </Card>
     </div>
