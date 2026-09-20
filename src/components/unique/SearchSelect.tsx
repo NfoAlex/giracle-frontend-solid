@@ -2,6 +2,7 @@ import * as ComboboxPrimitive from "@kobalte/core/combobox";
 import { IconCheck, IconChevronDown, IconX } from "@tabler/icons-solidjs";
 import {
   createEffect,
+  createMemo,
   createSignal,
   For,
   on,
@@ -10,7 +11,7 @@ import {
   Show,
 } from "solid-js";
 import type { JSX } from "solid-js";
-import { createStore } from "solid-js/store";
+import { createStore, reconcile } from "solid-js/store";
 import { Badge } from "~/components/ui/badge.tsx";
 import { Button } from "~/components/ui/button.tsx";
 import { cn } from "~/lib/utils.ts";
@@ -58,6 +59,11 @@ export interface ISearchSelectProps<T extends ISearchSelectOption> {
   placement?: "top" | "bottom";
   /** 1ページの件数。既定 30 */
   pageSize?: number;
+  /**
+   * 検索語の最大長。指定時は入力欄に maxLength を付け、
+   * 超過した検索語は fetchPage へ渡さない（サーバー側の 500 を防ぐ）
+   */
+  maxQueryLength?: number;
   /** 項目1行の描画。既定は name のテキスト表示 */
   renderItem?: (item: T) => JSX.Element;
   class?: string;
@@ -103,14 +109,15 @@ export default function SearchSelect<T extends ISearchSelectOption>(
     known[id] ?? ({ id, name: id } as unknown as T);
 
   /** props.value を必ず同じ長さ・同じ順序で T[] に変換する */
-  const selectedItems = (): T[] => props.value.map(fallback);
+  const selectedItems = createMemo<T[]>(() => props.value.map(fallback));
 
   /**
    * 現在のページ結果 + ページ結果に無い選択済み項目（id で重複排除）。
    * Kobalte は selectedOptions / onChange のペイロードを options から逆引きするため、
    * 選択済み項目が options に無いとチップも onChange も壊れる。
+   * Kobalte はこれを複数回読むため memo 化して再確保を避ける。
    */
-  const options = (): T[] => {
+  const options = createMemo<T[]>(() => {
     const merged = [...items()];
     const seen = new Set(merged.map((i) => i.id));
     for (const id of props.value) {
@@ -119,7 +126,7 @@ export default function SearchSelect<T extends ISearchSelectOption>(
       merged.push(fallback(id));
     }
     return merged;
-  };
+  });
 
   /**
    * ページを読み込む
@@ -127,6 +134,16 @@ export default function SearchSelect<T extends ISearchSelectOption>(
    * @param query - 検索語
    */
   const load = async (nextPage: number, query: string) => {
+    //上限は入力欄の maxLength が主たる制御（ブラウザが入力を打ち切る）。
+    //ここはそれを迂回する経路（プログラム経由の load 呼び出しなど）向けの保険で、
+    //通常の UI 操作では到達しない。サーバー超過は 500 になるため送らない
+    if (
+      props.maxQueryLength !== undefined &&
+      query.length > props.maxQueryLength
+    ) {
+      return;
+    }
+
     const seq = ++reqSeq;
     const size = props.pageSize ?? DEFAULT_PAGE_SIZE;
 
@@ -156,7 +173,19 @@ export default function SearchSelect<T extends ISearchSelectOption>(
       if (nextPage === 0) setItems(result.items);
       else setItems([...items(), ...result.items]);
 
-      for (const item of result.items) setKnown(item.id, item);
+      //known を書き直す。items() 分を残すのは、表示中の行を選択した時に resolveItems を
+      //再実行させないための最適化。props.value 分のループは最適化ではなく必須:
+      //resolveUnknown は onMount と props.value 変更でしか走らず、この prune では再実行
+      //されないため、落とすと現在のページに無い選択済み id のラベルが二度と復元されない。
+      //未解決 id は書き戻さない（プレースホルダを入れると resolveUnknown の
+      //known[id] === undefined 判定が偽になり、その id が永久に解決されなくなる）
+      const keep: { [id: string]: T } = {};
+      for (const item of items()) keep[item.id] = item;
+      for (const id of props.value) {
+        const resolved = known[id];
+        if (resolved !== undefined) keep[id] = resolved;
+      }
+      setKnown(reconcile(keep));
 
       setHasMore(result.hasMore);
       setPage(nextPage);
@@ -279,6 +308,7 @@ export default function SearchSelect<T extends ISearchSelectOption>(
             </For>
             <ComboboxPrimitive.Input
               aria-label={props.placeholder ?? "検索"}
+              maxLength={props.maxQueryLength}
               class="h-8 min-w-24 flex-1 bg-transparent outline-none placeholder:text-muted-foreground"
             />
             <ComboboxPrimitive.Trigger class="shrink-0">
@@ -295,7 +325,13 @@ export default function SearchSelect<T extends ISearchSelectOption>(
           <Show when={status() === "loading" && items().length === 0}>
             <p class="p-2 text-sm text-muted-foreground">読み込み中...</p>
           </Show>
-          <Show when={status() === "idle" && options().length === 0}>
+          <Show
+            when={
+              status() === "idle" &&
+              items().length === 0 &&
+              props.value.length === 0
+            }
+          >
             <p class="p-2 text-sm text-muted-foreground">該当なし</p>
           </Show>
           <Show when={status() === "error"}>
