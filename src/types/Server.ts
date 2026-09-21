@@ -46,6 +46,23 @@ export interface IBotChannelPermission {
   id: number;
 }
 
+// 管理者用Bot一覧(GET /server/bot/all)の1行分。バックエンドの select 列と一致させる
+export type TBotAdminListItem = Pick<
+  IBot,
+  | "id"
+  | "botName"
+  | "approveStatus"
+  | "useAllChannel"
+  | "canFetchUserinfo"
+  | "canFetchRoleinfo"
+  | "canManageUser"
+  | "canManageServerConfig"
+  | "canReadMessage"
+  | "canSendMessage"
+  | "createdAt"
+  | "createdBy"
+>;
+
 export interface IInvite {
   inviteCode: string;
   id: number;
