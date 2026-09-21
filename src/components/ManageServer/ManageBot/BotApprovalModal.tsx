@@ -71,9 +71,14 @@ export default function BotApprovalModal(props: {
         <Show when={props.bot}>
           {(bot) => (
             <>
-              <DialogTitle class="flex items-center gap-2">
-                {bot().botName}
-                <Badge variant={props.status[bot().approveStatus].variant}>
+              {/* DialogContent の grid 直下のため min-w-0 を付けないと min-content で列幅が伸びる */}
+              <DialogTitle class="flex items-center gap-2 min-w-0">
+                {/* min-w-0 が無いと flex 子の min-width:auto で長い名前が縮まずダイアログが横に広がる */}
+                <span class="min-w-0 truncate">{bot().botName}</span>
+                <Badge
+                  class="shrink-0"
+                  variant={props.status[bot().approveStatus].variant}
+                >
                   {props.status[bot().approveStatus].label}
                 </Badge>
               </DialogTitle>
@@ -89,7 +94,10 @@ export default function BotApprovalModal(props: {
               <div class="flex flex-col gap-1 text-sm">
                 <span class="flex gap-2">
                   <p class="w-24 shrink-0 text-muted-foreground">作成者</p>
-                  <p>{useStoreUserinfo.getterUserinfo(bot().createdBy).name}</p>
+                  {/* ユーザー名は文字種によっては折返されないため min-w-0 + break-all で収める */}
+                  <p class="min-w-0 break-all">
+                    {useStoreUserinfo.getterUserinfo(bot().createdBy).name}
+                  </p>
                 </span>
                 <span class="flex gap-2">
                   <p class="w-24 shrink-0 text-muted-foreground">作成日時</p>

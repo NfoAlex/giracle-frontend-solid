@@ -184,7 +184,7 @@ export default function ManageBot() {
               onClick={() => setReviewingBotId(bot.id)}
               class="p-2 rounded-md flex flex-wrap items-center gap-3 text-left hover:bg-accent cursor-pointer"
             >
-              <div class="flex flex-col min-w-0">
+              <div class="flex flex-col min-w-0 grow basis-0">
                 <p class="truncate font-semibold">{bot.botName}</p>
                 <p class="truncate text-sm text-muted-foreground">
                   {useStoreUserinfo.getterUserinfo(bot.createdBy).name}
