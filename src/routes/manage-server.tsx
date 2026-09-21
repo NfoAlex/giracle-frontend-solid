@@ -9,6 +9,7 @@ import { useStoreMyUserinfo } from "~/stores/MyUserinfo.store.ts";
 import SidebarTriggerWithDot from "~/components/unique/SidebarTriggerWithDot.tsx";
 import ManageEmoji from "~/components/ManageServer/manage-emoji.tsx";
 import ManageLogs from "~/components/ManageServer/manage-logs";
+import ManageBot from "~/components/ManageServer/manage-bot";
 
 type TManageServerTab = "community" | "role" | "bot" | "invite" | "customEmoji" | "logs";
 
@@ -72,7 +73,7 @@ export default function ManageServer() {
 
       { displayMode() === "community" && (useStoreMyUserinfo.getRolePower("manageServer") ? <ManageCommunity /> : <p>サーバーの管理権限がありません</p>) }
       { displayMode() === "role" && (useStoreMyUserinfo.getRolePower("manageRole") ? <ManageRole /> : <p>ロールの管理権限がありません</p>) }
-      { displayMode() === "bot" && (useStoreMyUserinfo.getRolePower("manageServer") ? <ManageRole /> : <p>サーバーの管理権限がありません</p>) }
+      { displayMode() === "bot" && (useStoreMyUserinfo.getRolePower("manageServer") ? <ManageBot /> : <p>サーバーの管理権限がありません</p>) }
       { displayMode() === "invite" && (useStoreMyUserinfo.getRolePower("manageServer") ? <ManageInvite /> : <p>サーバーの管理権限がありません</p>) }
       { displayMode() === "customEmoji" && (useStoreMyUserinfo.getRolePower("manageEmoji") ? <ManageEmoji /> : <p>カスタム絵文字の管理権限がありません</p>) }
       { displayMode() === "logs" && (useStoreMyUserinfo.getRolePower("manageServer") ? <ManageLogs /> : <p>ログ取得の管理権限がありません</p>) }
