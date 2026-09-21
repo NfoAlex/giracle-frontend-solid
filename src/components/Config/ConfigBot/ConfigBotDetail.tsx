@@ -119,7 +119,7 @@ export default function ConfigBotDetail(props: { returnToListProxy: () => void; 
           <p class="mt-4 font-medium">権限</p>
           <Card class="shrink-0 p-4 flex flex-col gap-4">
             <div class="flex items-center w-full">
-              <p>メッセージを取得できる</p>
+              <p>他人・自分のメッセージを取得できる</p>
               <Switch
                 checked={bot()!.canReadMessage ?? false}
                 onChange={(v) => setBot(b => ({ ...b!, canReadMessage: v }))}
@@ -132,7 +132,7 @@ export default function ConfigBotDetail(props: { returnToListProxy: () => void; 
             </div>
             <hr />
             <div class="flex items-center w-full">
-              <p>メッセージを送信できる</p>
+              <p>自分のメッセージを送信・編集できる</p>
               <Switch
                 checked={bot()!.canSendMessage ?? false}
                 onChange={(v) => setBot(b => ({ ...b!, canSendMessage: v }))}
