@@ -47,14 +47,20 @@ export default function ConfigBotList(props: {
 
     // 空文字を渡すとバックエンドがエラーを返すため、未検索時は undefined にする
     const trimmedQuery = query().trim();
+    // 続き読みは「同じ検索条件」かつ「カーソル取得済み」のときだけ成立させる。
+    // 条件が食い違っていたらカーソル無しの先頭ページ取得へフォールバックする
+    const useCursor =
+      continuous &&
+      latestSearchedQuery() === trimmedQuery &&
+      cursorBotId() !== undefined;
 
     try {
       const res = await api.server.getBot({
         query: trimmedQuery || undefined,
-        cursorBotId: continuous ? cursorBotId() : undefined,
+        cursorBotId: useCursor ? cursorBotId() : undefined,
       });
 
-      if (continuous && latestSearchedQuery() === trimmedQuery) {
+      if (useCursor) {
         setMyBots((prev) => [...prev, ...res.data]);
       } else {
         setMyBots(res.data);
@@ -74,6 +80,9 @@ export default function ConfigBotList(props: {
 
   // 先頭から取り直す（検索条件の変更・再取得時）
   const search = () => {
+    // 処理中に cursorBotId だけ消すと、in-flight な取得が失敗した場合に
+    // カーソルが復元されず、以降の続き読みが先頭ページ重複になる
+    if (processing()) return;
     setCursorBotId(undefined);
     fetchList();
   };
