@@ -1,26 +1,81 @@
-import { createSignal, For, onMount } from "solid-js";
+import { IconReload, IconSearch } from "@tabler/icons-solidjs";
+import { createSignal, For, onMount, Show } from "solid-js";
 import { api } from "~/api";
+import { Badge, type BadgeProps } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { Card } from "~/components/ui/card";
-import { IBot } from "~/types/Server";
+import { TextField, TextFieldInput } from "~/components/ui/text-field";
+import type { IBot } from "~/types/Server";
 import SubmitBotCreation from "./ConfigBotList/SubmitBotCreation";
 
-export default function ConfigBotList(props: { setActiveBot: (botId: string) => void }) {
-  const [myBots, setMyBots] = createSignal<Pick<IBot, "id" | "botName" | "approveStatus" | "createdAt" | "createdBy">[]>([]);
-  const [processing, setProcessing] = createSignal(false);
+// 1回の取得で読み込むボット数。APIは上限まで返すと続きがある可能性がある
+const PAGE_LENGTH = 50;
 
-  const fetchList = async () => {
+const APPROVE_STATUS_LABEL: Record<
+  IBot["approveStatus"],
+  { label: string; variant: BadgeProps["variant"] }
+> = {
+  APPROVED: { label: "承認済み", variant: "success" },
+  PENDING: { label: "承認待ち", variant: "warning" },
+  BLOCKED: { label: "停止中", variant: "error" },
+  DENIED: { label: "拒否", variant: "error" },
+};
+
+type TBotListItem = Pick<
+  IBot,
+  "id" | "botName" | "approveStatus" | "createdAt" | "createdBy"
+>;
+
+export default function ConfigBotList(props: {
+  setActiveBot: (botId: string) => void;
+}) {
+  const [myBots, setMyBots] = createSignal<TBotListItem[]>([]);
+  const [processing, setProcessing] = createSignal(false);
+  const [query, setQuery] = createSignal("");
+  const [hasMoreBots, setHasMoreBots] = createSignal(false);
+  const [cursorBotId, setCursorBotId] = createSignal<string | undefined>();
+  // 続き読みの追記先が現在の検索条件と一致するかを判定するため保持
+  const [latestSearchedQuery, setLatestSearchedQuery] = createSignal("");
+
+  /**
+   * ボット一覧を取得する
+   * @param continuous true なら既存一覧の末尾へ追記する
+   */
+  const fetchList = async (continuous: boolean = false) => {
+    if (processing()) return;
     setProcessing(true);
-    api.server.getBot()
-      .then((res) => {
-        setMyBots(res.data);
-      })
-      .catch(e => {
-        console.error("ConfigBotList :: fetchList : ", e);
-      })
-      .finally(() => {
-        setProcessing(false);
+
+    // 空文字を渡すとバックエンドがエラーを返すため、未検索時は undefined にする
+    const trimmedQuery = query().trim();
+
+    try {
+      const res = await api.server.getBot({
+        query: trimmedQuery || undefined,
+        cursorBotId: continuous ? cursorBotId() : undefined,
       });
+
+      if (continuous && latestSearchedQuery() === trimmedQuery) {
+        setMyBots((prev) => [...prev, ...res.data]);
+      } else {
+        setMyBots(res.data);
+      }
+
+      // 1ページ分返ってきたら続きがあるとみなす
+      setHasMoreBots(res.data.length === PAGE_LENGTH);
+      const lastBot = res.data[res.data.length - 1];
+      if (lastBot) setCursorBotId(lastBot.id);
+      setLatestSearchedQuery(trimmedQuery);
+    } catch (e) {
+      console.error("ConfigBotList :: fetchList : ", e);
+    } finally {
+      setProcessing(false);
+    }
+  };
+
+  // 先頭から取り直す（検索条件の変更・再取得時）
+  const search = () => {
+    setCursorBotId(undefined);
+    fetchList();
   };
 
   /**
@@ -28,44 +83,96 @@ export default function ConfigBotList(props: { setActiveBot: (botId: string) => 
    * @param botCreated
    */
   const myBotsBinder = (botCreated: IBot) => {
-    setMyBots(b => [botCreated, ...b])
+    setMyBots((b) => [botCreated, ...b]);
   };
 
-  onMount(fetchList);
+  onMount(() => {
+    fetchList();
+  });
 
   return (
     <div class="grow h-full flex flex-col gap-2">
-
       <div class="flex items-center justify-end gap-2">
-        <Button variant={"outline"}>ボット一覧を再取得</Button>
+        <Button
+          variant={"outline"}
+          size="icon"
+          onClick={search}
+          disabled={processing()}
+        >
+          <IconReload />
+        </Button>
         <SubmitBotCreation dataBinder={myBotsBinder} />
       </div>
 
-      <Card class="grow p-2">
-        { //取得中表示
-          processing()
-          &&
-          <div class="mt-5 text-center">
-            取得中...
-          </div>
+      <TextField class="shrink-0">
+        <span class="flex items-center gap-2">
+          <TextFieldInput
+            placeholder="Bot名で検索"
+            value={query()}
+            onInput={(e) => setQuery(e.currentTarget.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") search();
+            }}
+          />
+          <Button
+            onClick={search}
+            disabled={processing()}
+            size="icon"
+            class="shrink-0"
+          >
+            <IconSearch />
+          </Button>
+        </span>
+      </TextField>
+
+      <Card class="grow overflow-y-auto p-2 flex flex-col gap-1">
+        {
+          //取得中表示
+          processing() && myBots().length === 0 && (
+            <div class="mt-5 text-center">取得中...</div>
+          )
         }
-        { //ボットが無いときの表示
-          (myBots().length === 0 && !processing())
-          &&
-          <div class="mt-5 text-center">
-            ボットがありません。
-          </div>
+        {
+          //ボットが無いときの表示
+          myBots().length === 0 && !processing() && (
+            <div class="mt-5 text-center">ボットがありません。</div>
+          )
         }
 
         <For each={myBots()}>
-          {
-            (bot) => (
-              <div onClick={()=>props.setActiveBot(bot.id)}>
-                { bot.botName }
+          {(bot) => (
+            <div
+              onClick={() => props.setActiveBot(bot.id)}
+              class="p-2 rounded-md flex items-center gap-3 hover:bg-accent cursor-pointer"
+            >
+              <div class="flex flex-col min-w-0">
+                <p class="truncate font-semibold">{bot.botName}</p>
+                <p class="truncate text-sm text-muted-foreground">
+                  {bot.createdBy}
+                </p>
               </div>
-            )
-          }
+
+              <span class="ml-auto flex items-center gap-2 shrink-0">
+                <Badge variant={APPROVE_STATUS_LABEL[bot.approveStatus].variant}>
+                  {APPROVE_STATUS_LABEL[bot.approveStatus].label}
+                </Badge>
+                <span class="text-sm text-muted-foreground">
+                  {new Date(bot.createdAt).toLocaleString()}
+                </span>
+              </span>
+            </div>
+          )}
         </For>
+
+        <Show when={hasMoreBots() && !processing()}>
+          <Button
+            onClick={() => fetchList(true)}
+            variant="secondary"
+            class="w-full mt-2"
+          >
+            さらに読み込む
+          </Button>
+        </Show>
       </Card>
     </div>
   );
