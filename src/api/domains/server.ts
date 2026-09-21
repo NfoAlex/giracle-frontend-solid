@@ -144,7 +144,7 @@ export const server = {
       body: p
     }),
 
-  getBotAll: (q: { cursorBotId?: string }) =>
+  getBotAll: (q: { query?: string, cursorBotId?: string }) =>
     FETCH_CLIENT<{
       message: "",
       data: Omit<IBot, "user" | "channelPermissions">
