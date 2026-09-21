@@ -1,4 +1,4 @@
-import { IconHash, IconPlus, IconSearch, IconX } from "@tabler/icons-solidjs";
+import { IconCheck, IconHash, IconPlus, IconSearch, IconX } from "@tabler/icons-solidjs";
 import { Accessor, createSignal, For } from "solid-js";
 import { api } from "~/api";
 import { Badge } from "~/components/ui/badge";
@@ -63,7 +63,7 @@ export default function DialogSearchChannels(props: {
     <div>
       <Dialog open={displayDialog()} onOpenChange={openDialog}>
         <DialogTrigger>
-          <Button variant={"secondary"}>チャンネルを追加する</Button>
+          <Button variant={"secondary"}>使用チャンネルを管理する</Button>
         </DialogTrigger>
         <DialogContent>
           <DialogHeader class="min-w-0">
@@ -136,7 +136,7 @@ export default function DialogSearchChannels(props: {
                     channelId => (
                       <Badge
                         variant={"secondary"}
-                        class="group flex items-center gap-1 cursor-pointer"
+                        class="group flex items-center cursor-pointer"
                         onClick={() => setSelectedChannelIds(prev => prev.filter(id => id !== channelId))}
                       >
                         <span class="relative size-4 shrink-0">
@@ -156,8 +156,8 @@ export default function DialogSearchChannels(props: {
                   onClick={applyChannels}
                   class="ml-auto w-full md:w-fit"
                 >
-                  <IconPlus />
-                  選択したチャンネルを適用
+                  <IconCheck />
+                  選択チャンネルを適用
                 </Button>
               </div>
             </div>

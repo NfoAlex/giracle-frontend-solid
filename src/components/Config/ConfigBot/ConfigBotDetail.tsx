@@ -1,4 +1,4 @@
-import { IconArrowLeft } from "@tabler/icons-solidjs";
+import { IconArrowLeft, IconHash } from "@tabler/icons-solidjs";
 import { createMemo, createSignal, For, onMount, Show } from "solid-js";
 import { api } from "~/api";
 import { Button } from "~/components/ui/button";
@@ -9,6 +9,7 @@ import type { IBot } from "~/types/Server";
 import DialogSearchChannels from "./ConfigBotDetail/DialogSearchChannels";
 import type { IChannel } from "~/types/Channel";
 import { useStoreChannelInfo } from "~/stores/ChannelInfo.store";
+import { Badge } from "~/components/ui/badge";
 
 export default function ConfigBotDetail(props: { returnToListProxy: () => void; botId?: string }) {
   const [bot, setBot] = createSignal<IBot | undefined>();
@@ -144,11 +145,8 @@ export default function ConfigBotDetail(props: { returnToListProxy: () => void; 
             </div>
           </Card>
 
+          <p class="mt-4 font-medium">使用可能チャンネル</p>
           <Card class="shrink-0 p-4 flex flex-col gap-4">
-            <div class="flex items-center w-full">
-              <p>利用できるチャンネル</p>
-              <p>ここでチャンネルを選択できるようにする</p>
-            </div>
             <DialogSearchChannels
               currentChannelIdsSignal={usingChannelIds}
               applyChannelIds={
@@ -162,9 +160,10 @@ export default function ConfigBotDetail(props: { returnToListProxy: () => void; 
               >
                 {
                   (channelId) => (
-                    <div class="w-fit p-2 border rounded">
+                    <Badge class="flex items-center" variant={"secondary"}>
+                      <IconHash size={16} />
                       { useStoreChannelInfo.directGetterChannelInfo(channelId).name }
-                    </div>
+                    </Badge>
                   )
                 }
               </For>
