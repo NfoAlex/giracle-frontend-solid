@@ -1,6 +1,6 @@
 import type { IChannel } from "~/types/Channel.ts";
 import type { ICustomEmoji } from "~/types/Message.ts";
-import type { IBot, IInvite, IRequestLog, IRequestLogCount, IServer } from "~/types/Server.ts";
+import type { IBot, IInvite, IRequestLog, IRequestLogCount, IServer, TBotAdminListItem } from "~/types/Server.ts";
 import { FETCH_CLIENT } from "../FETCH_CLIENT.ts";
 
 export const server = {
@@ -146,8 +146,8 @@ export const server = {
 
   getBotAll: (q: { query?: string, cursorBotId?: string }) =>
     FETCH_CLIENT<{
-      message: "",
-      data: Omit<IBot, "user" | "channelPermissions">
+      message: "Bot fetched",
+      data: TBotAdminListItem[]
     }>({
       url: `/api/server/bot/all`,
       method: "GET",
@@ -161,8 +161,8 @@ export const server = {
       data: string
     }>({
       url: `/api/server/bot/approval`,
-      method: "GET",
-      label: "SERVER_GET_BOT_ALL",
+      method: "PATCH",
+      label: "SERVER_PATCH_BOT_APPROVAL",
       body: p
     }),
 
