@@ -85,7 +85,7 @@ export default function ConfigBotDetail(props: { returnToListProxy: () => void; 
           <IconArrowLeft /> 戻る</Button>
       </div>
 
-      <hr />
+      <hr class="mt-2" />
 
       <div class="grow overflow-y-auto flex flex-col gap-2 py-2">
         <Show
