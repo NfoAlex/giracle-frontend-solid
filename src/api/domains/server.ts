@@ -67,7 +67,7 @@ export const server = {
     return res.json();
   },
 
-  getBot: () =>
+  getBot: (q?: { cursorBotId?: string, query?: string }) =>
     FETCH_CLIENT<{
       message: "Fetched my bots",
       data: Pick<
@@ -76,7 +76,8 @@ export const server = {
     }>({
       url: "/api/server/bot/me",
       method: "GET",
-      label: "SERVER_GET_BOT_ME"
+      label: "SERVER_GET_BOT_ME",
+      query: q
     }),
 
   putBot: (p: {
