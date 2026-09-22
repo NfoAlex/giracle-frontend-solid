@@ -48,7 +48,7 @@ export default function Config() {
             value={displayMode()}
             defaultValue={"profile"}
             onChange={setDisplayMode}
-            options={["profile", "session", "chat", "notification", "display"]}
+            options={["profile", "session", "chat", "notification", "display", "bot"]}
             itemComponent={(props) =>
               <SelectItem item={props.item}>
                 {props.item.textValue === "profile" && "プロフィール"}
