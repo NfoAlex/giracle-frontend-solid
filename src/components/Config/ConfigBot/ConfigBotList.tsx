@@ -1,25 +1,15 @@
 import { IconReload, IconSearch } from "@tabler/icons-solidjs";
 import { createSignal, For, onMount, Show } from "solid-js";
 import { api } from "~/api";
-import { Badge, type BadgeProps } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { Card } from "~/components/ui/card";
 import { TextField, TextFieldInput } from "~/components/ui/text-field";
 import type { IBot } from "~/types/Server";
 import SubmitBotCreation from "./ConfigBotList/SubmitBotCreation";
+import BotApprovalBadge from "~/components/unique/BotApprovalBadge";
 
 // 1回の取得で読み込むボット数。APIは上限まで返すと続きがある可能性がある
 const PAGE_LENGTH = 50;
-
-const APPROVE_STATUS_LABEL: Record<
-  IBot["approveStatus"],
-  { label: string; variant: BadgeProps["variant"] }
-> = {
-  APPROVED: { label: "承認済み", variant: "success" },
-  PENDING: { label: "承認待ち", variant: "warning" },
-  BLOCKED: { label: "停止中", variant: "error" },
-  DENIED: { label: "拒否", variant: "error" },
-};
 
 type TBotListItem = Pick<
   IBot,
@@ -162,9 +152,7 @@ export default function ConfigBotList(props: {
               </div>
 
               <span class="ml-auto flex items-center gap-2 shrink-0">
-                <Badge variant={APPROVE_STATUS_LABEL[bot.approveStatus].variant}>
-                  {APPROVE_STATUS_LABEL[bot.approveStatus].label}
-                </Badge>
+                <BotApprovalBadge approveStatus={bot.approveStatus} />
                 <span class="text-sm text-muted-foreground">
                   {new Date(bot.createdAt).toLocaleString()}
                 </span>

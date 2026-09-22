@@ -10,6 +10,7 @@ import DialogSearchChannels from "./ConfigBotDetail/DialogSearchChannels";
 import type { IChannel } from "~/types/Channel";
 import { useStoreChannelInfo } from "~/stores/ChannelInfo.store";
 import { Badge } from "~/components/ui/badge";
+import BotApprovalBadge from "~/components/unique/BotApprovalBadge";
 
 export default function ConfigBotDetail(props: { returnToListProxy: () => void; botId?: string }) {
   const [bot, setBot] = createSignal<IBot | undefined>();
@@ -79,10 +80,19 @@ export default function ConfigBotDetail(props: { returnToListProxy: () => void; 
   onMount(fetchBot);
 
   return (
-    <div class="grow h-full flex flex-col overflow-y-hidden">
-      <div class="flex items-center gap-2">
+    <div class="grow h-full w-full flex flex-col overflow-y-hidden">
+      <div class="flex items-center gap-2 w-full">
         <Button onClick={props.returnToListProxy} variant={"ghost"}>
-          <IconArrowLeft /> 戻る</Button>
+          <IconArrowLeft /> 戻る
+        </Button>
+
+        <div class="shrink min-w-0 ml-auto flex items-center gap-2 w-fit md:max-w-[75%]">
+          <p class="truncate">{ currentBot()?.botName ?? "..." }</p>
+          <BotApprovalBadge
+            approveStatus={currentBot()?.approveStatus ?? "PENDING"}
+            class="shrink-0"
+          />
+        </div>
       </div>
 
       <hr class="mt-2" />
