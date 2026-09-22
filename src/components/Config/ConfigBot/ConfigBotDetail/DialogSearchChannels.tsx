@@ -12,7 +12,7 @@ import { IChannel } from "~/types/Channel";
 export default function DialogSearchChannels (props: {
   currentChannelIdsSignal: Accessor<IChannel["id"][]>,
   applyChannelIds: (channelIds: IChannel["id"][]) => void,
-  buttonClass?: string
+  disabled?: boolean
 }) {
   const [displayDialog, setDisplayDialog] = createSignal(false);
   const [query, setQuery] = createSignal("");
@@ -62,7 +62,12 @@ export default function DialogSearchChannels (props: {
 
   return (
     <div class="w-full md:w-fit">
-      <Button onClick={()=>setDisplayDialog(true)} variant={"secondary"} class="w-full">使用チャンネルを管理する</Button>
+      <Button
+        onClick={()=>setDisplayDialog(true)}
+        variant={"secondary"}
+        class="w-full"
+        disabled={props.disabled}
+      >使用チャンネルを管理する</Button>
       <Dialog open={displayDialog()} onOpenChange={openDialog}>
         <DialogContent>
           <DialogHeader class="min-w-0">

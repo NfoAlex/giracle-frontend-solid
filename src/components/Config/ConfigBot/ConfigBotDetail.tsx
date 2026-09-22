@@ -11,6 +11,7 @@ import type { IChannel } from "~/types/Channel";
 import { useStoreChannelInfo } from "~/stores/ChannelInfo.store";
 import { Badge } from "~/components/ui/badge";
 import BotApprovalBadge from "~/components/unique/BotApprovalBadge";
+import { Separator } from "~/components/ui/separator";
 
 export default function ConfigBotDetail(props: { returnToListProxy: () => void; botId?: string }) {
   const [bot, setBot] = createSignal<IBot | undefined>();
@@ -156,29 +157,45 @@ export default function ConfigBotDetail(props: { returnToListProxy: () => void; 
           </Card>
 
           <p class="mt-4 font-medium">使用可能チャンネル</p>
-          <Card class="shrink-0 p-4 flex flex-col-reverse gap-2 md:flex-row md:gap-0 items-start">
-            <div class="w-full flex flex-wrap gap-1">
-              <For
-                each={usingChannelIds()}
-                fallback={<p class="text-secondary mx-auto">チャンネルがありません</p>}
+          <Card class="shrink-0 p-4 flex flex-col gap-2">
+            <div class="flex items-center">
+              <p>すべてのチャンネルを利用する</p>
+              <Switch
+                checked={bot()!.useAllChannel ?? false}
+                onChange={(v) => setBot(b => ({ ...b!, useAllChannel: v }))}
+                class="ml-auto"
               >
-                {
-                  (channelId) => (
-                    <Badge class="flex items-center" variant={"secondary"}>
-                      <IconHash size={14} />
-                      { useStoreChannelInfo.directGetterChannelInfo(channelId).name }
-                    </Badge>
-                  )
-                }
-              </For>
+                <SwitchControl>
+                  <SwitchThumb />
+                </SwitchControl>
+              </Switch>
             </div>
-            <hr class="md:mx-2 w-full md:w-fit md:h-full border-r-2" />
-            <DialogSearchChannels
-              currentChannelIdsSignal={usingChannelIds}
-              applyChannelIds={
-                (channels) => setUsingChannelIds(channels)
-              }
-            />
+            <Separator />
+            <div class="flex flex-col-reverse gap-2 md:flex-row md:gap-0 items-start">
+              <div class="w-full flex flex-wrap gap-1">
+                <For
+                  each={usingChannelIds()}
+                  fallback={<p class="text-secondary mx-auto">チャンネルがありません</p>}
+                >
+                  {
+                    (channelId) => (
+                      <Badge class="flex items-center" variant={"secondary"}>
+                        <IconHash size={14} />
+                        { useStoreChannelInfo.directGetterChannelInfo(channelId).name }
+                      </Badge>
+                    )
+                  }
+                </For>
+              </div>
+              <hr class="hidden md:inline md:mx-2 w-full md:w-fit md:h-full border-r-2" />
+              <DialogSearchChannels
+                currentChannelIdsSignal={usingChannelIds}
+                applyChannelIds={
+                  (channels) => setUsingChannelIds(channels)
+                }
+                disabled={bot()?.useAllChannel}
+              />
+            </div>
           </Card>
         </Show>
       </div>
