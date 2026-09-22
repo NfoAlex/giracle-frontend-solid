@@ -75,7 +75,7 @@ export default function DialogSearchChannels (props: {
             <div class="h-full py-2 flex flex-col">
               <div class="w-full flex items-center gap-2">
                 <TextField class="grow">
-                  <TextFieldInput value={query()} onChange={(e)=>setQuery(e.currentTarget.value)} />
+                  <TextFieldInput value={query()} onInput={(e)=>setQuery(e.currentTarget.value)} />
                 </TextField>
                 <Button
                   onClick={()=>searchIt()}
