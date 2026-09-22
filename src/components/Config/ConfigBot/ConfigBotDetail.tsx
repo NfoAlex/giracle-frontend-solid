@@ -1,6 +1,7 @@
-import { IconArrowLeft, IconHash } from "@tabler/icons-solidjs";
+import { IconAlertCircle, IconArrowLeft, IconHash } from "@tabler/icons-solidjs";
 import { createMemo, createSignal, For, onMount, Show } from "solid-js";
 import { api } from "~/api";
+import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert";
 import { Button } from "~/components/ui/button";
 import { Card } from "~/components/ui/card";
 import { Switch, SwitchControl, SwitchThumb } from "~/components/ui/switch";
@@ -19,6 +20,7 @@ export default function ConfigBotDetail(props: { returnToListProxy: () => void; 
   const [processing, setProcessing] = createSignal(false);
   const [currentBot, setCurrentBot] = createSignal<IBot | undefined>();
   const [currentUsingChannelIds, setCurrentUsingChannelIds] = createSignal<IChannel["id"][]>([]);
+  const [error, setError] = createSignal<string | null>(null);
 
   const botId = props.botId;
   // 変更検知: 比較元 (currentBot) と編集値 (bot) を毎回文字列化して比較
@@ -33,6 +35,7 @@ export default function ConfigBotDetail(props: { returnToListProxy: () => void; 
 
   const fetchBot = () => {
     setProcessing(true);
+    setError(null);
     api.server.getBotById({ botId: botId })
       .then((res) => {
         setBot(res.data);
@@ -40,7 +43,10 @@ export default function ConfigBotDetail(props: { returnToListProxy: () => void; 
         setUsingChannelIds(res.data.channelPermissions.map(c => c.channelId));
         setCurrentUsingChannelIds(res.data.channelPermissions.map(c => c.channelId));
       })
-      .catch((e) => console.error("ConfigBotDetail :: fetchBot : e", e))
+      .catch((e) => {
+        console.error("ConfigBotDetail :: fetchBot : e", e);
+        setError(e instanceof Error ? e.message : String(e));
+      })
       .finally(() => {
         setProcessing(false);
       });
@@ -49,13 +55,23 @@ export default function ConfigBotDetail(props: { returnToListProxy: () => void; 
   const updateBot = () => {
     const botNow = bot();
     if (botNow === undefined) return;
-
-    const { user, remoteUserId, approveStatus, id, ...rest } = botNow;
+    setProcessing(true);
+    setError(null);
 
     api.server.patchBot({
       botId: botId,
+      botName: botNow.botName,
+      // 概要が未入力(Null/空文字)のときはキーごと送らない。
+      // バックエンドは指定時に1文字以上を要求するため、そのまま送ると422で更新全体が失敗する
+      botDescription: botNow.botDescription || undefined,
       permissionChannelIds: usingChannelIds(),
-      ...rest
+      useAllChannel: botNow.useAllChannel,
+      canFetchUserinfo: botNow.canFetchUserinfo,
+      canFetchRoleinfo: botNow.canFetchRoleinfo,
+      canManageUser: botNow.canManageUser,
+      canManageServerConfig: botNow.canManageServerConfig,
+      canReadMessage: botNow.canReadMessage,
+      canSendMessage: botNow.canSendMessage,
     })
       .then((res) => {
         setBot(res.data);
@@ -65,7 +81,10 @@ export default function ConfigBotDetail(props: { returnToListProxy: () => void; 
         setUsingChannelIds(savedChannelIds);
         setCurrentUsingChannelIds([...savedChannelIds]);
       })
-      .catch((e) => console.error("ConfigBotDetail :: updateBot : e", e))
+      .catch((e) => {
+        console.error("ConfigBotDetail :: updateBot : e", e);
+        setError(e instanceof Error ? e.message : String(e));
+      })
       .finally(() => {
         setProcessing(false);
       });
@@ -98,10 +117,22 @@ export default function ConfigBotDetail(props: { returnToListProxy: () => void; 
 
       <hr class="mt-2" />
 
+      <Show when={error()}>
+        <Alert variant="destructive" class="mt-2 shrink-0">
+          <IconAlertCircle class="size-6" />
+          <AlertTitle>エラー</AlertTitle>
+          <AlertDescription>内容: {error()}</AlertDescription>
+        </Alert>
+      </Show>
+
       <div class="grow overflow-y-auto flex flex-col gap-2 py-2">
         <Show
           when={bot()}
-          fallback={<p class="text-center">Bot取得中...</p>}
+          fallback={
+            <p class="text-center">
+              {processing() ? "Bot取得中..." : "Bot情報を取得できませんでした。"}
+            </p>
+          }
         >
           <p class="mt-4 font-medium">基本情報</p>
           <Card class="shrink-0 p-4 flex flex-col gap-4">
