@@ -183,7 +183,7 @@ export default function ConfigBotDetail(props: { returnToListProxy: () => void; 
         </Show>
       </div>
 
-      <Card class="flex items-center justify-end gap-2 shrink-0 mb-0 w-full p-4 sticky bottom-0 mx-auto">
+      <Card class="flex flex-col md:flex-row items-center justify-end gap-2 shrink-0 mb-0 w-full p-4 sticky bottom-0 mx-auto">
         {
           (botInfoChanged() || usingChannelsChanged())
           &&
@@ -194,13 +194,13 @@ export default function ConfigBotDetail(props: { returnToListProxy: () => void; 
 
         <Button
           onClick={updateBot}
-          class="px-8 w-1/2 md:w-fit"
+          class="px-8 w-full md:w-fit"
           disabled={(!botInfoChanged() && !usingChannelsChanged()) || processing()}
         >適用する</Button>
         <Button
           onClick={restore}
           variant={"ghost"}
-          class="px-8 w-1/2 md:w-fit"
+          class="px-8 w-full md:w-fit"
           disabled={(!botInfoChanged() && !usingChannelsChanged()) || processing()}
         >復元する</Button>
       </Card>
