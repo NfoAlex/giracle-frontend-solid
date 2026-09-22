@@ -1,5 +1,5 @@
 import { IconAlertCircle, IconArrowLeft, IconHash } from "@tabler/icons-solidjs";
-import { createMemo, createSignal, For, onMount, Show } from "solid-js";
+import { createEffect, createMemo, createSignal, For, on, Show } from "solid-js";
 import { api } from "~/api";
 import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert";
 import { Button } from "~/components/ui/button";
@@ -23,21 +23,21 @@ export default function ConfigBotDetail(props: { returnToListProxy: () => void; 
   const [currentUsingChannelIds, setCurrentUsingChannelIds] = createSignal<IChannel["id"][]>([]);
   const [error, setError] = createSignal<string | null>(null);
 
-  const botId = props.botId;
   // 変更検知: 比較元 (currentBot) と編集値 (bot) を毎回文字列化して比較
   const botInfoChanged = createMemo(() => JSON.stringify(currentBot()) !== JSON.stringify(bot()));
   const usingChannelsChanged = createMemo(() => JSON.stringify(currentUsingChannelIds()) !== JSON.stringify(usingChannelIds()));
 
-  if (botId === undefined) {
+  if (props.botId === undefined) {
     return (
       <p class="text-center">Bot情報が見つかりません。</p>
     )
   }
 
   const fetchBot = () => {
+    if (props.botId === undefined) return;
     setProcessing(true);
     setError(null);
-    api.server.getBotById({ botId: botId })
+    api.server.getBotById({ botId: props.botId })
       .then((res) => {
         setBot(res.data);
         setCurrentBot({ ...res.data });
@@ -55,12 +55,12 @@ export default function ConfigBotDetail(props: { returnToListProxy: () => void; 
 
   const updateBot = () => {
     const botNow = bot();
-    if (botNow === undefined) return;
+    if (botNow === undefined || props.botId === undefined) return;
     setProcessing(true);
     setError(null);
 
     api.server.patchBot({
-      botId: botId,
+      botId: props.botId,
       botName: botNow.botName,
       // 概要が未入力(Null/空文字)のときはキーごと送らない。
       // バックエンドは指定時に1文字以上を要求するため、そのまま送ると422で更新全体が失敗する
@@ -98,7 +98,8 @@ export default function ConfigBotDetail(props: { returnToListProxy: () => void; 
     setUsingChannelIds([...currentUsingChannelIds()]);
   };
 
-  onMount(fetchBot);
+  // botId が同一インスタンス内で変わっても再取得する
+  createEffect(on(() => props.botId, fetchBot));
 
   return (
     <div class="grow h-full w-full flex flex-col overflow-y-hidden">
@@ -232,7 +233,7 @@ export default function ConfigBotDetail(props: { returnToListProxy: () => void; 
 
           <Card class="mt-4 shrink-0 p-4 flex flex-col gap-4">
             <DialogConfirmDeleteBot
-              botId={botId}
+              botId={props.botId}
               botName={currentBot()?.botName ?? "..."}
               onDeleted={props.returnToListProxy}
             />
