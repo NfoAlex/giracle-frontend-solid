@@ -1,4 +1,4 @@
-import { IconBell, IconEye, IconHash, IconKey, IconUser } from "@tabler/icons-solidjs";
+import { IconBell, IconEye, IconHash, IconKey, IconRobot, IconUser } from "@tabler/icons-solidjs";
 import { createEffect, createSignal, on } from "solid-js";
 import ConfigBot from "~/components/Config/ConfigBot";
 import ConfigChat from "~/components/Config/ConfigChat.tsx";
@@ -127,7 +127,7 @@ export default function Config() {
               variant={displayMode()==="bot"?"outline":"default"}
               size={"lg"}
             >
-              <IconEye />
+              <IconRobot />
               Bot管理
             </SidebarMenuButton>
           </Card>
