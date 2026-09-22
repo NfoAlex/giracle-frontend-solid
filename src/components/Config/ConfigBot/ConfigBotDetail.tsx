@@ -156,13 +156,7 @@ export default function ConfigBotDetail(props: { returnToListProxy: () => void; 
           </Card>
 
           <p class="mt-4 font-medium">使用可能チャンネル</p>
-          <Card class="shrink-0 p-4 flex flex-col gap-4">
-            <DialogSearchChannels
-              currentChannelIdsSignal={usingChannelIds}
-              applyChannelIds={
-                (channels) => setUsingChannelIds(channels)
-              }
-            />
+          <Card class="shrink-0 p-4 flex flex-col-reverse gap-2 md:flex-row md:gap-0 items-start">
             <div class="w-full flex flex-wrap gap-1">
               <For
                 each={usingChannelIds()}
@@ -171,13 +165,20 @@ export default function ConfigBotDetail(props: { returnToListProxy: () => void; 
                 {
                   (channelId) => (
                     <Badge class="flex items-center" variant={"secondary"}>
-                      <IconHash size={16} />
+                      <IconHash size={14} />
                       { useStoreChannelInfo.directGetterChannelInfo(channelId).name }
                     </Badge>
                   )
                 }
               </For>
             </div>
+            <hr class="md:mx-2 w-full md:w-fit md:h-full border-r-2" />
+            <DialogSearchChannels
+              currentChannelIdsSignal={usingChannelIds}
+              applyChannelIds={
+                (channels) => setUsingChannelIds(channels)
+              }
+            />
           </Card>
         </Show>
       </div>

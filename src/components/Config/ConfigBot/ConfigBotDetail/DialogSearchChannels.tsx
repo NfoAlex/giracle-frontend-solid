@@ -9,9 +9,10 @@ import { TextField, TextFieldInput } from "~/components/ui/text-field";
 import { useStoreChannelInfo } from "~/stores/ChannelInfo.store";
 import { IChannel } from "~/types/Channel";
 
-export default function DialogSearchChannels(props: {
+export default function DialogSearchChannels (props: {
   currentChannelIdsSignal: Accessor<IChannel["id"][]>,
-  applyChannelIds: (channelIds: IChannel["id"][]) => void
+  applyChannelIds: (channelIds: IChannel["id"][]) => void,
+  buttonClass?: string
 }) {
   const [displayDialog, setDisplayDialog] = createSignal(false);
   const [query, setQuery] = createSignal("");
@@ -60,11 +61,9 @@ export default function DialogSearchChannels(props: {
   };
 
   return (
-    <div>
+    <div class="w-full md:w-fit">
+      <Button onClick={()=>setDisplayDialog(true)} variant={"secondary"} class="w-full">使用チャンネルを管理する</Button>
       <Dialog open={displayDialog()} onOpenChange={openDialog}>
-        <DialogTrigger>
-          <Button variant={"secondary"}>使用チャンネルを管理する</Button>
-        </DialogTrigger>
         <DialogContent>
           <DialogHeader class="min-w-0">
             <DialogTitle>チャンネル検索</DialogTitle>
