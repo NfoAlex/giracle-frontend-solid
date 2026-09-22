@@ -153,7 +153,7 @@ export default function ConfigBotDetail(props: { returnToListProxy: () => void; 
                 (channels) => setUsingChannelIds(channels)
               }
             />
-            <div class="w-full flex flex-wrap">
+            <div class="w-full flex flex-wrap gap-1">
               <For
                 each={usingChannelIds()}
                 fallback={<p class="text-secondary mx-auto">チャンネルがありません</p>}

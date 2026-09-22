@@ -130,7 +130,7 @@ export default function DialogSearchChannels(props: {
 
               <hr class="mb-2" />
 
-              <div class="flex flex-wrap justify-start max-h-6 overflow-y-auto">
+              <div class="flex flex-wrap justify-start max-h-6 overflow-y-auto gap-1">
                 <For each={selectedChannelIds()}>
                   {
                     channelId => (
