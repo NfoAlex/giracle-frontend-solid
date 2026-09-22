@@ -7,11 +7,8 @@ export default function ConfigBot() {
   const [activeBotId, setActiveBotId] = createSignal<string | undefined>(undefined);
 
   return (
-    <div class="h-full flex flex-col gap-6 pb-2">
-
-      <span class="flex flex-row items-center gap-2">
-        <p class="font-bold text-2xl my-2">Bot管理</p>
-      </span>
+    <div class="md:max-w-[950px] h-full mx-auto flex flex-col gap-2 pb-2">
+      <p class="font-bold text-xl md:text-2xl my-1 md:my-0">Bot管理</p>
 
       {
         displayMode() === "list"
