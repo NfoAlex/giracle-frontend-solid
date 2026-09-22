@@ -117,9 +117,10 @@ export const server = {
     FETCH_CLIENT<{
       message: "Bot deleted",
     }>({
-      url: `/api/server/bot/${p.botId}`,
+      url: `/api/server/bot`,
       method: "DELETE",
-      label: "SERVER_DELETE_BOT"
+      label: "SERVER_DELETE_BOT",
+      body: p
     }),
 
   patchBot: (p: {
