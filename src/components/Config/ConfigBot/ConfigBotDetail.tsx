@@ -173,6 +173,14 @@ export default function ConfigBotDetail(props: { returnToListProxy: () => void; 
       </div>
 
       <Card class="flex items-center justify-end gap-2 shrink-0 mb-0 w-full p-4 sticky bottom-0 mx-auto">
+        {
+          (botInfoChanged() || usingChannelsChanged())
+          &&
+          <div class="mr-auto text-sm">
+            <p>* 設定を変更するとBotの承諾状況が初期化されます</p>
+          </div>
+        }
+
         <Button
           onClick={updateBot}
           class="px-8 w-1/2 md:w-fit"
