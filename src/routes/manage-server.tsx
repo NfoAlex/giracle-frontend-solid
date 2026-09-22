@@ -44,7 +44,7 @@ export default function ManageServer() {
               <SelectItem item={props.item}>
                 {props.item.textValue === "community" && "コミュニティ設定"}
                 {props.item.textValue === "role" && "ロール"}
-                {props.item.textValue === "bot" && "ボット管理"}
+                {props.item.textValue === "bot" && "Bot管理"}
                 {props.item.textValue === "invite" && "招待"}
                 {props.item.textValue === "customEmoji" && "カスタム絵文字"}
                 {props.item.textValue === "logs" && "ログ"}
@@ -59,7 +59,7 @@ export default function ManageServer() {
                     { state.selectedOption() === "community" && <p>コミュニティ設定</p> }
                     { state.selectedOption() === "role" && <p>ロール設定</p> }
                     { state.selectedOption() === "invite" && <p>招待</p> }
-                    { state.selectedOption() === "bot" && <p>ボット管理</p> }
+                    { state.selectedOption() === "bot" && <p>Bot管理</p> }
                     { state.selectedOption() === "customEmoji" && <p>カスタム絵文字</p> }
                     { state.selectedOption() === "logs" && <p>ログ</p> }
                   </span>
