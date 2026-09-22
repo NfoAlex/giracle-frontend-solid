@@ -82,7 +82,8 @@ export const server = {
 
   putBot: (p: {
     name: string,
-    description: string,
+    // バックエンドは指定時に1文字以上を要求するため、未入力はキー自体を送らない
+    description?: string,
     permissionChannelIds?: string[],
     useAllChannel?: boolean,
     canFetchUserinfo?: boolean,
@@ -123,8 +124,9 @@ export const server = {
 
   patchBot: (p: {
     botId: string,
-    name?: string,
-    description?: string,
+    botName?: string,
+    // バックエンドは指定時に1文字以上を要求するため、未入力はキー自体を送らない
+    botDescription?: string,
     permissionChannelIds?: string[],
     useAllChannel?: boolean,
     canFetchUserinfo?: boolean,
