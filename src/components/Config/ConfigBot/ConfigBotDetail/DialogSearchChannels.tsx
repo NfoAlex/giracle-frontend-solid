@@ -1,6 +1,7 @@
-import { IconCheck, IconHash, IconPlus, IconSearch, IconX } from "@tabler/icons-solidjs";
-import { Accessor, createSignal, For } from "solid-js";
+import { IconAlertCircle, IconCheck, IconHash, IconPlus, IconSearch, IconX } from "@tabler/icons-solidjs";
+import { Accessor, createSignal, For, Show } from "solid-js";
 import { api } from "~/api";
+import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { Checkbox } from "~/components/ui/checkbox";
@@ -22,6 +23,7 @@ export default function DialogSearchChannels (props: {
   const [selectedChannelIds, setSelectedChannelIds] = createSignal<IChannel["id"][]>([]);
   const [hasMoreResult, setHasMoreResult] = createSignal(false);
   const [latestSearchedQuery, setLatestSearchedQuery] = createSignal("");
+  const [error, setError] = createSignal<string | null>(null);
 
   //開いた時点のprops値をスナップショット。閉じてる間のprops更新に引きずられないようにする
   const openDialog = (open: boolean) => {
@@ -31,6 +33,7 @@ export default function DialogSearchChannels (props: {
 
   const searchIt = (continuous: boolean = false) => {
     setProcessing(true);
+    setError(null);
     //続き読みは直前の結果末尾をカーソルにする。検索条件が変わっていたら先頭から取り直す
     const sameQuery = latestSearchedQuery() === query();
     const cursorChannelId =
@@ -55,6 +58,7 @@ export default function DialogSearchChannels (props: {
       })
       .catch((err) => {
         console.error("err", err);
+        setError(err instanceof Error ? err.message : String(err));
       })
       .finally(() => {
         setProcessing(false);
@@ -98,13 +102,24 @@ export default function DialogSearchChannels (props: {
 
               {/* 結果表示 */}
               <div class="w-full max-h-96 py-2 grow overflow-y-auto">
+                <Show when={error()}>
+                  <Alert variant="destructive" class="my-2">
+                    <IconAlertCircle class="size-6" />
+                    <AlertTitle>エラー</AlertTitle>
+                    <AlertDescription>内容: {error()}</AlertDescription>
+                  </Alert>
+                </Show>
+                { //取得中表示
+                  processing() && result().length === 0 &&
+                  <p class="text-center text-secondary my-6">検索中...</p>
+                }
                 { //初回検索
-                  (latestSearchedQuery() === "")
+                  (latestSearchedQuery() === "" && !processing() && !error())
                   &&
                   <p class="text-center text-secondary my-6">検索してください</p>
                 }
                 { //結果が無いとき
-                  (result().length === 0 && latestSearchedQuery() !== "")
+                  (result().length === 0 && latestSearchedQuery() !== "" && !processing() && !error())
                   &&
                   <p class="text-center text-secondary my-6">結果が見つかりませんでした</p>
                 }
@@ -132,7 +147,7 @@ export default function DialogSearchChannels (props: {
                 {
                   hasMoreResult()
                   &&
-                  <Button onClick={()=>searchIt(true)}>
+                  <Button onClick={()=>searchIt(true)} disabled={processing()}>
                     <IconPlus />
                   </Button>
                 }
