@@ -25,8 +25,8 @@ export default function ConfigSession() {
   });
   const [reachedSessionEnd, setReachedSessionEnd] = createSignal(false);
   const [newSessionName, setNewSessionName] = createSignal("");
-  let targetDeletingSession: ISession | undefined = undefined;
-  let targetNameChangingSession: ISession | undefined = undefined;
+  const [targetDeletingSession, setTargetDeletingSession] = createSignal<ISession>();
+  const [targetNameChangingSession, setTargetNameChangingSession] = createSignal<ISession>();
   let sessionFetcherCursor: number = 1;
   //モーダル制御用
   const [modalDeletionOpen, setModalDeletionOpen] = createSignal(false);
@@ -75,7 +75,7 @@ export default function ConfigSession() {
   };
 
   const changeSessionName = async () => {
-    const targetSession = targetNameChangingSession;
+    const targetSession = targetNameChangingSession();
     if (targetSession === undefined) throw new Error("Target session data is undefined");
     setFlags({ ...flags(), changingName: true });
 
@@ -110,7 +110,7 @@ export default function ConfigSession() {
             <p>遠隔でセッションをログアウトします。よろしいですか？</p>
             <span class="truncate flex items-center gap-2">
               <p class="shrink-0">ログアウトするセッション:</p>
-              <span class="font-bold truncate w-32 md:w-[256px]">{targetDeletingSession?.name ?? "?"}</span>
+              <span class="font-bold truncate w-32 md:w-[256px]">{targetDeletingSession()?.name ?? "?"}</span>
             </span>
           </DialogDescription>
           <DialogFooter>
@@ -120,7 +120,7 @@ export default function ConfigSession() {
               disabled={flags().deleting}
             >キャンセル</Button>
             <Button
-              onClick={() => { removeSession(targetDeletingSession?.id || 0) }}
+              onClick={() => { removeSession(targetDeletingSession()?.id || 0) }}
               variant={"destructive"}
               disabled={flags().deleting}
             >ログアウトする</Button>
@@ -137,7 +137,7 @@ export default function ConfigSession() {
             <p>変更先のセッション名を入力してください。</p>
             <span class="flex truncate items-center gap-2">
               <p>現在 : </p>
-              <span class="font-bold truncate overflow-x-auto w-64 md:w-[256px]">{targetNameChangingSession?.name ?? "?"}</span>
+              <span class="font-bold truncate overflow-x-auto w-64 md:w-[256px]">{targetNameChangingSession()?.name ?? "?"}</span>
             </span>
           </DialogDescription>
           <TextField>
@@ -179,7 +179,7 @@ export default function ConfigSession() {
             <Card class="p-4 flex flex-col md:flex-row item-start md:items-center gap-2">
               <span class="truncate shrink flex flex-row items-center gap-2">
                 <Button
-                  onClick={() => { targetNameChangingSession = session; setModalNameChangingOpen(true); }}
+                  onClick={() => { setTargetNameChangingSession(session); setModalNameChangingOpen(true); }}
                   class="shrink-0"
                   size={"icon"}
                   variant={"ghost"}
@@ -192,7 +192,7 @@ export default function ConfigSession() {
                 <Badge variant={"outline"}>{new Date(session.createdAt).toLocaleString()}</Badge>
                 <Show when={!session.thisIsYou}>
                   <Button
-                    onClick={() => { targetDeletingSession = session; setModalDeletionOpen(true); }}
+                    onClick={() => { setTargetDeletingSession(session); setModalDeletionOpen(true); }}
                     size={"sm"}
                     variant={"destructive"}
                   >
