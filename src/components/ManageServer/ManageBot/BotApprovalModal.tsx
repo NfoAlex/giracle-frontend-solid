@@ -3,23 +3,25 @@ import { createEffect, createSignal, For, on, Show } from "solid-js";
 import { api } from "~/api/index.ts";
 import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert.tsx";
 import { Badge, type BadgeProps } from "~/components/ui/badge.tsx";
-import { Button } from "~/components/ui/button.tsx";
 import { Dialog, DialogContent, DialogFooter, DialogTitle } from "~/components/ui/dialog.tsx";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "~/components/ui/select.tsx";
 import { useStoreUserinfo } from "~/stores/Userinfo.store.ts";
 import type { IBot } from "~/types/Server.ts";
 
 type TApproveStatus = IBot["approveStatus"];
 
-// 審査の操作ボタン。危険な操作を左、主要操作(承認)を右に置く
-const APPROVAL_ACTIONS: {
-  status: TApproveStatus;
-  label: string;
-  variant: "default" | "destructive" | "outline";
-}[] = [
-  { status: "DENIED", label: "拒否する", variant: "destructive" },
-  { status: "PENDING", label: "承認待ちに戻す", variant: "outline" },
-  { status: "BLOCKED", label: "停止する", variant: "destructive" },
-  { status: "APPROVED", label: "承認する", variant: "default" },
+// 選択できる審査状態。危険な操作を先、主要操作(承認)を最後に置く
+const APPROVAL_STATUSES: TApproveStatus[] = [
+  "DENIED",
+  "PENDING",
+  "BLOCKED",
+  "APPROVED",
 ];
 
 export default function BotApprovalModal(props: {
@@ -127,18 +129,31 @@ export default function BotApprovalModal(props: {
               </div>
 
               <DialogFooter class="flex flex-wrap items-center justify-end gap-2">
-                <For each={APPROVAL_ACTIONS}>
-                  {(action) => (
-                    <Button
-                      variant={action.variant}
-                      disabled={processing() ||
-                        bot().approveStatus === action.status}
-                      onClick={() => changeApproval(action.status)}
-                    >
-                      {action.label}
-                    </Button>
+                <Select<TApproveStatus>
+                  options={APPROVAL_STATUSES}
+                  value={bot().approveStatus}
+                  disabled={processing()}
+                  onChange={(next) => next && changeApproval(next)}
+                  itemComponent={(itemProps) => (
+                    <SelectItem item={itemProps.item}>
+                      {props.status[itemProps.item.rawValue].label}
+                    </SelectItem>
                   )}
-                </For>
+                >
+                  <SelectTrigger
+                    class="w-52"
+                    aria-label="bot-approval-status"
+                  >
+                    <SelectValue<TApproveStatus>>
+                      {(state) => (
+                        <p>
+                          {props.status[state.selectedOption() ?? bot().approveStatus].label}
+                        </p>
+                      )}
+                    </SelectValue>
+                  </SelectTrigger>
+                  <SelectContent />
+                </Select>
               </DialogFooter>
             </>
           )}
