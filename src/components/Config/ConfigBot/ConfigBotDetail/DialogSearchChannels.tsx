@@ -31,9 +31,15 @@ export default function DialogSearchChannels (props: {
 
   const searchIt = (continuous: boolean = false) => {
     setProcessing(true);
-    api.channel.search({ query: query() })
+    //続き読みは直前の結果末尾をカーソルにする。検索条件が変わっていたら先頭から取り直す
+    const sameQuery = latestSearchedQuery() === query();
+    const cursorChannelId =
+      continuous && sameQuery && result().length > 0
+      ? result()[result().length - 1].id
+      : undefined;
+    api.channel.search({ query: query(), cursorChannelId })
       .then(r => {
-        if (continuous && latestSearchedQuery() === query()) {
+        if (continuous && sameQuery) {
           setResult(prev => [...prev, ...r.data]);
         } else {
           setResult(r.data);
