@@ -5,6 +5,7 @@ import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert";
 import { Button } from "~/components/ui/button";
 import { Card } from "~/components/ui/card";
 import { TextField, TextFieldInput } from "~/components/ui/text-field";
+import { useStoreUserinfo } from "~/stores/Userinfo.store";
 import type { IBot } from "~/types/Server";
 import SubmitBotCreation from "./ConfigBotList/SubmitBotCreation";
 import BotApprovalBadge from "~/components/unique/BotApprovalBadge";
@@ -159,7 +160,7 @@ export default function ConfigBotList(props: {
               <div class="flex flex-col min-w-0">
                 <p class="truncate font-semibold">{bot.botName}</p>
                 <p class="truncate text-sm text-muted-foreground">
-                  {bot.createdBy}
+                  {useStoreUserinfo.getterUserinfo(bot.createdBy).name}
                 </p>
               </div>
 
