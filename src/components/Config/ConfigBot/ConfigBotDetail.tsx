@@ -8,6 +8,7 @@ import { Switch, SwitchControl, SwitchThumb } from "~/components/ui/switch";
 import { TextField, TextFieldInput, TextFieldTextArea } from "~/components/ui/text-field";
 import type { IBot } from "~/types/Server";
 import DialogSearchChannels from "./ConfigBotDetail/DialogSearchChannels";
+import DialogConfirmDeleteBot from "./ConfigBotDetail/DialogConfirmDeleteBot";
 import type { IChannel } from "~/types/Channel";
 import { useStoreChannelInfo } from "~/stores/ChannelInfo.store";
 import { Badge } from "~/components/ui/badge";
@@ -227,6 +228,14 @@ export default function ConfigBotDetail(props: { returnToListProxy: () => void; 
                 disabled={bot()?.useAllChannel}
               />
             </div>
+          </Card>
+
+          <Card class="mt-4 shrink-0 p-4 flex flex-col gap-4">
+            <DialogConfirmDeleteBot
+              botId={botId}
+              botName={currentBot()?.botName ?? "..."}
+              onDeleted={props.returnToListProxy}
+            />
           </Card>
         </Show>
       </div>
