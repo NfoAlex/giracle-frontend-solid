@@ -1,6 +1,7 @@
-import { IconReload, IconSearch } from "@tabler/icons-solidjs";
+import { IconAlertCircle, IconReload, IconSearch } from "@tabler/icons-solidjs";
 import { createSignal, For, onMount, Show } from "solid-js";
 import { api } from "~/api";
+import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert";
 import { Button } from "~/components/ui/button";
 import { Card } from "~/components/ui/card";
 import { TextField, TextFieldInput } from "~/components/ui/text-field";
@@ -26,6 +27,7 @@ export default function ConfigBotList(props: {
   const [cursorBotId, setCursorBotId] = createSignal<string | undefined>();
   // 続き読みの追記先が現在の検索条件と一致するかを判定するため保持
   const [latestSearchedQuery, setLatestSearchedQuery] = createSignal("");
+  const [error, setError] = createSignal<string | null>(null);
 
   /**
    * ボット一覧を取得する
@@ -34,6 +36,7 @@ export default function ConfigBotList(props: {
   const fetchList = async (continuous: boolean = false) => {
     if (processing()) return;
     setProcessing(true);
+    setError(null);
 
     // 空文字を渡すとバックエンドがエラーを返すため、未検索時は undefined にする
     const trimmedQuery = query().trim();
@@ -63,6 +66,7 @@ export default function ConfigBotList(props: {
       setLatestSearchedQuery(trimmedQuery);
     } catch (e) {
       console.error("ConfigBotList :: fetchList : ", e);
+      setError(e instanceof Error ? e.message : String(e));
     } finally {
       setProcessing(false);
     }
@@ -91,6 +95,14 @@ export default function ConfigBotList(props: {
 
   return (
     <div class="grow h-full flex flex-col gap-2">
+      <Show when={error()}>
+        <Alert variant="destructive">
+          <IconAlertCircle class="size-6" />
+          <AlertTitle>エラー</AlertTitle>
+          <AlertDescription>内容: {error()}</AlertDescription>
+        </Alert>
+      </Show>
+
       <div class="flex items-center justify-end gap-2">
         <Button
           variant={"outline"}
@@ -132,8 +144,8 @@ export default function ConfigBotList(props: {
           )
         }
         {
-          //ボットが無いときの表示
-          myBots().length === 0 && !processing() && (
+          //ボットが無いときの表示。エラー時は空一覧と区別できるよう出さない
+          myBots().length === 0 && !processing() && !error() && (
             <div class="mt-5 text-center">ボットがありません。</div>
           )
         }
