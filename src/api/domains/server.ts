@@ -106,7 +106,7 @@ export const server = {
   getBotById: (p: { botId: string }) =>
     FETCH_CLIENT<{
       message: "Fetched my bot info",
-      data: IBot
+      data: IBot & { tokenCode: string }
     }>({
       url: `/api/server/bot/me/${p.botId}`,
       method: "GET",
