@@ -1,4 +1,4 @@
-import { IconAlertCircle, IconArrowLeft, IconHash } from "@tabler/icons-solidjs";
+import { IconAlertCircle, IconArrowLeft, IconCheck, IconCopy, IconEye, IconEyeOff, IconHash } from "@tabler/icons-solidjs";
 import { createEffect, createMemo, createSignal, For, on, Show } from "solid-js";
 import { api } from "~/api";
 import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert";
@@ -22,6 +22,10 @@ export default function ConfigBotDetail(props: { returnToListProxy: () => void; 
   const [currentBot, setCurrentBot] = createSignal<IBot | undefined>();
   const [currentUsingChannelIds, setCurrentUsingChannelIds] = createSignal<IChannel["id"][]>([]);
   const [error, setError] = createSignal<string | null>(null);
+  // トークンコードは getBotById のみが返すため bot シグナルとは分離管理(patchBot 応答には含まれない)
+  const [tokenCode, setTokenCode] = createSignal<string | undefined>();
+  const [tokenVisible, setTokenVisible] = createSignal(false);
+  const [tokenCopied, setTokenCopied] = createSignal(false);
 
   // 変更検知: 比較元 (currentBot) と編集値 (bot) を毎回文字列化して比較
   const botInfoChanged = createMemo(() => JSON.stringify(currentBot()) !== JSON.stringify(bot()));
@@ -41,6 +45,8 @@ export default function ConfigBotDetail(props: { returnToListProxy: () => void; 
       .then((res) => {
         setBot(res.data);
         setCurrentBot({ ...res.data });
+        setTokenCode(res.data.tokenCode);
+        setTokenVisible(false);
         setUsingChannelIds(res.data.channelPermissions.map(c => c.channelId));
         setCurrentUsingChannelIds(res.data.channelPermissions.map(c => c.channelId));
       })
@@ -91,6 +97,15 @@ export default function ConfigBotDetail(props: { returnToListProxy: () => void; 
       });
   };
 
+  const copyToken = () => {
+    const t = tokenCode();
+    if (t === undefined) return;
+    navigator.clipboard.writeText(t).then(() => {
+      setTokenCopied(true);
+      setTimeout(() => setTokenCopied(false), 2000);
+    });
+  };
+
   const restore = () => {
     const currentBotNow = currentBot();
     if (currentBotNow === undefined) return;
@@ -136,6 +151,38 @@ export default function ConfigBotDetail(props: { returnToListProxy: () => void; 
             </p>
           }
         >
+          <p class="mt-4 font-medium">トークンコード</p>
+          <Card class="shrink-0 p-4 flex flex-col gap-2">
+            <p class="text-sm">
+              Bot API の認証に使う秘密コードです。他人に共有しないでください
+            </p>
+            <div class="flex items-center gap-1">
+              <code class="grow min-w-0 break-all text-sm bg-muted rounded-md px-3 py-2">
+                <Show when={tokenCode()} fallback="取得できませんでした">
+                  {tokenVisible() ? tokenCode() : "••••••••••••••••"}
+                </Show>
+              </code>
+              <Button
+                size="icon"
+                variant="ghost"
+                onClick={() => setTokenVisible(v => !v)}
+                aria-label={tokenVisible() ? "トークンを隠す" : "トークンを表示"}
+                disabled={tokenCode() === undefined}
+              >
+                {tokenVisible() ? <IconEyeOff /> : <IconEye />}
+              </Button>
+              <Button
+                size="icon"
+                variant="ghost"
+                onClick={copyToken}
+                aria-label="トークンをコピー"
+                disabled={tokenCode() === undefined}
+              >
+                {tokenCopied() ? <IconCheck class="text-success" /> : <IconCopy />}
+              </Button>
+            </div>
+          </Card>
+
           <p class="mt-4 font-medium">基本情報</p>
           <Card class="shrink-0 p-4 flex flex-col gap-4">
             <div class="flex items-center w-full">
