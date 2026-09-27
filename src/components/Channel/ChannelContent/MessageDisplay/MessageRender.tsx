@@ -65,7 +65,7 @@ export default function MessageRender(props: {
       <Show when={props.displayUserName}>
         <UserinfoModalWrapper userId={props.message.userId}>
           <span class={"flex items-center gap-2"}>
-            <p class="truncate font-bold hover:underline">{useStoreUserinfo.getterUserinfo(props.message.userId).name}</p>
+            <p class="min-w-0 truncate font-bold hover:underline">{useStoreUserinfo.getterUserinfo(props.message.userId).name}</p>
             <Show when={useStoreUserinfo.getterUserinfo(props.message.userId).isBot}>
               <Badge variant={"outline"} class="shrink-0 flex items-center gap-1">
                 <IconCircleFilled size={12} color={"blue"} />
