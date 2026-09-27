@@ -46,6 +46,7 @@ export namespace useStoreUserinfo {
         id: userId,
         name: "ロード中...",
         isBanned: false,
+        isBot: false,
         selfIntroduction:
           "ロード中のユーザー情報です。しばらく経っても同じ表示の場合、リロードしてください。",
         ChannelJoin: [],
@@ -64,6 +65,7 @@ export namespace useStoreUserinfo {
             id: userId,
             name: "存在しないユーザー",
             isBanned: false,
+            isBot: false,
             selfIntroduction: "このユーザーは存在しません。",
             ChannelJoin: [],
             RoleLink: [],
