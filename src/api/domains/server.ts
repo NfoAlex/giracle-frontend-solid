@@ -113,14 +113,14 @@ export const server = {
       label: "SERVER_GET_BOT_ME_ID"
     }),
 
-  getBotById: (p: { botId: string }) =>
+  getBotByRemoteUserId: (p: { remoteUserId: string }) =>
     FETCH_CLIENT<{
       message: "Fetched bot info",
       data: Omit<IBot, "tokenCode" | "user"> & { user: Pick<IBot["user"], "id"> }
     }>({
-      url: `/api/server/bot/${p.botId}`,
+      url: `/api/server/bot/${p.remoteUserId}`,
       method: "GET",
-      label: "SERVER_GET_BOT_ID"
+      label: "SERVER_GET_BOT_REMOTE_USER_ID"
     }),
 
   deleteBotById: (p: { botId: string }) =>
