@@ -15,6 +15,13 @@ import type { IRole } from "~/types/Role.ts";
 import { storeRoleInfo } from "~/stores/RoleInfo.store.ts";
 import { api } from "~/api/index.ts";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
+import type { IBot } from "~/types/Server";
+import { createMutable } from "solid-js/store";
+
+//Bot取得ハンドラの返り値そのまま
+type TBotInfoFetch = Omit<IBot, "tokenCode" | "user"> & { user: Pick<IBot["user"], "id"> };
+// createMutable は Map 等の組み込みクラスをラップできない（メソッド呼出時にProxy不一致エラー）ので、キーをBotのidにしたプレーンオブジェクトで保持する
+const BOT_INFO_CACHE = createMutable<Record<IBot["id"], TBotInfoFetch>>({});
 
 export default function UserinfoModalWrapper(props: { children: JSX.Element, userId: string, class?: string }) {
   const user = () => useStoreUserinfo.getterUserinfo(props.userId);
@@ -66,6 +73,21 @@ export default function UserinfoModalWrapper(props: { children: JSX.Element, use
         })
         .catch((e) => console.error("UserName :: controlBanState :: err ->", e));
     }
+  }
+
+  /**
+   * Botユーザーだった時用の取得ハンドラ
+   */
+  const botInfoGetter = () => {
+    const cached = BOT_INFO_CACHE[user().id];
+    if (cached) return cached;
+
+    api.server.getBotByRemoteUserId({ remoteUserId: user().id })
+      .then((res) => {
+        BOT_INFO_CACHE[user().id] = res.data;
+      })
+      .catch((err) => console.error("UserinfoModalWrapper :: fetchBotInfo : e", err));
+
   }
 
   return (
@@ -138,6 +160,20 @@ export default function UserinfoModalWrapper(props: { children: JSX.Element, use
                   <Label>自己紹介</Label>
                   <Card class="px-4 py-2">{storeUserinfo[user().id].selfIntroduction}</Card>
                 </div>
+
+                {/* Botユーザー用の作成者 */}
+                <Show when={user().isBot}>
+                  <Card class="p-2">
+                      作成者: {(() => {
+                        const info = botInfoGetter();
+                        return info
+                          ?
+                          (<UserinfoModalWrapper userId={info.createdBy}>{useStoreUserinfo.getterUserinfo(info.createdBy).name}</UserinfoModalWrapper>)
+                          :
+                          "...";
+                      })()}
+                  </Card>
+                </Show>
 
                 {/* ロール */}
                 <Show when={!user().isBot}>
