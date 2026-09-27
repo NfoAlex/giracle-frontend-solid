@@ -239,14 +239,14 @@ export default function UserinfoModalWrapper(props: { children: JSX.Element, use
                     {
                       useStoreMyUserinfo.getRolePower("manageServer")
                       ?
-                      <A
+                      <Button
+                        as={A}
                         href={
                           "/app/manage-server?botName=" +
                           encodeURIComponent(user().name)
                         }
-                      >
-                        <Button as="a" class="w-full">このBot管理ページへ飛ぶ</Button>
-                      </A>
+                        class="w-full"
+                      >このBot管理ページへ飛ぶ</Button>
                       :
                       <p>サーバーの管理権限がありません</p>
                     }
