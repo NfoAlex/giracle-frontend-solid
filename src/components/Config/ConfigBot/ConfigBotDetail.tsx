@@ -41,7 +41,7 @@ export default function ConfigBotDetail(props: { returnToListProxy: () => void; 
     if (props.botId === undefined) return;
     setProcessing(true);
     setError(null);
-    api.server.getBotById({ botId: props.botId })
+    api.server.getBotMeById({ botId: props.botId })
       .then((res) => {
         setBot(res.data);
         setCurrentBot({ ...res.data });

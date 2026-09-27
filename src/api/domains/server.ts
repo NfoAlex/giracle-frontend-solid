@@ -103,7 +103,7 @@ export const server = {
       body: p
     }),
 
-  getBotById: (p: { botId: string }) =>
+  getBotMeById: (p: { botId: string }) =>
     FETCH_CLIENT<{
       message: "Fetched my bot info",
       data: IBot & { tokenCode: string }
@@ -111,6 +111,16 @@ export const server = {
       url: `/api/server/bot/me/${p.botId}`,
       method: "GET",
       label: "SERVER_GET_BOT_ME_ID"
+    }),
+
+  getBotById: (p: { botId: string }) =>
+    FETCH_CLIENT<{
+      message: "Fetched bot info",
+      data: Omit<IBot, "tokenCode" | "user"> & { user: Pick<IBot["user"], "id"> }
+    }>({
+      url: `/api/server/bot/${p.botId}`,
+      method: "GET",
+      label: "SERVER_GET_BOT_ID"
     }),
 
   deleteBotById: (p: { botId: string }) =>
