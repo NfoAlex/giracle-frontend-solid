@@ -200,7 +200,7 @@ export default function UserinfoModalWrapper(props: { children: JSX.Element, use
                           encodeURIComponent(user().name)
                         }
                       >
-                        <Button>このBot管理ページへ飛ぶ</Button>
+                        <Button as="a" class="w-full">このBot管理ページへ飛ぶ</Button>
                       </A>
                       :
                       <p>サーバーの管理権限がありません</p>
