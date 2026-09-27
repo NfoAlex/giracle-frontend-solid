@@ -62,6 +62,12 @@ export default function ConfigBotDetail(props: { returnToListProxy: () => void; 
   const updateBot = () => {
     const botNow = bot();
     if (botNow === undefined || props.botId === undefined) return;
+    // 概要の完全削除はAPI仕様上不可(空文字送信は422、キー省略は現状維持)。
+    // 保存後に黙って元の概要へ戻るので、送信前に弾いて明示する
+    if (!botNow.botDescription && currentBot()?.botDescription) {
+      setError("概要を空にすることはできません。1文字以上入力してください");
+      return;
+    }
     setProcessing(true);
     setError(null);
 
