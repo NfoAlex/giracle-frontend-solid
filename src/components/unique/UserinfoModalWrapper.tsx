@@ -187,15 +187,25 @@ export default function UserinfoModalWrapper(props: { children: JSX.Element, use
 
               {/* 管理 */}
               <TabsContent value="manage">
-                <Card class="p-2 flex flex-col gap-1">
-                  {
-                    !storeUserinfo[user().id].isBanned ?
-                      <Button ondblclick={() => controlBanState(true)} class={"w-full"} variant={"destructive"}>BANする</Button>
-                      :
-                      <Button ondblclick={() => controlBanState(false)} class={"w-full"} variant={"default"}>BANを解除する</Button>
-                  }
-                  <Label class={"text-border"}>ダブルクリックで操作</Label>
-                </Card>
+                {
+                  user().isBot
+                  ?
+                  <Card class="p-2 flex flex-col gap-1">
+                    <A href={"/app/manage-server?botName=" + user().name}>
+                      <Button>このBot管理ページへ飛ぶ</Button>
+                    </A>
+                  </Card>
+                  :
+                  <Card class="p-2 flex flex-col gap-1">
+                    {
+                      !storeUserinfo[user().id].isBanned ?
+                        <Button ondblclick={() => controlBanState(true)} class={"w-full"} variant={"destructive"}>BANする</Button>
+                        :
+                        <Button ondblclick={() => controlBanState(false)} class={"w-full"} variant={"default"}>BANを解除する</Button>
+                    }
+                    <Label class={"text-border"}>ダブルクリックで操作</Label>
+                  </Card>
+                }
               </TabsContent>
             </Tabs>
           </div>

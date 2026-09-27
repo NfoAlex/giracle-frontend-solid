@@ -1,3 +1,4 @@
+import { useSearchParams } from "@solidjs/router";
 import { createSignal } from "solid-js";
 import ManageCommunity from "~/components/ManageServer/manage-community.tsx";
 import ManageInvite from "~/components/ManageServer/manage-invite.tsx";
@@ -14,7 +15,11 @@ import ManageBot from "~/components/ManageServer/manage-bot";
 type TManageServerTab = "community" | "role" | "bot" | "invite" | "customEmoji" | "logs";
 
 export default function ManageServer() {
-  const [displayMode, setDisplayMode] = createSignal<TManageServerTab>("community");
+  // ?botName= 指定時はBot管理タブを開く（ManageBotがクエリで初期検索するため）
+  const [searchParams] = useSearchParams();
+  const [displayMode, setDisplayMode] = createSignal<TManageServerTab>(
+    searchParams.botName ? "bot" : "community",
+  );
 
   return (
     <div class="p-2 flex flex-col h-full">

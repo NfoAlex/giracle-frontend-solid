@@ -1,3 +1,4 @@
+import { useSearchParams } from "@solidjs/router";
 import { IconAlertCircle, IconSearch } from "@tabler/icons-solidjs";
 import { createMemo, createSignal, For, onMount, Show } from "solid-js";
 import { api } from "~/api/index.ts";
@@ -59,6 +60,8 @@ const BOT_PERMISSION_KEYS = Object.keys(
 ) as TBotPermissionKey[];
 
 export default function ManageBot() {
+  // URLクエリ（?botName=xxx）で初期検索ワードを指定できる
+  const [searchParams] = useSearchParams();
   const [bots, setBots] = createSignal<TBotAdminListItem[]>([]);
   const [processing, setProcessing] = createSignal(false);
   const [query, setQuery] = createSignal("");
@@ -133,6 +136,11 @@ export default function ManageBot() {
   };
 
   onMount(() => {
+    // クエリの botName を初期検索ワードとして設定してから一覧を取得する
+    const botNameFromQuery = searchParams.botName;
+    if (typeof botNameFromQuery === "string" && botNameFromQuery !== "") {
+      setQuery(botNameFromQuery);
+    }
     fetchList();
   });
 
