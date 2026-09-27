@@ -172,7 +172,7 @@ export const server = {
       query: q
     }),
 
-  patchBotApproval: (p: { botId: string, approvalStatus: IBot["approveStatus"] }) =>
+  patchBotApproval: (p: { botId?: string, remoteUserId?: string, approvalStatus: IBot["approveStatus"] }) =>
     FETCH_CLIENT<{
       message: "Bot approval updated",
       data: string
