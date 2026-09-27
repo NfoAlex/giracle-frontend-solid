@@ -81,18 +81,26 @@ export default function UserinfoModalWrapper(props: { children: JSX.Element, use
           </div>
 
           {/* ユーザーアイコンとオンライン表示 */}
-          <div class="w-full -mt-12 flex items-center gap-4">
+          <div class="w-full px-2 -mt-12 flex items-center gap-4">
             <Avatar class="w-16 h-16 ml-4">
               <AvatarImage src={`/api/user/icon/${user().id}`} />
               <AvatarFallback class="w-full h-full">{user().name}</AvatarFallback>
             </Avatar>
 
-            <Show when={storeUserOnline.includes(props.userId)}>
-              <Badge variant={"secondary"} class={"flex ml-auto mr-4 items-center gap-2"}>
-                <IconCircleFilled size={16} color={"green"} />
-                <p>オンライン</p>
-              </Badge>
-            </Show>
+            <div class="flex items-center ml-auto gap-2">
+              <Show when={user().isBot}>
+                <Badge variant={"secondary"} class={"flex items-center gap-2"}>
+                  <IconCircleFilled size={12} color={"blue"} />
+                  <p>Bot</p>
+                </Badge>
+              </Show>
+              <Show when={storeUserOnline.includes(props.userId)}>
+                <Badge variant={"secondary"} class={"flex items-center gap-2"}>
+                  <IconCircleFilled size={12} color={"green"} />
+                  <p>オンライン</p>
+                </Badge>
+              </Show>
+            </div>
           </div>
 
           <div class="pb-4 px-4 flex flex-col gap-2">
@@ -132,47 +140,49 @@ export default function UserinfoModalWrapper(props: { children: JSX.Element, use
                 </div>
 
                 {/* ロール */}
-                <div>
-                  <Label>ロール</Label>
-                  <div class="flex flex-wrap gap-1">
-                    <For each={storeUserinfo[user().id].RoleLink}>
-                      {(role) =>
-                        <RoleChip
-                          deletable={useStoreMyUserinfo.getRolePower("manageRole")}
-                          roleId={role.roleId}
-                          userId={props.userId}
-                          onDelete={(roleId) => unlinkRole(roleId)}
-                        />
-                      }
-                    </For>
+                <Show when={!user().isBot}>
+                  <div>
+                    <Label>ロール</Label>
+                    <div class="flex flex-wrap gap-1">
+                      <For each={storeUserinfo[user().id].RoleLink}>
+                        {(role) =>
+                          <RoleChip
+                            deletable={useStoreMyUserinfo.getRolePower("manageRole")}
+                            roleId={role.roleId}
+                            userId={props.userId}
+                            onDelete={(roleId) => unlinkRole(roleId)}
+                          />
+                        }
+                      </For>
+                    </div>
+                    <Show when={useStoreMyUserinfo.getRolePower("manageRole")}>
+                      {/* ロール追加ボタン */}
+                      <Popover onOpenChange={setOpenRoleList}>
+                        <PopoverTrigger>
+                          <Badge
+                            variant={"outline"}
+                            class="cursor-pointer h-full mt-1"
+                          >
+                            <IconPlus size={16} />
+                          </Badge>
+                        </PopoverTrigger>
+                        <PopoverContent class="w-fit">
+                          <div class="max-h-[25vh] max-w-[75vw] overflow-y-auto flex flex-col gap-1">
+                            <For each={roles}>
+                              {(role) => //ロールリンクされていないものだけ表示
+                                !storeUserinfo[user().id].RoleLink.some((rl) => rl.roleId === role.id)
+                                &&
+                                <span onclick={() => linkRole(role.id)} class="cursor-pointer pr-2">
+                                  <RoleChip deletable={false} roleId={role.id} />
+                                </span>
+                              }
+                            </For>
+                          </div>
+                        </PopoverContent>
+                      </Popover>
+                    </Show>
                   </div>
-                  <Show when={useStoreMyUserinfo.getRolePower("manageRole")}>
-                    {/* ロール追加ボタン */}
-                    <Popover onOpenChange={setOpenRoleList}>
-                      <PopoverTrigger>
-                        <Badge
-                          variant={"outline"}
-                          class="cursor-pointer h-full mt-1"
-                        >
-                          <IconPlus size={16} />
-                        </Badge>
-                      </PopoverTrigger>
-                      <PopoverContent class="w-fit">
-                        <div class="max-h-[25vh] max-w-[75vw] overflow-y-auto flex flex-col gap-1">
-                          <For each={roles}>
-                            {(role) => //ロールリンクされていないものだけ表示
-                              !storeUserinfo[user().id].RoleLink.some((rl) => rl.roleId === role.id)
-                              &&
-                              <span onclick={() => linkRole(role.id)} class="cursor-pointer pr-2">
-                                <RoleChip deletable={false} roleId={role.id} />
-                              </span>
-                            }
-                          </For>
-                        </div>
-                      </PopoverContent>
-                    </Popover>
-                  </Show>
-                </div>
+                </Show>
               </TabsContent>
 
               {/* 管理 */}
