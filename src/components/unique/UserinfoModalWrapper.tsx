@@ -97,13 +97,19 @@ export default function UserinfoModalWrapper(props: { children: JSX.Element, use
     <Dialog open={open()} onOpenChange={setOpen}>
       <DialogContent class="p-0 max-h-[90vh] flex flex-col overflow-y-auto">
         <Show when={open() && user()}>
-          <div class="h-[250px] shrink-0 grow w-full">
-            <img
-              alt="ユーザーバナー"
-              src={`/api/user/banner/${storeUserinfo[props.userId].id}`}
-              class="h-full w-full text-center object-cover"
-            />
-          </div>
+          {
+            user().isBot
+            ?
+            <div class="h-[75px] shrink-0 grow w-full"></div>
+            :
+            <div class="h-[250px] shrink-0 grow w-full">
+              <img
+                alt="ユーザーバナー"
+                src={`/api/user/banner/${storeUserinfo[props.userId].id}`}
+                class="h-full w-full text-center object-cover"
+              />
+            </div>
+          }
 
           {/* ユーザーアイコンとオンライン表示 */}
           <div class="w-full px-2 -mt-12 flex items-center gap-4">
