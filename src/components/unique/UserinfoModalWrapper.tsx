@@ -243,7 +243,10 @@ export default function UserinfoModalWrapper(props: { children: JSX.Element, use
                         as={A}
                         href={
                           "/app/manage-server?botName=" +
-                          encodeURIComponent(user().name)
+                          // 検索キーはBot名。botName改名後も外れないようbotNameを使う
+                          encodeURIComponent(
+                            botInfoGetter()?.botName ?? user().name,
+                          )
                         }
                         class="w-full"
                       >このBot管理ページへ飛ぶ</Button>
