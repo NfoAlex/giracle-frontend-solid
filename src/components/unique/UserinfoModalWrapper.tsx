@@ -85,6 +85,9 @@ export default function UserinfoModalWrapper(props: { children: JSX.Element, use
     api.server.getBotByRemoteUserId({ remoteUserId: user().id })
       .then((res) => {
         BOT_INFO_CACHE[user().id] = res.data;
+        // 上限150件を超えたら挿入順（＝古い順）の先頭を1件削除
+        const keys = Object.keys(BOT_INFO_CACHE);
+        if (keys.length > 150) delete BOT_INFO_CACHE[keys[0]];
       })
       .catch((err) => console.error("UserinfoModalWrapper :: fetchBotInfo : e", err));
 
