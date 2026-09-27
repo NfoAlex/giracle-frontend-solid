@@ -191,9 +191,15 @@ export default function UserinfoModalWrapper(props: { children: JSX.Element, use
                   user().isBot
                   ?
                   <Card class="p-2 flex flex-col gap-1">
-                    <A href={"/app/manage-server?botName=" + user().name}>
-                      <Button>このBot管理ページへ飛ぶ</Button>
-                    </A>
+                    {
+                      useStoreMyUserinfo.getRolePower("manageServer")
+                      ?
+                      <A href={"/app/manage-server?botName=" + user().name}>
+                        <Button>このBot管理ページへ飛ぶ</Button>
+                      </A>
+                      :
+                      <p>サーバーの管理権限がありません</p>
+                    }
                   </Card>
                   :
                   <Card class="p-2 flex flex-col gap-1">
