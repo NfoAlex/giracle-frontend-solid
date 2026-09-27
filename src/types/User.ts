@@ -14,6 +14,7 @@ export interface IUser {
   id: string;
   name: string;
   isBanned: boolean;
+  isBot: boolean;
   selfIntroduction: string;
   ChannelJoin: {
     channelId: string;
