@@ -17,7 +17,7 @@ import { api } from "~/api/index.ts";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 
 export default function UserinfoModalWrapper(props: { children: JSX.Element, userId: string, class?: string }) {
-  const [user] = createSignal(useStoreUserinfo.getterUserinfo(props.userId));
+  const user = () => useStoreUserinfo.getterUserinfo(props.userId);
   const [open, setOpen] = createSignal(false);
 
   // ロールリスト用
