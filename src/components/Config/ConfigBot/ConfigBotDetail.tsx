@@ -218,7 +218,7 @@ export default function ConfigBotDetail(props: { returnToListProxy: () => void; 
             <div class="flex items-center w-full">
               <span class="flex flex-col">
                 <p>他人・自分のメッセージを取得できる</p>
-                <p class="text-xs">リアルタイムでのメッセージ受信は権限関係無く可能です。</p>
+                <p class="text-xs">WS通信を使ったリアルタイムでのメッセージ受信を含む権限</p>
               </span>
               <Switch
                 checked={bot()!.canReadMessage ?? false}
