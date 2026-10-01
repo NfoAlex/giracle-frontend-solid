@@ -1,6 +1,12 @@
 import type { IChannel } from "~/types/Channel.ts";
 import type { ICustomEmoji } from "~/types/Message.ts";
-import type { IBot, IInvite, IRequestLog, IRequestLogCount, IServer } from "~/types/Server.ts";
+import type {
+  IBot,
+  IInvite,
+  IRequestLog,
+  IRequestLogCount,
+  IServer,
+} from "~/types/Server.ts";
 import { FETCH_CLIENT } from "../FETCH_CLIENT.ts";
 
 export const server = {
@@ -67,99 +73,102 @@ export const server = {
     return res.json();
   },
 
-  getBot: (q?: { cursorBotId?: string, query?: string }) =>
+  getBot: (q?: { cursorBotId?: string; query?: string }) =>
     FETCH_CLIENT<{
-      message: "Fetched my bots",
+      message: "Fetched my bots";
       data: Pick<
-        IBot, "id" | "botName" | "approveStatus" | "createdAt" | "createdBy"
-      >[]
+        IBot,
+        "id" | "botName" | "approveStatus" | "createdAt" | "createdBy"
+      >[];
     }>({
       url: "/api/server/bot/me",
       method: "GET",
       label: "SERVER_GET_BOT_ME",
-      query: q
+      query: q,
     }),
 
   putBot: (p: {
-    name: string,
+    name: string;
     // バックエンドは指定時に1文字以上を要求するため、未入力はキー自体を送らない
-    description?: string,
-    permissionChannelIds?: string[],
-    useAllChannel?: boolean,
-    canFetchUserinfo?: boolean,
-    canFetchRoleinfo?: boolean,
-    canManageUser?: boolean,
-    canManageServerConfig?: boolean,
-    canReadMessage?: boolean,
-    canSendMessage?: boolean,
+    description?: string;
+    permissionChannelIds?: string[];
+    useAllChannel?: boolean;
+    canFetchUserinfo?: boolean;
+    canFetchRoleinfo?: boolean;
+    canManageUser?: boolean;
+    canManageServerConfig?: boolean;
+    canReadMessage?: boolean;
+    canSendMessage?: boolean;
   }) =>
     FETCH_CLIENT<{
-      message: "Bot created",
-      data: IBot,
+      message: "Bot created";
+      data: IBot;
     }>({
       url: "/api/server/bot",
       method: "PUT",
       label: "SERVER_PUT_BOT",
-      body: p
+      body: p,
     }),
 
   getBotMeById: (p: { botId: string }) =>
     FETCH_CLIENT<{
-      message: "Fetched my bot info",
-      data: IBot & { tokenCode: string }
+      message: "Fetched my bot info";
+      data: IBot & { tokenCode: string };
     }>({
       url: `/api/server/bot/me/${p.botId}`,
       method: "GET",
-      label: "SERVER_GET_BOT_ME_ID"
+      label: "SERVER_GET_BOT_ME_ID",
     }),
 
   getBotByRemoteUserId: (p: { remoteUserId: string }) =>
     FETCH_CLIENT<{
-      message: "Fetched bot info",
-      data: Omit<IBot, "tokenCode" | "user"> & { user: Pick<IBot["user"], "id"> }
+      message: "Fetched bot info";
+      data: Omit<IBot, "tokenCode" | "user"> & {
+        user: Pick<IBot["user"], "id">;
+      };
     }>({
       url: `/api/server/bot/${p.remoteUserId}`,
       method: "GET",
-      label: "SERVER_GET_BOT_REMOTE_USER_ID"
+      label: "SERVER_GET_BOT_REMOTE_USER_ID",
     }),
 
   deleteBotById: (p: { botId: string }) =>
     FETCH_CLIENT<{
-      message: "Bot deleted",
+      message: "Bot deleted";
     }>({
       url: `/api/server/bot`,
       method: "DELETE",
       label: "SERVER_DELETE_BOT",
-      body: p
+      body: p,
     }),
 
   patchBot: (p: {
-    botId: string,
-    botName?: string,
+    botId: string;
+    botName?: string;
     // バックエンドは指定時に1文字以上を要求するため、未入力はキー自体を送らない
-    botDescription?: string,
-    permissionChannelIds?: string[],
-    useAllChannel?: boolean,
-    canFetchUserinfo?: boolean,
-    canFetchRoleinfo?: boolean,
-    canManageUser?: boolean,
-    canManageServerConfig?: boolean,
-    canReadMessage?: boolean,
-    canSendMessage?: boolean,
+    botDescription?: string;
+    permissionChannelIds?: string[];
+    useAllChannel?: boolean;
+    canFetchUserinfo?: boolean;
+    canFetchRoleinfo?: boolean;
+    canManageUser?: boolean;
+    canManageServerConfig?: boolean;
+    canReadMessage?: boolean;
+    canSendMessage?: boolean;
   }) =>
     FETCH_CLIENT<{
-      message: "Bot updated",
-      data: IBot
+      message: "Bot updated";
+      data: IBot;
     }>({
       url: `/api/server/bot`,
       method: "PATCH",
       label: "SERVER_PATCH_BOT",
-      body: p
+      body: p,
     }),
 
-  getBotAll: (q: { query?: string, cursorBotId?: string }) =>
+  getBotAll: (q: { query?: string; cursorBotId?: string }) =>
     FETCH_CLIENT<{
-      message: "Bot fetched",
+      message: "Bot fetched";
       data: Pick<
         IBot,
         | "id"
@@ -174,23 +183,27 @@ export const server = {
         | "canSendMessage"
         | "createdAt"
         | "createdBy"
-      >[]
+      >[];
     }>({
       url: `/api/server/bot/all`,
       method: "GET",
       label: "SERVER_GET_BOT_ALL",
-      query: q
+      query: q,
     }),
 
-  patchBotApproval: (p: { botId?: string, remoteUserId?: string, approvalStatus: IBot["approveStatus"] }) =>
+  patchBotApproval: (p: {
+    botId?: string;
+    remoteUserId?: string;
+    approvalStatus: IBot["approveStatus"];
+  }) =>
     FETCH_CLIENT<{
-      message: "Bot approval updated",
-      data: string
+      message: "Bot approval updated";
+      data: string;
     }>({
       url: `/api/server/bot/approval`,
       method: "PATCH",
       label: "SERVER_PATCH_BOT_APPROVAL",
-      body: p
+      body: p,
     }),
 
   createInvite: (p: { inviteCode: string; maxUsage?: number }) =>
@@ -244,10 +257,7 @@ export const server = {
       label: "SERVER_GET_INVITE",
     }),
 
-  getLog: (p: {
-    targetDate: Date,
-    cursorLogId?: string
-  }) =>
+  getLog: (p: { targetDate: Date; cursorLogId?: string }) =>
     FETCH_CLIENT<{
       message: string;
       data: IRequestLog[]; //最高50件
@@ -257,9 +267,11 @@ export const server = {
       label: "SERVER_GET_LOG",
       query: {
         targetDate: p.targetDate
-          ? new Date(p.targetDate).toLocaleDateString("sv-SE", { timeZone: "Asia/Tokyo" })
+          ? new Date(p.targetDate).toLocaleDateString("sv-SE", {
+              timeZone: "Asia/Tokyo",
+            })
           : undefined,
-        cursorLogId: p.cursorLogId
+        cursorLogId: p.cursorLogId,
       },
     }),
 
@@ -267,13 +279,13 @@ export const server = {
     type?: "success" | "error";
     userId?: string;
     cursorLogDate?: Date;
-    includeFirstLogs?: boolean
+    includeFirstLogs?: boolean;
   }) =>
     FETCH_CLIENT<{
       message: string;
       data: {
-        group: IRequestLogCount[],
-        firstDayLog: IRequestLog[] | undefined
+        group: IRequestLogCount[];
+        firstDayLog: IRequestLog[] | undefined;
       };
     }>({
       url: "/api/server/log-group",
@@ -283,9 +295,11 @@ export const server = {
         type: p.type,
         userId: p.userId,
         cursorLogDate: p.cursorLogDate
-          ? new Date(p.cursorLogDate).toLocaleDateString("sv-SE", { timeZone: "Asia/Tokyo" })
+          ? new Date(p.cursorLogDate).toLocaleDateString("sv-SE", {
+              timeZone: "Asia/Tokyo",
+            })
           : undefined,
-        includeFirstLogs: p.includeFirstLogs
+        includeFirstLogs: p.includeFirstLogs,
       },
     }),
 };
