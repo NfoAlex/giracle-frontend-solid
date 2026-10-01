@@ -155,7 +155,14 @@ export default function UserinfoModalWrapper(props: { children: JSX.Element, use
 
             {/* タブ */}
             <Tabs defaultValue="overview">
-              <Show when={useStoreMyUserinfo.getRolePower("manageUser")}>
+              <Show
+                when={
+                  user().isBot
+                    // Botの管理はサーバー管理者のみ可能。manageUserでは承認できない
+                    ? useStoreMyUserinfo.getRolePower("manageServer")
+                    : useStoreMyUserinfo.getRolePower("manageUser")
+                }
+              >
                 <TabsList class="w-full">
                   <TabsTrigger value="overview" class="w-full">概要</TabsTrigger>
                   <TabsTrigger value="manage" class="w-full">管理</TabsTrigger>
@@ -236,23 +243,17 @@ export default function UserinfoModalWrapper(props: { children: JSX.Element, use
                   user().isBot
                   ?
                   <Card class="p-2 flex flex-col gap-1">
-                    {
-                      useStoreMyUserinfo.getRolePower("manageServer")
-                      ?
-                      <Button
-                        as={A}
-                        href={
-                          "/app/manage-server?botName=" +
-                          // 検索キーはBot名。botName改名後も外れないようbotNameを使う
-                          encodeURIComponent(
-                            botInfoGetter()?.botName ?? user().name,
-                          )
-                        }
-                        class="w-full"
-                      >このBot管理ページへ飛ぶ</Button>
-                      :
-                      <p>サーバーの管理権限がありません</p>
-                    }
+                    <Button
+                      as={A}
+                      href={
+                        "/app/manage-server?botName=" +
+                        // 検索キーはBot名。botName改名後も外れないようbotNameを使う
+                        encodeURIComponent(
+                          botInfoGetter()?.botName ?? user().name,
+                        )
+                      }
+                      class="w-full"
+                    >このBot管理ページへ飛ぶ</Button>
                   </Card>
                   :
                   <Card class="p-2 flex flex-col gap-1">
