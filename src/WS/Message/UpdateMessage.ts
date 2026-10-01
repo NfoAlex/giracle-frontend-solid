@@ -8,12 +8,12 @@ import type { IMessage } from "~/types/Message";
  * @constructor
  */
 export default function WSUpdateMessage(dat: {
-  id: string,
-  content: string,
-  channelId: string,
-  userId: string,
-  isEdited: boolean,
-  MessageUrlPreview?: IMessage["MessageUrlPreview"]
+  id: string;
+  content: string;
+  channelId: string;
+  userId: string;
+  isEdited: boolean;
+  MessageUrlPreview?: IMessage["MessageUrlPreview"];
 }) {
   //console.log("WSUpdateMessage :: triggered dat->", dat);
 
