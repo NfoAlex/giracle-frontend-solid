@@ -24,23 +24,20 @@ export default function Auth() {
     setErrorFetchingServerinfo(false);
     setTempServerinfoLoaded(false);
 
-    //クッキーにTokenがあれば初期処理をして移動
-    const token = GetCookie("token");
-    if (token !== undefined) {
-      await api.user.verifyToken()
-        .then((r) => {
-          InitLoad(r.data.userId, true);
-          //もともと行こうとしていた場所を指定
-          if (loc.search.split("?redirect=")[1]) {
-            navi(`${loc.search.split("?redirect=")[1]}`);
-          } else {
-            navi("/app");
-          }
-        })
-        .catch((e) => {
-          console.error("auth :: Cookie認証失敗");
-        });
-    }
+    //Token検証を試みる
+    await api.user.verifyToken()
+      .then((r) => {
+        InitLoad(r.data.userId, true);
+        //もともと行こうとしていた場所を指定
+        if (loc.search.split("?redirect=")[1]) {
+          navi(`${loc.search.split("?redirect=")[1]}`);
+        } else {
+          navi("/app");
+        }
+      })
+      .catch((e) => {
+        console.error("auth :: Cookie認証失敗");
+      });
 
     //サーバー情報を取得、再試行もする
     await new Promise(async (resolve) => {
