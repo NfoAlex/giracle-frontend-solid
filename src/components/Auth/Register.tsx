@@ -12,7 +12,11 @@ export default function Register() {
   const [result, setResult] = createSignal("");
 
   const signUp = async () => {
-    await api.user.register({ username: username(), password: password(), inviteCode: inviteCode() })
+    await api.user.register({
+      username: username(),
+      password: password(),
+      inviteCode: inviteCode() !== "" ? inviteCode() : undefined
+    })
       .then((res) => {
         //console.log("Register :: signUp : res->", res);
         setResult("success");
