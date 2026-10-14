@@ -18,10 +18,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import type { IBot } from "~/types/Server";
 import { createMutable } from "solid-js/store";
 
-//Bot取得ハンドラの返り値そのまま
-type TBotInfoFetch = Omit<IBot, "tokenCode" | "user"> & { user: Pick<IBot["user"], "id"> };
 // createMutable は Map 等の組み込みクラスをラップできない（メソッド呼出時にProxy不一致エラー）ので、キーをBotのidにしたプレーンオブジェクトで保持する
-const BOT_INFO_CACHE = createMutable<Record<IBot["id"], TBotInfoFetch>>({});
+const BOT_INFO_CACHE = createMutable<Record<IBot["id"], IBot>>({});
 
 export default function UserinfoModalWrapper(props: { children: JSX.Element, userId: string, class?: string }) {
   const user = () => useStoreUserinfo.getterUserinfo(props.userId);
@@ -247,10 +245,8 @@ export default function UserinfoModalWrapper(props: { children: JSX.Element, use
                       as={A}
                       href={
                         "/app/manage-server?botName=" +
-                        // 検索キーはBot名。botName改名後も外れないようbotNameを使う
-                        encodeURIComponent(
-                          botInfoGetter()?.botName ?? user().name,
-                        )
+                        // 検索キーはBot名。Bot名はusers.nameなのでuser().nameを使う
+                        encodeURIComponent(user().name)
                       }
                       class="w-full"
                     >このBot管理ページへ飛ぶ</Button>
