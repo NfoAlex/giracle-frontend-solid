@@ -6,6 +6,7 @@ import type {
   IRequestLog,
   IRequestLogCount,
   IServer,
+  TBotListItem,
 } from "~/types/Server.ts";
 import { FETCH_CLIENT } from "../FETCH_CLIENT.ts";
 
@@ -41,7 +42,6 @@ export const server = {
       RegisterAnnounceChannelId?: string | undefined;
       MessageMaxLength?: number | undefined;
       BotEnabled?: boolean;
-      BotAutoApprove?: boolean;
     };
   }> => {
     let FLAG_RECEIVED = false;
@@ -73,137 +73,67 @@ export const server = {
     return res.json();
   },
 
-  getBot: (q?: { cursorBotId?: string; query?: string }) =>
-    FETCH_CLIENT<{
-      message: "Fetched my bots";
-      data: Pick<
-        IBot,
-        "id" | "botName" | "approveStatus" | "createdAt" | "createdBy"
-      >[];
-    }>({
-      url: "/api/server/bot/me",
+  getBot: (q?: { length?: number; cursorBotId?: string; query?: string }) =>
+    FETCH_CLIENT<{ message: "Bot list fetched"; data: TBotListItem[] }>({
+      url: "/api/bot/list",
       method: "GET",
-      label: "SERVER_GET_BOT_ME",
-      query: q,
+      label: "BOT_LIST",
+      query: {
+        length: q?.length,
+        cursorBotId: q?.cursorBotId,
+        query: q?.query,
+      },
+    }),
+
+  getBotAll: (q: { length?: number; query?: string; cursorBotId?: string }) =>
+    FETCH_CLIENT<{ message: "Bot list fetched"; data: TBotListItem[] }>({
+      url: "/api/bot/all",
+      method: "GET",
+      label: "BOT_ALL",
+      query: { length: q.length, query: q.query, cursorBotId: q.cursorBotId },
+    }),
+
+  // リモートユーザーIdからBot情報を取得(作成者表示用)。tokenCodeは含まない
+  getBotByRemoteUserId: (p: { remoteUserId: string }) =>
+    FETCH_CLIENT<{ message: "Bot info"; data: IBot }>({
+      url: `/api/bot/${p.remoteUserId}`,
+      method: "GET",
+      label: "BOT_GET_BY_REMOTE_USER_ID",
     }),
 
   putBot: (p: {
     name: string;
     // バックエンドは指定時に1文字以上を要求するため、未入力はキー自体を送らない
-    description?: string;
-    permissionChannelIds?: string[];
-    useAllChannel?: boolean;
-    canFetchUserinfo?: boolean;
-    canFetchRoleinfo?: boolean;
-    canManageUser?: boolean;
-    canManageServerConfig?: boolean;
-    canReadMessage?: boolean;
-    canSendMessage?: boolean;
+    introduction?: string;
   }) =>
     FETCH_CLIENT<{
       message: "Bot created";
-      data: IBot;
-    }>({
-      url: "/api/server/bot",
-      method: "PUT",
-      label: "SERVER_PUT_BOT",
-      body: p,
-    }),
-
-  getBotMeById: (p: { botId: string }) =>
-    FETCH_CLIENT<{
-      message: "Fetched my bot info";
-      data: IBot & { tokenCode: string };
-    }>({
-      url: `/api/server/bot/me/${p.botId}`,
-      method: "GET",
-      label: "SERVER_GET_BOT_ME_ID",
-    }),
-
-  getBotByRemoteUserId: (p: { remoteUserId: string }) =>
-    FETCH_CLIENT<{
-      message: "Fetched bot info";
-      data: Omit<IBot, "tokenCode" | "user"> & {
-        user: Pick<IBot["user"], "id">;
+      data: {
+        remoteUser: { id: string; name: string | null; isBot: boolean };
+        bot: TBotListItem;
       };
     }>({
-      url: `/api/server/bot/${p.remoteUserId}`,
-      method: "GET",
-      label: "SERVER_GET_BOT_REMOTE_USER_ID",
+      url: "/api/bot",
+      method: "PUT",
+      label: "BOT_PUT",
+      body: p,
     }),
 
   deleteBotById: (p: { botId: string }) =>
-    FETCH_CLIENT<{
-      message: "Bot deleted";
-    }>({
-      url: `/api/server/bot`,
+    FETCH_CLIENT<{ message: "Bot deleted" }>({
+      url: "/api/bot",
       method: "DELETE",
-      label: "SERVER_DELETE_BOT",
+      label: "BOT_DELETE",
       body: p,
     }),
 
-  patchBot: (p: {
-    botId: string;
-    botName?: string;
-    // バックエンドは指定時に1文字以上を要求するため、未入力はキー自体を送らない
-    botDescription?: string;
-    permissionChannelIds?: string[];
-    useAllChannel?: boolean;
-    canFetchUserinfo?: boolean;
-    canFetchRoleinfo?: boolean;
-    canManageUser?: boolean;
-    canManageServerConfig?: boolean;
-    canReadMessage?: boolean;
-    canSendMessage?: boolean;
-  }) =>
-    FETCH_CLIENT<{
-      message: "Bot updated";
-      data: IBot;
-    }>({
-      url: `/api/server/bot`,
-      method: "PATCH",
-      label: "SERVER_PATCH_BOT",
-      body: p,
-    }),
-
-  getBotAll: (q: { query?: string; cursorBotId?: string }) =>
-    FETCH_CLIENT<{
-      message: "Bot fetched";
-      data: Pick<
-        IBot,
-        | "id"
-        | "botName"
-        | "approveStatus"
-        | "useAllChannel"
-        | "canFetchUserinfo"
-        | "canFetchRoleinfo"
-        | "canManageUser"
-        | "canManageServerConfig"
-        | "canReadMessage"
-        | "canSendMessage"
-        | "createdAt"
-        | "createdBy"
-      >[];
-    }>({
-      url: `/api/server/bot/all`,
-      method: "GET",
-      label: "SERVER_GET_BOT_ALL",
-      query: q,
-    }),
-
-  patchBotApproval: (p: {
-    botId?: string;
-    remoteUserId?: string;
-    approvalStatus: IBot["approveStatus"];
-  }) =>
-    FETCH_CLIENT<{
-      message: "Bot approval updated";
-      data: string;
-    }>({
-      url: `/api/server/bot/approval`,
-      method: "PATCH",
-      label: "SERVER_PATCH_BOT_APPROVAL",
-      body: p,
+  // 承認状態の変更(manageServer)。enabled=true で承認
+  configureBot: (p: { botId: string; enabled: boolean }) =>
+    FETCH_CLIENT<{ message: "Bot updated"; data: IBot }>({
+      url: "/api/server/bot/set-approve",
+      method: "POST",
+      label: "BOT_SET_APPROVE",
+      body: { botId: p.botId, isApproved: p.enabled },
     }),
 
   createInvite: (p: { inviteCode: string; maxUsage?: number }) =>

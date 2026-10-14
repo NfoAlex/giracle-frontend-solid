@@ -10,41 +10,21 @@ export interface IServer {
   MessageMaxFileSize: number;
   defaultJoinChannel: IChannel[];
   BotEnabled: boolean;
-  BotAutoApprove: boolean;
 }
 
 export interface IBot {
-  approveStatus: "APPROVED" | "BLOCKED" | "DENIED" | "PENDING";
-  botDescription: string | null;
-  botName: string;
-  canFetchRoleinfo: boolean;
-  canFetchUserinfo: boolean;
-  canManageServerConfig: boolean;
-  canManageUser: boolean;
-  canReadMessage: boolean;
-  canSendMessage: boolean;
-  channelPermissions: IBotChannelPermission[];
-  createdAt: Date;
-  createdBy: string;
   id: string;
   remoteUserId: string;
-  useAllChannel: boolean;
-  user: {
-    createdAt: Date;
-    id: string;
-    isBanned: boolean;
-    isBot: boolean;
-    isDeleted: boolean;
-    name: string | null;
-    selfIntroduction: string;
-  };
+  createdAt: Date;
+  createdBy: string;
+  isApproved: boolean;
 }
 
-export interface IBotChannelPermission {
-  botId: string;
-  channelId: string;
-  id: number;
-}
+// Bot一覧(GET /bot/list, GET /bot/all)の1行。tokenCode は /bot/list のみ返す
+export type TBotListItem = IBot & {
+  remoteUserName: string | null;
+  tokenCode?: string;
+};
 
 export interface IInvite {
   inviteCode: string;
