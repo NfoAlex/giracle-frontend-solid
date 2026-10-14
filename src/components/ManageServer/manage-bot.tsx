@@ -3,66 +3,21 @@ import { IconAlertCircle, IconSearch } from "@tabler/icons-solidjs";
 import { createMemo, createSignal, For, onMount, Show } from "solid-js";
 import { api } from "~/api/index.ts";
 import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert.tsx";
-import { Badge, type BadgeProps } from "~/components/ui/badge.tsx";
 import { Button } from "~/components/ui/button.tsx";
 import { Card } from "~/components/ui/card.tsx";
 import { TextField, TextFieldInput } from "~/components/ui/text-field.tsx";
 import { useStoreUserinfo } from "~/stores/Userinfo.store.ts";
-import type { IBot } from "~/types/Server.ts";
+import type { TBotListItem } from "~/types/Server.ts";
+import BotApprovalBadge from "~/components/unique/BotApprovalBadge.tsx";
 import BotApprovalModal from "./ManageBot/BotApprovalModal.tsx";
 
 // 1回の取得で読み込むボット数。APIは上限まで返すと続きがある可能性がある
 const PAGE_LENGTH = 50;
 
-// 管理者用Bot一覧(GET /server/bot/all)の1行分。バックエンドの select 列と一致させる
-type TBotAdminListItem = Pick<
-  IBot,
-  | "id"
-  | "botName"
-  | "approveStatus"
-  | "useAllChannel"
-  | "canFetchUserinfo"
-  | "canFetchRoleinfo"
-  | "canManageUser"
-  | "canManageServerConfig"
-  | "canReadMessage"
-  | "canSendMessage"
-  | "createdAt"
-  | "createdBy"
->;
-
-type TApproveStatus = IBot["approveStatus"];
-
-const APPROVE_STATUS_LABEL: Record<
-  TApproveStatus,
-  { label: string; variant: BadgeProps["variant"] }
-> = {
-  APPROVED: { label: "承認済み", variant: "success" },
-  PENDING: { label: "承認待ち", variant: "warning" },
-  BLOCKED: { label: "停止中", variant: "error" },
-  DENIED: { label: "拒否", variant: "error" },
-};
-
-// 承認者が要求権限を確認できるようにするための表示ラベル。
-// 審査モーダルにも props で渡すため、ここを唯一の定義とする
-const BOT_PERMISSION_LABEL = {
-  canReadMessage: "メッセージ取得",
-  canSendMessage: "メッセージ送信",
-  canFetchUserinfo: "ユーザー情報取得",
-  canFetchRoleinfo: "ロール情報取得",
-  canManageUser: "ユーザー編集",
-  canManageServerConfig: "サーバー設定変更",
-} as const;
-type TBotPermissionKey = keyof typeof BOT_PERMISSION_LABEL;
-
-const BOT_PERMISSION_KEYS = Object.keys(
-  BOT_PERMISSION_LABEL,
-) as TBotPermissionKey[];
-
 export default function ManageBot() {
   // URLクエリ（?botName=xxx）で初期検索ワードを指定できる
   const [searchParams] = useSearchParams();
-  const [bots, setBots] = createSignal<TBotAdminListItem[]>([]);
+  const [bots, setBots] = createSignal<TBotListItem[]>([]);
   const [processing, setProcessing] = createSignal(false);
   const [query, setQuery] = createSignal("");
   const [hasMoreBots, setHasMoreBots] = createSignal(false);
@@ -96,6 +51,7 @@ export default function ManageBot() {
 
     try {
       const res = await api.server.getBotAll({
+        length: PAGE_LENGTH,
         query: trimmedQuery || undefined,
         cursorBotId: useCursor ? cursorBotId() : undefined,
       });
@@ -129,9 +85,9 @@ export default function ManageBot() {
   };
 
   /** モーダルでの承認状態変更を一覧の該当行へ反映する */
-  const applyApproval = (botId: string, approveStatus: TApproveStatus) => {
+  const applyApproval = (botId: string, isApproved: boolean) => {
     setBots((prev) =>
-      prev.map((b) => (b.id === botId ? { ...b, approveStatus } : b)),
+      prev.map((b) => (b.id === botId ? { ...b, isApproved } : b)),
     );
   };
 
@@ -193,31 +149,16 @@ export default function ManageBot() {
               class="p-2 rounded-md flex flex-wrap items-center gap-3 text-left hover:bg-accent cursor-pointer"
             >
               <div class="flex flex-col min-w-0 grow basis-0">
-                <p class="truncate font-semibold">{bot.botName}</p>
+                <p class="truncate font-semibold">
+                  {bot.remoteUserName ?? "(名称未設定)"}
+                </p>
                 <p class="truncate text-sm text-muted-foreground">
                   {useStoreUserinfo.getterUserinfo(bot.createdBy).name}
                 </p>
               </div>
 
-              {/* 要求権限。一覧でも概要が分かるようにする */}
-              <span class="flex flex-wrap items-center gap-1">
-                <Badge variant={bot.useAllChannel ? "secondary" : "outline"}>
-                  {bot.useAllChannel ? "全チャンネル" : "指定チャンネルのみ"}
-                </Badge>
-                <For
-                  each={BOT_PERMISSION_KEYS.filter((key) => bot[key]).map(
-                    (key) => BOT_PERMISSION_LABEL[key],
-                  )}
-                  fallback={<Badge variant="outline">追加権限なし</Badge>}
-                >
-                  {(label) => <Badge variant="secondary">{label}</Badge>}
-                </For>
-              </span>
-
               <span class="ml-auto flex items-center gap-2 shrink-0">
-                <Badge variant={APPROVE_STATUS_LABEL[bot.approveStatus].variant}>
-                  {APPROVE_STATUS_LABEL[bot.approveStatus].label}
-                </Badge>
+                <BotApprovalBadge isApproved={bot.isApproved} />
                 <span class="text-sm text-muted-foreground">
                   {new Date(bot.createdAt).toLocaleString()}
                 </span>
@@ -239,10 +180,6 @@ export default function ManageBot() {
 
       <BotApprovalModal
         bot={reviewingBot()}
-        status={APPROVE_STATUS_LABEL}
-        permissionLabels={BOT_PERMISSION_KEYS.filter((key) =>
-          reviewingBot()?.[key]
-        ).map((key) => BOT_PERMISSION_LABEL[key])}
         onOpenChange={(open) => !open && setReviewingBotId(undefined)}
         approvalChanged={applyApproval}
       />
