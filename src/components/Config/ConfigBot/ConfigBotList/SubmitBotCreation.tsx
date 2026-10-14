@@ -5,9 +5,9 @@ import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert";
 import { Button } from "~/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogTitle, DialogTrigger } from "~/components/ui/dialog";
 import { TextField, TextFieldInput, TextFieldLabel, TextFieldTextArea } from "~/components/ui/text-field";
-import type { IBot } from "~/types/Server";
+import type { TBotListItem } from "~/types/Server";
 
-export default function SubmitBotCreation(props: { dataBinder: (bot: IBot) => void }) {
+export default function SubmitBotCreation(props: { dataBinder: (bot: TBotListItem) => void }) {
   const [botName, setBotName] = createSignal<string>("");
   const [description, setDescription] = createSignal<string>("");
   const [open, setOpen] = createSignal(false); //ダイアログの開閉
@@ -26,10 +26,15 @@ export default function SubmitBotCreation(props: { dataBinder: (bot: IBot) => vo
       name: botName(),
       // 概要が未入力ならキーごと送らない。
       // バックエンドは指定時に1文字以上を要求するため、空文字を送ると422になる
-      description: description() || undefined,
+      introduction: description() || undefined,
     })
       .then((r) => {
-        props.dataBinder(r.data); //親のBot一覧に追加する
+        // PUT /bot の応答は BotManage 行そのもので remoteUserName を含まないため、
+        // 同じ応答の remoteUser.name から補う
+        props.dataBinder({
+          ...r.data.bot,
+          remoteUserName: r.data.remoteUser.name,
+        }); //親のBot一覧に追加する
         setBotName("");
         setDescription("");
         setOpen(false); //ダイアログを閉じる

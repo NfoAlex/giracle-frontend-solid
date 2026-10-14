@@ -6,20 +6,15 @@ import { Button } from "~/components/ui/button";
 import { Card } from "~/components/ui/card";
 import { TextField, TextFieldInput } from "~/components/ui/text-field";
 import { useStoreUserinfo } from "~/stores/Userinfo.store";
-import type { IBot } from "~/types/Server";
+import type { TBotListItem } from "~/types/Server";
 import SubmitBotCreation from "./ConfigBotList/SubmitBotCreation";
 import BotApprovalBadge from "~/components/unique/BotApprovalBadge";
 
 // 1回の取得で読み込むボット数。APIは上限まで返すと続きがある可能性がある
 const PAGE_LENGTH = 50;
 
-type TBotListItem = Pick<
-  IBot,
-  "id" | "botName" | "approveStatus" | "createdAt" | "createdBy"
->;
-
 export default function ConfigBotList(props: {
-  setActiveBot: (botId: string) => void;
+  setActiveBot: (bot: TBotListItem) => void;
 }) {
   const [myBots, setMyBots] = createSignal<TBotListItem[]>([]);
   const [processing, setProcessing] = createSignal(false);
@@ -50,6 +45,7 @@ export default function ConfigBotList(props: {
 
     try {
       const res = await api.server.getBot({
+        length: PAGE_LENGTH,
         query: trimmedQuery || undefined,
         cursorBotId: useCursor ? cursorBotId() : undefined,
       });
@@ -86,8 +82,9 @@ export default function ConfigBotList(props: {
    * 作ったBotを一覧に追加するためだけのもの
    * @param botCreated
    */
-  const myBotsBinder = (botCreated: IBot) => {
-    setMyBots((b) => [botCreated, ...b]);
+  const myBotsBinder = (botCreated: TBotListItem) => {
+    // 一覧は作成順(昇順)なので末尾へ追加する
+    setMyBots((b) => [...b, botCreated]);
   };
 
   onMount(() => {
@@ -154,18 +151,20 @@ export default function ConfigBotList(props: {
         <For each={myBots()}>
           {(bot) => (
             <div
-              onClick={() => props.setActiveBot(bot.id)}
+              onClick={() => props.setActiveBot(bot)}
               class="p-2 rounded-md flex items-center gap-3 hover:bg-accent cursor-pointer"
             >
               <div class="flex flex-col min-w-0">
-                <p class="truncate font-semibold">{bot.botName}</p>
+                <p class="truncate font-semibold">
+                  {bot.remoteUserName ?? "(名称未設定)"}
+                </p>
                 <p class="truncate text-sm text-muted-foreground">
                   {useStoreUserinfo.getterUserinfo(bot.createdBy).name}
                 </p>
               </div>
 
               <span class="ml-auto flex items-center gap-2 shrink-0">
-                <BotApprovalBadge approveStatus={bot.approveStatus} />
+                <BotApprovalBadge isApproved={bot.isApproved} />
                 <span class="text-sm text-muted-foreground">
                   {new Date(bot.createdAt).toLocaleString()}
                 </span>

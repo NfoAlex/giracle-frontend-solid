@@ -1,10 +1,13 @@
 import ConfigBotDetail from "./ConfigBot/ConfigBotDetail.tsx";
 import ConfigBotList from "./ConfigBot/ConfigBotList.tsx";
 import { createSignal } from "solid-js";
+import type { TBotListItem } from "~/types/Server.ts";
 
 export default function ConfigBot() {
   const [displayMode, setDisplayMode] = createSignal<"list" | "detail">("list");
-  const [activeBotId, setActiveBotId] = createSignal<string | undefined>(undefined);
+  const [activeBot, setActiveBot] = createSignal<TBotListItem | undefined>(
+    undefined,
+  );
 
   return (
     <div class="md:max-w-[950px] h-full mx-auto flex flex-col gap-2 pb-2">
@@ -14,10 +17,10 @@ export default function ConfigBot() {
         displayMode() === "list"
         ?
         <ConfigBotList
-          setActiveBot={botId => { setActiveBotId(botId); setDisplayMode("detail"); }}
+          setActiveBot={bot => { setActiveBot(bot); setDisplayMode("detail"); }}
         />
         :
-        <ConfigBotDetail returnToListProxy={() => setDisplayMode("list") } botId={activeBotId()} />
+        <ConfigBotDetail returnToListProxy={() => setDisplayMode("list") } bot={activeBot()} />
       }
 
     </div>
