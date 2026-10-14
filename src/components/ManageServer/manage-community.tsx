@@ -20,8 +20,7 @@ export default function ManageCommunity() {
     MessageMaxLength: 0,
     defaultJoinChannel: [],
     MessageMaxFileSize: 0,
-    BotEnabled: false,
-    BotAutoApprove: false
+    BotEnabled: false
   });
   const configChanged = () => {
     return JSON.stringify(serverConfig()) !== JSON.stringify(storeServerinfo);
@@ -188,16 +187,6 @@ export default function ManageCommunity() {
                   <SwitchThumb />
                 </SwitchControl>
                 <SwitchLabel>Botの利用・作成を許可</SwitchLabel>
-              </Switch>
-              <Switch
-                checked={serverConfig().BotAutoApprove}
-                onChange={(e) => setServerConfig({...serverConfig(), BotAutoApprove: e.valueOf()})}
-                class="flex items-center space-x-2"
-              >
-                <SwitchControl>
-                  <SwitchThumb />
-                </SwitchControl>
-                <SwitchLabel>Bot作成を自動で承認する</SwitchLabel>
               </Switch>
             </span>
           </CardContent>
