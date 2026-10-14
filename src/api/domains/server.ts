@@ -73,16 +73,12 @@ export const server = {
     return res.json();
   },
 
-  getBot: (q?: { length?: number; cursorBotId?: string; query?: string }) =>
+  getBot: (q: { length?: number; cursorBotId?: string; query?: string }) =>
     FETCH_CLIENT<{ message: "Bot list fetched"; data: TBotListItem[] }>({
       url: "/api/bot/list",
       method: "GET",
       label: "BOT_LIST",
-      query: {
-        length: q?.length,
-        cursorBotId: q?.cursorBotId,
-        query: q?.query,
-      },
+      query: q,
     }),
 
   getBotAll: (q: { length?: number; query?: string; cursorBotId?: string }) =>
@@ -90,7 +86,7 @@ export const server = {
       url: "/api/bot/all",
       method: "GET",
       label: "BOT_ALL",
-      query: { length: q.length, query: q.query, cursorBotId: q.cursorBotId },
+      query: q,
     }),
 
   // リモートユーザーIdからBot情報を取得(作成者表示用)。tokenCodeは含まない
