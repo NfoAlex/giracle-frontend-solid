@@ -5,6 +5,7 @@ import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert";
 import { Button } from "~/components/ui/button";
 import { Card } from "~/components/ui/card";
 import { TextField, TextFieldInput } from "~/components/ui/text-field";
+import { storeServerinfo } from "~/stores/Serverinfo.store";
 import { useStoreUserinfo } from "~/stores/Userinfo.store";
 import type { TBotListItem } from "~/types/Server";
 import SubmitBotCreation from "./ConfigBotList/SubmitBotCreation";
@@ -101,6 +102,12 @@ export default function ConfigBotList(props: {
         </Alert>
       </Show>
 
+      <Show when={!storeServerinfo.BotEnabled}>
+        <p class="text-sm text-muted-foreground">
+          サーバー設定でBotの利用が無効になっています
+        </p>
+      </Show>
+
       <div class="flex items-center justify-end gap-2">
         <Button
           variant={"outline"}
@@ -110,7 +117,10 @@ export default function ConfigBotList(props: {
         >
           <IconReload />
         </Button>
-        <SubmitBotCreation dataBinder={myBotsBinder} />
+        <SubmitBotCreation
+          dataBinder={myBotsBinder}
+          disabled={!storeServerinfo.BotEnabled}
+        />
       </div>
 
       <TextField class="shrink-0">

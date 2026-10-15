@@ -1,5 +1,5 @@
 import { IconBell, IconEye, IconHash, IconKey, IconRobot, IconUser } from "@tabler/icons-solidjs";
-import { createEffect, createSignal, on, Show } from "solid-js";
+import { createEffect, createSignal, on } from "solid-js";
 import ConfigBot from "~/components/Config/ConfigBot";
 import ConfigChat from "~/components/Config/ConfigChat.tsx";
 import ConfigDisplay from "~/components/Config/ConfigDisplay.tsx";
@@ -12,7 +12,6 @@ import { SidebarMenuButton } from "~/components/ui/sidebar.tsx";
 import SidebarTriggerWithDot from "~/components/unique/SidebarTriggerWithDot.tsx";
 import { storeAppStatus } from "~/stores/AppStatus.store.ts";
 import { storeClientConfig } from "~/stores/ClientConfig.store.ts";
-import { storeServerinfo } from "~/stores/Serverinfo.store.ts";
 
 type TConfigTab = "profile" | "session" | "chat" | "notification" | "display" | "bot";
 
@@ -49,7 +48,7 @@ export default function Config() {
             value={displayMode()}
             defaultValue={"profile"}
             onChange={setDisplayMode}
-            options={storeServerinfo.BotEnabled ? ["profile", "session", "chat", "notification", "display", "bot"] : ["profile", "session", "chat", "notification", "display"]}
+            options={["profile", "session", "chat", "notification", "display", "bot"]}
             itemComponent={(props) =>
               <SelectItem item={props.item}>
                 {props.item.textValue === "profile" && "プロフィール"}
@@ -123,16 +122,14 @@ export default function Config() {
               <IconEye />
               表示
             </SidebarMenuButton>
-            <Show when={storeServerinfo.BotEnabled}>
-              <SidebarMenuButton
-                onClick={()=>setDisplayMode("bot")}
-                variant={displayMode()==="bot"?"outline":"default"}
-                size={"lg"}
-              >
-                <IconRobot />
-                Bot管理
-              </SidebarMenuButton>
-            </Show>
+            <SidebarMenuButton
+              onClick={()=>setDisplayMode("bot")}
+              variant={displayMode()==="bot"?"outline":"default"}
+              size={"lg"}
+            >
+              <IconRobot />
+              Bot管理
+            </SidebarMenuButton>
           </Card>
         </div>
 
@@ -142,7 +139,7 @@ export default function Config() {
           { displayMode()==="chat" && <ConfigChat /> }
           { displayMode()==="display" && <ConfigDisplay /> }
           { displayMode()==="notification" && <ConfigNotification /> }
-          { displayMode()==="bot" && storeServerinfo.BotEnabled && <ConfigBot /> }
+          { displayMode()==="bot" && <ConfigBot /> }
         </div>
 
       </div>

@@ -7,7 +7,11 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogTitle, Di
 import { TextField, TextFieldInput, TextFieldLabel, TextFieldTextArea } from "~/components/ui/text-field";
 import type { TBotListItem } from "~/types/Server";
 
-export default function SubmitBotCreation(props: { dataBinder: (bot: TBotListItem) => void }) {
+export default function SubmitBotCreation(props: {
+  dataBinder: (bot: TBotListItem) => void;
+  /** BotEnabled=false のときに作成させない */
+  disabled?: boolean;
+}) {
   const [botName, setBotName] = createSignal<string>("");
   const [description, setDescription] = createSignal<string>("");
   const [open, setOpen] = createSignal(false); //ダイアログの開閉
@@ -88,8 +92,8 @@ export default function SubmitBotCreation(props: { dataBinder: (bot: TBotListIte
           >作成</Button>
         </DialogFooter>
       </DialogContent>
-      <DialogTrigger>
-        <Button class="">
+      <DialogTrigger disabled={props.disabled}>
+        <Button class="" disabled={props.disabled}>
           <IconPlus />
           ボットを作成
         </Button>
