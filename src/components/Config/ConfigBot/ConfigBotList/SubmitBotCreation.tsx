@@ -60,18 +60,25 @@ export default function SubmitBotCreation(props: {
         </DialogTitle>
         <DialogDescription class="flex flex-col gap-4">
           <TextField class="grid w-full items-center gap-2">
-            <TextFieldLabel for="email">Bot名</TextFieldLabel>
+            <TextFieldLabel for="bot-name">Bot名</TextFieldLabel>
             <TextFieldInput
+              id="bot-name"
               type="text"
               placeholder="Bot名"
+              maxLength={32}
               value={botName()}
               onInput={(e)=>setBotName(e.currentTarget.value)}
             />
+            <p class="text-xs text-muted-foreground text-right">
+              {botName().length}/32
+            </p>
           </TextField>
           <TextField class="grid w-full items-center gap-2">
-            <TextFieldLabel for="email">概要</TextFieldLabel>
+            <TextFieldLabel for="bot-introduction">概要</TextFieldLabel>
             <TextFieldTextArea
+              id="bot-introduction"
               placeholder="概要"
+              maxLength={128}
               value={description()}
               onInput={(e)=>setDescription(e.currentTarget.value)}
             />
