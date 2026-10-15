@@ -1,8 +1,9 @@
 import { IconArrowLeft, IconCheck, IconCopy, IconEye, IconEyeOff } from "@tabler/icons-solidjs";
-import { createSignal, Show } from "solid-js";
+import { createSignal, onMount, Show } from "solid-js";
+import { api } from "~/api";
 import { Button } from "~/components/ui/button";
 import { Card } from "~/components/ui/card";
-import type { TBotListItem } from "~/types/Server";
+import type { IBot, TBotListItem } from "~/types/Server";
 import { useStoreUserinfo } from "~/stores/Userinfo.store";
 import DialogConfirmDeleteBot from "./ConfigBotDetail/DialogConfirmDeleteBot";
 import BotApprovalBadge from "~/components/unique/BotApprovalBadge";
@@ -10,14 +11,23 @@ import BotApprovalBadge from "~/components/unique/BotApprovalBadge";
 export default function ConfigBotDetail(props: { returnToListProxy: () => void; bot?: TBotListItem }) {
   const [tokenVisible, setTokenVisible] = createSignal(false);
   const [tokenCopied, setTokenCopied] = createSignal(false);
+  // 承認状態は管理者操作で変わり得るため、一覧行の値とは別に取り直して優先する
+  const [remoteBot, setRemoteBot] = createSignal<IBot>();
 
   if (props.bot === undefined) {
     return (
       <p class="text-center">Bot情報が見つかりません。</p>
     )
   }
-  // 選択済みの一覧行をそのまま表示する(編集APIが無いため再取得しない)
+  // 選択済みの一覧行をそのまま表示する（tokenCodeとBot名はこの応答にしか含まれない）
   const bot = props.bot;
+
+  onMount(() => {
+    // 失敗しても一覧行の値で表示を続ける（削除直後の404など）
+    api.bot.getByRemoteUserId({ remoteUserId: bot.remoteUserId })
+      .then((res) => setRemoteBot(res.data))
+      .catch((e) => console.error("ConfigBotDetail :: fetchBot : ", e));
+  });
 
   const copyToken = () => {
     // トークンコードは GET /bot/list の応答にのみ含まれる
@@ -38,7 +48,7 @@ export default function ConfigBotDetail(props: { returnToListProxy: () => void; 
         <div class="shrink min-w-0 ml-auto flex items-center gap-2 w-fit md:max-w-[75%]">
           <p class="truncate">{ bot.remoteUserName ?? "(名称未設定)" }</p>
           <BotApprovalBadge
-            isApproved={bot.isApproved}
+            isApproved={remoteBot()?.isApproved ?? bot.isApproved}
             class="shrink-0"
           />
         </div>
@@ -99,6 +109,11 @@ export default function ConfigBotDetail(props: { returnToListProxy: () => void; 
           <div class="flex items-center w-full gap-2">
             <p class="shrink-0">作成日時</p>
             <p class="ml-auto">{new Date(bot.createdAt).toLocaleString()}</p>
+          </div>
+          <hr />
+          <div class="flex items-center w-full gap-2">
+            <p class="shrink-0">作成者</p>
+            <p class="ml-auto">{useStoreUserinfo.getterUserinfo(bot.createdBy).name}</p>
           </div>
         </Card>
 
