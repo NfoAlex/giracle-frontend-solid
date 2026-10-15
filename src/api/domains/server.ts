@@ -6,7 +6,6 @@ import type {
   IRequestLog,
   IRequestLogCount,
   IServer,
-  TBotListItem,
 } from "~/types/Server.ts";
 import { FETCH_CLIENT } from "../FETCH_CLIENT.ts";
 
@@ -73,63 +72,13 @@ export const server = {
     return res.json();
   },
 
-  getBot: (q: { length?: number; cursorBotId?: string; query?: string }) =>
-    FETCH_CLIENT<{ message: "Bot list fetched"; data: TBotListItem[] }>({
-      url: "/api/bot/list",
-      method: "GET",
-      label: "BOT_LIST",
-      query: q,
-    }),
-
-  getBotAll: (q: { length?: number; query?: string; cursorBotId?: string }) =>
-    FETCH_CLIENT<{ message: "Bot list fetched"; data: TBotListItem[] }>({
-      url: "/api/bot/all",
-      method: "GET",
-      label: "BOT_ALL",
-      query: q,
-    }),
-
-  // リモートユーザーIdからBot情報を取得(作成者表示用)。tokenCodeは含まない
-  getBotByRemoteUserId: (p: { remoteUserId: string }) =>
-    FETCH_CLIENT<{ message: "Bot info"; data: IBot }>({
-      url: `/api/bot/${p.remoteUserId}`,
-      method: "GET",
-      label: "BOT_GET_BY_REMOTE_USER_ID",
-    }),
-
-  putBot: (p: {
-    name: string;
-    // バックエンドは指定時に1文字以上を要求するため、未入力はキー自体を送らない
-    introduction?: string;
-  }) =>
-    FETCH_CLIENT<{
-      message: "Bot created";
-      data: {
-        remoteUser: { id: string; name: string | null; isBot: boolean };
-        bot: TBotListItem;
-      };
-    }>({
-      url: "/api/bot",
-      method: "PUT",
-      label: "BOT_PUT",
-      body: p,
-    }),
-
-  deleteBotById: (p: { botId: string }) =>
-    FETCH_CLIENT<{ message: "Bot deleted" }>({
-      url: "/api/bot",
-      method: "DELETE",
-      label: "BOT_DELETE",
-      body: p,
-    }),
-
-  // 承認状態の変更(manageServer)。enabled=true で承認
-  configureBot: (p: { botId: string; enabled: boolean }) =>
+  // 承認状態の変更(manageServer)。isApproved=true で承認
+  setBotApproved: (p: { botId: string; isApproved: boolean }) =>
     FETCH_CLIENT<{ message: "Bot updated"; data: IBot }>({
       url: "/api/server/bot/set-approve",
       method: "POST",
       label: "BOT_SET_APPROVE",
-      body: { botId: p.botId, isApproved: p.enabled },
+      body: { botId: p.botId, isApproved: p.isApproved },
     }),
 
   createInvite: (p: { inviteCode: string; maxUsage?: number }) =>

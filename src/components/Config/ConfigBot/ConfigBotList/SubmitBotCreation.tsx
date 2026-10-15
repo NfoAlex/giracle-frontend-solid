@@ -22,7 +22,7 @@ export default function SubmitBotCreation(props: { dataBinder: (bot: TBotListIte
     setProcessing(true);
     setError(null);
 
-    api.server.putBot({
+    api.bot.create({
       name: botName(),
       // 概要が未入力ならキーごと送らない。
       // バックエンドは指定時に1文字以上を要求するため、空文字を送ると422になる

@@ -80,7 +80,7 @@ export default function UserinfoModalWrapper(props: { children: JSX.Element, use
     const cached = BOT_INFO_CACHE[user().id];
     if (cached) return cached;
 
-    api.server.getBotByRemoteUserId({ remoteUserId: user().id })
+    api.bot.getByRemoteUserId({ remoteUserId: user().id })
       .then((res) => {
         BOT_INFO_CACHE[user().id] = res.data;
         // 上限150件を超えたら挿入順（＝古い順）の先頭を1件削除

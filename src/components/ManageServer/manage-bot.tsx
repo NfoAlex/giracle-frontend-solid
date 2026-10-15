@@ -50,7 +50,7 @@ export default function ManageBot() {
       cursorBotId() !== undefined;
 
     try {
-      const res = await api.server.getBotAll({
+      const res = await api.bot.listAll({
         length: PAGE_LENGTH,
         query: trimmedQuery || undefined,
         cursorBotId: useCursor ? cursorBotId() : undefined,

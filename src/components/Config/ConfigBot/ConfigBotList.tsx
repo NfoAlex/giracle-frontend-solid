@@ -44,7 +44,7 @@ export default function ConfigBotList(props: {
       cursorBotId() !== undefined;
 
     try {
-      const res = await api.server.getBot({
+      const res = await api.bot.list({
         length: PAGE_LENGTH,
         query: trimmedQuery || undefined,
         cursorBotId: useCursor ? cursorBotId() : undefined,

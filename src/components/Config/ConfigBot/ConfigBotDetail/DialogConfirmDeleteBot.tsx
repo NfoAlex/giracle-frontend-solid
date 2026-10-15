@@ -24,8 +24,8 @@ export default function DialogConfirmDeleteBot(props: {
   const deleteBot = () => {
     setProcessing(true);
     setError(null);
-    api.server
-      .deleteBotById({ botId: props.botId })
+    api.bot
+      .delete({ botId: props.botId })
       .then(() => {
         // 削除成功 → 親に一覧へ戻すよう伝える
         props.onDeleted();

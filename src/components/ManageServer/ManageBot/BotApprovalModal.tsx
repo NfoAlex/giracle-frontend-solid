@@ -33,7 +33,7 @@ export default function BotApprovalModal(props: {
     setProcessing(true);
     setError(null);
 
-    api.server.configureBot({ botId: bot.id, enabled: next })
+    api.server.setBotApproved({ botId: bot.id, isApproved: next })
       .then(() => props.approvalChanged(bot.id, next))
       .catch((e) => {
         console.error("BotApprovalModal :: changeApproval : ", e);
