@@ -1,4 +1,5 @@
 import type { IBot, TBotListItem } from "~/types/Server.ts";
+import type { IUser } from "~/types/User.ts";
 import { FETCH_CLIENT } from "../FETCH_CLIENT.ts";
 
 export const bot = {
@@ -43,6 +44,14 @@ export const bot = {
       url: "/api/bot",
       method: "PUT",
       label: "BOT_CREATE",
+      body: p,
+    }),
+
+  update: (p: { botId: string; name?: string; selfIntroduction?: string }) =>
+    FETCH_CLIENT<{ message: "Bot user updated"; data: IUser }>({
+      url: "/api/bot",
+      method: "POST",
+      label: "BOT_POST",
       body: p,
     }),
 
