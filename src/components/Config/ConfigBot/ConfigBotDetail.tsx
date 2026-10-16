@@ -26,10 +26,9 @@ export default function ConfigBotDetail(props: { returnToListProxy: () => void; 
   const [remoteBot, setRemoteBot] = createSignal<IBot>();
   // 改名直後の表示値。一覧行の値(props.bot.remoteUserName)は更新されないため上書きする
   const [updatedBotName, setUpdatedBotName] = createSignal<string>();
-  const [nameEditMode, setNameEditMode] = createSignal(false);
-  const [newName, setNewName] = createSignal("");
-  const [introEditMode, setIntroEditMode] = createSignal(false);
-  const [newIntro, setNewIntro] = createSignal("");
+  // 編集中の項目と入力値。同時に開けるのは1項目のみ
+  const [editing, setEditing] = createSignal<"name" | "intro" | null>(null);
+  const [draft, setDraft] = createSignal("");
   const [processing, setProcessing] = createSignal(false);
   const [error, setError] = createSignal<string | null>(null);
 
@@ -67,50 +66,40 @@ export default function ConfigBotDetail(props: { returnToListProxy: () => void; 
     });
   };
 
-  const enterNameEdit = () => {
+  const enterEdit = (target: "name" | "intro") => {
     setError(null);
-    setNewName(displayName());
-    setNameEditMode(true);
+    setDraft(
+      target === "name"
+        ? displayName()
+        : useStoreUserinfo.getterUserinfo(bot.remoteUserId).selfIntroduction,
+    );
+    setEditing(target);
   };
 
-  const enterIntroEdit = () => {
-    setError(null);
-    setNewIntro(useStoreUserinfo.getterUserinfo(bot.remoteUserId).selfIntroduction);
-    setIntroEditMode(true);
-  };
-
-  /** Bot名の保存。name未指定ならバックエンドは改名扱いにしないため、名前だけを送る */
-  const saveName = () => {
-    if (processing() || newName().length < 2) return;
+  /** 編集中の項目を保存する。name未指定ならバックエンドは改名扱いにしないため、対象の項目だけを送る */
+  const save = () => {
+    const target = editing();
+    if (target === null || processing()) return;
+    // 名前はバックエンドの最小長(2)に合わせる。概要は空文字可（クリア）
+    if (target === "name" && draft().length < 2) return;
     setProcessing(true);
     setError(null);
-    api.bot.update({ botId: bot.id, name: newName() })
+    api.bot.update(
+      target === "name"
+        ? { botId: bot.id, name: draft() }
+        : { botId: bot.id, selfIntroduction: draft() },
+    )
       .then((res) => {
-        setUpdatedBotName(res.data.name ?? newName());
+        if (target === "name") {
+          setUpdatedBotName(res.data.name ?? draft());
+          // 改名するとバックエンドで承認が取り消されるため、承認状態を取り直す
+          fetchRemoteBot();
+        }
         applyUpdatedUser(res.data);
-        // 改名するとバックエンドで承認が取り消されるため、承認状態を取り直す
-        fetchRemoteBot();
-        setNameEditMode(false);
+        setEditing(null);
       })
       .catch((e) => {
-        console.error("ConfigBotDetail :: saveName : ", e);
-        setError(e instanceof Error ? e.message : String(e));
-      })
-      .finally(() => setProcessing(false));
-  };
-
-  /** 自己紹介の保存。空文字はバックエンドが許容する（概要のクリア可） */
-  const saveIntro = () => {
-    if (processing()) return;
-    setProcessing(true);
-    setError(null);
-    api.bot.update({ botId: bot.id, selfIntroduction: newIntro() })
-      .then((res) => {
-        applyUpdatedUser(res.data);
-        setIntroEditMode(false);
-      })
-      .catch((e) => {
-        console.error("ConfigBotDetail :: saveIntro : ", e);
+        console.error("ConfigBotDetail :: save : ", e);
         setError(e instanceof Error ? e.message : String(e));
       })
       .finally(() => setProcessing(false));
@@ -191,14 +180,14 @@ export default function ConfigBotDetail(props: { returnToListProxy: () => void; 
           <div class="flex items-center w-full gap-2">
             <p class="shrink-0">Bot名</p>
             <Show
-              when={nameEditMode()}
+              when={editing() === "name"}
               fallback={
                 <span class="ml-auto min-w-0 flex items-center gap-1">
                   <p class="truncate">{displayName()}</p>
                   <Button
                     size="icon"
                     variant="ghost"
-                    onClick={enterNameEdit}
+                    onClick={() => enterEdit("name")}
                     aria-label="Bot名を変更"
                   >
                     <IconPencil />
@@ -211,18 +200,18 @@ export default function ConfigBotDetail(props: { returnToListProxy: () => void; 
                   <TextFieldInput
                     maxLength={32}
                     placeholder="新しいBot名"
-                    value={newName()}
-                    onInput={(e) => setNewName(e.currentTarget.value)}
+                    value={draft()}
+                    onInput={(e) => setDraft(e.currentTarget.value)}
                     onKeyDown={(e) => {
-                      if (e.key === "Enter") saveName();
+                      if (e.key === "Enter") save();
                     }}
                   />
                 </TextField>
                 <Button
                   size="icon"
                   variant="ghost"
-                  onClick={saveName}
-                  disabled={newName().length < 2 || processing()}
+                  onClick={save}
+                  disabled={draft().length < 2 || processing()}
                   aria-label="Bot名の変更を保存"
                 >
                   <IconCheck />
@@ -230,7 +219,7 @@ export default function ConfigBotDetail(props: { returnToListProxy: () => void; 
                 <Button
                   size="icon"
                   variant="ghost"
-                  onClick={() => setNameEditMode(false)}
+                  onClick={() => setEditing(null)}
                   disabled={processing()}
                   aria-label="Bot名の変更をキャンセル"
                 >
@@ -243,7 +232,7 @@ export default function ConfigBotDetail(props: { returnToListProxy: () => void; 
           <div class="flex items-center w-full gap-2">
             <p class="shrink-0">概要</p>
             <Show
-              when={introEditMode()}
+              when={editing() === "intro"}
               fallback={
                 <span class="ml-auto min-w-0 flex items-center gap-1">
                   <p class="whitespace-pre-wrap break-all text-right">
@@ -252,7 +241,7 @@ export default function ConfigBotDetail(props: { returnToListProxy: () => void; 
                   <Button
                     size="icon"
                     variant="ghost"
-                    onClick={enterIntroEdit}
+                    onClick={() => enterEdit("intro")}
                     aria-label="自己紹介を変更"
                   >
                     <IconPencil />
@@ -265,14 +254,14 @@ export default function ConfigBotDetail(props: { returnToListProxy: () => void; 
                   <TextFieldTextArea
                     maxLength={128}
                     placeholder="新しい自己紹介文"
-                    value={newIntro()}
-                    onInput={(e) => setNewIntro(e.currentTarget.value)}
+                    value={draft()}
+                    onInput={(e) => setDraft(e.currentTarget.value)}
                   />
                 </TextField>
                 <Button
                   size="icon"
                   variant="ghost"
-                  onClick={saveIntro}
+                  onClick={save}
                   disabled={processing()}
                   aria-label="自己紹介の変更を保存"
                 >
@@ -281,7 +270,7 @@ export default function ConfigBotDetail(props: { returnToListProxy: () => void; 
                 <Button
                   size="icon"
                   variant="ghost"
-                  onClick={() => setIntroEditMode(false)}
+                  onClick={() => setEditing(null)}
                   disabled={processing()}
                   aria-label="自己紹介の変更をキャンセル"
                 >
