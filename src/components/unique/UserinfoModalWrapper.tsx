@@ -3,7 +3,7 @@ import { Dialog, DialogContent, DialogTrigger } from "~/components/ui/dialog.tsx
 import { useStoreUserinfo, storeUserinfo, storeUserOnline } from "~/stores/Userinfo.store.ts";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar.tsx";
 import { Badge } from "~/components/ui/badge.tsx";
-import { IconCircleFilled, IconPencil, IconPlus } from "@tabler/icons-solidjs";
+import { IconCheck, IconCircleFilled, IconCopy, IconPencil, IconPlus } from "@tabler/icons-solidjs";
 import { useStoreMyUserinfo, storeMyUserinfo } from "~/stores/MyUserinfo.store.ts";
 import { Button } from "~/components/ui/button.tsx";
 import { A } from "@solidjs/router";
@@ -25,6 +25,7 @@ const BOT_INFO_CACHE = createMutable<Record<IBot["id"], IBot>>({});
 export default function UserinfoModalWrapper(props: { children: JSX.Element, userId: string, class?: string }) {
   const user = () => useStoreUserinfo.getterUserinfo(props.userId);
   const [open, setOpen] = createSignal(false);
+  const [copied, setCopied] = createSignal(false);
 
   // ロールリスト用
   const [, setOpenRoleList] = createSignal(false);
@@ -92,6 +93,16 @@ export default function UserinfoModalWrapper(props: { children: JSX.Element, use
 
   }
 
+  /**
+   * ユーザーIDをクリップボードへコピー
+   */
+  const copyUserId = () => {
+    navigator.clipboard.writeText(props.userId).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  }
+
   return (
     <Dialog open={open()} onOpenChange={setOpen}>
       <DialogContent class="p-0 max-h-[90vh] flex flex-col overflow-y-auto">
@@ -151,19 +162,20 @@ export default function UserinfoModalWrapper(props: { children: JSX.Element, use
 
             {/* タブ */}
             <Tabs defaultValue="overview">
-              <Show
-                when={
-                  user().isBot
-                    // Botの管理はサーバー管理者のみ可能。manageUserでは承認できない
-                    ? useStoreMyUserinfo.getRolePower("manageServer")
-                    : useStoreMyUserinfo.getRolePower("manageUser")
-                }
-              >
-                <TabsList class="w-full">
-                  <TabsTrigger value="overview" class="w-full">概要</TabsTrigger>
+              <TabsList class="w-full">
+                <TabsTrigger value="overview" class="w-full">概要</TabsTrigger>
+                <Show
+                  when={
+                    user().isBot
+                      // Botの管理はサーバー管理者のみ可能。manageUserでは承認できない
+                      ? useStoreMyUserinfo.getRolePower("manageServer")
+                      : useStoreMyUserinfo.getRolePower("manageUser")
+                  }
+                >
                   <TabsTrigger value="manage" class="w-full">管理</TabsTrigger>
-                </TabsList>
-              </Show>
+                </Show>
+                <TabsTrigger value="id" class="w-full">ID</TabsTrigger>
+              </TabsList>
 
               {/* 概要 */}
               <TabsContent value="overview" class="flex flex-col gap-2">
@@ -268,6 +280,27 @@ export default function UserinfoModalWrapper(props: { children: JSX.Element, use
                     <Label class={"text-border"}>ダブルクリックで操作</Label>
                   </Card>
                 }
+              </TabsContent>
+
+              {/* ID */}
+              <TabsContent value="id" class="flex flex-col gap-2">
+                <div>
+                  <Label>ユーザーID</Label>
+                  <Card class="px-4 py-2 flex items-center gap-2">
+                    <code class="grow min-w-0 break-all text-sm">{props.userId}</code>
+                    <Button
+                      size="icon"
+                      variant={"outline"}
+                      class="shrink-0"
+                      title="ユーザーIDをコピー"
+                      onclick={copyUserId}
+                    >
+                      <Show when={copied()} fallback={<IconCopy size={16} />}>
+                        <IconCheck size={16} />
+                      </Show>
+                    </Button>
+                  </Card>
+                </div>
               </TabsContent>
             </Tabs>
           </div>
