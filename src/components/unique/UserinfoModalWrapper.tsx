@@ -208,49 +208,53 @@ export default function UserinfoModalWrapper(props: { children: JSX.Element, use
                 </Show>
 
                 {/* ロール */}
-                <Show when={!user().isBot}>
-                  <div>
-                    <Label>ロール</Label>
-                    <div class="flex flex-wrap gap-1">
-                      <For each={storeUserinfo[user().id].RoleLink}>
-                        {(role) =>
-                          <RoleChip
-                            deletable={useStoreMyUserinfo.getRolePower("manageRole")}
-                            roleId={role.roleId}
-                            userId={props.userId}
-                            onDelete={(roleId) => unlinkRole(roleId)}
-                          />
-                        }
-                      </For>
-                    </div>
-                    <Show when={useStoreMyUserinfo.getRolePower("manageRole")}>
-                      {/* ロール追加ボタン */}
-                      <Popover onOpenChange={setOpenRoleList}>
-                        <PopoverTrigger>
-                          <Badge
-                            variant={"outline"}
-                            class="cursor-pointer h-full mt-1"
-                          >
-                            <IconPlus size={16} />
-                          </Badge>
-                        </PopoverTrigger>
-                        <PopoverContent class="w-fit">
-                          <div class="max-h-[25vh] max-w-[75vw] overflow-y-auto flex flex-col gap-1">
-                            <For each={roles}>
-                              {(role) => //ロールリンクされていないものだけ表示
-                                !storeUserinfo[user().id].RoleLink.some((rl) => rl.roleId === role.id)
-                                &&
-                                <span onclick={() => linkRole(role.id)} class="cursor-pointer pr-2">
-                                  <RoleChip deletable={false} roleId={role.id} />
-                                </span>
-                              }
-                            </For>
-                          </div>
-                        </PopoverContent>
-                      </Popover>
-                    </Show>
+                <div>
+                  <Label>ロール</Label>
+                  <div class="flex flex-wrap gap-1">
+                    { //ロールが無いとき用表示
+                      storeUserinfo[user().id].RoleLink.length === 0
+                      &&
+                      <span class="text-border">ロールがありません</span>
+                    }
+
+                    <For each={storeUserinfo[user().id].RoleLink}>
+                      {(role) =>
+                        <RoleChip
+                          deletable={useStoreMyUserinfo.getRolePower("manageRole")}
+                          roleId={role.roleId}
+                          userId={props.userId}
+                          onDelete={(roleId) => unlinkRole(roleId)}
+                        />
+                      }
+                    </For>
                   </div>
-                </Show>
+                  <Show when={useStoreMyUserinfo.getRolePower("manageRole")}>
+                    {/* ロール追加ボタン */}
+                    <Popover onOpenChange={setOpenRoleList}>
+                      <PopoverTrigger>
+                        <Badge
+                          variant={"outline"}
+                          class="cursor-pointer h-full mt-1"
+                        >
+                          <IconPlus size={16} />
+                        </Badge>
+                      </PopoverTrigger>
+                      <PopoverContent class="w-fit">
+                        <div class="max-h-[25vh] max-w-[75vw] overflow-y-auto flex flex-col gap-1">
+                          <For each={roles}>
+                            {(role) => //ロールリンクされていないものだけ表示
+                              !storeUserinfo[user().id].RoleLink.some((rl) => rl.roleId === role.id)
+                              &&
+                              <span onclick={() => linkRole(role.id)} class="cursor-pointer pr-2">
+                                <RoleChip deletable={false} roleId={role.id} />
+                              </span>
+                            }
+                          </For>
+                        </div>
+                      </PopoverContent>
+                    </Popover>
+                  </Show>
+                </div>
               </TabsContent>
 
               {/* 管理 */}
