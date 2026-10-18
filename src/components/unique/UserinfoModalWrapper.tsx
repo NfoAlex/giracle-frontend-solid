@@ -170,7 +170,15 @@ export default function UserinfoModalWrapper(props: { children: JSX.Element, use
                 {/* 自己紹介 */}
                 <div>
                   <Label>自己紹介</Label>
-                  <Card class="px-4 py-2">{storeUserinfo[user().id].selfIntroduction}</Card>
+                  <Card class="px-4 py-2">
+                    {
+                      storeUserinfo[user().id].selfIntroduction.length !== 0
+                      ?
+                        storeUserinfo[user().id].selfIntroduction
+                      :
+                        <span class="text-border">自己紹介文がありません</span>
+                    }
+                  </Card>
                 </div>
 
                 {/* Botユーザー用の作成者 */}
