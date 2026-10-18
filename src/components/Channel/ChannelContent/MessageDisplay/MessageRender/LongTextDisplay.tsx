@@ -4,6 +4,7 @@ import { createSignal, For, Show } from "solid-js";
 import { Button } from "~/components/ui/button.tsx";
 import { Badge } from "~/components/ui/badge.tsx";
 import UserinfoModalWrapper from "~/components/unique/UserinfoModalWrapper.tsx";
+import BotBadge from "~/components/unique/BotBadge.tsx";
 import { Avatar, AvatarImage } from "~/components/ui/avatar.tsx";
 import { useStoreUserinfo } from "~/stores/Userinfo.store.ts";
 import { IconBrowserMaximize } from "@tabler/icons-solidjs";
@@ -39,6 +40,9 @@ export default function LongTextDisplay(props: { message: IMessage }) {
               </Avatar>
             </UserinfoModalWrapper>
             <p class={"line-clamp-1 truncate"}>{useStoreUserinfo.getterUserinfo(props.message.userId).name}</p>
+            <Show when={useStoreUserinfo.getterUserinfo(props.message.userId).isBot}>
+              <BotBadge />
+            </Show>
             <Badge variant={"secondary"} class={"ml-auto"}>{new Date(props.message.createdAt).toLocaleString()}</Badge>
           </span>
           <hr />

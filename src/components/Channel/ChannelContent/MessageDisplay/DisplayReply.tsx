@@ -1,6 +1,7 @@
-import { createMemo, Match, Switch } from "solid-js";
+import { createMemo, Match, Show, Switch } from "solid-js";
 import { Avatar, AvatarImage, AvatarFallback } from "~/components/ui/avatar.tsx";
 import UserinfoModalWrapper from "~/components/unique/UserinfoModalWrapper.tsx";
+import BotBadge from "~/components/unique/BotBadge.tsx";
 import { useStoreUserinfo } from "~/stores/Userinfo.store.ts";
 import { IconCornerUpRight } from "@tabler/icons-solidjs";
 import { storeMyUserinfo } from "~/stores/MyUserinfo.store.ts";
@@ -57,6 +58,9 @@ export default function DisplayReply(props: { replyingMessageId?: string | null,
               <span class="font-bold">
                 {useStoreUserinfo.getterUserinfo(message()!.userId).name}
               </span>
+              <Show when={useStoreUserinfo.getterUserinfo(message()!.userId).isBot}>
+                <BotBadge />
+              </Show>
             </UserinfoModalWrapper>
             <span onClick={jumpToMessage} class="shrink truncate line-clamp-1 cursor-pointer">
               <span class="pointer-events-none">

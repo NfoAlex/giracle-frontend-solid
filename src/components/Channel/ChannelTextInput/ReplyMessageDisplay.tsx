@@ -1,4 +1,4 @@
-import { createMemo } from "solid-js";
+import { createMemo, Show } from "solid-js";
 import { IconCornerUpLeft, IconX } from "@tabler/icons-solidjs";
 import { IMessage } from "~/types/Message.ts";
 import { storeHistory } from "~/stores/History.store.ts";
@@ -7,6 +7,7 @@ import { Card } from "~/components/ui/card.tsx";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar.tsx";
 import { useStoreUserinfo } from "~/stores/Userinfo.store.ts";
 import { Badge } from "~/components/ui/badge.tsx";
+import BotBadge from "~/components/unique/BotBadge.tsx";
 
 export default function ReplyMessageDisplay(props: {messageId: string, channelId: string, onRemove: () => void}) {
 
@@ -51,6 +52,9 @@ export default function ReplyMessageDisplay(props: {messageId: string, channelId
         <p class="truncate shrink-0 font-bold" style="max-width: 25%">
           { useStoreUserinfo.getterUserinfo(getReplyingMessage().userId).name || "不明なユーザー" }
         </p>
+        <Show when={useStoreUserinfo.getterUserinfo(getReplyingMessage().userId).isBot}>
+          <BotBadge />
+        </Show>
         {
           getReplyingMessage().MessageFileAttached.length > 0
           &&

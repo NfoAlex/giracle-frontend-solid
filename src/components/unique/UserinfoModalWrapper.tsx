@@ -10,6 +10,7 @@ import { A } from "@solidjs/router";
 import { Label } from "~/components/ui/label.tsx";
 import { Card } from "~/components/ui/card.tsx";
 import RoleChip from "~/components/unique/RoleChip";
+import BotBadge from "~/components/unique/BotBadge.tsx";
 import { Popover, PopoverContent, PopoverTrigger } from "~/components/ui/popover";
 import type { IRole } from "~/types/Role.ts";
 import { storeRoleInfo } from "~/stores/RoleInfo.store.ts";
@@ -118,10 +119,7 @@ export default function UserinfoModalWrapper(props: { children: JSX.Element, use
 
             <div class="flex items-center ml-auto gap-2">
               <Show when={user().isBot}>
-                <Badge variant={"secondary"} class={"flex items-center gap-2"}>
-                  <IconCircleFilled size={12} color={"blue"} />
-                  <p>Bot</p>
-                </Badge>
+                <BotBadge variant={"secondary"} class={"gap-2"} />
               </Show>
               <Show when={storeUserOnline.includes(props.userId)}>
                 <Badge variant={"secondary"} class={"flex items-center gap-2"}>

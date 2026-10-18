@@ -9,8 +9,7 @@ import URLPreview from "./MessageRender/URLPreview.tsx";
 import LongTextDisplay from "./MessageRender/LongTextDisplay.tsx";
 import RenderEmojiReactions from "./MessageRender/RenderEmojiReactions.tsx";
 import MessageLinkPreview from "./MessageRender/MessageLinkPreview.tsx";
-import { Badge } from "~/components/ui/badge.tsx";
-import { IconCircleFilled } from "@tabler/icons-solidjs";
+import BotBadge from "~/components/unique/BotBadge.tsx";
 
 const messageLinkPattern = /&<([a-f0-9-]+):([a-f0-9-]+)>/g;
 
@@ -67,10 +66,7 @@ export default function MessageRender(props: {
           <span class={"flex items-center gap-2"}>
             <p class="min-w-0 truncate font-bold hover:underline">{useStoreUserinfo.getterUserinfo(props.message.userId).name}</p>
             <Show when={useStoreUserinfo.getterUserinfo(props.message.userId).isBot}>
-              <Badge variant={"outline"} class="shrink-0 flex items-center gap-1">
-                <IconCircleFilled size={12} color={"blue"} />
-                <span>Bot</span>
-              </Badge>
+              <BotBadge />
             </Show>
             <p class="shrink-0 text-sm text-muted-foreground">{displayDate(props.message.createdAt)}</p>
           </span>
