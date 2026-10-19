@@ -13,6 +13,19 @@ import BotApprovalBadge from "~/components/unique/BotApprovalBadge";
 // 1回の取得で読み込むボット数。APIは上限まで返すと続きがある可能性がある
 const PAGE_LENGTH = 50;
 
+/**
+ * 既存一覧へ未取得のBotだけを追加し、APIと同じ作成順(createdAt,id昇順)に並べ直す。
+ * 作成直後のBotを末尾へ足した後に続きを読むと、そのBotだけが新しいページより前に残るため
+ */
+const appendUniqueBots = (prev: TBotListItem[], incoming: TBotListItem[]) => {
+  const known = new Set(prev.map((b) => b.id));
+  return [...prev, ...incoming.filter((b) => !known.has(b.id))].sort(
+    (a, b) =>
+      new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime() ||
+      (a.id < b.id ? -1 : a.id > b.id ? 1 : 0),
+  );
+};
+
 export default function ConfigBotList(props: {
   setActiveBot: (bot: TBotListItem) => void;
 }) {
@@ -51,7 +64,7 @@ export default function ConfigBotList(props: {
       });
 
       if (useCursor) {
-        setMyBots((prev) => [...prev, ...res.data]);
+        setMyBots((prev) => appendUniqueBots(prev, res.data));
       } else {
         setMyBots(res.data);
       }
@@ -83,8 +96,10 @@ export default function ConfigBotList(props: {
    * @param botCreated
    */
   const myBotsBinder = (botCreated: TBotListItem) => {
-    // 一覧は作成順(昇順)なので末尾へ追加する
-    setMyBots((b) => [...b, botCreated]);
+    // 検索中は一覧が絞り込まれているので、条件に合わない新規作成Botを混ぜない
+    if (latestSearchedQuery() !== "") return;
+    // 続き読みで同じBotが返っても重複しないようidで統合し、作成順を保つ
+    setMyBots((prev) => appendUniqueBots(prev, [botCreated]));
   };
 
   onMount(() => {
