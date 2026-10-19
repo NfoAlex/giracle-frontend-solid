@@ -136,8 +136,8 @@ export default function ManageBot() {
         {processing() && bots().length === 0 && (
           <div class="mt-5 text-center">取得中...</div>
         )}
-        {/* ボットが無いときの表示 */}
-        {bots().length === 0 && !processing() && (
+        {/* ボットが無いときの表示。エラー時は空一覧と区別できるよう出さない */}
+        {bots().length === 0 && !processing() && !error() && (
           <div class="mt-5 text-center">ボットがありません。</div>
         )}
 
