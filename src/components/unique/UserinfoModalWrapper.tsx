@@ -21,6 +21,8 @@ import { createMutable } from "solid-js/store";
 
 // createMutable は Map 等の組み込みクラスをラップできない（メソッド呼出時にProxy不一致エラー）ので、キーをBotのidにしたプレーンオブジェクトで保持する
 const BOT_INFO_CACHE = createMutable<Record<IBot["id"], IBot>>({});
+// レンダー中に呼ばれる取得処理の二重発火を防ぐため、飛んでいるリクエストのIDを保持する
+const BOT_INFO_PENDING = new Set<IBot["id"]>();
 
 export default function UserinfoModalWrapper(props: { children: JSX.Element, userId: string, class?: string }) {
   const user = () => useStoreUserinfo.getterUserinfo(props.userId);
@@ -79,18 +81,21 @@ export default function UserinfoModalWrapper(props: { children: JSX.Element, use
    * Botユーザーだった時用の取得ハンドラ
    */
   const botInfoGetter = () => {
-    const cached = BOT_INFO_CACHE[user().id];
+    const botUserId = user().id;
+    const cached = BOT_INFO_CACHE[botUserId];
     if (cached) return cached;
+    if (BOT_INFO_PENDING.has(botUserId)) return;
 
-    api.bot.getByRemoteUserId({ remoteUserId: user().id })
+    BOT_INFO_PENDING.add(botUserId);
+    api.bot.getByRemoteUserId({ remoteUserId: botUserId })
       .then((res) => {
-        BOT_INFO_CACHE[user().id] = res.data;
+        BOT_INFO_CACHE[botUserId] = res.data;
         // 上限150件を超えたら挿入順（＝古い順）の先頭を1件削除
         const keys = Object.keys(BOT_INFO_CACHE);
         if (keys.length > 150) delete BOT_INFO_CACHE[keys[0]];
       })
-      .catch((err) => console.error("UserinfoModalWrapper :: fetchBotInfo : e", err));
-
+      .catch((err) => console.error("UserinfoModalWrapper :: fetchBotInfo : e", err))
+      .finally(() => BOT_INFO_PENDING.delete(botUserId));
   }
 
   /**
