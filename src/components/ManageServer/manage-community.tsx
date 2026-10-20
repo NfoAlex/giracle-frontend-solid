@@ -20,6 +20,7 @@ export default function ManageCommunity() {
     MessageMaxLength: 0,
     defaultJoinChannel: [],
     MessageMaxFileSize: 0,
+    BotEnabled: false
   });
   const configChanged = () => {
     return JSON.stringify(serverConfig()) !== JSON.stringify(storeServerinfo);
@@ -172,6 +173,22 @@ export default function ManageCommunity() {
 
             <p class="font-bold mb-2">デフォルトで参加するチャンネル</p>
             <p class="italic">todo...</p>
+
+            <hr class="my-6" />
+
+            <p class="font-bold mb-2">Bot設定</p>
+            <span class="flex flex-col gap-2">
+              <Switch
+                checked={serverConfig().BotEnabled}
+                onChange={(e) => setServerConfig({...serverConfig(), BotEnabled: e.valueOf()})}
+                class="flex items-center space-x-2"
+              >
+                <SwitchControl>
+                  <SwitchThumb />
+                </SwitchControl>
+                <SwitchLabel>Botの利用・作成を許可</SwitchLabel>
+              </Switch>
+            </span>
           </CardContent>
         </Card>
       </div>

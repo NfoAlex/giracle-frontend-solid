@@ -9,7 +9,22 @@ export interface IServer {
   MessageMaxLength: number;
   MessageMaxFileSize: number;
   defaultJoinChannel: IChannel[];
+  BotEnabled: boolean;
 }
+
+export interface IBot {
+  id: string;
+  remoteUserId: string;
+  createdAt: Date;
+  createdBy: string;
+  isApproved: boolean;
+}
+
+// Bot一覧(GET /bot/list, GET /bot/all)の1行。tokenCode は /bot/list のみ返す
+export type TBotListItem = IBot & {
+  remoteUserName: string | null;
+  tokenCode?: string;
+};
 
 export interface IInvite {
   inviteCode: string;

@@ -5,6 +5,7 @@ import { Button } from "~/components/ui/button.tsx";
 import { Card } from "~/components/ui/card.tsx";
 import { TextField, TextFieldInput, TextFieldLabel } from "~/components/ui/text-field.tsx";
 import UserinfoModalWrapper from "~/components/unique/UserinfoModalWrapper.tsx";
+import BotBadge from "~/components/unique/BotBadge.tsx";
 import { useStoreUserinfo } from "~/stores/Userinfo.store.ts";
 import type { IUser } from "~/types/User.ts";
 import InviteUserModal from "./ChannelMembers/InviteUserModal.tsx";
@@ -104,6 +105,9 @@ export default function ChannelMembers(props: {channelId: string}) {
                       <AvatarImage src={"/api/user/icon/" + user.id} alt={user.id} />
                     </Avatar>
                     { useStoreUserinfo.getterUserinfo(user.id).name }
+                    <Show when={useStoreUserinfo.getterUserinfo(user.id).isBot}>
+                      <BotBadge />
+                    </Show>
                   </span>
                 </UserinfoModalWrapper>
 

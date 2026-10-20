@@ -1,5 +1,6 @@
-import { IconBell, IconEye, IconHash, IconKey, IconUser } from "@tabler/icons-solidjs";
+import { IconBell, IconEye, IconHash, IconKey, IconRobot, IconUser } from "@tabler/icons-solidjs";
 import { createEffect, createSignal, on } from "solid-js";
+import ConfigBot from "~/components/Config/ConfigBot";
 import ConfigChat from "~/components/Config/ConfigChat.tsx";
 import ConfigDisplay from "~/components/Config/ConfigDisplay.tsx";
 import ConfigNotification from "~/components/Config/ConfigNotification.tsx";
@@ -12,8 +13,10 @@ import SidebarTriggerWithDot from "~/components/unique/SidebarTriggerWithDot.tsx
 import { storeAppStatus } from "~/stores/AppStatus.store.ts";
 import { storeClientConfig } from "~/stores/ClientConfig.store.ts";
 
+type TConfigTab = "profile" | "session" | "chat" | "notification" | "display" | "bot";
+
 export default function Config() {
-  const [displayMode, setDisplayMode] = createSignal<"profile" | "session" | "chat" | "notification" | "display">("profile");
+  const [displayMode, setDisplayMode] = createSignal<TConfigTab>("profile");
 
   //設定の変更を監視してLocalStorageに保存する
   createEffect(on(
@@ -45,7 +48,7 @@ export default function Config() {
             value={displayMode()}
             defaultValue={"profile"}
             onChange={setDisplayMode}
-            options={["profile", "session", "chat", "notification", "display"]}
+            options={["profile", "session", "chat", "notification", "display", "bot"]}
             itemComponent={(props) =>
               <SelectItem item={props.item}>
                 {props.item.textValue === "profile" && "プロフィール"}
@@ -53,11 +56,12 @@ export default function Config() {
                 {props.item.textValue === "chat" && "会話"}
                 {props.item.textValue === "notification" && "通知"}
                 {props.item.textValue === "display" && "表示"}
+                {props.item.textValue === "bot" && "Bot管理"}
               </SelectItem>
             }
           >
             <SelectTrigger aria-label="manage-display-mode">
-              <SelectValue<"profile" | "session" | "chat" | "notification" | "display">>
+              <SelectValue<TConfigTab>>
                 {
                   (state) =>
                   <span class="flex items-center">
@@ -66,6 +70,7 @@ export default function Config() {
                     { state.selectedOption() === "chat" && <p>会話</p> }
                     { state.selectedOption() === "notification" && <p>通知</p> }
                     { state.selectedOption() === "display" && <p>表示</p> }
+                    { state.selectedOption() === "bot" && <p>Bot管理</p> }
                   </span>
                 }
               </SelectValue>
@@ -117,6 +122,14 @@ export default function Config() {
               <IconEye />
               表示
             </SidebarMenuButton>
+            <SidebarMenuButton
+              onClick={()=>setDisplayMode("bot")}
+              variant={displayMode()==="bot"?"outline":"default"}
+              size={"lg"}
+            >
+              <IconRobot />
+              Bot管理
+            </SidebarMenuButton>
           </Card>
         </div>
 
@@ -126,6 +139,7 @@ export default function Config() {
           { displayMode()==="chat" && <ConfigChat /> }
           { displayMode()==="display" && <ConfigDisplay /> }
           { displayMode()==="notification" && <ConfigNotification /> }
+          { displayMode()==="bot" && <ConfigBot /> }
         </div>
 
       </div>

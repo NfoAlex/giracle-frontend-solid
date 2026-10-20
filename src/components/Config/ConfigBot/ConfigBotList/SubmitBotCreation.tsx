@@ -1,0 +1,110 @@
+import { IconAlertCircle, IconPlus } from "@tabler/icons-solidjs";
+import { createSignal, Show } from "solid-js";
+import { api } from "~/api";
+import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert";
+import { Button } from "~/components/ui/button";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogTitle, DialogTrigger } from "~/components/ui/dialog";
+import { TextField, TextFieldInput, TextFieldLabel, TextFieldTextArea } from "~/components/ui/text-field";
+import type { TBotListItem } from "~/types/Server";
+
+export default function SubmitBotCreation(props: {
+  dataBinder: (bot: TBotListItem) => void;
+  /** BotEnabled=false のときに作成させない */
+  disabled?: boolean;
+}) {
+  const [botName, setBotName] = createSignal<string>("");
+  const [description, setDescription] = createSignal<string>("");
+  const [open, setOpen] = createSignal(false); //ダイアログの開閉
+  const [processing, setProcessing] = createSignal(false);
+  const [error, setError] = createSignal<string | null>(null);
+
+  /**
+   * bot作成
+   */
+  const createBotRequest = () => {
+    if (processing()) return;
+    setProcessing(true);
+    setError(null);
+
+    api.bot.create({
+      name: botName(),
+      // 概要が未入力ならキーごと送らない。
+      // バックエンドは指定時に1文字以上を要求するため、空文字を送ると422になる
+      introduction: description() || undefined,
+    })
+      .then((r) => {
+        // PUT /bot の応答は BotManage 行そのもので remoteUserName を含まないため、
+        // 同じ応答の remoteUser.name から補う
+        props.dataBinder({
+          ...r.data.bot,
+          remoteUserName: r.data.remoteUser.name,
+        }); //親のBot一覧に追加する
+        setBotName("");
+        setDescription("");
+        setOpen(false); //ダイアログを閉じる
+      })
+      .catch((err) => {
+        console.error("SubmitBotCreation :: createBotRequest : err ->", err);
+        setError(err instanceof Error ? err.message : String(err));
+      })
+      .finally(() => {
+        setProcessing(false);
+      });
+  }
+
+  return (
+    <Dialog open={open()} onOpenChange={setOpen}>
+      <DialogContent>
+        <DialogTitle>
+          Botの作成
+        </DialogTitle>
+        <DialogDescription class="flex flex-col gap-4">
+          <TextField class="grid w-full items-center gap-2">
+            <TextFieldLabel for="bot-name">Bot名</TextFieldLabel>
+            <TextFieldInput
+              id="bot-name"
+              type="text"
+              placeholder="Bot名"
+              maxLength={32}
+              value={botName()}
+              onInput={(e)=>setBotName(e.currentTarget.value)}
+            />
+            <p class="text-xs text-muted-foreground text-right">
+              {botName().length}/32
+            </p>
+          </TextField>
+          <TextField class="grid w-full items-center gap-2">
+            <TextFieldLabel for="bot-introduction">概要</TextFieldLabel>
+            <TextFieldTextArea
+              id="bot-introduction"
+              placeholder="概要"
+              maxLength={128}
+              value={description()}
+              onInput={(e)=>setDescription(e.currentTarget.value)}
+            />
+          </TextField>
+        </DialogDescription>
+        <Show when={error()}>
+          <Alert variant="destructive">
+            <IconAlertCircle class="size-6" />
+            <AlertTitle>エラー</AlertTitle>
+            <AlertDescription>内容: {error()}</AlertDescription>
+          </Alert>
+        </Show>
+        <DialogFooter>
+          <Button
+            onClick={createBotRequest}
+            disabled={botName() === "" || processing()}
+            type="submit"
+          >作成</Button>
+        </DialogFooter>
+      </DialogContent>
+      <DialogTrigger disabled={props.disabled}>
+        <Button class="" disabled={props.disabled}>
+          <IconPlus />
+          ボットを作成
+        </Button>
+      </DialogTrigger>
+    </Dialog>
+  );
+}

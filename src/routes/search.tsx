@@ -1,6 +1,6 @@
 import { A } from "@solidjs/router";
 import { IconArrowRight, IconSearch } from "@tabler/icons-solidjs";
-import { createEffect, createMemo, createSignal, For } from "solid-js";
+import { createEffect, createMemo, createSignal, For, Show } from "solid-js";
 import { api } from "~/api/index.ts";
 import MessageRender from "~/components/Channel/ChannelContent/MessageDisplay/MessageRender.tsx";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar.tsx";
@@ -9,6 +9,7 @@ import { Card } from "~/components/ui/card.tsx";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~/components/ui/select.tsx";
 import { TextField, TextFieldInput } from "~/components/ui/text-field.tsx";
 import SidebarTriggerWithDot from "~/components/unique/SidebarTriggerWithDot.tsx";
+import BotBadge from "~/components/unique/BotBadge.tsx";
 import UserinfoModalWrapper from "~/components/unique/UserinfoModalWrapper.tsx";
 import { useStoreChannelInfo } from "~/stores/ChannelInfo.store.ts";
 import { storeMyUserinfo } from "~/stores/MyUserinfo.store.ts";
@@ -212,6 +213,9 @@ export default function Search() {
                       <AvatarFallback>{useStoreUserinfo.getterUserinfo(message.userId).name[0]}</AvatarFallback>
                     </Avatar>
                     <p>{useStoreUserinfo.getterUserinfo(message.userId).name}</p>
+                    <Show when={useStoreUserinfo.getterUserinfo(message.userId).isBot}>
+                      <BotBadge />
+                    </Show>
                   </UserinfoModalWrapper>
                 </span>
                 <span class={"grow"}>

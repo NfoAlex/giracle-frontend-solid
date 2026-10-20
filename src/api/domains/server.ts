@@ -1,6 +1,12 @@
 import type { IChannel } from "~/types/Channel.ts";
 import type { ICustomEmoji } from "~/types/Message.ts";
-import type { IInvite, IRequestLog, IRequestLogCount, IServer } from "~/types/Server.ts";
+import type {
+  IBot,
+  IInvite,
+  IRequestLog,
+  IRequestLogCount,
+  IServer,
+} from "~/types/Server.ts";
 import { FETCH_CLIENT } from "../FETCH_CLIENT.ts";
 
 export const server = {
@@ -34,6 +40,7 @@ export const server = {
       RegisterInviteOnly?: boolean | undefined;
       RegisterAnnounceChannelId?: string | undefined;
       MessageMaxLength?: number | undefined;
+      BotEnabled?: boolean;
     };
   }> => {
     let FLAG_RECEIVED = false;
@@ -64,6 +71,15 @@ export const server = {
     if (!res.ok) throw new Error(await res.text());
     return res.json();
   },
+
+  // 承認状態の変更(manageServer)。isApproved=true で承認
+  setBotApproved: (p: { botId: string; isApproved: boolean }) =>
+    FETCH_CLIENT<{ message: "Bot updated"; data: IBot }>({
+      url: "/api/server/bot/set-approve",
+      method: "POST",
+      label: "BOT_SET_APPROVE",
+      body: { botId: p.botId, isApproved: p.isApproved },
+    }),
 
   createInvite: (p: { inviteCode: string; maxUsage?: number }) =>
     FETCH_CLIENT<{ message: "Server invite created"; data: IInvite }>({
@@ -116,10 +132,7 @@ export const server = {
       label: "SERVER_GET_INVITE",
     }),
 
-  getLog: (p: {
-    targetDate: Date,
-    cursorLogId?: string
-  }) =>
+  getLog: (p: { targetDate: Date; cursorLogId?: string }) =>
     FETCH_CLIENT<{
       message: string;
       data: IRequestLog[]; //最高50件
@@ -129,9 +142,11 @@ export const server = {
       label: "SERVER_GET_LOG",
       query: {
         targetDate: p.targetDate
-          ? new Date(p.targetDate).toLocaleDateString("sv-SE", { timeZone: "Asia/Tokyo" })
+          ? new Date(p.targetDate).toLocaleDateString("sv-SE", {
+              timeZone: "Asia/Tokyo",
+            })
           : undefined,
-        cursorLogId: p.cursorLogId
+        cursorLogId: p.cursorLogId,
       },
     }),
 
@@ -139,13 +154,13 @@ export const server = {
     type?: "success" | "error";
     userId?: string;
     cursorLogDate?: Date;
-    includeFirstLogs?: boolean
+    includeFirstLogs?: boolean;
   }) =>
     FETCH_CLIENT<{
       message: string;
       data: {
-        group: IRequestLogCount[],
-        firstDayLog: IRequestLog[] | undefined
+        group: IRequestLogCount[];
+        firstDayLog: IRequestLog[] | undefined;
       };
     }>({
       url: "/api/server/log-group",
@@ -155,9 +170,11 @@ export const server = {
         type: p.type,
         userId: p.userId,
         cursorLogDate: p.cursorLogDate
-          ? new Date(p.cursorLogDate).toLocaleDateString("sv-SE", { timeZone: "Asia/Tokyo" })
+          ? new Date(p.cursorLogDate).toLocaleDateString("sv-SE", {
+              timeZone: "Asia/Tokyo",
+            })
           : undefined,
-        includeFirstLogs: p.includeFirstLogs
+        includeFirstLogs: p.includeFirstLogs,
       },
     }),
 };

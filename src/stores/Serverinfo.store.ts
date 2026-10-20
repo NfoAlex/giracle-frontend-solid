@@ -10,6 +10,7 @@ export const [storeServerinfo, setStoreServerinfo] = createStore<IServer>({
   MessageMaxLength: 1,
   MessageMaxFileSize: 1,
   defaultJoinChannel: [],
+  BotEnabled: false,
 });
 
 export namespace useStoreServerinfo {

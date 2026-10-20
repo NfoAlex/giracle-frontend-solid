@@ -9,6 +9,7 @@ import URLPreview from "./MessageRender/URLPreview.tsx";
 import LongTextDisplay from "./MessageRender/LongTextDisplay.tsx";
 import RenderEmojiReactions from "./MessageRender/RenderEmojiReactions.tsx";
 import MessageLinkPreview from "./MessageRender/MessageLinkPreview.tsx";
+import BotBadge from "~/components/unique/BotBadge.tsx";
 
 const messageLinkPattern = /&<([a-f0-9-]+):([a-f0-9-]+)>/g;
 
@@ -59,11 +60,15 @@ export default function MessageRender(props: {
 
   return (
     <div class="w-full">
+      {/* 名前と時間表示 */}
       <Show when={props.displayUserName}>
         <UserinfoModalWrapper userId={props.message.userId}>
           <span class={"flex items-center gap-2"}>
-            <p class="font-bold hover:underline">{useStoreUserinfo.getterUserinfo(props.message.userId).name}</p>
-            <p class="text-sm text-muted-foreground">{displayDate(props.message.createdAt)}</p>
+            <p class="min-w-0 truncate font-bold hover:underline">{useStoreUserinfo.getterUserinfo(props.message.userId).name}</p>
+            <Show when={useStoreUserinfo.getterUserinfo(props.message.userId).isBot}>
+              <BotBadge />
+            </Show>
+            <p class="shrink-0 text-sm text-muted-foreground">{displayDate(props.message.createdAt)}</p>
           </span>
         </UserinfoModalWrapper>
       </Show>
