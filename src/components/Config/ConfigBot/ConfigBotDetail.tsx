@@ -49,9 +49,11 @@ export default function ConfigBotDetail(props: { returnToListProxy: () => void; 
 
   onMount(fetchRemoteBot);
 
+  /** 入力欄の初期値。未設定時にプレースホルダ文字列を本名として保存しないよう空文字にする */
+  const editableName = () => updatedBotName() ?? bot.remoteUserName ?? "";
+
   /** ヘッダー・基本情報・削除ダイアログで共通に使う現在のBot名 */
-  const displayName = () =>
-    updatedBotName() ?? bot.remoteUserName ?? "(名称未設定)";
+  const displayName = () => editableName() || "(名称未設定)";
 
   /** 更新結果をユーザー情報Storeへ反映する（概要の表示はこのStoreを参照している） */
   const applyUpdatedUser = (data: {
@@ -70,7 +72,7 @@ export default function ConfigBotDetail(props: { returnToListProxy: () => void; 
     setError(null);
     setDraft(
       target === "name"
-        ? displayName()
+        ? editableName()
         : useStoreUserinfo.getterUserinfo(bot.remoteUserId).selfIntroduction,
     );
     setEditing(target);
