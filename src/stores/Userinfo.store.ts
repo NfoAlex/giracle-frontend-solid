@@ -13,13 +13,14 @@ export namespace useStoreUserinfo {
    * @param value 挿入/更新するチャンネルデータ。
    */
   export const updateUserinfo = (value: IUser) => {
-    //ユーザー情報をコピーして追記or書き換え
-    const _userinfo = { ...storeUserinfo };
-    _userinfo[value.id] = value;
-    //storeへ格納
-    setStoreUserinfo({
-      ..._userinfo,
-    });
+    // users 行のみの payload（user::ProfileUpdate 等）で RoleLink / ChannelJoin が
+    // 消えないよう、既存値で補ってから格納する
+    setStoreUserinfo(value.id, (prev: IUser | undefined) => ({
+      ...prev,
+      ...value,
+      ChannelJoin: value.ChannelJoin ?? prev?.ChannelJoin ?? [],
+      RoleLink: value.RoleLink ?? prev?.RoleLink ?? [],
+    }));
   };
 
   /**

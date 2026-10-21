@@ -20,7 +20,8 @@ import type { IBot } from "~/types/Server";
 import { createMutable } from "solid-js/store";
 
 // createMutable は Map 等の組み込みクラスをラップできない（メソッド呼出時にProxy不一致エラー）ので、キーをBotのidにしたプレーンオブジェクトで保持する
-const BOT_INFO_CACHE = createMutable<Record<IBot["id"], IBot>>({});
+// undefined=未取得/取得中, null=取得失敗（Bot削除後は GET /bot/:remoteUserId が恒久的に404）
+const BOT_INFO_CACHE = createMutable<Record<IBot["id"], IBot | null | undefined>>({});
 // レンダー中に呼ばれる取得処理の二重発火を防ぐため、飛んでいるリクエストのIDを保持する
 const BOT_INFO_PENDING = new Set<IBot["id"]>();
 
@@ -79,11 +80,12 @@ export default function UserinfoModalWrapper(props: { children: JSX.Element, use
 
   /**
    * Botユーザーだった時用の取得ハンドラ
+   * @returns undefined=取得中 / null=取得失敗 / IBot=取得成功
    */
   const botInfoGetter = () => {
     const botUserId = user().id;
     const cached = BOT_INFO_CACHE[botUserId];
-    if (cached) return cached;
+    if (cached !== undefined) return cached;
     if (BOT_INFO_PENDING.has(botUserId)) return;
 
     BOT_INFO_PENDING.add(botUserId);
@@ -94,7 +96,11 @@ export default function UserinfoModalWrapper(props: { children: JSX.Element, use
         const keys = Object.keys(BOT_INFO_CACHE);
         if (keys.length > 150) delete BOT_INFO_CACHE[keys[0]];
       })
-      .catch((err) => console.error("UserinfoModalWrapper :: fetchBotInfo : e", err))
+      .catch((err) => {
+        console.error("UserinfoModalWrapper :: fetchBotInfo : e", err);
+        // 失敗をキャッシュし、表示が「...」のまま固まらないようにする
+        BOT_INFO_CACHE[botUserId] = null;
+      })
       .finally(() => BOT_INFO_PENDING.delete(botUserId));
   }
 
@@ -108,8 +114,16 @@ export default function UserinfoModalWrapper(props: { children: JSX.Element, use
     });
   }
 
+  /** モーダル開閉。開いた時に前回の取得失敗マーカーを消して再取得させる */
+  const handleOpenChange = (isOpen: boolean) => {
+    if (isOpen && BOT_INFO_CACHE[props.userId] === null) {
+      delete BOT_INFO_CACHE[props.userId];
+    }
+    setOpen(isOpen);
+  };
+
   return (
-    <Dialog open={open()} onOpenChange={setOpen}>
+    <Dialog open={open()} onOpenChange={handleOpenChange}>
       <DialogContent class="p-0 max-h-[90vh] flex flex-col overflow-y-auto">
         <Show when={open() && user()}>
           {
@@ -203,11 +217,13 @@ export default function UserinfoModalWrapper(props: { children: JSX.Element, use
                   <Card class="p-2">
                       作成者: {(() => {
                         const info = botInfoGetter();
-                        return info
-                          ?
-                          (<UserinfoModalWrapper userId={info.createdBy}>{useStoreUserinfo.getterUserinfo(info.createdBy).name}</UserinfoModalWrapper>)
-                          :
-                          "...";
+                        if (info === undefined) return "...";
+                        if (info === null) return "取得できませんでした";
+                        return (
+                          <UserinfoModalWrapper userId={info.createdBy}>
+                            {useStoreUserinfo.getterUserinfo(info.createdBy).name}
+                          </UserinfoModalWrapper>
+                        );
                       })()}
                   </Card>
                 </Show>
