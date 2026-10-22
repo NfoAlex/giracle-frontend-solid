@@ -76,6 +76,10 @@ export default defineConfig({
         target: apiURI,
         ws: true,
       },
+      "/ext/ws": { //Bot用
+        target: apiURI,
+        ws: true,
+      },
     },
   },
   preview: {
