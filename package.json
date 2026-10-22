@@ -1,6 +1,6 @@
 {
   "name": "giracle-front-solid",
-  "version": "0.25.1-alpha",
+  "version": "0.25.2-alpha",
   "description": "",
   "type": "module",
   "scripts": {
@@ -38,7 +38,7 @@
     "sortablejs": "^1.15.7",
     "tailwind-merge": "^3.7.0",
     "tailwindcss-animate": "^1.0.7",
-    "vite": "^8.3.4"
+    "vite": "^8.3.5"
   },
   "packageManager": "pnpm@12.4.1"
 }
