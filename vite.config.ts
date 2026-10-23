@@ -80,6 +80,10 @@ export default defineConfig({
         target: apiURI,
         ws: true,
       },
+      "/ext": {
+        target: apiURI,
+        rewrite: (path) => path.replace(/^\/api/, ""),
+      },
     },
   },
   preview: {
