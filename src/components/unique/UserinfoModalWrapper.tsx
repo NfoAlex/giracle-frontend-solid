@@ -163,7 +163,7 @@ export default function UserinfoModalWrapper(props: { children: JSX.Element, use
           <div class="pb-4 px-4 flex flex-col gap-2">
             {/* 名前 */}
             <span class="flex items-center">
-              <p class="font-bold text-2xl w-min">{storeUserinfo[user().id].name}</p>
+              <p class="font-bold text-2xl min-w-0 line-clamp-2 break-words">{storeUserinfo[user().id].name}</p>
 
               {
                 storeUserinfo[user().id].isBanned
