@@ -10,7 +10,6 @@ import type { IChannel } from "~/types/Channel.ts";
 import { Dialog, DialogContent, DialogDescription, DialogHeader } from "../ui/dialog.tsx";
 import { TabsList, TabsTrigger, TabsContent, Tabs } from "../ui/tabs.tsx";
 import ChannelInfo from "./ChannelHeader/ChannelManage/ChannelInfos.tsx";
-import ChannelId from "./ChannelHeader/ChannelManage/ChannelId.tsx";
 import ChannelMembers from "./ChannelHeader/ChannelManage/ChannelMembers.tsx";
 import {
   setStoreMutedChannels,
@@ -75,7 +74,6 @@ export default function ChannelHeader() {
               <TabsList class="w-fit">
                 <TabsTrigger value="info">概要</TabsTrigger>
                 <TabsTrigger value="users">参加者</TabsTrigger>
-                <TabsTrigger value="id">ID</TabsTrigger>
               </TabsList>
 
               <TabsContent value="info">
@@ -83,11 +81,6 @@ export default function ChannelHeader() {
               </TabsContent>
               <TabsContent value="users">
                 <ChannelMembers channelId={currentChannelId()} />
-              </TabsContent>
-
-              {/* チャンネルID */}
-              <TabsContent value="id">
-                <ChannelId channelId={currentChannelId()} />
               </TabsContent>
             </Tabs>
 
