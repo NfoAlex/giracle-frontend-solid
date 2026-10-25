@@ -18,8 +18,8 @@ export default function ChannelId(props: { channelId: string }) {
 
   return (
     <div class="text-muted-foreground mt-auto justify-self-end flex items-center gap-1">
-      <Label>チャンネルID: </Label>
-      <code class="grow min-w-0 break-all text-sm">{props.channelId}</code>
+      <Label class="shrink-0">チャンネルID: </Label>
+      <code class="shrink truncate grow min-w-0 break-all text-sm">{props.channelId}</code>
       <Button
         size={"icon"}
         variant={"ghost"}
