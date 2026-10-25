@@ -1,4 +1,4 @@
-import {createSignal, For, Show} from "solid-js";
+import {createMemo, For, Show} from "solid-js";
 import {IconPlus} from "@tabler/icons-solidjs";
 import {Popover, PopoverContent, PopoverTrigger} from "~/components/ui/popover";
 import {Badge} from "~/components/ui/badge.tsx";
@@ -7,20 +7,21 @@ import {storeRoleInfo} from "~/stores/RoleInfo.store.ts";
 import { useStoreMyUserinfo } from "~/stores/MyUserinfo.store.ts";
 
 export default function RoleLinker(props: { roles: string[], onUpdate?: (roles: string[])=>void }) {
-  const [newRoles, setNewRoles] = createSignal(props.roles);
+  const linkedRoleIds = createMemo(() => new Set(props.roles));
+  const addableRoles = createMemo(() =>
+    Object.values(storeRoleInfo).filter((role) => !linkedRoleIds().has(role.id))
+  );
 
   const updateRoles = (roleIdAdding: string) => {
-    if (props.onUpdate === undefined) return;
+    if (props.onUpdate === undefined || linkedRoleIds().has(roleIdAdding)) return;
 
-    setNewRoles([...newRoles(), roleIdAdding]);
-    props.onUpdate(newRoles());
+    props.onUpdate([...props.roles, roleIdAdding]);
   }
 
   const removeRole = (roleIdRemoving: string) => {
     if (props.onUpdate === undefined) return;
 
-    setNewRoles(newRoles().filter((r) => r !== roleIdRemoving));
-    props.onUpdate(newRoles());
+    props.onUpdate(props.roles.filter((r) => r !== roleIdRemoving));
   }
 
   return (
@@ -59,8 +60,8 @@ export default function RoleLinker(props: { roles: string[], onUpdate?: (roles: 
         </PopoverTrigger>
         <PopoverContent class="w-fit">
           <div class="max-h-[25vh] max-w-[75vw] overflow-y-auto flex flex-col gap-1">
-            <For each={Object.values(storeRoleInfo).map((r) => r)}>
-              {(role) => //ロールリンクされていないものだけ表示
+            <For each={addableRoles()}>
+              {(role) =>
                 <span onClick={()=>updateRoles(role.id)} class="cursor-pointer pr-2">
                   <RoleChip deletable={false} roleId={role.id} />
                 </span>
