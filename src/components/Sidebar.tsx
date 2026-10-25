@@ -112,7 +112,7 @@ export function AppSidebar() {
             <Avatar class="w-auto h-8">
               <AvatarImage src={`/api/user/icon/${storeMyUserinfo.id}`} />
             </Avatar>
-            <p>{storeMyUserinfo.name}</p>
+            <p class={loc.pathname === "/app/config" ? "font-bold" : ""}>{storeMyUserinfo.name}</p>
 
             <IconSettings class="ml-auto w-5" />
           </div>
