@@ -83,8 +83,7 @@ export function AppSidebar() {
           <hr />
 
           <SidebarGroup>
-
-          <SidebarGroupLabel>参加チャンネル</SidebarGroupLabel>
+            <SidebarGroupLabel>参加チャンネル</SidebarGroupLabel>
             <ChannelButtons />
           </SidebarGroup>
 
