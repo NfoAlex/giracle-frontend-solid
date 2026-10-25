@@ -90,7 +90,6 @@ export function AppSidebar() {
 
         </div>
 
-        <SidebarGroup />
       </SidebarContent>
 
       <hr class="pb-2" />
