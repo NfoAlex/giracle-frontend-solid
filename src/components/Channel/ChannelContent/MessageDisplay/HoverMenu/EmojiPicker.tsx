@@ -71,19 +71,40 @@ export default function EmojiPicker(props: {message: IMessage, onClicked: () => 
     if (e.key === "Shift") setShiftPressed(false);
   }
 
+  const applyPickerSize = () => {
+    if (!elementRef) return;
+
+    //履歴表示領域と、絶対配置の基準要素の位置を取得
+    const historyRect = document.getElementById("history")?.getBoundingClientRect();
+    const anchorRect = (elementRef.offsetParent as HTMLElement | null)?.getBoundingClientRect();
+    if (!historyRect || !anchorRect) return;
+
+    //履歴の上下端から8px内側を表示可能範囲とする
+    const visibleTop = historyRect.top + 8;
+    const visibleBottom = historyRect.bottom - 8;
+    //基準要素が履歴の外にあっても、ピッカーの手前側を履歴内へ寄せる
+    const belowTop = Math.max(anchorRect.bottom, visibleTop);
+    const aboveBottom = Math.min(anchorRect.top, visibleBottom);
+    const spaceBelow = Math.max(0, visibleBottom - belowTop);
+    const spaceAbove = Math.max(0, aboveBottom - visibleTop);
+    const openBelow = spaceBelow >= spaceAbove;
+
+    setOnUpperHalf(openBelow);
+    const height = Math.min(400, openBelow ? spaceBelow : spaceAbove);
+    const offset = openBelow ? belowTop - anchorRect.bottom : anchorRect.top - aboveBottom;
+    elementRef.style.transform = offset > 0 ? `translateY(${openBelow ? offset : -offset}px)` : "";
+    picker.style.setProperty("height", `${height}px`);
+    elementRef.style.maxHeight = `${height}px`;
+  };
+
   onMount(() => {
     //console.log("EmojiPicker :: onMount : emoji-picker-element", Picker);
-
-    //絵文字ピッカー表示位置のための要素の高さ取得
-    if (elementRef) {
-      //console.log("EmojiPicker :: onMount : elementRef.getBoundingClientRect().height->", elementRef.getBoundingClientRect().top);
-      setOnUpperHalf(Math.abs(elementRef.getBoundingClientRect().top) < window.innerHeight / 2);
-    }
 
     //絵文字ピッカーをマウント
     const emojiPickerDiv = document.getElementById("emojiPickerDiv");
     if (emojiPickerDiv) {
       emojiPickerDiv.appendChild(picker);
+      applyPickerSize();
 
       //スタイル適用
       const htmlTheme: string = document.querySelector("html")?.style.getPropertyValue("color-scheme") as string; //テーマ取得
@@ -96,6 +117,9 @@ export default function EmojiPicker(props: {message: IMessage, onClicked: () => 
       picker.addEventListener('emoji-click', emojiClickHandler);
     }
 
+    //ウィンドウサイズ変更時に高さと表示位置を再計算
+    window.addEventListener('resize', applyPickerSize);
+
     //Shiftキー押下時のハンドラリンク
     window.addEventListener('keydown', shiftDownHandler);
     window.addEventListener('keyup', shiftUpHandler);
@@ -103,6 +127,7 @@ export default function EmojiPicker(props: {message: IMessage, onClicked: () => 
 
   onCleanup(() => {
     picker.removeEventListener('emoji-click', emojiClickHandler);
+    window.removeEventListener('resize', applyPickerSize);
     window.removeEventListener('keydown', shiftDownHandler);
     window.removeEventListener('keyup', shiftUpHandler);
   });
