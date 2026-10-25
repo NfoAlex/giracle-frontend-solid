@@ -17,7 +17,7 @@ export default function ChannelId(props: { channelId: string }) {
   };
 
   return (
-    <div class="mt-auto justify-self-end flex items-center gap-1">
+    <div class="text-muted-foreground mt-auto justify-self-end flex items-center gap-1">
       <Label>チャンネルID: </Label>
       <code class="grow min-w-0 break-all text-sm">{props.channelId}</code>
       <Button
