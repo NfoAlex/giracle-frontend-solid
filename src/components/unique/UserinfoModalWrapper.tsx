@@ -333,7 +333,7 @@ export default function UserinfoModalWrapper(props: { children: JSX.Element, use
       </DialogContent>
 
       {/* ボタンはshrink-to-fitのため、長い名前で親からはみ出さないよう幅を制限 */}
-      <DialogTrigger class={`max-w-full ${props.class}`}>
+      <DialogTrigger class={`min-w-0 max-w-full ${props.class}`}>
         {props.children}
       </DialogTrigger>
     </Dialog>
