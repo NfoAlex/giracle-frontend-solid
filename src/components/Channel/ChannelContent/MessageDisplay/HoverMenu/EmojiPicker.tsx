@@ -71,26 +71,40 @@ export default function EmojiPicker(props: {message: IMessage, onClicked: () => 
     if (e.key === "Shift") setShiftPressed(false);
   }
 
+  const applyPickerSize = () => {
+    if (!elementRef) return;
+
+    //履歴表示領域と、絶対配置の基準要素の位置を取得
+    const historyRect = document.getElementById("history")?.getBoundingClientRect();
+    const anchorRect = (elementRef.offsetParent as HTMLElement | null)?.getBoundingClientRect();
+    if (!historyRect || !anchorRect) return;
+
+    //履歴の上下端から8px内側を表示可能範囲とする
+    const visibleTop = historyRect.top + 8;
+    const visibleBottom = historyRect.bottom - 8;
+    //基準要素が履歴の外にあっても、ピッカーの手前側を履歴内へ寄せる
+    const belowTop = Math.max(anchorRect.bottom, visibleTop);
+    const aboveBottom = Math.min(anchorRect.top, visibleBottom);
+    const spaceBelow = Math.max(0, visibleBottom - belowTop);
+    const spaceAbove = Math.max(0, aboveBottom - visibleTop);
+    const openBelow = spaceBelow >= spaceAbove;
+
+    setOnUpperHalf(openBelow);
+    const height = Math.min(400, openBelow ? spaceBelow : spaceAbove);
+    const offset = openBelow ? belowTop - anchorRect.bottom : anchorRect.top - aboveBottom;
+    elementRef.style.transform = offset > 0 ? `translateY(${openBelow ? offset : -offset}px)` : "";
+    picker.style.setProperty("height", `${height}px`);
+    elementRef.style.maxHeight = `${height}px`;
+  };
+
   onMount(() => {
     //console.log("EmojiPicker :: onMount : emoji-picker-element", Picker);
-
-    //絵文字ピッカーの最大高さを履歴表示領域内の空きに収める
-    let pickerHeight: number | undefined;
-    const historyRect = document.getElementById("history")?.getBoundingClientRect();
-    //絶対配置の基準要素(PCはホバーメニュー、スマホはメッセージ本体)
-    const anchorRect = (elementRef?.offsetParent as HTMLElement | null)?.getBoundingClientRect();
-    if (historyRect && anchorRect) {
-      const spaceBelow = historyRect.bottom - anchorRect.bottom;
-      const spaceAbove = anchorRect.top - historyRect.top;
-      const openBelow = spaceBelow >= spaceAbove;
-      setOnUpperHalf(openBelow);
-      pickerHeight = Math.max(0, Math.min(400, (openBelow ? spaceBelow : spaceAbove) - 8));
-    }
 
     //絵文字ピッカーをマウント
     const emojiPickerDiv = document.getElementById("emojiPickerDiv");
     if (emojiPickerDiv) {
       emojiPickerDiv.appendChild(picker);
+      applyPickerSize();
 
       //スタイル適用
       const htmlTheme: string = document.querySelector("html")?.style.getPropertyValue("color-scheme") as string; //テーマ取得
@@ -98,14 +112,13 @@ export default function EmojiPicker(props: {message: IMessage, onClicked: () => 
       picker.style.setProperty("--border-radius", "0.5rem");
       picker.style.setProperty("max-width", "90vw");
       picker.style.setProperty("--border-size", "1.5px");
-      if (pickerHeight !== undefined) {
-        picker.style.setProperty("height", `${pickerHeight}px`);
-        emojiPickerDiv.style.maxHeight = `${pickerHeight}px`;
-      }
 
       //絵文字クリックしたときのハンドラリンク
       picker.addEventListener('emoji-click', emojiClickHandler);
     }
+
+    //ウィンドウサイズ変更時に高さと表示位置を再計算
+    window.addEventListener('resize', applyPickerSize);
 
     //Shiftキー押下時のハンドラリンク
     window.addEventListener('keydown', shiftDownHandler);
@@ -114,6 +127,7 @@ export default function EmojiPicker(props: {message: IMessage, onClicked: () => 
 
   onCleanup(() => {
     picker.removeEventListener('emoji-click', emojiClickHandler);
+    window.removeEventListener('resize', applyPickerSize);
     window.removeEventListener('keydown', shiftDownHandler);
     window.removeEventListener('keyup', shiftUpHandler);
   });
