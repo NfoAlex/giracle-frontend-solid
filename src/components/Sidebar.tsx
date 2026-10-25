@@ -36,7 +36,7 @@ export function AppSidebar() {
         </Popover>
       </SidebarHeader>
 
-      <SidebarContent id={"sidebar-content flex flex-col"}>
+      <SidebarContent id={"sidebar-content flex flex-col"} class={"gap-0"}>
         <SidebarGroup class={"shrink-0"}>
           {
             storeAppStatus.wsConnected ?
@@ -83,14 +83,12 @@ export function AppSidebar() {
           <hr />
 
           <SidebarGroup>
-
-          <SidebarGroupLabel>参加チャンネル</SidebarGroupLabel>
+            <SidebarGroupLabel>参加チャンネル</SidebarGroupLabel>
             <ChannelButtons />
           </SidebarGroup>
 
         </div>
 
-        <SidebarGroup />
       </SidebarContent>
 
       <hr class="pb-2" />
@@ -112,7 +110,7 @@ export function AppSidebar() {
             <Avatar class="w-auto h-8">
               <AvatarImage src={`/api/user/icon/${storeMyUserinfo.id}`} />
             </Avatar>
-            <p>{storeMyUserinfo.name}</p>
+            <p class={loc.pathname === "/app/config" ? "font-bold" : ""}>{storeMyUserinfo.name}</p>
 
             <IconSettings class="ml-auto w-5" />
           </div>
