@@ -193,7 +193,6 @@ export default function UserinfoModalWrapper(props: { children: JSX.Element, use
                 >
                   <TabsTrigger value="manage" class="w-full">管理</TabsTrigger>
                 </Show>
-                <TabsTrigger value="id" class="w-full">ID</TabsTrigger>
               </TabsList>
 
               {/* 概要 */}
@@ -307,27 +306,24 @@ export default function UserinfoModalWrapper(props: { children: JSX.Element, use
                 }
               </TabsContent>
 
-              {/* ID */}
-              <TabsContent value="id" class="flex flex-col gap-2">
-                <div>
-                  <Label>ユーザーID</Label>
-                  <Card class="px-4 py-2 flex items-center gap-2">
-                    <code class="grow min-w-0 break-all text-sm">{props.userId}</code>
-                    <Button
-                      size="icon"
-                      variant={"outline"}
-                      class="shrink-0"
-                      title="ユーザーIDをコピー"
-                      onclick={copyUserId}
-                    >
-                      <Show when={copied()} fallback={<IconCopy size={16} />}>
-                        <IconCheck size={16} />
-                      </Show>
-                    </Button>
-                  </Card>
-                </div>
-              </TabsContent>
             </Tabs>
+
+            {/* ユーザーID */}
+            <div class="text-muted-foreground mt-auto flex items-center gap-1">
+              <Label class="shrink-0">ユーザーID: </Label>
+              <code class="shrink truncate grow min-w-0 break-all text-sm">{props.userId}</code>
+              <Button
+                size={"icon"}
+                variant={"ghost"}
+                class="shrink-0 ml-auto"
+                title="ユーザーIDをコピー"
+                onclick={copyUserId}
+              >
+                <Show when={copied()} fallback={<IconCopy size={16} />}>
+                  <IconCheck size={16} />
+                </Show>
+              </Button>
+            </div>
           </div>
         </Show>
       </DialogContent>
