@@ -177,7 +177,7 @@ export default function ChannelInfo(props: { channelId: string }) {
               <Button
                 onClick={bindCurrentViewableRole}
                 size={"sm"}
-                class={"w-fit"}
+                class={"md:w-fit w-1/2"}
                 variant={"ghost"}
                 disabled={!roleIsDiff() || processing()}
               >
@@ -187,7 +187,7 @@ export default function ChannelInfo(props: { channelId: string }) {
               <Button
                 onClick={updateChannel}
                 size={"sm"}
-                class={"w-fit"}
+                class={"md:w-fit w-1/2"}
                 variant={"secondary"}
                 disabled={!roleIsDiff() || processing()}
               >
