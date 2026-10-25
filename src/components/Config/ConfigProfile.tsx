@@ -1,4 +1,4 @@
-import {IconCheck, IconCircleX, IconPencil, IconPlus} from "@tabler/icons-solidjs";
+import {IconCheck, IconCircleX, IconPencil, IconPhotoOff, IconPlus} from "@tabler/icons-solidjs";
 import { For, Show, createSignal } from "solid-js";
 import ChangeIcon from "~/components/Profile/ChangeIcon";
 import { Avatar, AvatarImage } from "~/components/ui/avatar.tsx";
@@ -19,6 +19,8 @@ export default function ConfigProfile() {
   const [nameEditMode, setNameEditMode] = createSignal(false);
   const [newName, setNewName] = createSignal(storeMyUserinfo.name);
   const [selfIntroEditMode, setSelfIntroEditMode] = createSignal(false);
+  //バナー画像が無い(404)場合の表示切り替え用
+  const [bannerError, setBannerError] = createSignal(false);
   const [newSelfIntro, setNewSelfIntro] = createSignal(
     storeMyUserinfo.selfIntroduction,
   );
@@ -97,7 +99,22 @@ export default function ConfigProfile() {
       <Card class="w-full">
         <CardHeader>
           <div class={"relative"}>
-            <img alt={"バナー画像"} src={"/api/user/banner/" + storeMyUserinfo.id} class="w-full h-36 object-cover border rounded" />
+            <Show
+              when={!bannerError()}
+              fallback={
+                <div class="w-full h-36 border rounded flex flex-col items-center justify-center gap-1 text-muted-foreground">
+                  <IconPhotoOff size={32} stroke="1.5" />
+                  <p>画像がありません</p>
+                </div>
+              }
+            >
+              <img
+                alt={"バナー画像"}
+                src={"/api/user/banner/" + storeMyUserinfo.id}
+                class="w-full h-36 object-cover border rounded"
+                onError={() => setBannerError(true)}
+              />
+            </Show>
             <span class={"absolute bottom-2 right-2 z-50"}>
               <ChangeBanner />
             </span>
