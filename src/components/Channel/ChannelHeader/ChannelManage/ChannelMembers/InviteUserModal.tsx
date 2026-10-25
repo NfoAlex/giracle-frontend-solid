@@ -82,7 +82,7 @@ export default function InviteUserModal(props: { channelId: string, onInvite?: (
 
   return (
     <Dialog>
-      <DialogTrigger>
+      <DialogTrigger class="w-full">
         <Button variant={"secondary"} class="w-full">
           <IconExternalLink />
           ユーザーを招待する

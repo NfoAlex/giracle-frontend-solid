@@ -4,7 +4,6 @@ import {Popover, PopoverContent, PopoverTrigger} from "~/components/ui/popover";
 import {Badge} from "~/components/ui/badge.tsx";
 import RoleChip from "~/components/unique/RoleChip";
 import {storeRoleInfo} from "~/stores/RoleInfo.store.ts";
-import {Card} from "~/components/ui/card.tsx";
 import { useStoreMyUserinfo } from "~/stores/MyUserinfo.store.ts";
 
 export default function RoleLinker(props: { roles: string[], onUpdate?: (roles: string[])=>void }) {
@@ -25,7 +24,7 @@ export default function RoleLinker(props: { roles: string[], onUpdate?: (roles: 
   }
 
   return (
-    <Card class={"p-2 flex flex-col gap-2"}>
+    <div class={"py-2 flex flex-col gap-2"}>
       {/* ロール一覧表示 */}
       <div class={"flex flex-wrap gap-2"}>
         <For each={props.roles}>
@@ -70,7 +69,7 @@ export default function RoleLinker(props: { roles: string[], onUpdate?: (roles: 
           </div>
         </PopoverContent>
       </Popover>
-    </Card>
+    </div>
   )
 
 }

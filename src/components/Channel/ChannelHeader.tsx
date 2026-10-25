@@ -10,7 +10,6 @@ import type { IChannel } from "~/types/Channel.ts";
 import { Dialog, DialogContent, DialogDescription, DialogHeader } from "../ui/dialog.tsx";
 import { TabsList, TabsTrigger, TabsContent, Tabs } from "../ui/tabs.tsx";
 import ChannelInfo from "./ChannelHeader/ChannelManage/ChannelInfos.tsx";
-import ChannelId from "./ChannelHeader/ChannelManage/ChannelId.tsx";
 import ChannelMembers from "./ChannelHeader/ChannelManage/ChannelMembers.tsx";
 import {
   setStoreMutedChannels,
@@ -69,29 +68,23 @@ export default function ChannelHeader() {
           <DialogHeader>
             <p class={"ml-2"}>チャンネル情報</p>
           </DialogHeader>
-          <DialogDescription class={"overflow-x-hidden mt-2 px-2 w-full h-full shrink"}>
+          <div class={"overflow-x-hidden mt-2 md:px-2 w-full grow flex flex-col"}>
 
-            <Tabs defaultValue="info" class="w-full">
-              <TabsList class="w-fit">
-                <TabsTrigger value="info">概要</TabsTrigger>
-                <TabsTrigger value="users">参加者</TabsTrigger>
-                <TabsTrigger value="id">ID</TabsTrigger>
+            <Tabs defaultValue="info" class="w-full grow flex flex-col">
+              <TabsList class="w-full md:w-fit">
+                <TabsTrigger class="w-1/2 md:w-fit" value="info">概要</TabsTrigger>
+                <TabsTrigger class="w-1/2 md:w-fit" value="users">参加者</TabsTrigger>
               </TabsList>
 
-              <TabsContent value="info">
+              <TabsContent value="info" class="grow">
                 <ChannelInfo channelId={currentChannelId()} />
               </TabsContent>
-              <TabsContent value="users">
+              <TabsContent value="users" class="grow">
                 <ChannelMembers channelId={currentChannelId()} />
-              </TabsContent>
-
-              {/* チャンネルID */}
-              <TabsContent value="id">
-                <ChannelId channelId={currentChannelId()} />
               </TabsContent>
             </Tabs>
 
-          </DialogDescription>
+          </div>
         </DialogContent>
       </Dialog>
 
