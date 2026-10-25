@@ -67,16 +67,7 @@ export default function ChannelMembers(props: {channelId: string}) {
   });
 
   return (
-    <div class="max-h-[400px] flex flex-col gap-3 mt-2">
-
-      { //チャンネル招待ボタン
-        useStoreMyUserinfo.getRolePower("manageChannel")
-        &&
-        <InviteUserModal
-          channelId={props.channelId}
-          onInvite={(u) => setUsers([...users(), u])}
-        />
-      }
+    <div class="h-full flex flex-col gap-3">
 
       <TextField>
         <span class="flex items-center gap-2">
@@ -129,6 +120,17 @@ export default function ChannelMembers(props: {channelId: string}) {
           >さらに読み込む</Button>
         </Show>
       </Card>
+
+      { //チャンネル招待ボタン
+        useStoreMyUserinfo.getRolePower("manageChannel")
+        &&
+        <span class="mt-auto w-full">
+          <InviteUserModal
+            channelId={props.channelId}
+            onInvite={(u) => setUsers([...users(), u])}
+          />
+        </span>
+      }
     </div>
   );
 }
