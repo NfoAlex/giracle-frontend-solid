@@ -88,24 +88,22 @@ export default function ChannelMembers(props: {channelId: string}) {
         <For each={users()}>
           {
             (user) => (
-              <div class="p-2 w-full flex flex-row items-center gap-2 rounded">
-                <UserinfoModalWrapper userId={user.id}>
-                  <span class="flex items-center gap-2 cursor-pointer hover:underline">
-                    <Avatar class="w-8 h-8">
-                      <AvatarFallback >{ user.id.slice(0,2) }</AvatarFallback>
-                      <AvatarImage src={"/api/user/icon/" + user.id} alt={user.id} />
-                    </Avatar>
-                    { useStoreUserinfo.getterUserinfo(user.id).name }
-                    <Show when={useStoreUserinfo.getterUserinfo(user.id).isBot}>
-                      <BotBadge />
-                    </Show>
-                  </span>
+              <div class="w-full flex flex-row items-center gap-2">
+                <UserinfoModalWrapper userId={user.id} class="p-2 rounded grow flex flex-row items-center gap-2 hover:bg-accent cursor-pointer">
+                  <Avatar class="w-8 h-8 shrink-0">
+                    <AvatarFallback >{ user.id.slice(0,2) }</AvatarFallback>
+                    <AvatarImage src={"/api/user/icon/" + user.id} alt={user.id} />
+                  </Avatar>
+                  <span class="truncate shrink">{ useStoreUserinfo.getterUserinfo(user.id).name }</span>
+                  <Show when={useStoreUserinfo.getterUserinfo(user.id).isBot}>
+                    <BotBadge />
+                  </Show>
                 </UserinfoModalWrapper>
 
                 {
                   (useStoreMyUserinfo.getRolePower("manageChannel") && storeMyUserinfo.id !== user.id)
                   &&
-                  <Button onClick={()=>kickIt(user.id)} class="ml-auto" size={"icon"} variant={"outline"}><IconKarate /></Button>
+                  <Button onClick={()=>kickIt(user.id)} class="ml-auto mr-2 shrink-0" size={"icon"} variant={"outline"}><IconKarate /></Button>
                 }
               </div>
             )
