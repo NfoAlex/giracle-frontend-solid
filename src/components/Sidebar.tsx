@@ -36,7 +36,7 @@ export function AppSidebar() {
         </Popover>
       </SidebarHeader>
 
-      <SidebarContent id={"sidebar-content flex flex-col"}>
+      <SidebarContent id={"sidebar-content flex flex-col"} class={"gap-0"}>
         <SidebarGroup class={"shrink-0"}>
           {
             storeAppStatus.wsConnected ?
