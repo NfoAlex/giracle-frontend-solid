@@ -74,10 +74,17 @@ export default function EmojiPicker(props: {message: IMessage, onClicked: () => 
   onMount(() => {
     //console.log("EmojiPicker :: onMount : emoji-picker-element", Picker);
 
-    //絵文字ピッカー表示位置のための要素の高さ取得
-    if (elementRef) {
-      //console.log("EmojiPicker :: onMount : elementRef.getBoundingClientRect().height->", elementRef.getBoundingClientRect().top);
-      setOnUpperHalf(Math.abs(elementRef.getBoundingClientRect().top) < window.innerHeight / 2);
+    //絵文字ピッカーの最大高さを履歴表示領域内の空きに収める
+    let pickerHeight: number | undefined;
+    const historyRect = document.getElementById("history")?.getBoundingClientRect();
+    //絶対配置の基準要素(PCはホバーメニュー、スマホはメッセージ本体)
+    const anchorRect = (elementRef?.offsetParent as HTMLElement | null)?.getBoundingClientRect();
+    if (historyRect && anchorRect) {
+      const spaceBelow = historyRect.bottom - anchorRect.bottom;
+      const spaceAbove = anchorRect.top - historyRect.top;
+      const openBelow = spaceBelow >= spaceAbove;
+      setOnUpperHalf(openBelow);
+      pickerHeight = Math.max(0, Math.min(400, (openBelow ? spaceBelow : spaceAbove) - 8));
     }
 
     //絵文字ピッカーをマウント
@@ -91,6 +98,10 @@ export default function EmojiPicker(props: {message: IMessage, onClicked: () => 
       picker.style.setProperty("--border-radius", "0.5rem");
       picker.style.setProperty("max-width", "90vw");
       picker.style.setProperty("--border-size", "1.5px");
+      if (pickerHeight !== undefined) {
+        picker.style.setProperty("height", `${pickerHeight}px`);
+        emojiPickerDiv.style.maxHeight = `${pickerHeight}px`;
+      }
 
       //絵文字クリックしたときのハンドラリンク
       picker.addEventListener('emoji-click', emojiClickHandler);
