@@ -68,12 +68,12 @@ export default function ChannelHeader() {
           <DialogHeader>
             <p class={"ml-2"}>チャンネル情報</p>
           </DialogHeader>
-          <div class={"overflow-x-hidden mt-2 px-2 w-full grow flex flex-col"}>
+          <div class={"overflow-x-hidden mt-2 md:px-2 w-full grow flex flex-col"}>
 
             <Tabs defaultValue="info" class="w-full grow flex flex-col">
-              <TabsList class="w-fit">
-                <TabsTrigger value="info">概要</TabsTrigger>
-                <TabsTrigger value="users">参加者</TabsTrigger>
+              <TabsList class="w-full md:w-fit">
+                <TabsTrigger class="w-1/2 md:w-fit" value="info">概要</TabsTrigger>
+                <TabsTrigger class="w-1/2 md:w-fit" value="users">参加者</TabsTrigger>
               </TabsList>
 
               <TabsContent value="info" class="grow">
