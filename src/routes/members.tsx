@@ -42,13 +42,13 @@ export default function Members() {
    * @param insert true なら既存一覧の末尾へ追記する
    * @param online 一覧ソース。省略時は URL クエリのオンライン絞り込み状態に従う
    */
-  const fetchUsers = async (insert = false, online = onlineOnly()) => {
+  const fetchUsers = async (insert = false, filterOnline = onlineOnly()) => {
     const seq = ++requestSeq;
     let append = insert;
     setProcessing(true);
 
     try {
-      if (online) {
+      if (filterOnline) {
         let ids: string[];
         try {
           ids = (await api.user.getOnline({ cursorUserId: cursorUserId() }))
