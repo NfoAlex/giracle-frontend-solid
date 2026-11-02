@@ -68,10 +68,15 @@ export default function Members() {
         // 一覧・バッジ（storeUserOnline 参照）のオンライン判定を揃える
         setStoreUserOnline((prev) => [...new Set([...prev, ...ids])]);
 
-        // getOnline はユーザーIDのみ返すため、ユーザー情報はキャッシュ優先で解決する
-        const fetched = await Promise.all(
-          ids.map((id) => useStoreUserinfo.asyncGetterUserinfo(id)),
-        );
+        // getOnline はユーザーIDのみ返すため、ユーザー情報はキャッシュ優先で解決する。
+        // 1件の取得失敗（レートリミットの429等）で一覧全体を失わないよう失敗行だけ落とす
+        const fetched = (
+          await Promise.all(
+            ids.map((id) =>
+              useStoreUserinfo.asyncGetterUserinfo(id).catch(() => undefined),
+            ),
+          )
+        ).filter((u): u is IUser => u !== undefined);
 
         if (seq !== requestSeq) return;
 
