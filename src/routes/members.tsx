@@ -11,11 +11,17 @@ import { TextField, TextFieldInput } from "~/components/ui/text-field.tsx";
 import RoleChip from "~/components/unique/RoleChip.tsx";
 import SidebarTriggerWithDot from "~/components/unique/SidebarTriggerWithDot.tsx";
 import UserinfoModalWrapper from "~/components/unique/UserinfoModalWrapper.tsx";
-import { storeUserOnline, useStoreUserinfo } from "~/stores/Userinfo.store.ts";
+import {
+  setStoreUserOnline,
+  storeUserOnline,
+  useStoreUserinfo,
+} from "~/stores/Userinfo.store.ts";
 import type { IUser } from "~/types/User.ts";
 
 // 1回の取得で読み込むユーザー数
 const PAGE_LENGTH = 30;
+// getOnline の1回あたり上限（バックエンド ServiceUser.GetOnline が50件で打ち切る）
+const ONLINE_PAGE_LENGTH = 50;
 
 export default function Members() {
   const [users, setUsers] = createSignal<IUser[]>([]);
@@ -28,36 +34,79 @@ export default function Members() {
   const [searchParams, setSearchParams] = useSearchParams();
   const onlineOnly = () => searchParams.online === "1";
 
+  // 取得の世代。モード切替などで新しい取得が始まったら古い応答は捨てる
+  let requestSeq = 0;
+
   /**
    * ユーザー一覧を取得する
    * @param insert true なら既存一覧の末尾へ追記する
+   * @param online 一覧ソース。省略時は URL クエリのオンライン絞り込み状態に従う
    */
-  const fetchUsers = async (insert = false) => {
-    if (processing()) return;
+  const fetchUsers = async (insert = false, online = onlineOnly()) => {
+    const seq = ++requestSeq;
+    let append = insert;
     setProcessing(true);
 
     try {
+      if (online) {
+        let ids: string[];
+        try {
+          ids = (await api.user.getOnline({ cursorUserId: cursorUserId() }))
+            .data;
+        } catch (e) {
+          if (seq !== requestSeq) return;
+          if (cursorUserId() === undefined) throw e;
+          // カーソルにしたユーザーが切断済み(404)なら先頭から取り直す
+          setCursorUserId(undefined);
+          ids = (await api.user.getOnline()).data;
+          append = false;
+        }
+
+        if (seq !== requestSeq) return;
+
+        // 初回接続時の storeUserOnline は最大50件なので、取得したIDを先に反映して
+        // 一覧・バッジ（storeUserOnline 参照）のオンライン判定を揃える
+        setStoreUserOnline((prev) => [...new Set([...prev, ...ids])]);
+
+        // getOnline はユーザーIDのみ返すため、ユーザー情報はキャッシュ優先で解決する
+        const fetched = await Promise.all(
+          ids.map((id) => useStoreUserinfo.asyncGetterUserinfo(id)),
+        );
+
+        if (seq !== requestSeq) return;
+
+        setUsers((prev) => (append ? [...prev, ...fetched] : fetched));
+        setHasMore(ids.length === ONLINE_PAGE_LENGTH);
+        const lastId = ids[ids.length - 1];
+        if (lastId !== undefined) setCursorUserId(lastId);
+        return;
+      }
+
       const r = await api.user.list({
         length: PAGE_LENGTH,
         cursorUserId: cursorUserId(),
         username: query().trim() || undefined,
       });
 
+      if (seq !== requestSeq) return;
+
       // 詳細モーダル表示用にユーザー情報をStoreへ格納
       for (const user of r.data) {
         useStoreUserinfo.updateUserinfo(user);
       }
 
-      setUsers((prev) => (insert ? [...prev, ...r.data] : r.data));
+      setUsers((prev) => (append ? [...prev, ...r.data] : r.data));
 
       // 1ページ分返ってきたら続きがあるとみなす
       setHasMore(r.data.length === PAGE_LENGTH);
       const lastUser = r.data[r.data.length - 1];
       if (lastUser) setCursorUserId(lastUser.id);
     } catch (e) {
-      console.error("Members :: fetchUsers :: err ->", e);
+      if (seq === requestSeq) {
+        console.error("Members :: fetchUsers :: err ->", e);
+      }
     } finally {
-      setProcessing(false);
+      if (seq === requestSeq) setProcessing(false);
     }
   };
 
@@ -65,15 +114,24 @@ export default function Members() {
     fetchUsers();
   });
 
-  // オンラインのみ表示フィルター（クライアント側）
+  // shortcut: getOnline はユーザー名検索に対応しないため、オンライン表示中の
+  // 検索語は読み込み済みの一覧にのみ掛かる
   const filteredUsers = createMemo(() => {
-    if (!onlineOnly()) return users();
+    const online = onlineOnly();
+    const keyword = online ? query().trim().toLowerCase() : "";
 
-    return users().filter((user) => storeUserOnline.includes(user.id));
+    return users().filter((user) => {
+      // オンライン表示でも WS の切断通知を反映して行を消す
+      if (online && !storeUserOnline.includes(user.id)) return false;
+      if (keyword !== "" && !user.name.toLowerCase().includes(keyword)) {
+        return false;
+      }
+      return true;
+    });
   });
 
   return (
-    <div class="h-svh p-2 flex flex-col gap-2">
+    <div class="h-svh p-2 flex flex-col gap-4">
       <Card class="w-full py-3 px-5 flex items-center gap-2 shrink-0">
         <SidebarTriggerWithDot />
         <p>メンバー一覧</p>
@@ -91,44 +149,51 @@ export default function Members() {
         </Button>
       </Card>
 
-      <TextField class="shrink-0">
-        <span class="flex items-center gap-2">
-          <TextFieldInput
-            placeholder="ユーザー名で検索"
-            value={query()}
-            onInput={(e) => setQuery(e.currentTarget.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
+      <div class="flex flex-col gap-2 shrink-0">
+        <TextField>
+          <span class="flex items-center gap-2">
+            <TextFieldInput
+              placeholder="ユーザー名で検索"
+              value={query()}
+              onInput={(e) => setQuery(e.currentTarget.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  setCursorUserId(undefined);
+                  fetchUsers();
+                }
+              }}
+            />
+            <Button
+              onClick={() => {
                 setCursorUserId(undefined);
                 fetchUsers();
-              }
-            }}
-          />
-          <Button
-            onClick={() => {
-              setCursorUserId(undefined);
-              fetchUsers();
-            }}
-            size="icon"
-            class="shrink-0"
-          >
-            <IconSearch />
-          </Button>
-        </span>
-      </TextField>
+              }}
+              size="icon"
+              class="shrink-0"
+            >
+              <IconSearch />
+            </Button>
+          </span>
+        </TextField>
 
-      <Switch
-        class="flex items-center gap-2 shrink-0"
-        checked={onlineOnly()}
-        onChange={(checked) =>
-          setSearchParams({ online: checked ? "1" : undefined })
-        }
-      >
-        <SwitchControl>
-          <SwitchThumb />
-        </SwitchControl>
-        <SwitchLabel>オンラインユーザーのみ表示</SwitchLabel>
-      </Switch>
+        <Switch
+          class="flex items-center gap-2"
+          checked={onlineOnly()}
+          onChange={(checked) => {
+            setSearchParams({ online: checked ? "1" : undefined });
+            // 取得元が変わるので表示中の一覧とカーソルをリセットして取り直す
+            setUsers([]);
+            setCursorUserId(undefined);
+            setHasMore(false);
+            void fetchUsers(false, checked);
+          }}
+        >
+          <SwitchControl>
+            <SwitchThumb />
+          </SwitchControl>
+          <SwitchLabel>オンラインユーザーのみ表示</SwitchLabel>
+        </Switch>
+      </div>
 
       <div class="grow overflow-y-auto flex flex-col gap-1 pb-2">
         <Show when={processing() && users().length === 0}>
@@ -137,7 +202,9 @@ export default function Members() {
 
         <Show when={!processing() && filteredUsers().length === 0}>
           <p class="text-center text-muted-foreground">
-            ユーザーが見つかりませんでした。
+            {onlineOnly()
+              ? "オンラインのユーザーが見つかりませんでした。"
+              : "ユーザーが見つかりませんでした。"}
           </p>
         </Show>
 
