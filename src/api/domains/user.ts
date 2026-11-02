@@ -50,11 +50,13 @@ export const user = {
       label: "DELETE_USER_SESSION",
     }),
 
-  getOnline: () =>
+  //dataの長さは最大50
+  getOnline: (p: { cursorUserId?: string } = {}) =>
     FETCH_CLIENT<{ message: "Fetched online user list"; data: string[] }>({
       url: "/api/user/get-online",
       method: "GET",
       label: "USER_GET_ONLINE",
+      query: { cursorUserId: p.cursorUserId }
     }),
 
   getSession: (p: { cursor?: number } = {}) =>
