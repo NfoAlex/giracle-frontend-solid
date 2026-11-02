@@ -170,7 +170,7 @@ export default function Members() {
               value={query()}
               onInput={(e) => setQuery(e.currentTarget.value)}
               onKeyDown={(e) => {
-                if (e.key === "Enter") {
+                if (e.key === "Enter" && !onlineOnly()) {
                   setCursorUserId(undefined);
                   fetchUsers();
                 }
@@ -178,8 +178,10 @@ export default function Members() {
             />
             <Button
               onClick={() => {
-                setCursorUserId(undefined);
-                fetchUsers();
+                if (!onlineOnly()) {
+                  setCursorUserId(undefined);
+                  fetchUsers();
+                }
               }}
               size="icon"
               class="shrink-0"
