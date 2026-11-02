@@ -80,7 +80,15 @@ export default function Members() {
 
         if (seq !== requestSeq) return;
 
-        setUsers((prev) => (append ? [...prev, ...fetched] : fetched));
+        // 再接続でカーソル順が変わり同じユーザーが次ページに再登場し得るため追記時に重複を除く
+        setUsers((prev) =>
+          append
+            ? [
+                ...prev,
+                ...fetched.filter((u) => !prev.some((p) => p.id === u.id)),
+              ]
+            : fetched,
+        );
         setHasMore(ids.length === ONLINE_PAGE_LENGTH);
         const lastId = ids[ids.length - 1];
         if (lastId !== undefined) setCursorUserId(lastId);
