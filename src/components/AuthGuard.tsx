@@ -7,7 +7,9 @@ export default function AuthGuard(props: {children?: JSX.Element}) {
   const navi = useNavigate();
 
   const checkAuth = () => {
-    if (!storeAppStatus.loggedIn) navi(`/auth?redirect=${location.pathname}`);
+    // リロード時にクエリ（?online=1 等）が落ちないよう pathname と search を引き継ぐ
+    if (!storeAppStatus.loggedIn)
+      navi(`/auth?redirect=${location.pathname}${location.search}`);
   }
 
   onMount(checkAuth);
