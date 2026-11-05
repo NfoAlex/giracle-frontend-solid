@@ -227,6 +227,7 @@ export default function ChannelContents() {
         fetchLength?: number | undefined;
       },
       _direction: "older" | "newer" = "older",
+      _scrollToNewMessageLine: boolean = false //新着線にスクロールさせる
     ) => {
       if (globalStateFetchingHistory) return;
       globalStateFetchingHistory = true;
@@ -252,13 +253,23 @@ export default function ChannelContents() {
           setStoreImageDimensions(
             produce((prev) => Object.assign(prev, r.data.ImageDimensions)),
           );
-          //スクロール位置記憶
-          let anchor = null;
-          anchor = FnBrowserApis.captureScrollAnchor();
-          useStoreHistory.insertHistory(r.data.history);
 
-          await FnBrowserApis.waitForDomToSettle();
-          FnBrowserApis.restoreScrollFromAnchor(anchor);
+          //新着線へ移動するかどうか
+          if (_scrollToNewMessageLine) {
+            const firstMessageId = r.data.history.at(-1);
+            if (firstMessageId) {
+              FnHistoryControllers.scrollToMessage(firstMessageId.id);
+            }
+          } else {
+            //スクロール位置記憶
+            let anchor = null;
+            anchor = FnBrowserApis.captureScrollAnchor();
+
+            useStoreHistory.insertHistory(r.data.history);
+
+            await FnBrowserApis.waitForDomToSettle();
+            FnBrowserApis.restoreScrollFromAnchor(anchor);
+          }
         })
         .catch((e) =>
           console.warn(
