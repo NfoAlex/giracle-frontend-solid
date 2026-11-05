@@ -1,25 +1,40 @@
 import { useBeforeLeave, useParams } from "@solidjs/router";
-import { Show, createEffect, createSignal, onCleanup, onMount, on, For } from "solid-js";
-import { setStoreHistory, setStoreImageDimensions, storeHistory, useStoreHistory } from "~/stores/History.store.ts";
-import type { IMessage } from "~/types/Message.tsx";
-import { storeClientConfig } from "~/stores/ClientConfig.store.ts";
-import { Button } from "../ui/button.tsx";
 import { IconArrowDown } from "@tabler/icons-solidjs";
-import MessageDisplay from "./ChannelContent/MessageDisplay.tsx";
-import { storeMessageReadTime } from "~/stores/Readtime.store.ts";
-import { storeMyUserinfo } from "~/stores/MyUserinfo.store.ts";
-import { api } from "~/api/index.ts";
+import {
+  createEffect,
+  createSignal,
+  For,
+  on,
+  onCleanup,
+  onMount,
+  Show,
+} from "solid-js";
 import { produce } from "solid-js/store";
-import SkeletonLoader from "./ChannelContent/SkeletonLoader.tsx";
+import { api } from "~/api/index.ts";
+import { storeClientConfig } from "~/stores/ClientConfig.store.ts";
+import {
+  setStoreHistory,
+  setStoreImageDimensions,
+  storeHistory,
+  useStoreHistory,
+} from "~/stores/History.store.ts";
+import { storeMyUserinfo } from "~/stores/MyUserinfo.store.ts";
+import { storeMessageReadTime } from "~/stores/Readtime.store.ts";
+import type { IMessage } from "~/types/Message.tsx";
 import UpdateReadTimeOnRemoteAndStore from "~/utils/UpdateReadTimeOnRemoteAndStore.util.ts";
+import { Button } from "../ui/button.tsx";
 import { showToast } from "../ui/toast.tsx";
+import MessageDisplay from "./ChannelContent/MessageDisplay.tsx";
+import SkeletonLoader from "./ChannelContent/SkeletonLoader.tsx";
 
 const channelScrollPos: Map<string, number> = new Map();
 
 export default function ChannelContents() {
   const param = useParams();
   const [_, setIsWindowFocused] = createSignal(true);
-  const [currentChannelId, setCurrentChannelId] = createSignal<string>(param.channelId ?? "");
+  const [currentChannelId, setCurrentChannelId] = createSignal<string>(
+    param.channelId ?? "",
+  );
   const [editingMsgId, setEditingMsgId] = createSignal("");
 
   const historyElementId = "history";
@@ -27,9 +42,10 @@ export default function ChannelContents() {
   let globalStateChannelMoveDone = false;
 
   const FnBrowserApis = {
-
     getHistoryElement: () => {
-      const container = document.getElementById(historyElementId) as HTMLElement | null;
+      const container = document.getElementById(
+        historyElementId,
+      ) as HTMLElement | null;
       if (!container) return null;
 
       return container;
@@ -75,12 +91,17 @@ export default function ChannelContents() {
     /**
      * 履歴スクロール前のメッセージIdと移動量をアンカーとして書き出す
      */
-    captureScrollAnchor: (): { id: string; offsetTopInContainer: number } | null => {
+    captureScrollAnchor: (): {
+      id: string;
+      offsetTopInContainer: number;
+    } | null => {
       const container = FnBrowserApis.getHistoryElement();
       if (!container) return null;
 
       const containerRect = container.getBoundingClientRect();
-      const candidates = container.querySelectorAll<HTMLElement>("[id^='messageId::']");
+      const candidates = container.querySelectorAll<HTMLElement>(
+        "[id^='messageId::']",
+      );
       if (candidates.length === 0) return null;
 
       let bestMessageEl: HTMLElement | null = null;
@@ -88,7 +109,8 @@ export default function ChannelContents() {
 
       for (const el of candidates) {
         const rect = el.getBoundingClientRect();
-        const intersects = rect.bottom > containerRect.top && rect.top < containerRect.bottom;
+        const intersects =
+          rect.bottom > containerRect.top && rect.top < containerRect.bottom;
         if (!intersects) continue;
 
         const distance = Math.abs(rect.top - containerRect.top);
@@ -100,7 +122,10 @@ export default function ChannelContents() {
 
       if (!bestMessageEl) return null;
       const bestRect = bestMessageEl.getBoundingClientRect();
-      return { id: bestMessageEl.id, offsetTopInContainer: bestRect.top - containerRect.top };
+      return {
+        id: bestMessageEl.id,
+        offsetTopInContainer: bestRect.top - containerRect.top,
+      };
     },
 
     /**
@@ -129,21 +154,68 @@ export default function ChannelContents() {
      * @param messageId
      */
     blinkTargetMessage: async (messageId: string) => {
-      const targetEl = document.getElementById(`messageId::${messageId}::content`) as HTMLElement | null;
+      const targetEl = document.getElementById(
+        `messageId::${messageId}::content`,
+      ) as HTMLElement | null;
       if (!targetEl) return;
 
-      targetEl.classList.add("bg-accent", "transition-colors", "duration-1000", "rounded");
-      setTimeout(() => targetEl.classList.remove("bg-accent", "transition-colors", "duration-500"), 500);
-      setTimeout(() => targetEl.classList.add("bg-accent", "transition-colors", "duration-500", "rounded"), 1000);
-      setTimeout(() => targetEl.classList.remove("bg-accent", "transition-colors", "duration-1000"), 1500);
-      setTimeout(() => targetEl.classList.add("bg-accent", "transition-colors", "duration-500", "rounded"), 2000);
-      setTimeout(() => targetEl.classList.remove("bg-accent", "transition-colors", "duration-1000"), 3000);
-    }
-
-  }
+      targetEl.classList.add(
+        "bg-accent",
+        "transition-colors",
+        "duration-1000",
+        "rounded",
+      );
+      setTimeout(
+        () =>
+          targetEl.classList.remove(
+            "bg-accent",
+            "transition-colors",
+            "duration-500",
+          ),
+        500,
+      );
+      setTimeout(
+        () =>
+          targetEl.classList.add(
+            "bg-accent",
+            "transition-colors",
+            "duration-500",
+            "rounded",
+          ),
+        1000,
+      );
+      setTimeout(
+        () =>
+          targetEl.classList.remove(
+            "bg-accent",
+            "transition-colors",
+            "duration-1000",
+          ),
+        1500,
+      );
+      setTimeout(
+        () =>
+          targetEl.classList.add(
+            "bg-accent",
+            "transition-colors",
+            "duration-500",
+            "rounded",
+          ),
+        2000,
+      );
+      setTimeout(
+        () =>
+          targetEl.classList.remove(
+            "bg-accent",
+            "transition-colors",
+            "duration-1000",
+          ),
+        3000,
+      );
+    },
+  };
 
   const FnHistoryControllers = {
-
     /**
      * 履歴の取得、挿入
      */
@@ -159,16 +231,17 @@ export default function ChannelContents() {
       if (globalStateFetchingHistory) return;
       globalStateFetchingHistory = true;
 
-      let anchor = null;
-      anchor = FnBrowserApis.captureScrollAnchor();
+      //let anchor = null;
+      //anchor = FnBrowserApis.captureScrollAnchor();
 
-      await api.channel.getHistory({
-        channelId: _channelId,
-        messageIdFrom: _dat.messageIdFrom,
-        messageTimeFrom: _dat.messageTimeFrom,
-        fetchLength: _dat.fetchLength,
-        fetchDirection: _direction,
-      })
+      await api.channel
+        .getHistory({
+          channelId: _channelId,
+          messageIdFrom: _dat.messageIdFrom,
+          messageTimeFrom: _dat.messageTimeFrom,
+          fetchLength: _dat.fetchLength,
+          fetchDirection: _direction,
+        })
         .then(async (r) => {
           //console.log("ChannelContent :: FnHistoryController.fetchHistory : r->", r);
           //if (r.data.history.length === 0) { console.log("ChannelContent :: fetchHistory : 履歴がありません"); return; }
@@ -176,7 +249,9 @@ export default function ChannelContents() {
             atEnd: r.data.atEnd,
             atTop: r.data.atTop,
           });
-          setStoreImageDimensions(produce(prev => (Object.assign(prev, r.data.ImageDimensions))));
+          setStoreImageDimensions(
+            produce((prev) => Object.assign(prev, r.data.ImageDimensions)),
+          );
           //スクロール位置記憶
           let anchor = null;
           anchor = FnBrowserApis.captureScrollAnchor();
@@ -186,7 +261,11 @@ export default function ChannelContents() {
           FnBrowserApis.restoreScrollFromAnchor(anchor);
         })
         .catch((e) =>
-          console.warn("ChannelContent :: FnHistoryControllers.fetchHistory : エラー->", _dat, e),
+          console.warn(
+            "ChannelContent :: FnHistoryControllers.fetchHistory : エラー->",
+            _dat,
+            e,
+          ),
         )
         .finally(() => {
           globalStateFetchingHistory = false;
@@ -202,12 +281,10 @@ export default function ChannelContents() {
       requestAnimationFrame(() => {
         messageElement.scrollIntoView({ behavior: "smooth", block: "center" });
       });
-    }
-
+    },
   };
 
   const FnGiracleServices = {
-
     /**
      * 既読時間を更新する
      */
@@ -217,20 +294,20 @@ export default function ChannelContents() {
       if (!FnBrowserApis.isScrolledToVisualBottom()) return;
 
       //既読時間Storeの時間と最新メッセージの時間を比較
-      const latestMessageTime = storeHistory[currentChannelId()]?.history[0]?.createdAt;
+      const latestMessageTime =
+        storeHistory[currentChannelId()]?.history[0]?.createdAt;
       if (latestMessageTime === undefined) return;
 
       UpdateReadTimeOnRemoteAndStore(currentChannelId(), latestMessageTime);
     },
-
   };
 
   interface IExecutorOptionInput {
-    tryUpdateReadTime: Parameters<typeof FnGiracleServices.tryUpdateReadTime>,
-    fetchHistory: Parameters<typeof FnHistoryControllers.fetchHistory>,
-    scrollToMessage: Parameters<typeof FnHistoryControllers.scrollToMessage>,
-    waitToDraw: []
-  };
+    tryUpdateReadTime: Parameters<typeof FnGiracleServices.tryUpdateReadTime>;
+    fetchHistory: Parameters<typeof FnHistoryControllers.fetchHistory>;
+    scrollToMessage: Parameters<typeof FnHistoryControllers.scrollToMessage>;
+    waitToDraw: [];
+  }
   type TExecutorQueueItem = {
     [K in keyof IExecutorOptionInput]: {
       action: K;
@@ -239,7 +316,6 @@ export default function ChannelContents() {
   }[keyof IExecutorOptionInput];
 
   const FnExecutor = {
-
     execute: async (queue: TExecutorQueueItem[]) => {
       for (const q of queue) {
         switch (q.action) {
@@ -249,9 +325,12 @@ export default function ChannelContents() {
 
           case "fetchHistory":
             if (q.option === undefined) {
-              console.error("ChannelContent :: FnExecutor(fetchHistory) : エラー[optionが関数にあっていません]", q);
+              console.error(
+                "ChannelContent :: FnExecutor(fetchHistory) : エラー[optionが関数にあっていません]",
+                q,
+              );
               break;
-            };
+            }
             await FnHistoryControllers.fetchHistory(
               q.option[0], //channelId
               q.option[1], //dat
@@ -261,9 +340,12 @@ export default function ChannelContents() {
 
           case "scrollToMessage":
             if (q.option === undefined) {
-              console.error("ChannelContent :: FnExecutor(scrollToMessage) : エラー[optionが関数にあっていません]", q);
+              console.error(
+                "ChannelContent :: FnExecutor(scrollToMessage) : エラー[optionが関数にあっていません]",
+                q,
+              );
               break;
-            };
+            }
             FnHistoryControllers.scrollToMessage(
               q.option[0], //messageId
             );
@@ -272,7 +354,7 @@ export default function ChannelContents() {
           case "waitToDraw":
             await FnBrowserApis.waitForDomToSettle();
             break;
-        };
+        }
       }
     },
 
@@ -292,31 +374,52 @@ export default function ChannelContents() {
       //console.log("ChannelContent :: checkConditionToFetchHistory : トリガー");
 
       //履歴Storeが初期化されたうえでの取得判別だと既読時間から取って終わり
-      if (!historyState.atEnd && !historyState.atTop && historyState.history.length === 0) {
+      if (
+        !historyState.atEnd &&
+        !historyState.atTop &&
+        historyState.history.length === 0
+      ) {
         await FnExecutor.executePreset.fetchFromLastRead();
         return;
       }
 
-      let checkCanFetchForOlder = () => !isHistoryAtTop && containerAtTop;
-      let checkCanFetchForNewer = () => !isHistoryAtEnd && containerAtBottom;
+      const checkCanFetchForOlder = () => !isHistoryAtTop && containerAtTop;
+      const checkCanFetchForNewer = () => !isHistoryAtEnd && containerAtBottom;
       let flagFetchedHistory = false;
 
       if (checkCanFetchForOlder()) {
         const oldest = historyState?.history?.at(-1);
         //console.log("ChannelContent :: FnExecutor.checkConditionToFetchHistory : 古い方向に取得🔷", { isHistoryAtEnd, isHistoryAtTop, containerAtTop, containerAtBottom });
         await FnExecutor.execute([
-          { action: "fetchHistory", option: [currentChannelIdNow, { messageIdFrom: oldest?.id }, "older"] },
-          { action: "waitToDraw" }
+          {
+            action: "fetchHistory",
+            option: [
+              currentChannelIdNow,
+              { messageIdFrom: oldest?.id },
+              "older",
+            ],
+          },
+          { action: "waitToDraw" },
         ]);
         flagFetchedHistory = true;
       }
       if (checkCanFetchForNewer()) {
-        const newest = historyState?.history !== undefined ? historyState?.history[0] : undefined;
+        const newest =
+          historyState?.history !== undefined
+            ? historyState?.history[0]
+            : undefined;
         //console.log("ChannelContent :: FnExecutor.checkConditionToFetchHistory : 新しい方向に取得🔶", { isHistoryAtEnd, isHistoryAtTop, containerAtTop, containerAtBottom });
         await FnExecutor.execute([
-          { action: "fetchHistory", option: [currentChannelIdNow, { messageIdFrom: newest?.id }, "newer"] },
+          {
+            action: "fetchHistory",
+            option: [
+              currentChannelIdNow,
+              { messageIdFrom: newest?.id },
+              "newer",
+            ],
+          },
           { action: "waitToDraw" },
-          { action: "tryUpdateReadTime" }
+          { action: "tryUpdateReadTime" },
         ]);
         flagFetchedHistory = true;
       }
@@ -340,7 +443,14 @@ export default function ChannelContents() {
         });
 
         FnExecutor.execute([
-          { action: "fetchHistory", option: [currentChannelId(), { messageIdFrom: "", fetchLength: 20 }, "older"] }
+          {
+            action: "fetchHistory",
+            option: [
+              currentChannelId(),
+              { messageIdFrom: "", fetchLength: 20 },
+              "older",
+            ],
+          },
         ]);
       },
 
@@ -363,8 +473,15 @@ export default function ChannelContents() {
         })?.readTime;
 
         await FnExecutor.execute([
-          { action: "fetchHistory", option: [currentChannelId(), { messageTimeFrom: readTime, fetchLength: 20 }, "older"] },
-          { action: "waitToDraw" }
+          {
+            action: "fetchHistory",
+            option: [
+              currentChannelId(),
+              { messageTimeFrom: readTime, fetchLength: 20 },
+              "older",
+            ],
+          },
+          { action: "waitToDraw" },
         ]);
       },
 
@@ -375,9 +492,13 @@ export default function ChannelContents() {
        */
       moveToTargetMessage: async (messageId: string) => {
         //今のStoreにあるか調べてあるなら移動して終了
-        const messageElement = document.getElementById(`messageId::${messageId}`);
+        const messageElement = document.getElementById(
+          `messageId::${messageId}`,
+        );
         if (messageElement) {
-          await FnExecutor.execute([{ action: "scrollToMessage", option: [messageId] }]);
+          await FnExecutor.execute([
+            { action: "scrollToMessage", option: [messageId] },
+          ]);
           FnBrowserApis.blinkTargetMessage(messageId);
           return;
         }
@@ -393,22 +514,36 @@ export default function ChannelContents() {
         });
 
         await FnExecutor.execute([
-          { action: "fetchHistory", option: [currentChannelId(), { messageIdFrom: messageId }, "older"] },
+          {
+            action: "fetchHistory",
+            option: [currentChannelId(), { messageIdFrom: messageId }, "older"],
+          },
           { action: "waitToDraw" },
-          { action: "fetchHistory", option: [currentChannelId(), { messageIdFrom: messageId }, "newer"] },
+          {
+            action: "fetchHistory",
+            option: [currentChannelId(), { messageIdFrom: messageId }, "newer"],
+          },
           { action: "waitToDraw" },
           { action: "scrollToMessage", option: [messageId] },
         ]);
         //もしメッセージが見つからなかった場合既読時間から取り返す
-        if (!storeHistory[currentChannelId()].history.some((m) => m.id === messageId)) {
-          showToast({ title: "エラー", variant: "error", description: "対象のメッセージを取得できませんでした。削除された可能性があります。" })
+        if (
+          !storeHistory[currentChannelId()].history.some(
+            (m) => m.id === messageId,
+          )
+        ) {
+          showToast({
+            title: "エラー",
+            variant: "error",
+            description:
+              "対象のメッセージを取得できませんでした。削除された可能性があります。",
+          });
           FnExecutor.executePreset.fetchFromLastRead();
           return;
         }
         FnBrowserApis.blinkTargetMessage(messageId);
-      }
-    }
-
+      },
+    },
   };
 
   /**
@@ -418,19 +553,28 @@ export default function ChannelContents() {
   const sameSenderAsNext = (index: number): boolean => {
     //メッセオブジェクト取得
     const msgHere = storeHistory[currentChannelId()].history[index];
-    const msgBehind: IMessage | undefined = storeHistory[currentChannelId()].history[index + 1];
+    const msgBehind: IMessage | undefined =
+      storeHistory[currentChannelId()].history[index + 1];
     //5分を比較するための変数(ミリ秒)
     const msFiveMin = 1000 * 60 * 5;
 
     if (msgBehind === undefined) return false; //次のメッセージがない場合
-    if (new Date(msgHere.createdAt).valueOf() - new Date(msgBehind.createdAt).valueOf() > msFiveMin) //5分以上の差がある場合
+    if (
+      new Date(msgHere.createdAt).valueOf() -
+        new Date(msgBehind.createdAt).valueOf() >
+      msFiveMin
+    )
+      //5分以上の差がある場合
       return false;
     if (storeHistory[currentChannelId()].history === undefined) return false; //履歴がない場合(一応のエラーcatch)
-    if (storeHistory[currentChannelId()].history.length === index + 1) return false; //最後のメッセージの場合
+    if (storeHistory[currentChannelId()].history.length === index + 1)
+      return false; //最後のメッセージの場合
 
     //最後に送信者が同じかどうか
-    return storeHistory[currentChannelId()].history[index].userId ===
-      storeHistory[currentChannelId()].history[index + 1].userId;
+    return (
+      storeHistory[currentChannelId()].history[index].userId ===
+      storeHistory[currentChannelId()].history[index + 1].userId
+    );
   };
 
   /**
@@ -443,7 +587,9 @@ export default function ChannelContents() {
     KeyArrowUp: (event: KeyboardEvent) => {
       if (event.key === "ArrowUp" && editingMsgId() === "") {
         //もしテキストが入力された状態なら停止
-        const inputEl = document.getElementById("messageInput") as HTMLInputElement | null;
+        const inputEl = document.getElementById(
+          "messageInput",
+        ) as HTMLInputElement | null;
         if (inputEl && inputEl.value !== "") return;
 
         //一番近い自分のメッセージを探して編集モードにする
@@ -486,28 +632,33 @@ export default function ChannelContents() {
 
         //if (flagWasFocused) FnExecutor.checkConditionToFecthHistory();
         //FnExecutor.checkConditionToFecthHistory();
-        FnExecutor.execute([{ action: "waitToDraw" }, { action: "tryUpdateReadTime" }]);
+        FnExecutor.execute([
+          { action: "waitToDraw" },
+          { action: "tryUpdateReadTime" },
+        ]);
       },
       setFalse: () => {
         setIsWindowFocused(false);
         //console.log("ChannelContents :: toggleWindowFocus : isFocused->", isFocused());
-      }
-    }
+      },
+    },
   };
 
   //履歴の最古部分更新監視
-  createEffect(on(
-    () => storeHistory[currentChannelId()]?.history.at(-1)?.id,
-    async () => {
-      //console.log("ChannelContent :: createEffect(storeHistory[currentChannelId()]?.history.at(-1)?.id) : トリガー");
-      // 新着メッセージ到着時 → 既読時間更新のみ
-      setTimeout(async () => {
-        await FnExecutor.checkConditionToFecthHistory();
-        await FnGiracleServices.tryUpdateReadTime();
-      });
-    },
-    { defer: true }
-  ));
+  createEffect(
+    on(
+      () => storeHistory[currentChannelId()]?.history.at(-1)?.id,
+      async () => {
+        //console.log("ChannelContent :: createEffect(storeHistory[currentChannelId()]?.history.at(-1)?.id) : トリガー");
+        // 新着メッセージ到着時 → 既読時間更新のみ
+        setTimeout(async () => {
+          await FnExecutor.checkConditionToFecthHistory();
+          await FnGiracleServices.tryUpdateReadTime();
+        });
+      },
+      { defer: true },
+    ),
+  );
 
   //チャンネルから離れるときにスクロール位置を保存
   useBeforeLeave(() => {
@@ -520,64 +671,83 @@ export default function ChannelContents() {
   });
 
   //チャンネル移動監視
-  createEffect(on(
-    () => [param.channelId, param.messageId],
-    async ([currentChId, currentMsgId], prevArgs) => {
-      //console.log("ChannelContent :: createEffect : currentChId", currentChId, currentMsgId, prevArgs);
-      if (currentChId === undefined) return;
+  createEffect(
+    on(
+      () => [param.channelId, param.messageId],
+      async ([currentChId, currentMsgId], prevArgs) => {
+        //console.log("ChannelContent :: createEffect : currentChId", currentChId, currentMsgId, prevArgs);
+        if (currentChId === undefined) return;
 
-      setCurrentChannelId(currentChId);
+        setCurrentChannelId(currentChId);
 
-      //メッセージId指定があれば移動して完了
-      if (currentMsgId) {
-        await FnExecutor.executePreset.moveToTargetMessage(currentMsgId);
-        globalStateChannelMoveDone = true;
-        return;
-      }
-
-      //同じチャンネルIdでの移動の場合ここで停止
-      {
-        const previousChannelId = prevArgs?.[0];
-        if (previousChannelId && currentChId === previousChannelId) {
+        //メッセージId指定があれば移動して完了
+        if (currentMsgId) {
+          await FnExecutor.executePreset.moveToTargetMessage(currentMsgId);
           globalStateChannelMoveDone = true;
           return;
         }
-      }
 
-      const el = FnBrowserApis.getHistoryElement();
-      //スクロール位置復元
-      if (channelScrollPos.has(currentChannelId()) && el !== null) {
-        await FnExecutor.execute([{ action: "waitToDraw" }]);
-        el.scrollTop = channelScrollPos.get(currentChannelId()) ?? 0;
-      }
+        //同じチャンネルIdでの移動の場合ここで停止
+        {
+          const previousChannelId = prevArgs?.[0];
+          if (previousChannelId && currentChId === previousChannelId) {
+            globalStateChannelMoveDone = true;
+            return;
+          }
+        }
 
-      //履歴が無い場合既読時間から取得してみる
-      if (!storeHistory[currentChId]?.atEnd && !storeHistory[currentChId]?.atTop && (storeHistory[currentChId]?.history?.length ?? 0) === 0) {
-        await FnExecutor.executePreset.fetchFromLastRead();
-      }
+        const el = FnBrowserApis.getHistoryElement();
+        //スクロール位置復元
+        if (channelScrollPos.has(currentChannelId()) && el !== null) {
+          await FnExecutor.execute([{ action: "waitToDraw" }]);
+          el.scrollTop = channelScrollPos.get(currentChannelId()) ?? 0;
+        }
 
-      //チャンネル移動完了フラグを立てて履歴取得トリガー確認
-      globalStateChannelMoveDone = true;
-      FnExecutor.checkConditionToFecthHistory();
-    }
-  ));
+        //履歴が無い場合既読時間から取得してみる
+        if (
+          !storeHistory[currentChId]?.atEnd &&
+          !storeHistory[currentChId]?.atTop &&
+          (storeHistory[currentChId]?.history?.length ?? 0) === 0
+        ) {
+          await FnExecutor.executePreset.fetchFromLastRead();
+        }
+
+        //チャンネル移動完了フラグを立てて履歴取得トリガー確認
+        globalStateChannelMoveDone = true;
+        FnExecutor.checkConditionToFecthHistory();
+      },
+    ),
+  );
 
   onMount(() => {
     const el = FnBrowserApis.getHistoryElement();
     if (el === null) return;
     el.addEventListener("scroll", BrowserEventHandlers.ScrollFns.handler);
 
-    window.addEventListener("focus", BrowserEventHandlers.windowFocusFns.setTrue);
-    window.addEventListener("blur", BrowserEventHandlers.windowFocusFns.setFalse);
+    window.addEventListener(
+      "focus",
+      BrowserEventHandlers.windowFocusFns.setTrue,
+    );
+    window.addEventListener(
+      "blur",
+      BrowserEventHandlers.windowFocusFns.setFalse,
+    );
     window.addEventListener("keydown", BrowserEventHandlers.KeyArrowUp);
   });
 
   onCleanup(() => {
     const el = FnBrowserApis.getHistoryElement();
-    if (el) el.removeEventListener("scroll", BrowserEventHandlers.ScrollFns.handler);
+    if (el)
+      el.removeEventListener("scroll", BrowserEventHandlers.ScrollFns.handler);
 
-    window.removeEventListener("focus", BrowserEventHandlers.windowFocusFns.setTrue);
-    window.removeEventListener("blur", BrowserEventHandlers.windowFocusFns.setFalse);
+    window.removeEventListener(
+      "focus",
+      BrowserEventHandlers.windowFocusFns.setTrue,
+    );
+    window.removeEventListener(
+      "blur",
+      BrowserEventHandlers.windowFocusFns.setFalse,
+    );
     window.removeEventListener("keydown", BrowserEventHandlers.KeyArrowUp);
   });
 
@@ -619,12 +789,18 @@ export default function ChannelContents() {
         </Show>
       </div>
 
-      { //TODO :: 最新に戻るボタン
-        !storeHistory[currentChannelId()]?.atEnd
-        &&
-        <div class="absolute bottom-10 right-10 z-10">
-          <Button onClick={FnExecutor.executePreset.moveToNewest} class="w-16 h-16"><IconArrowDown style="height:28px; width:28px;" /></Button>
-        </div>
+      {
+        //TODO :: 最新に戻るボタン
+        !storeHistory[currentChannelId()]?.atEnd && (
+          <div class="absolute bottom-10 right-10 z-10">
+            <Button
+              onClick={FnExecutor.executePreset.moveToNewest}
+              class="w-16 h-16"
+            >
+              <IconArrowDown style="height:28px; width:28px;" />
+            </Button>
+          </div>
+        )
       }
     </div>
   );
