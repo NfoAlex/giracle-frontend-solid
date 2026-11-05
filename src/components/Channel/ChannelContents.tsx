@@ -346,6 +346,7 @@ export default function ChannelContents() {
               q.option[0], //channelId
               q.option[1], //dat
               q.option[2], //direction
+              q.option[3]  //scrollToNewMessageLine
             );
             break;
 
@@ -490,6 +491,7 @@ export default function ChannelContents() {
               currentChannelId(),
               { messageTimeFrom: readTime, fetchLength: 20 },
               "older",
+              true //新着線にスクロールさせる
             ],
           },
           { action: "waitToDraw" },
