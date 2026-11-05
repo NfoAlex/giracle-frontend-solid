@@ -254,22 +254,24 @@ export default function ChannelContents() {
             produce((prev) => Object.assign(prev, r.data.ImageDimensions)),
           );
 
-          //新着線へ移動するかどうか
+          //新着線へ移動させる
           if (_scrollToNewMessageLine) {
             const firstMessageId = r.data.history.at(-1);
             if (firstMessageId) {
               FnHistoryControllers.scrollToMessage(firstMessageId.id);
+              return; //移動できたらここで停止
             }
-          } else {
-            //スクロール位置記憶
-            let anchor = null;
-            anchor = FnBrowserApis.captureScrollAnchor();
-
-            useStoreHistory.insertHistory(r.data.history);
-
-            await FnBrowserApis.waitForDomToSettle();
-            FnBrowserApis.restoreScrollFromAnchor(anchor);
           }
+
+          //スクロール位置記憶
+          let anchor = null;
+          anchor = FnBrowserApis.captureScrollAnchor();
+
+          useStoreHistory.insertHistory(r.data.history);
+
+          await FnBrowserApis.waitForDomToSettle();
+          FnBrowserApis.restoreScrollFromAnchor(anchor);
+
         })
         .catch((e) =>
           console.warn(
