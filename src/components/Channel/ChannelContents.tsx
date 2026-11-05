@@ -241,21 +241,6 @@ export default function ChannelContents() {
   const FnExecutor = {
 
     execute: async (queue: TExecutorQueueItem[]) => {
-      //コンテナ上のスクロール制御用
-      const stateAnchor: {
-        isRegistered: boolean;
-        data: {
-          id: string;
-          offsetTopInContainer: number;
-        } | null
-      } = {
-        isRegistered: false,
-        data: {
-          id: "",
-          offsetTopInContainer: 0,
-        }
-      };
-
       for (const q of queue) {
         switch (q.action) {
           case "tryUpdateReadTime":
