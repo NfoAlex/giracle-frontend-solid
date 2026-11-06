@@ -1,0 +1,33 @@
+.ql-container {
+  font-family: inherit;
+  font-size: inherit;
+  height: auto;
+}
+
+.ql-editor {
+  min-height: 2.5rem;
+  max-height: 10rem; /* 既存 textarea の max-h-40 に合わせる */
+  padding: 0.5rem; /* 既存 textarea の p-2 に合わせる */
+  overflow-y: auto;
+  word-break: break-all;
+}
+
+.ql-editor.ql-blank::before {
+  left: 0.5rem;
+  right: 0.5rem;
+  color: hsl(var(--muted-foreground));
+  font-style: normal;
+}
+
+.quill-input-url {
+  @apply underline break-all text-blue-500;
+}
+
+.quill-input-mention {
+  @apply inline-flex items-center gap-1 rounded bg-border px-1 align-baseline;
+  user-select: all;
+}
+
+.quill-input-mention > img {
+  @apply size-4 rounded-full;
+}
