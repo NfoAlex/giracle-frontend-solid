@@ -45,7 +45,7 @@ export default function QuillInput(props: IQuillInputProps) {
   let searchTimer: ReturnType<typeof setTimeout> | undefined;
   let searchSeq = 0;
   let urlRaf = 0;
-  const dirtyLines = new Set<number>();
+  const renderQueueInput = new Set<number>();
 
   const triggerOf = (trigger: string) =>
     props.triggers?.find((t) => t.trigger === trigger);
@@ -143,16 +143,16 @@ export default function QuillInput(props: IQuillInputProps) {
   };
 
   const scheduleUrlFormat = (index: number) => {
-    dirtyLines.add(index);
+    renderQueueInput.add(index);
     if (urlRaf) return;
     urlRaf = requestAnimationFrame(() => {
       urlRaf = 0;
       if (composing) {
-        dirtyLines.clear();
+        renderQueueInput.clear();
         return;
       }
-      const lines = [...dirtyLines];
-      dirtyLines.clear();
+      const lines = [...renderQueueInput];
+      renderQueueInput.clear();
       if (!quill) return;
       for (const i of lines) applyInlinePatterns(quill, i);
     });
@@ -168,19 +168,19 @@ export default function QuillInput(props: IQuillInputProps) {
           if (op.insert.includes("\n")) {
             let offset = 0;
             for (const part of op.insert.split("\n")) {
-              dirtyLines.add(index + offset);
+              renderQueueInput.add(index + offset);
               offset += part.length + 1;
             }
           } else {
-            dirtyLines.add(index);
+            renderQueueInput.add(index);
           }
           index += op.insert.length;
         } else {
-          dirtyLines.add(index);
+          renderQueueInput.add(index);
           index += 1;
         }
       } else if (op.delete !== undefined) {
-        dirtyLines.add(index);
+        renderQueueInput.add(index);
       } else if (typeof op.retain === "number") {
         index += op.retain;
       }
