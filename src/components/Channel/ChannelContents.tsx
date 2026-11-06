@@ -266,7 +266,6 @@ export default function ChannelContents() {
             const newLine = document.querySelector("#NEW_LINE");
             if (newLine) {
               newLine.scrollIntoView({ behavior: "smooth", block: "center" });
-              console.log("ChannelContents :: FnHistoryControllers.fetchHistory : 新着線へ移動");
               return; //移動できたらここで停止
             }
           }
