@@ -1,4 +1,4 @@
-import { IconLink } from "@tabler/icons-solidjs";
+import { IconLink, IconPlayerPlayFilled } from "@tabler/icons-solidjs";
 import { createSignal, Show } from "solid-js";
 import { Button } from "~/components/ui/button.tsx";
 import {
@@ -16,7 +16,6 @@ import {
 import ImageWithModal from "~/components/unique/ImageWithModal.tsx";
 import { storeClientConfig } from "~/stores/ClientConfig.store.ts";
 import type { IMessageUrlPreview } from "~/types/Message.ts";
-import VideoPlayerModal from "./URLPreview/VideoPlayerModal.tsx";
 
 export default function URLPreview(props: { urlPreview: IMessageUrlPreview }) {
   const [open, setOpen] = createSignal(false);
@@ -83,15 +82,16 @@ export default function URLPreview(props: { urlPreview: IMessageUrlPreview }) {
             ></div>
 
             {/* 動画URLがある場合の表示 */}
-            <Show
-              when={
-                props.urlPreview.videoLink &&
-                !props.urlPreview.videoLink.startsWith("https://www.youtube")
-              }
-            >
-              <span class={"absolute bottom-3 right-3 shadow-xl z-50"}>
-                <VideoPlayerModal urlPreview={props.urlPreview} />
-              </span>
+            <Show when={props.urlPreview.videoLink}>
+              {(videoLink) => (
+                <span class={"absolute bottom-3 right-3 shadow-xl z-50"}>
+                  <a href={videoLink()} target="_blank" rel="noreferrer">
+                    <Button size="icon">
+                      <IconPlayerPlayFilled />
+                    </Button>
+                  </a>
+                </span>
+              )}
             </Show>
           </div>
         </div>
@@ -124,10 +124,7 @@ export default function URLPreview(props: { urlPreview: IMessageUrlPreview }) {
           <p>
             {props.urlPreview.description.length >=
             storeClientConfig.display.maxUrlPreviewTextLength
-              ? props.urlPreview.description.slice(
-                  0,
-                  storeClientConfig.display.maxUrlPreviewTextLength,
-                ) + "..."
+              ? `${props.urlPreview.description.slice(0, storeClientConfig.display.maxUrlPreviewTextLength)}...`
               : props.urlPreview.description}
           </p>
           <Button
