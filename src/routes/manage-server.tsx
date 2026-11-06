@@ -34,8 +34,8 @@ export default function ManageServer() {
   );
 
   return (
-    <div class="p-2 flex flex-col h-full">
-      <Card class="w-full py-3 px-5 mb-2 flex md:flex-col flex-row gap-2">
+    <div class="p-2 flex flex-col h-full overflow-hidden">
+      <Card class="w-full py-3 px-5 mb-2 flex md:flex-col flex-row gap-2 shrink-0">
         <div class="flex items-center gap-2">
           <SidebarTriggerWithDot />
           <p>サーバー管理</p>
