@@ -44,7 +44,7 @@ export default function QuillInput(props: IQuillInputProps) {
   let composing = false;
   let searchTimer: ReturnType<typeof setTimeout> | undefined;
   let searchSeq = 0;
-  let urlRaf = 0;
+  let urlRaf = 0; // requestAnimationFrame の ID。行内装飾の適用を次フレームにまとめる
   const renderQueueInput = new Set<number>();
 
   const triggerOf = (trigger: string) =>
