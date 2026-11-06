@@ -25,7 +25,7 @@ export interface IQuillInputApi {
 }
 
 export interface IQuillInputProps {
-  id?: string; // 外側ラッパー div に付与
+  id?: string; // 編集領域（contenteditable）に付与。focus 可能になる
   class?: string; // 外側ラッパー div に cn() で合成
   placeholder?: string;
   triggers?: IQuillInputTrigger[];

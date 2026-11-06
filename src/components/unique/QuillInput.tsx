@@ -110,8 +110,10 @@ export default function QuillInput(props: IQuillInputProps) {
     const before = quill.getText(start, index - start);
     const chars = props.triggers.map((t) => t.trigger).join("");
     const escaped = chars.replace(/[-.*+?^${}()|[\]\\]/g, "\\$&");
+    // 前接は「行頭 or 英数字以外」。日本語文中（空白なし）でも検出しつつ、
+    // メールアドレス中の @ では開かない
     const match = new RegExp(
-      `(?:^|\\s)([${escaped}])([^\\s${escaped}<>]*)$`,
+      `(?:^|[^A-Za-z0-9_])([${escaped}])([^\\s${escaped}<>]*)$`,
     ).exec(before);
     if (!match) {
       setMention(CLOSED);
@@ -261,6 +263,8 @@ export default function QuillInput(props: IQuillInputProps) {
       modules: { toolbar: false },
       placeholder: props.placeholder ?? "",
     });
+    // 外側の div は focus できないため、id は編集領域（contenteditable）に付ける
+    if (props.id) quill.root.id = props.id;
 
     quill.on("text-change", onTextChange);
     quill.on("selection-change", onSelectionChange);
@@ -308,11 +312,7 @@ export default function QuillInput(props: IQuillInputProps) {
   });
 
   return (
-    <div
-      id={props.id}
-      ref={wrapperEl}
-      class={cn("relative flex flex-col", props.class)}
-    >
+    <div ref={wrapperEl} class={cn("relative flex flex-col", props.class)}>
       {/* Quill が自前で DOM を管理するため、ここには何も置かない */}
       <div ref={hostEl} />
       <Show when={mention().open}>
@@ -324,6 +324,8 @@ export default function QuillInput(props: IQuillInputProps) {
             {(item, index) => (
               <button
                 type="button"
+                // mousedown でフォーカスが外れると Quill が selection-change(null) を出し候補が閉じる
+                onMouseDown={(e) => e.preventDefault()}
                 onClick={() => selectMention(item)}
                 class={cn(
                   "flex w-full items-center gap-2 rounded p-2 text-left hover:bg-border",
