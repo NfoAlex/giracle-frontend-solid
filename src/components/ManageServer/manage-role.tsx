@@ -123,7 +123,7 @@ export default function ManageRole() {
             ロール一覧
           </CardTitle>
         </CardHeader>
-        <CardContent class="overflow-y-auto grow h-full pt-1 pb-3">
+        <div class="overflow-y-auto grow h-full flex flex-col gap-1 p-2">
           <HoverCard>
             <HoverCardTrigger>
               <SidebarMenuButton
@@ -148,7 +148,7 @@ export default function ManageRole() {
                 onclick={() => setRoleEditing(role)}
                 variant={roleEditing().id === role.id ? "outline" : "default"}
                 tabIndex={index()}
-                class="w-full truncate"
+                class="w-full truncate p-2"
                 disabled={role.id === "HOST"}
               >
                 <IconCircle style={`color: ${role.color}`} />
@@ -156,7 +156,7 @@ export default function ManageRole() {
               </SidebarMenuButton>
             )}
           </For>
-        </CardContent>
+        </div>
       </Card>
 
       {/* スマホUI用ロール選択 */}
