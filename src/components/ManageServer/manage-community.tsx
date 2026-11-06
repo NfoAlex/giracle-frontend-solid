@@ -82,7 +82,7 @@ export default function ManageCommunity() {
   });
 
   return (
-    <div class="flex flex-col h-full">
+    <div class="flex flex-col flex-1 min-h-0">
       <Card class="fixed py-3 px-5 bottom-3 left-1/2 transform -translate-x-1/2 flex items-center gap-2 z-50">
         <Button onClick={changeServerConfig} disabled={!configChanged()}>
           変更を適用
