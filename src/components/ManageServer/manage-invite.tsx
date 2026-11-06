@@ -77,7 +77,7 @@ export default function ManageInvite() {
   onMount(fetchInvites);
 
   return (
-    <div class="flex flex-col overflow-y-auto">
+    <div class="flex flex-col overflow-y-auto flex-1 min-h-0">
       <InviteTable
         columns={col}
         data={invites()}

@@ -167,7 +167,7 @@ export default function ManageLogs() {
   onMount(() => fetchLogCount());
 
   return (
-    <div class="flex flex-col h-full w-full gap-2 overflow-y-auto">
+    <div class="flex flex-col flex-1 min-h-0 w-full gap-2 overflow-y-auto">
       <Show when={error()}>
         <Alert variant="destructive">
           <IconAlertCircle class="size-6" />

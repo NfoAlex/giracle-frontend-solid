@@ -114,7 +114,7 @@ export default function ManageRole() {
   });
 
   return (
-    <div class="flex flex-col md:flex-row overflow-y-auto h-full gap-2">
+    <div class="flex flex-col md:flex-row overflow-y-auto flex-1 min-h-0 gap-2">
       {/* PCUI用ロール選択 */}
       <Card class="w-52 hidden h-full flex-col md:flex">
         <CardHeader>

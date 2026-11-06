@@ -29,7 +29,8 @@ export default function ManageEmoji() {
   };
 
   return (
-    <div class="flex flex-col overflow-y-auto h-full gap-2">
+    <div class="flex flex-col overflow-y-auto flex-1 min-h-0 gap-2">
+
       <CreateCustomEmoji />
 
       <Card class={"p-2 max-h-full overflow-y-auto flex flex-col"}>

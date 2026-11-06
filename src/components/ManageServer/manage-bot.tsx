@@ -101,7 +101,7 @@ export default function ManageBot() {
   });
 
   return (
-    <div class="grow h-full flex flex-col gap-2">
+    <div class="grow flex flex-col gap-2 min-h-0">
       <Show when={error()}>
         <Alert variant="destructive">
           <IconAlertCircle class="size-6" />
