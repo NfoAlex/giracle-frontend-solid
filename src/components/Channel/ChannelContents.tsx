@@ -262,9 +262,10 @@ export default function ChannelContents() {
 
           //新着線へ移動させる
           if (_scrollToNewMessageLine) {
-            const firstMessageId = r.data.history.at(-1);
-            if (firstMessageId) {
-              FnHistoryControllers.scrollToMessage(firstMessageId.id);
+            await FnBrowserApis.waitForDomToSettle();
+            const newLine = document.querySelector("#NEW_LINE");
+            if (newLine) {
+              newLine.scrollIntoView({ behavior: "smooth", block: "center" });
               console.log("ChannelContents :: FnHistoryControllers.fetchHistory : 新着線へ移動");
               return; //移動できたらここで停止
             }
