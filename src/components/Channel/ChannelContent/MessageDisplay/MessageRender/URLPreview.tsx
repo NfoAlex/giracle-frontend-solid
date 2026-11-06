@@ -1,4 +1,4 @@
-import { IconLink, IconPlayerPlayFilled } from "@tabler/icons-solidjs";
+import { IconExternalLink, IconLink } from "@tabler/icons-solidjs";
 import { createSignal, Show } from "solid-js";
 import { Button } from "~/components/ui/button.tsx";
 import {
@@ -87,7 +87,7 @@ export default function URLPreview(props: { urlPreview: IMessageUrlPreview }) {
                 <span class={"absolute bottom-3 right-3 shadow-xl z-50"}>
                   <a href={videoLink()} target="_blank" rel="noreferrer">
                     <Button size="icon">
-                      <IconPlayerPlayFilled />
+                      <IconExternalLink />
                     </Button>
                   </a>
                 </span>
