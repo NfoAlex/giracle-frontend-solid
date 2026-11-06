@@ -227,7 +227,7 @@ export default function ChannelContents() {
         fetchLength?: number | undefined;
       },
       _direction: "older" | "newer" = "older",
-      _scrollToNewMessageLine: boolean = false //新着線にスクロールさせる
+      _scrollToNewMessageLine: boolean = false, //新着線にスクロールさせる
     ) => {
       if (globalStateFetchingHistory) return;
       globalStateFetchingHistory = true;
@@ -273,7 +273,6 @@ export default function ChannelContents() {
 
           await FnBrowserApis.waitForDomToSettle();
           FnBrowserApis.restoreScrollFromAnchor(anchor);
-
         })
         .catch((e) =>
           console.warn(
@@ -350,7 +349,7 @@ export default function ChannelContents() {
               q.option[0], //channelId
               q.option[1], //dat
               q.option[2], //direction
-              q.option[3]  //scrollToNewMessageLine
+              q.option[3], //scrollToNewMessageLine
             );
             break;
 
@@ -495,7 +494,7 @@ export default function ChannelContents() {
               currentChannelId(),
               { messageTimeFrom: readTime, fetchLength: 20 },
               "older",
-              true //新着線にスクロールさせる
+              true, //新着線にスクロールさせる
             ],
           },
           { action: "waitToDraw" },
