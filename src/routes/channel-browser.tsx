@@ -1,15 +1,24 @@
+import { A } from "@solidjs/router";
 import { IconArchiveFilled, IconReload } from "@tabler/icons-solidjs";
 import { createSignal, For, onMount, Show } from "solid-js";
 import { api } from "~/api/index.ts";
 import CreateChannel from "~/components/ChannelBrowser/CreateChannel.tsx";
+import DeleteChannel from "~/components/ChannelBrowser/DeleteChannel.tsx";
 import { Button } from "~/components/ui/button.tsx";
 import { Card } from "~/components/ui/card.tsx";
-import { Switch, SwitchControl, SwitchLabel, SwitchThumb } from "~/components/ui/switch.tsx";
-import { useStoreMyUserinfo, setStoreMyUserinfo, storeMyUserinfo } from "~/stores/MyUserinfo.store.ts";
-import type { IChannel } from "~/types/Channel.ts";
-import DeleteChannel from "~/components/ChannelBrowser/DeleteChannel.tsx";
+import {
+  Switch,
+  SwitchControl,
+  SwitchLabel,
+  SwitchThumb,
+} from "~/components/ui/switch.tsx";
 import SidebarTriggerWithDot from "~/components/unique/SidebarTriggerWithDot.tsx";
-import { A } from "@solidjs/router";
+import {
+  setStoreMyUserinfo,
+  storeMyUserinfo,
+  useStoreMyUserinfo,
+} from "~/stores/MyUserinfo.store.ts";
+import type { IChannel } from "~/types/Channel.ts";
 
 export default function ChannelBrowser() {
   const [processing, setProcessing] = createSignal(true);
@@ -21,28 +30,37 @@ export default function ChannelBrowser() {
    * @param channelId 参加するチャンネルId
    */
   const joinChannel = (channelId: string) => {
-    api.channel.join({ channelId })
+    api.channel
+      .join({ channelId })
       .then((r) => {
         //console.log("ChannelBrowser :: joinChannel :: r ->", r);
       })
-      .catch((err) => console.error("ChannelBrowser :: joinChannel :: err ->", err));
-  }
+      .catch((err) =>
+        console.error("ChannelBrowser :: joinChannel :: err ->", err),
+      );
+  };
 
   /**
    * チャンネルから退出する
    * @param channelId 退出するチャンネルId
    */
   const leaveChannel = (channelId: string) => {
-    api.channel.leave({ channelId })
+    api.channel
+      .leave({ channelId })
       .then((r) => {
         //console.log("ChannelBrowser :: leaveChannel :: r ->", r);
         //StoreからチャンネルIdをを削除
-        setStoreMyUserinfo((prev) => (
-          { ...prev, ChannelJoin: prev.ChannelJoin.filter((cj) => cj.channelId !== channelId) }
-        ));
+        setStoreMyUserinfo((prev) => ({
+          ...prev,
+          ChannelJoin: prev.ChannelJoin.filter(
+            (cj) => cj.channelId !== channelId,
+          ),
+        }));
       })
-      .catch((err) => console.error("ChannelBrowser :: leaveChannel :: err ->", err));
-  }
+      .catch((err) =>
+        console.error("ChannelBrowser :: leaveChannel :: err ->", err),
+      );
+  };
 
   /**
    * チャンネル一覧を取得する
@@ -50,15 +68,16 @@ export default function ChannelBrowser() {
   const fetchChannels = () => {
     setProcessing(true); //ローディング中
     setChannels([]); //初期化
-    api.channel.list()
+    api.channel
+      .list()
       .then((r) => {
         setChannels(r.data);
         setProcessing(false);
       })
       .catch((err) => {
         console.error("ChannelBrowser :: fetchChannels : err ->", err);
-      })
-  }
+      });
+  };
 
   onMount(async () => {
     fetchChannels();
@@ -104,33 +123,51 @@ export default function ChannelBrowser() {
           {(channel) => (
             <Show when={!channel.isArchived || displayArchived()}>
               <Card class="w-full py-5 md:py-3 px-5 flex items-center gap-2">
-                <A href={`/app/channel/${channel.id}`} class="shrink max-w-[1/2] line-clamp-1 hover:underline">
+                <A
+                  href={`/app/channel/${channel.id}`}
+                  class="shrink max-w-[1/2] line-clamp-1 hover:underline"
+                >
                   <p class={"truncate"}>{channel.name}</p>
                 </A>
                 {channel.description && <p class="font-thin"> | </p>}
-                <p class="shrink max-w-[1/3] line-clamp-2 truncate">{channel.description}</p>
+                <p class="shrink max-w-[1/3] line-clamp-2 truncate">
+                  {channel.description}
+                </p>
                 <div class="ml-auto flex items-center gap-2">
                   {channel.isArchived && <IconArchiveFilled color="orange" />}
 
-                  {
-                    storeMyUserinfo.ChannelJoin.some((cj) => cj.channelId === channel.id)
-                      ?
-                      <Button onclick={() => leaveChannel(channel.id)} variant={"outline"}>退出</Button>
-                      :
-                      <Button onclick={() => joinChannel(channel.id)}>参加</Button>
-                  }
+                  {storeMyUserinfo.ChannelJoin.some(
+                    (cj) => cj.channelId === channel.id,
+                  ) ? (
+                    <Button
+                      onclick={() => leaveChannel(channel.id)}
+                      variant={"outline"}
+                    >
+                      退出
+                    </Button>
+                  ) : (
+                    <Button onclick={() => joinChannel(channel.id)}>
+                      参加
+                    </Button>
+                  )}
 
-                  {useStoreMyUserinfo.getRolePower("manageChannel") && <DeleteChannel fetchChannels={fetchChannels} channel={channel} />}
+                  {useStoreMyUserinfo.getRolePower("manageChannel") && (
+                    <DeleteChannel
+                      fetchChannels={fetchChannels}
+                      channel={channel}
+                    />
+                  )}
                 </div>
               </Card>
             </Show>
           )}
         </For>
-
       </div>
 
       {/* チャンネル作成FAB */}
-      {useStoreMyUserinfo.getRolePower("manageChannel") && <CreateChannel fetchChannels={fetchChannels} />}
+      {useStoreMyUserinfo.getRolePower("manageChannel") && (
+        <CreateChannel fetchChannels={fetchChannels} />
+      )}
     </div>
-  )
+  );
 }

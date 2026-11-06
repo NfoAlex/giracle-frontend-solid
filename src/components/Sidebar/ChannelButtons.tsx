@@ -1,12 +1,12 @@
-import { createEffect, createSignal, For, on, onMount } from "solid-js";
-import { SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "../ui/sidebar";
-import { storeMyUserinfo } from "~/stores/MyUserinfo.store.ts";
 import { A, useLocation } from "@solidjs/router";
-import { IconLock, IconHash } from "@tabler/icons-solidjs";
+import { IconHash, IconLock } from "@tabler/icons-solidjs";
+import { createEffect, createSignal, For, on, onMount } from "solid-js";
+import Sortable from "sortablejs";
 import { useStoreChannelInfo } from "~/stores/ChannelInfo.store.ts";
 import { storeHasNewMessage } from "~/stores/HasNewMessage.store.ts";
-import Sortable from 'sortablejs';
 import { storeInbox } from "~/stores/Inbox.store.ts";
+import { storeMyUserinfo } from "~/stores/MyUserinfo.store.ts";
+import { SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "../ui/sidebar";
 
 export default function ChannelButtons() {
   const loc = useLocation();
@@ -16,7 +16,9 @@ export default function ChannelButtons() {
   //内部ソート計算用のチャンネルリスト
   let virtualList = [] as { channelId: string }[];
   //表示に使うチャンネルリスト
-  const [channelListSorted, setChannelListSorted] = createSignal([...storeMyUserinfo.ChannelJoin]);
+  const [channelListSorted, setChannelListSorted] = createSignal([
+    ...storeMyUserinfo.ChannelJoin,
+  ]);
 
   /**
    * チャンネル表示をソートする
@@ -51,14 +53,14 @@ export default function ChannelButtons() {
       setChannelListSorted([...storeMyUserinfo.ChannelJoin]);
       virtualList = [...storeMyUserinfo.ChannelJoin];
     }
-  }
+  };
 
   //チャンネルの入退出を監視してそのたびにソートする
   createEffect(
     on(
       () => storeMyUserinfo.ChannelJoin,
-      () => sortIt()
-    )
+      () => sortIt(),
+    ),
   );
 
   onMount(() => {
@@ -119,7 +121,8 @@ export default function ChannelButtons() {
   });
 
   //チャンネルにメンションがあるかどうか
-  const hasMention = (channelId: string) => storeInbox.some((i) => i.Message.channelId === channelId);
+  const hasMention = (channelId: string) =>
+    storeInbox.some((i) => i.Message.channelId === channelId);
 
   return (
     <SidebarMenu id="channelButtonDisplay">
@@ -129,28 +132,42 @@ export default function ChannelButtons() {
             <SidebarMenuButton
               as={A}
               href={`/app/channel/${c.channelId}`}
-              variant={loc.pathname.startsWith(`/app/channel/${c.channelId}`) ? "outline" : "default"}
+              variant={
+                loc.pathname.startsWith(`/app/channel/${c.channelId}`)
+                  ? "outline"
+                  : "default"
+              }
               class="truncate flex flex-row items-center md:p-2 p-5"
             >
-              { //チャンネルの閲覧権限がある時の錠前アイコン、違うなら"#"アイコン
-                useStoreChannelInfo.directGetterChannelInfo(c.channelId).ChannelViewableRole.length !== 0
-                  ?
+              {
+                //チャンネルの閲覧権限がある時の錠前アイコン、違うなら"#"アイコン
+                useStoreChannelInfo.directGetterChannelInfo(c.channelId)
+                  .ChannelViewableRole.length !== 0 ? (
                   <IconLock class={"shrink-0 drag-handler"} size={"18"} />
-                  :
+                ) : (
                   <IconHash class={"drag-handler"} />
+                )
               }
-              <p class={storeHasNewMessage[c.channelId] ? "truncate" : "text-muted-foreground truncate"}>
+              <p
+                class={
+                  storeHasNewMessage[c.channelId]
+                    ? "truncate"
+                    : "text-muted-foreground truncate"
+                }
+              >
                 {useStoreChannelInfo.directGetterChannelInfo(c.channelId).name}
               </p>
-              {
-                (storeHasNewMessage[c.channelId] || hasMention(c.channelId))
-                &&
-                <span class={`text-xs ml-auto shrink-0 ${hasMention(c.channelId) && 'text-red-500'}`}>●</span>
-              }
+              {(storeHasNewMessage[c.channelId] || hasMention(c.channelId)) && (
+                <span
+                  class={`text-xs ml-auto shrink-0 ${hasMention(c.channelId) && "text-red-500"}`}
+                >
+                  ●
+                </span>
+              )}
             </SidebarMenuButton>
           </SidebarMenuItem>
         )}
       </For>
     </SidebarMenu>
-  )
+  );
 }

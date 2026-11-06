@@ -1,18 +1,30 @@
 import { useSearchParams } from "@solidjs/router";
 import { createSignal } from "solid-js";
+import ManageBot from "~/components/ManageServer/manage-bot";
 import ManageCommunity from "~/components/ManageServer/manage-community.tsx";
+import ManageEmoji from "~/components/ManageServer/manage-emoji.tsx";
 import ManageInvite from "~/components/ManageServer/manage-invite.tsx";
+import ManageLogs from "~/components/ManageServer/manage-logs";
 import ManageRole from "~/components/ManageServer/manage-role.tsx";
 import { Button } from "~/components/ui/button.tsx";
 import { Card } from "~/components/ui/card.tsx";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~/components/ui/select.tsx";
-import { useStoreMyUserinfo } from "~/stores/MyUserinfo.store.ts";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "~/components/ui/select.tsx";
 import SidebarTriggerWithDot from "~/components/unique/SidebarTriggerWithDot.tsx";
-import ManageEmoji from "~/components/ManageServer/manage-emoji.tsx";
-import ManageLogs from "~/components/ManageServer/manage-logs";
-import ManageBot from "~/components/ManageServer/manage-bot";
+import { useStoreMyUserinfo } from "~/stores/MyUserinfo.store.ts";
 
-type TManageServerTab = "community" | "role" | "bot" | "invite" | "customEmoji" | "logs";
+type TManageServerTab =
+  | "community"
+  | "role"
+  | "bot"
+  | "invite"
+  | "customEmoji"
+  | "logs";
 
 export default function ManageServer() {
   // ?botName= 指定時はBot管理タブを開く（ManageBotがクエリで初期検索するため）
@@ -30,12 +42,42 @@ export default function ManageServer() {
         </div>
         <hr class="hidden md:inline" />
         <div class="md:flex items-center gap-2 hidden">
-          <Button onclick={()=>setDisplayMode("community")} variant={ displayMode()==="community" ? "default" : "outline" }>コミュニティ設定</Button>
-          <Button onclick={()=>setDisplayMode("role")} variant={ displayMode()==="role" ? "default" : "outline" }>ロール</Button>
-          <Button onclick={()=>setDisplayMode("bot")} variant={ displayMode()==="bot" ? "default" : "outline" }>Bot管理</Button>
-          <Button onclick={()=>setDisplayMode("invite")} variant={ displayMode()==="invite" ? "default" : "outline" }>招待</Button>
-          <Button onclick={()=>setDisplayMode("customEmoji")} variant={ displayMode()==="customEmoji" ? "default" : "outline" }>カスタム絵文字</Button>
-          <Button onclick={()=>setDisplayMode("logs")} variant={ displayMode()==="logs" ? "default" : "outline" }>ログ</Button>
+          <Button
+            onclick={() => setDisplayMode("community")}
+            variant={displayMode() === "community" ? "default" : "outline"}
+          >
+            コミュニティ設定
+          </Button>
+          <Button
+            onclick={() => setDisplayMode("role")}
+            variant={displayMode() === "role" ? "default" : "outline"}
+          >
+            ロール
+          </Button>
+          <Button
+            onclick={() => setDisplayMode("bot")}
+            variant={displayMode() === "bot" ? "default" : "outline"}
+          >
+            Bot管理
+          </Button>
+          <Button
+            onclick={() => setDisplayMode("invite")}
+            variant={displayMode() === "invite" ? "default" : "outline"}
+          >
+            招待
+          </Button>
+          <Button
+            onclick={() => setDisplayMode("customEmoji")}
+            variant={displayMode() === "customEmoji" ? "default" : "outline"}
+          >
+            カスタム絵文字
+          </Button>
+          <Button
+            onclick={() => setDisplayMode("logs")}
+            variant={displayMode() === "logs" ? "default" : "outline"}
+          >
+            ログ
+          </Button>
         </div>
 
         {/* スマホ用 */}
@@ -44,8 +86,15 @@ export default function ManageServer() {
             value={displayMode()}
             defaultValue={"community"}
             onChange={setDisplayMode}
-            options={["community", "role", "bot", "invite", "customEmoji", "logs"]}
-            itemComponent={(props) =>
+            options={[
+              "community",
+              "role",
+              "bot",
+              "invite",
+              "customEmoji",
+              "logs",
+            ]}
+            itemComponent={(props) => (
               <SelectItem item={props.item}>
                 {props.item.textValue === "community" && "コミュニティ設定"}
                 {props.item.textValue === "role" && "ロール"}
@@ -54,21 +103,24 @@ export default function ManageServer() {
                 {props.item.textValue === "customEmoji" && "カスタム絵文字"}
                 {props.item.textValue === "logs" && "ログ"}
               </SelectItem>
-            }
+            )}
           >
             <SelectTrigger aria-label="manage-display-mode">
               <SelectValue<TManageServerTab>>
-                {
-                  (state) =>
+                {(state) => (
                   <span class="flex items-center">
-                    { state.selectedOption() === "community" && <p>コミュニティ設定</p> }
-                    { state.selectedOption() === "role" && <p>ロール設定</p> }
-                    { state.selectedOption() === "invite" && <p>招待</p> }
-                    { state.selectedOption() === "bot" && <p>Bot管理</p> }
-                    { state.selectedOption() === "customEmoji" && <p>カスタム絵文字</p> }
-                    { state.selectedOption() === "logs" && <p>ログ</p> }
+                    {state.selectedOption() === "community" && (
+                      <p>コミュニティ設定</p>
+                    )}
+                    {state.selectedOption() === "role" && <p>ロール設定</p>}
+                    {state.selectedOption() === "invite" && <p>招待</p>}
+                    {state.selectedOption() === "bot" && <p>Bot管理</p>}
+                    {state.selectedOption() === "customEmoji" && (
+                      <p>カスタム絵文字</p>
+                    )}
+                    {state.selectedOption() === "logs" && <p>ログ</p>}
                   </span>
-                }
+                )}
               </SelectValue>
             </SelectTrigger>
             <SelectContent />
@@ -76,12 +128,42 @@ export default function ManageServer() {
         </div>
       </Card>
 
-      { displayMode() === "community" && (useStoreMyUserinfo.getRolePower("manageServer") ? <ManageCommunity /> : <p>サーバーの管理権限がありません</p>) }
-      { displayMode() === "role" && (useStoreMyUserinfo.getRolePower("manageRole") ? <ManageRole /> : <p>ロールの管理権限がありません</p>) }
-      { displayMode() === "bot" && (useStoreMyUserinfo.getRolePower("manageServer") ? <ManageBot /> : <p>サーバーの管理権限がありません</p>) }
-      { displayMode() === "invite" && (useStoreMyUserinfo.getRolePower("manageServer") ? <ManageInvite /> : <p>サーバーの管理権限がありません</p>) }
-      { displayMode() === "customEmoji" && (useStoreMyUserinfo.getRolePower("manageEmoji") ? <ManageEmoji /> : <p>カスタム絵文字の管理権限がありません</p>) }
-      { displayMode() === "logs" && (useStoreMyUserinfo.getRolePower("manageServer") ? <ManageLogs /> : <p>ログ取得の管理権限がありません</p>) }
+      {displayMode() === "community" &&
+        (useStoreMyUserinfo.getRolePower("manageServer") ? (
+          <ManageCommunity />
+        ) : (
+          <p>サーバーの管理権限がありません</p>
+        ))}
+      {displayMode() === "role" &&
+        (useStoreMyUserinfo.getRolePower("manageRole") ? (
+          <ManageRole />
+        ) : (
+          <p>ロールの管理権限がありません</p>
+        ))}
+      {displayMode() === "bot" &&
+        (useStoreMyUserinfo.getRolePower("manageServer") ? (
+          <ManageBot />
+        ) : (
+          <p>サーバーの管理権限がありません</p>
+        ))}
+      {displayMode() === "invite" &&
+        (useStoreMyUserinfo.getRolePower("manageServer") ? (
+          <ManageInvite />
+        ) : (
+          <p>サーバーの管理権限がありません</p>
+        ))}
+      {displayMode() === "customEmoji" &&
+        (useStoreMyUserinfo.getRolePower("manageEmoji") ? (
+          <ManageEmoji />
+        ) : (
+          <p>カスタム絵文字の管理権限がありません</p>
+        ))}
+      {displayMode() === "logs" &&
+        (useStoreMyUserinfo.getRolePower("manageServer") ? (
+          <ManageLogs />
+        ) : (
+          <p>ログ取得の管理権限がありません</p>
+        ))}
     </div>
   );
 }

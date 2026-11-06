@@ -1,26 +1,44 @@
-import { createSignal, onCleanup, onMount,Show } from "solid-js";
 import { useParams } from "@solidjs/router";
-import { IconSquareRoundedX, IconFileFilled,IconInfoCircle } from '@tabler/icons-solidjs';
-import { Card } from "~/components/ui/card.tsx";
-import { ProgressCircle } from "~/components/ui/progress-circle.tsx";
-import { HoverCard, HoverCardContent, HoverCardTrigger } from "~/components/ui/hover-card.tsx";
+import {
+  IconFileFilled,
+  IconInfoCircle,
+  IconSquareRoundedX,
+} from "@tabler/icons-solidjs";
+import { createSignal, onCleanup, onMount, Show } from "solid-js";
+import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert.tsx";
 import { Button } from "~/components/ui/button.tsx";
-import { Tooltip,TooltipContent,TooltipTrigger } from "~/components/ui/tooltip.tsx";
-import { Dialog,DialogDescription,DialogHeader,DialogContent,DialogTitle } from "~/components/ui/dialog.tsx";
+import { Card } from "~/components/ui/card.tsx";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "~/components/ui/dialog.tsx";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "~/components/ui/hover-card.tsx";
+import { ProgressCircle } from "~/components/ui/progress-circle.tsx";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "~/components/ui/tooltip.tsx";
 import { storeServerinfo } from "~/stores/Serverinfo.store.ts";
 import ConvertSizeToHumanSize from "~/utils/ConvertSizeToHumanSize.ts";
-import { Alert,AlertDescription,AlertTitle } from "~/components/ui/alert.tsx";
 
-export default function FileUploadPreview(
-  props: {
-    file: File,
-    dataSetter: (files: string) => void,
-    onRemove?: (fileIdBinded: string, fileName: string) => void,
-  }
-) {
+export default function FileUploadPreview(props: {
+  file: File;
+  dataSetter: (files: string) => void;
+  onRemove?: (fileIdBinded: string, fileName: string) => void;
+}) {
   const params = useParams();
   const [progress, setProgress] = createSignal(0);
-  const [result, setResult] = createSignal<"" | "SUCCESS" | "内部エラー" | `error::${string}`>("");
+  const [result, setResult] = createSignal<
+    "" | "SUCCESS" | "内部エラー" | `error::${string}`
+  >("");
   const [openFileNameCard, setOpenFileNameCard] = createSignal(false);
   const [previewUrl, setPreviewUrl] = createSignal<string>("");
   const [open, setOpen] = createSignal(false); //エラー表示ダイアログ用
@@ -41,7 +59,7 @@ export default function FileUploadPreview(
     }
 
     //画像ファイルならプレビュー用のURLを生成
-    if (props.file.type.startsWith('image/')) {
+    if (props.file.type.startsWith("image/")) {
       setPreviewUrl(URL.createObjectURL(props.file));
     }
 
@@ -73,9 +91,8 @@ export default function FileUploadPreview(
 
       if (xhr.status === 200) {
         //console.log("FileUploadPreview :: uploadFile : 成功!->", xhr.responseText);
-        const result: { result: string; data: { fileId: { id: string } } } = JSON.parse(
-          xhr.responseText,
-        );
+        const result: { result: string; data: { fileId: { id: string } } } =
+          JSON.parse(xhr.responseText);
         //結果がちゃんと取れているなら親コンポにファイルIdを渡す
         if (result.data !== undefined) {
           props.dataSetter(result.data.fileId.id);
@@ -84,11 +101,18 @@ export default function FileUploadPreview(
           setResult("SUCCESS");
         } else {
           //エラーとして設定
-          console.error("FileUploadPreview :: uploadFile : 結果が取れていない->", result);
+          console.error(
+            "FileUploadPreview :: uploadFile : 結果が取れていない->",
+            result,
+          );
           setResult(`error::${xhr.responseText}`);
         }
       } else {
-        console.error("FileUploadPreview :: uploadFile : 失敗...->", xhr.statusText, xhr.responseText);
+        console.error(
+          "FileUploadPreview :: uploadFile : 失敗...->",
+          xhr.statusText,
+          xhr.responseText,
+        );
         if (xhr.responseText === "File size is too large") {
           setResult("error::ファイルサイズが大きすぎます");
           return;
@@ -101,7 +125,7 @@ export default function FileUploadPreview(
     xhr.open("POST", "/api/message/file/upload");
     //アップロードする
     xhr.send(formData);
-  }
+  };
 
   onMount(() => uploadFile());
   onCleanup(() => {
@@ -110,7 +134,7 @@ export default function FileUploadPreview(
     if (previewUrl()) {
       URL.revokeObjectURL(previewUrl());
     }
-  })
+  });
 
   return (
     <div class="w-48 h-48 overflow-hidden">
@@ -120,14 +144,20 @@ export default function FileUploadPreview(
           <DialogHeader>
             <DialogTitle>ファイルアップロードに失敗</DialogTitle>
             <DialogDescription class="pt-2">
-              <p>{ result().startsWith("error::") ? result().substring("error::".length) : "不明なエラーが発生しました。" }</p>
+              <p>
+                {result().startsWith("error::")
+                  ? result().substring("error::".length)
+                  : "不明なエラーが発生しました。"}
+              </p>
               <Show when={result() === "error::ファイルサイズが大きすぎます"}>
                 <br />
                 <Alert>
                   <IconInfoCircle />
                   <AlertTitle>ファイルサイズ制限について</AlertTitle>
                   <AlertDescription>
-                    このコミュニティではファイルサイズの制限は{ConvertSizeToHumanSize(storeServerinfo.MessageMaxFileSize)}と設定されています。
+                    このコミュニティではファイルサイズの制限は
+                    {ConvertSizeToHumanSize(storeServerinfo.MessageMaxFileSize)}
+                    と設定されています。
                   </AlertDescription>
                 </Alert>
               </Show>
@@ -139,55 +169,69 @@ export default function FileUploadPreview(
       <Card class={"py-2 h-full w-full flex flex-col gap-1"}>
         {/* 画像のプレビューかファイルアイコンの表示 */}
         <div class="px-2 grow flex justify-center items-center">
-          {
-            props.file.type.startsWith('image/')
-            ?
-              <img
-                src={previewUrl()}
-                class={"rounded object-cover max-h-28 max-w-full"}
-                alt={props.file.name}
-              />
-            :
-              <span class="my-auto mx-auto"><IconFileFilled class="w-16 h-16" /></span>
-          }
+          {props.file.type.startsWith("image/") ? (
+            <img
+              src={previewUrl()}
+              class={"rounded object-cover max-h-28 max-w-full"}
+              alt={props.file.name}
+            />
+          ) : (
+            <span class="my-auto mx-auto">
+              <IconFileFilled class="w-16 h-16" />
+            </span>
+          )}
         </div>
 
         <span class="border-b-2"></span>
 
         <span class="px-2 w-full shrink-0 flex items-center gap-1 truncate">
           {/* アップロードの進捗か結果表示 */}
-          <span class="shrink-0 grow-0 text-sm w-4 h-4 text-center" style="font-family: 'consolas'">
-            {result() === "" && <ProgressCircle value={progress()} class="w-4 h-4 mx-auto" /> }
-            {result() === "SUCCESS" && "✅" }
-            { //エラー表示
-              result().startsWith("error::")
-              &&
-              <Tooltip placement="top">
-                <TooltipTrigger>
-                  <span onClick={()=>setOpen(true)}>⛔</span>
-                </TooltipTrigger>
-                <TooltipContent>{ result().substring("error::".length) }</TooltipContent>
-              </Tooltip>
+          <span
+            class="shrink-0 grow-0 text-sm w-4 h-4 text-center"
+            style="font-family: 'consolas'"
+          >
+            {result() === "" && (
+              <ProgressCircle value={progress()} class="w-4 h-4 mx-auto" />
+            )}
+            {result() === "SUCCESS" && "✅"}
+            {
+              //エラー表示
+              result().startsWith("error::") && (
+                <Tooltip placement="top">
+                  <TooltipTrigger>
+                    <span onClick={() => setOpen(true)}>⛔</span>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    {result().substring("error::".length)}
+                  </TooltipContent>
+                </Tooltip>
+              )
             }
           </span>
 
           {/* ファイル名表示 */}
           <div class="shrink truncate">
-            <HoverCard open={openFileNameCard()} onOpenChange={setOpenFileNameCard} >
+            <HoverCard
+              open={openFileNameCard()}
+              onOpenChange={setOpenFileNameCard}
+            >
               <HoverCardTrigger>
-                <p onClick={()=>setOpenFileNameCard(true)} class="text-sm truncate">
-                  { props.file.name }
+                <p
+                  onClick={() => setOpenFileNameCard(true)}
+                  class="text-sm truncate"
+                >
+                  {props.file.name}
                 </p>
               </HoverCardTrigger>
-              <HoverCardContent>
-                { props.file.name }
-              </HoverCardContent>
+              <HoverCardContent>{props.file.name}</HoverCardContent>
             </HoverCard>
           </div>
 
           {/* 削除ボタン */}
           <Button
-            onClick={()=>props.onRemove && props.onRemove(fileIdBinded, props.file.name)}
+            onClick={() =>
+              props.onRemove && props.onRemove(fileIdBinded, props.file.name)
+            }
             size={"icon"}
             variant={"ghost"}
             class={"ml-auto shrink-0"}

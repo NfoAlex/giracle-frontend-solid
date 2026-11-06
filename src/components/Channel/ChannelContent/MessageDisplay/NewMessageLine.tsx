@@ -1,6 +1,6 @@
 import { Badge } from "~/components/ui/badge.tsx";
 
-export default function NewMessageLine () {
+export default function NewMessageLine() {
   return (
     <div class="w-full flex flex-row items-center gap-2" id="NEW_LINE">
       <hr class="grow shrink" />

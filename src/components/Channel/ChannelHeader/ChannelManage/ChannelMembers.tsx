@@ -1,48 +1,62 @@
 import { IconKarate, IconSearch } from "@tabler/icons-solidjs";
 import { createSignal, For, onMount, Show } from "solid-js";
-import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar.tsx";
+import { api } from "~/api/index.ts";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "~/components/ui/avatar.tsx";
 import { Button } from "~/components/ui/button.tsx";
 import { Card } from "~/components/ui/card.tsx";
-import { TextField, TextFieldInput, TextFieldLabel } from "~/components/ui/text-field.tsx";
-import UserinfoModalWrapper from "~/components/unique/UserinfoModalWrapper.tsx";
+import {
+  TextField,
+  TextFieldInput,
+  TextFieldLabel,
+} from "~/components/ui/text-field.tsx";
 import BotBadge from "~/components/unique/BotBadge.tsx";
+import UserinfoModalWrapper from "~/components/unique/UserinfoModalWrapper.tsx";
+import {
+  storeMyUserinfo,
+  useStoreMyUserinfo,
+} from "~/stores/MyUserinfo.store.ts";
 import { useStoreUserinfo } from "~/stores/Userinfo.store.ts";
 import type { IUser } from "~/types/User.ts";
 import InviteUserModal from "./ChannelMembers/InviteUserModal.tsx";
-import { api } from "~/api/index.ts";
-import { useStoreMyUserinfo, storeMyUserinfo } from "~/stores/MyUserinfo.store.ts";
 
-export default function ChannelMembers(props: {channelId: string}) {
+export default function ChannelMembers(props: { channelId: string }) {
   const [users, setUsers] = createSignal<IUser[]>([]);
   const [searchQuery, setSearchQuery] = createSignal<string>("");
-  const [cursorUserId, setCursorUserId] = createSignal<IUser["id"] | undefined>(undefined);
+  const [cursorUserId, setCursorUserId] = createSignal<IUser["id"] | undefined>(
+    undefined,
+  );
 
   // ユーザー一覧を取得、オプションで挿入か格納かを選択
   const fetchUsers = async (optionInsert = false) => {
     // 新規検索時はカーソルをリセット（古いカーソルで先頭が欠損するのを防ぐ）
     const cursor = optionInsert ? cursorUserId() : undefined;
     if (!optionInsert) setCursorUserId(undefined);
-    api.user.list({
-      username: searchQuery(),
-      joinedChannel: props.channelId,
-      cursorUserId: cursor,
-    })
-    .then((r) => {
-      console.log(r);
+    api.user
+      .list({
+        username: searchQuery(),
+        joinedChannel: props.channelId,
+        cursorUserId: cursor,
+      })
+      .then((r) => {
+        console.log(r);
 
-      if (optionInsert) {
-        setUsers((u) => [...u, ...r.data]);
-      } else {
-        setUsers(r.data);
-      }
+        if (optionInsert) {
+          setUsers((u) => [...u, ...r.data]);
+        } else {
+          setUsers(r.data);
+        }
 
-      if (r.data.length >= 30) {
-        setCursorUserId(r.data.at(-1)?.id);
-      } else {
-        setCursorUserId(undefined);
-      }
-    })
-    .catch((e) => console.error("ChannelMembers :: fetchUsers : e", e));
+        if (r.data.length >= 30) {
+          setCursorUserId(r.data.at(-1)?.id);
+        } else {
+          setCursorUserId(undefined);
+        }
+      })
+      .catch((e) => console.error("ChannelMembers :: fetchUsers : e", e));
   };
 
   /**
@@ -50,7 +64,8 @@ export default function ChannelMembers(props: {channelId: string}) {
    * @param userId
    */
   const kickIt = (userId: string) => {
-    api.channel.kick({ userId, channelId: props.channelId })
+    api.channel
+      .kick({ userId, channelId: props.channelId })
       .then((r) => {
         //console.log("ChannelMember :: kickIt : 招待成功 -> ", r);
         // キックしたユーザーを一覧から削除
@@ -68,15 +83,20 @@ export default function ChannelMembers(props: {channelId: string}) {
 
   return (
     <div class="h-full flex flex-col gap-3">
-
       <TextField>
         <span class="flex items-center gap-2">
           <TextFieldInput
             value={searchQuery()}
-            onInput={(e)=>setSearchQuery(e.currentTarget.value)}
+            onInput={(e) => setSearchQuery(e.currentTarget.value)}
             placeholder="ユーザー名検索"
           />
-          <Button onClick={() => fetchUsers(false)} size={"icon"} class="shrink-0"><IconSearch /></Button>
+          <Button
+            onClick={() => fetchUsers(false)}
+            size={"icon"}
+            class="shrink-0"
+          >
+            <IconSearch />
+          </Button>
         </span>
       </TextField>
 
@@ -86,48 +106,63 @@ export default function ChannelMembers(props: {channelId: string}) {
         </Show>
 
         <For each={users()}>
-          {
-            (user) => (
-              <div class="w-full flex flex-row items-center gap-2">
-                <UserinfoModalWrapper userId={user.id} class="p-2 rounded grow flex flex-row items-center gap-2 hover:bg-accent cursor-pointer">
-                  <Avatar class="w-8 h-8 shrink-0">
-                    <AvatarFallback >{ user.id.slice(0,2) }</AvatarFallback>
-                    <AvatarImage src={"/api/user/icon/" + user.id} alt={user.id} />
-                  </Avatar>
-                  <span class="truncate shrink">{ useStoreUserinfo.getterUserinfo(user.id).name }</span>
-                  <Show when={useStoreUserinfo.getterUserinfo(user.id).isBot}>
-                    <BotBadge />
-                  </Show>
-                </UserinfoModalWrapper>
+          {(user) => (
+            <div class="w-full flex flex-row items-center gap-2">
+              <UserinfoModalWrapper
+                userId={user.id}
+                class="p-2 rounded grow flex flex-row items-center gap-2 hover:bg-accent cursor-pointer"
+              >
+                <Avatar class="w-8 h-8 shrink-0">
+                  <AvatarFallback>{user.id.slice(0, 2)}</AvatarFallback>
+                  <AvatarImage
+                    src={"/api/user/icon/" + user.id}
+                    alt={user.id}
+                  />
+                </Avatar>
+                <span class="truncate shrink">
+                  {useStoreUserinfo.getterUserinfo(user.id).name}
+                </span>
+                <Show when={useStoreUserinfo.getterUserinfo(user.id).isBot}>
+                  <BotBadge />
+                </Show>
+              </UserinfoModalWrapper>
 
-                {
-                  (useStoreMyUserinfo.getRolePower("manageChannel") && storeMyUserinfo.id !== user.id)
-                  &&
-                  <Button onClick={()=>kickIt(user.id)} class="ml-auto mr-2 shrink-0" size={"icon"} variant={"outline"}><IconKarate /></Button>
-                }
-              </div>
-            )
-          }
+              {useStoreMyUserinfo.getRolePower("manageChannel") &&
+                storeMyUserinfo.id !== user.id && (
+                  <Button
+                    onClick={() => kickIt(user.id)}
+                    class="ml-auto mr-2 shrink-0"
+                    size={"icon"}
+                    variant={"outline"}
+                  >
+                    <IconKarate />
+                  </Button>
+                )}
+            </div>
+          )}
         </For>
 
         <Show when={cursorUserId() !== undefined}>
           <Button
-            onClick={() => fetchUsers(true) }
+            onClick={() => fetchUsers(true)}
             class="w-full mt-2"
             variant={"secondary"}
-          >さらに読み込む</Button>
+          >
+            さらに読み込む
+          </Button>
         </Show>
       </Card>
 
-      { //チャンネル招待ボタン
-        useStoreMyUserinfo.getRolePower("manageChannel")
-        &&
-        <span class="mt-auto w-full">
-          <InviteUserModal
-            channelId={props.channelId}
-            onInvite={(u) => setUsers([...users(), u])}
-          />
-        </span>
+      {
+        //チャンネル招待ボタン
+        useStoreMyUserinfo.getRolePower("manageChannel") && (
+          <span class="mt-auto w-full">
+            <InviteUserModal
+              channelId={props.channelId}
+              onInvite={(u) => setUsers([...users(), u])}
+            />
+          </span>
+        )
       }
     </div>
   );

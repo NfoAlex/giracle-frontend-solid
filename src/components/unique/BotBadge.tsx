@@ -1,5 +1,5 @@
-import { Badge, type BadgeProps } from "~/components/ui/badge.tsx";
 import { IconCircleFilled } from "@tabler/icons-solidjs";
+import { Badge, type BadgeProps } from "~/components/ui/badge.tsx";
 import { cn } from "~/lib/utils.ts";
 
 export default function BotBadge(props: {

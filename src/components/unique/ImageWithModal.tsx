@@ -1,23 +1,23 @@
-import { createSignal } from "solid-js";
 import { Dialog as KDialog } from "@kobalte/core/dialog";
+import { createSignal } from "solid-js";
 
 /**
  * img要素として使うことができクリックするとモーダルとして拡大もできるコンポーネント。
  * @param props - `{class: 適用したいCSSのクラス, src: 画像のURL}`
  */
 export default function ImageWithModal(props: {
-  class?: string,
-  src: string | null,
-  height?: number,
-  width?: number,
-  useThumbnail?: boolean
+  class?: string;
+  src: string | null;
+  height?: number;
+  width?: number;
+  useThumbnail?: boolean;
 }) {
   const [isOpen, setIsOpen] = createSignal(false);
 
   //URL
   const srcUrl = props.src;
   //URLが無効なら何も返さない
-  if (srcUrl === null) return <></>
+  if (srcUrl === null) return <></>;
 
   return (
     <>
@@ -25,7 +25,10 @@ export default function ImageWithModal(props: {
       <img
         onClick={() => setIsOpen(true)}
         src={
-          props.useThumbnail ? "/api/message/url-thumbnail?targetUrl=" + srcUrl : srcUrl}
+          props.useThumbnail
+            ? "/api/message/url-thumbnail?targetUrl=" + srcUrl
+            : srcUrl
+        }
         class={`${props.class} cursor-pointer object-contain`}
         style={`height: ${props.height}px;`}
         alt={srcUrl.length > 30 ? srcUrl.slice(0, 15) + "..." : srcUrl}
@@ -36,7 +39,9 @@ export default function ImageWithModal(props: {
         <KDialog.Portal>
           <div
             onClick={() => setIsOpen(false)}
-            class={"inset-0 z-50 p-2 fixed flex justify-center items-center w-full h-full bg-black bg-opacity-50"}
+            class={
+              "inset-0 z-50 p-2 fixed flex justify-center items-center w-full h-full bg-black bg-opacity-50"
+            }
           >
             <KDialog.Content
               class={"h-4/5 w-11/12 flex justify-center items-center"}
@@ -51,5 +56,5 @@ export default function ImageWithModal(props: {
         </KDialog.Portal>
       </KDialog>
     </>
-  )
+  );
 }

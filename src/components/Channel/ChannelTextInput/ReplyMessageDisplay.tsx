@@ -1,16 +1,23 @@
-import { createMemo, Show } from "solid-js";
 import { IconCornerUpLeft, IconX } from "@tabler/icons-solidjs";
-import { IMessage } from "~/types/Message.ts";
+import { createMemo, Show } from "solid-js";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "~/components/ui/avatar.tsx";
+import { Badge } from "~/components/ui/badge.tsx";
+import { Card } from "~/components/ui/card.tsx";
+import BotBadge from "~/components/unique/BotBadge.tsx";
 import { storeHistory } from "~/stores/History.store.ts";
 import storeReplyingMessageId from "~/stores/ReplyingMessageId.store.ts";
-import { Card } from "~/components/ui/card.tsx";
-import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar.tsx";
 import { useStoreUserinfo } from "~/stores/Userinfo.store.ts";
-import { Badge } from "~/components/ui/badge.tsx";
-import BotBadge from "~/components/unique/BotBadge.tsx";
+import type { IMessage } from "~/types/Message.ts";
 
-export default function ReplyMessageDisplay(props: {messageId: string, channelId: string, onRemove: () => void}) {
-
+export default function ReplyMessageDisplay(props: {
+  messageId: string;
+  channelId: string;
+  onRemove: () => void;
+}) {
   /**
    * 返信先メッセージの情報を取得するだけ
    */
@@ -26,13 +33,15 @@ export default function ReplyMessageDisplay(props: {messageId: string, channelId
       MessageUrlPreview: [],
       MessageFileAttached: [],
       reactionSummary: [],
-      replyingMessageId: null
+      replyingMessageId: null,
     };
     try {
-      const msg = storeHistory[props.channelId].history.find(m => m.id===storeReplyingMessageId[props.channelId]);
+      const msg = storeHistory[props.channelId].history.find(
+        (m) => m.id === storeReplyingMessageId[props.channelId],
+      );
       if (msg === undefined) return msgHolder;
       return msg;
-    }  catch(e) {
+    } catch (e) {
       return msgHolder;
     }
   });
@@ -44,30 +53,39 @@ export default function ReplyMessageDisplay(props: {messageId: string, channelId
       </div>
 
       <div class="ml-2 grow flex items-center gap-2 truncate">
-
         <Avatar class="w-8 h-8">
           <AvatarImage src={`/api/user/icon/${getReplyingMessage().userId}`} />
-          <AvatarFallback class="w-full h-full">{getReplyingMessage().userId}</AvatarFallback>
+          <AvatarFallback class="w-full h-full">
+            {getReplyingMessage().userId}
+          </AvatarFallback>
         </Avatar>
         <p class="truncate shrink-0 font-bold" style="max-width: 25%">
-          { useStoreUserinfo.getterUserinfo(getReplyingMessage().userId).name || "不明なユーザー" }
+          {useStoreUserinfo.getterUserinfo(getReplyingMessage().userId).name ||
+            "不明なユーザー"}
         </p>
-        <Show when={useStoreUserinfo.getterUserinfo(getReplyingMessage().userId).isBot}>
+        <Show
+          when={
+            useStoreUserinfo.getterUserinfo(getReplyingMessage().userId).isBot
+          }
+        >
           <BotBadge />
         </Show>
-        {
-          getReplyingMessage().MessageFileAttached.length > 0
-          &&
-          <Badge>{getReplyingMessage().MessageFileAttached.length}件の添付ファイル</Badge>
-        }
+        {getReplyingMessage().MessageFileAttached.length > 0 && (
+          <Badge>
+            {getReplyingMessage().MessageFileAttached.length}件の添付ファイル
+          </Badge>
+        )}
         <p class="truncate grow shrink-0 text-left">
-          { getReplyingMessage().content }
+          {getReplyingMessage().content}
         </p>
       </div>
 
-      <div onClick={props.onRemove} class="ml-auto border p-2 shrink-0 cursor-pointer hover:bg-border rounded-md">
+      <div
+        onClick={props.onRemove}
+        class="ml-auto border p-2 shrink-0 cursor-pointer hover:bg-border rounded-md"
+      >
         <IconX class="w-4 h-4" />
       </div>
     </Card>
-  )
+  );
 }

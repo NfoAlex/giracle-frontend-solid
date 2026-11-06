@@ -1,28 +1,51 @@
-import { createMemo, Match, Show, Switch } from "solid-js";
-import { Avatar, AvatarImage, AvatarFallback } from "~/components/ui/avatar.tsx";
-import UserinfoModalWrapper from "~/components/unique/UserinfoModalWrapper.tsx";
-import BotBadge from "~/components/unique/BotBadge.tsx";
-import { useStoreUserinfo } from "~/stores/Userinfo.store.ts";
-import { IconCornerUpRight } from "@tabler/icons-solidjs";
-import { storeMyUserinfo } from "~/stores/MyUserinfo.store.ts";
-import MessageTextRender from "./MessageRender/MessageTextRender.tsx";
 import { useLocation, useNavigate } from "@solidjs/router";
+import { IconCornerUpRight } from "@tabler/icons-solidjs";
+import { createMemo, Match, Show, Switch } from "solid-js";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "~/components/ui/avatar.tsx";
+import BotBadge from "~/components/unique/BotBadge.tsx";
+import UserinfoModalWrapper from "~/components/unique/UserinfoModalWrapper.tsx";
 import { useStoreMessageFetchCache } from "~/stores/MessageFetchCache.store.ts";
+import { storeMyUserinfo } from "~/stores/MyUserinfo.store.ts";
+import { useStoreUserinfo } from "~/stores/Userinfo.store.ts";
+import MessageTextRender from "./MessageRender/MessageTextRender.tsx";
 
-export default function DisplayReply(props: { replyingMessageId?: string | null, channelId?: string | null }) {
-  if (props.replyingMessageId === null || props.replyingMessageId === undefined || !props.channelId) {
+export default function DisplayReply(props: {
+  replyingMessageId?: string | null;
+  channelId?: string | null;
+}) {
+  if (
+    props.replyingMessageId === null ||
+    props.replyingMessageId === undefined ||
+    !props.channelId
+  ) {
     return <></>;
   }
   const nav = useNavigate();
   const loc = useLocation();
 
   const message = createMemo(() => {
-    if (props.channelId && props.replyingMessageId) return useStoreMessageFetchCache.getMessage(props.channelId, props.replyingMessageId)
+    if (props.channelId && props.replyingMessageId)
+      return useStoreMessageFetchCache.getMessage(
+        props.channelId,
+        props.replyingMessageId,
+      );
   });
-  const isDeleted = createMemo(() => props.replyingMessageId ? useStoreMessageFetchCache.getIsDeleted(props.replyingMessageId) : false);
+  const isDeleted = createMemo(() =>
+    props.replyingMessageId
+      ? useStoreMessageFetchCache.getIsDeleted(props.replyingMessageId)
+      : false,
+  );
 
   const jumpToMessage = () => {
-    if (props.replyingMessageId === null || props.replyingMessageId === undefined) return;
+    if (
+      props.replyingMessageId === null ||
+      props.replyingMessageId === undefined
+    )
+      return;
 
     const channelId = props.channelId;
     const messageId = props.replyingMessageId;
@@ -44,25 +67,37 @@ export default function DisplayReply(props: { replyingMessageId?: string | null,
       <Switch>
         <Match when={isDeleted()}>
           <IconCornerUpRight class="w-5 h-5 mr-1" />
-          <div class="italic text-sm text-muted-foreground">メッセージが見つかりません。</div>
+          <div class="italic text-sm text-muted-foreground">
+            メッセージが見つかりません。
+          </div>
         </Match>
 
         <Match when={message() !== undefined}>
           <div class="text-xs flex flex-row items-center gap-1">
             <IconCornerUpRight class="shrink-0 w-5 h-5" />
-            <UserinfoModalWrapper userId={message()!.userId} class="shrink-0 flex flex-row items-center gap-1">
+            <UserinfoModalWrapper
+              userId={message()!.userId}
+              class="shrink-0 flex flex-row items-center gap-1"
+            >
               <Avatar class="mx-auto w-5 h-5">
                 <AvatarImage src={`/api/user/icon/${message()!.userId}`} />
-                <AvatarFallback class="w-5 h-5">{message()!.userId.slice(0, 2)}</AvatarFallback>
+                <AvatarFallback class="w-5 h-5">
+                  {message()!.userId.slice(0, 2)}
+                </AvatarFallback>
               </Avatar>
               <span class="font-bold">
                 {useStoreUserinfo.getterUserinfo(message()!.userId).name}
               </span>
-              <Show when={useStoreUserinfo.getterUserinfo(message()!.userId).isBot}>
+              <Show
+                when={useStoreUserinfo.getterUserinfo(message()!.userId).isBot}
+              >
                 <BotBadge />
               </Show>
             </UserinfoModalWrapper>
-            <span onClick={jumpToMessage} class="shrink truncate line-clamp-1 cursor-pointer">
+            <span
+              onClick={jumpToMessage}
+              class="shrink truncate line-clamp-1 cursor-pointer"
+            >
               <span class="pointer-events-none">
                 <MessageTextRender content={message()!.content} />
               </span>

@@ -1,9 +1,21 @@
 import { IconPlus } from "@tabler/icons-solidjs";
-import { Button } from "../ui/button.tsx";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogTitle, DialogTrigger } from "../ui/dialog.tsx";
 import { createSignal } from "solid-js";
-import { TextField, TextFieldInput, TextFieldLabel, TextFieldTextArea } from "../ui/text-field.tsx";
 import { api } from "~/api/index.ts";
+import { Button } from "../ui/button.tsx";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogTitle,
+  DialogTrigger,
+} from "../ui/dialog.tsx";
+import {
+  TextField,
+  TextFieldInput,
+  TextFieldLabel,
+  TextFieldTextArea,
+} from "../ui/text-field.tsx";
 
 export default function CreateChannel(props: { fetchChannels: () => void }) {
   const [channelName, setChannelName] = createSignal<string>("");
@@ -14,7 +26,8 @@ export default function CreateChannel(props: { fetchChannels: () => void }) {
    * チャンネル作成
    */
   const createChannel = () => {
-    api.channel.create({ channelName: channelName(), description: description() })
+    api.channel
+      .create({ channelName: channelName(), description: description() })
       .then((r) => {
         //console.log("CreateChannel :: createChannel :: r ->", r);
         props.fetchChannels(); //チャンネルリストを更新する
@@ -23,14 +36,12 @@ export default function CreateChannel(props: { fetchChannels: () => void }) {
       .catch((err) => {
         console.error("CreateChannel :: createChannel :: err ->", err);
       });
-  }
+  };
 
   return (
     <Dialog open={open()} onOpenChange={setOpen}>
       <DialogContent>
-        <DialogTitle>
-          チャンネル作成
-        </DialogTitle>
+        <DialogTitle>チャンネル作成</DialogTitle>
         <DialogDescription class="flex flex-col gap-4">
           <TextField class="grid w-full items-center gap-2">
             <TextFieldLabel for="email">チャンネル名</TextFieldLabel>
@@ -38,7 +49,7 @@ export default function CreateChannel(props: { fetchChannels: () => void }) {
               type="text"
               placeholder="チャンネル名"
               value={channelName()}
-              onInput={(e)=>setChannelName(e.currentTarget.value)}
+              onInput={(e) => setChannelName(e.currentTarget.value)}
             />
           </TextField>
           <TextField class="grid w-full items-center gap-2">
@@ -46,7 +57,7 @@ export default function CreateChannel(props: { fetchChannels: () => void }) {
             <TextFieldTextArea
               placeholder="概要"
               value={description()}
-              onInput={(e)=>setDescription(e.currentTarget.value)}
+              onInput={(e) => setDescription(e.currentTarget.value)}
             />
           </TextField>
         </DialogDescription>
@@ -55,7 +66,9 @@ export default function CreateChannel(props: { fetchChannels: () => void }) {
             onClick={createChannel}
             disabled={channelName() === ""}
             type="submit"
-          >作成</Button>
+          >
+            作成
+          </Button>
         </DialogFooter>
       </DialogContent>
       <DialogTrigger>

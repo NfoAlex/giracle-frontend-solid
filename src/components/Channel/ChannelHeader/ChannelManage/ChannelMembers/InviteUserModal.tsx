@@ -1,26 +1,47 @@
-import { IconCheck, IconExternalLink, IconPlus, IconSearch } from "@tabler/icons-solidjs";
+import {
+  IconCheck,
+  IconExternalLink,
+  IconPlus,
+  IconSearch,
+} from "@tabler/icons-solidjs";
 import { createSignal, For, Show } from "solid-js";
 import { createMutable } from "solid-js/store";
 import { api } from "~/api/index.ts";
-import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar.tsx";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "~/components/ui/avatar.tsx";
 import { Button } from "~/components/ui/button.tsx";
-import { Dialog, DialogContent, DialogHeader, DialogTrigger } from "~/components/ui/dialog.tsx";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTrigger,
+} from "~/components/ui/dialog.tsx";
 import { TextField, TextFieldInput } from "~/components/ui/text-field.tsx";
-import UserinfoModalWrapper from "~/components/unique/UserinfoModalWrapper.tsx";
 import BotBadge from "~/components/unique/BotBadge.tsx";
+import UserinfoModalWrapper from "~/components/unique/UserinfoModalWrapper.tsx";
 import { useStoreUserinfo } from "~/stores/Userinfo.store.ts";
-import { IUser } from "~/types/User.ts";
+import type { IUser } from "~/types/User.ts";
 
-export default function InviteUserModal(props: { channelId: string, onInvite?: (user: IUser) => void }) {
+export default function InviteUserModal(props: {
+  channelId: string;
+  onInvite?: (user: IUser) => void;
+}) {
   const [searchQuery, setSearchQuery] = createSignal("");
   const [userList, setUserList] = createSignal<IUser[]>([]);
-  const [cursorUserId, setCursorUserId] = createSignal<IUser["id"] | undefined>(undefined);
-  const [status, setStatus] = createSignal<"waiting"|"success"|"fail">("waiting");
+  const [cursorUserId, setCursorUserId] = createSignal<IUser["id"] | undefined>(
+    undefined,
+  );
+  const [status, setStatus] = createSignal<"waiting" | "success" | "fail">(
+    "waiting",
+  );
 
   //招待時の結果、状態管理
   const inviteJson = createMutable({
     processing: false,
-    invitedUserIds: [] as string[]
+    invitedUserIds: [] as string[],
   });
 
   /**
@@ -31,10 +52,11 @@ export default function InviteUserModal(props: { channelId: string, onInvite?: (
     // 新規検索時はカーソルをリセット（古いカーソルで先頭が欠損するのを防ぐ）
     const cursor = optionInsert ? cursorUserId() : undefined;
     if (!optionInsert) setCursorUserId(undefined);
-    api.user.list({
-      username: searchQuery(),
-      cursorUserId: cursor
-    })
+    api.user
+      .list({
+        username: searchQuery(),
+        cursorUserId: cursor,
+      })
       .then((r) => {
         setStatus("success");
         if (optionInsert) {
@@ -65,7 +87,8 @@ export default function InviteUserModal(props: { channelId: string, onInvite?: (
     inviteJson.invitedUserIds.push(user.id);
     inviteJson.processing = true;
 
-    api.channel.invite({ userId: user.id, channelId: props.channelId })
+    api.channel
+      .invite({ userId: user.id, channelId: props.channelId })
       .then((r) => {
         //console.log("InviteUserModal :: inviteIt : 招待成功 -> ", r);
         props.onInvite?.(user);
@@ -90,7 +113,6 @@ export default function InviteUserModal(props: { channelId: string, onInvite?: (
       </DialogTrigger>
 
       <DialogContent>
-
         <DialogHeader>
           <p>ユーザーを招待</p>
         </DialogHeader>
@@ -99,12 +121,14 @@ export default function InviteUserModal(props: { channelId: string, onInvite?: (
           <TextField class="w-full">
             <TextFieldInput
               value={searchQuery()}
-              onInput={(e)=>setSearchQuery(e.currentTarget.value)}
+              onInput={(e) => setSearchQuery(e.currentTarget.value)}
               placeholder="招待するユーザー名を検索"
             />
           </TextField>
 
-          <Button onclick={()=>searchIt(false)} size="icon"><IconSearch /></Button>
+          <Button onclick={() => searchIt(false)} size="icon">
+            <IconSearch />
+          </Button>
         </div>
 
         <hr class={"my-2"} />
@@ -112,54 +136,53 @@ export default function InviteUserModal(props: { channelId: string, onInvite?: (
         <Show when={status() === "waiting"}>
           <p class="text-center">ユーザー名を入力してください。</p>
         </Show>
-        {
-          (userList().length === 0 && status() === "success")
-          &&
+        {userList().length === 0 && status() === "success" && (
           <p class="text-center">ユーザーが見つかりません。</p>
-        }
+        )}
 
         <For each={userList()}>
-          {
-            (user) => (
-              <div class="p-2 w-full flex flex-row items-center gap-2 rounded cursor-pointer">
-                <Avatar class="w-8 h-8">
-                  <AvatarFallback >{ user.id.slice(0,2) }</AvatarFallback>
-                  <AvatarImage src={"/api/user/icon/" + user.id} alt={user.id} />
-                </Avatar>
-                <UserinfoModalWrapper userId={user.id}>
-                  <span class="flex items-center gap-1">
-                    <p class="hover:underline">{ useStoreUserinfo.getterUserinfo(user.id).name }</p>
-                    <Show when={useStoreUserinfo.getterUserinfo(user.id).isBot}>
-                      <BotBadge />
-                    </Show>
-                  </span>
-                </UserinfoModalWrapper>
+          {(user) => (
+            <div class="p-2 w-full flex flex-row items-center gap-2 rounded cursor-pointer">
+              <Avatar class="w-8 h-8">
+                <AvatarFallback>{user.id.slice(0, 2)}</AvatarFallback>
+                <AvatarImage src={"/api/user/icon/" + user.id} alt={user.id} />
+              </Avatar>
+              <UserinfoModalWrapper userId={user.id}>
+                <span class="flex items-center gap-1">
+                  <p class="hover:underline">
+                    {useStoreUserinfo.getterUserinfo(user.id).name}
+                  </p>
+                  <Show when={useStoreUserinfo.getterUserinfo(user.id).isBot}>
+                    <BotBadge />
+                  </Show>
+                </span>
+              </UserinfoModalWrapper>
 
-                {
-                  (user.ChannelJoin.some((c) => c.channelId === props.channelId) || inviteJson.invitedUserIds.includes(user.id))
-                  ?
-                    <IconCheck class="ml-auto" />
-                  :
-                    <Button
-                      onclick={()=>inviteIt(user)}
-                      class="ml-auto"
-                      size="icon"
-                      disabled={inviteJson.processing}
-                    >
-                      <IconPlus />
-                    </Button>
-                }
-              </div>
-            )
-          }
+              {user.ChannelJoin.some((c) => c.channelId === props.channelId) ||
+              inviteJson.invitedUserIds.includes(user.id) ? (
+                <IconCheck class="ml-auto" />
+              ) : (
+                <Button
+                  onclick={() => inviteIt(user)}
+                  class="ml-auto"
+                  size="icon"
+                  disabled={inviteJson.processing}
+                >
+                  <IconPlus />
+                </Button>
+              )}
+            </div>
+          )}
         </For>
 
         <Show when={cursorUserId() !== undefined && userList().length !== 0}>
           <Button
-            onClick={() => searchIt(true) }
+            onClick={() => searchIt(true)}
             class="w-full mt-2"
             variant={"secondary"}
-          >さらに読み込む</Button>
+          >
+            さらに読み込む
+          </Button>
         </Show>
       </DialogContent>
     </Dialog>

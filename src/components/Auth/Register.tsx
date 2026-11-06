@@ -1,9 +1,13 @@
-import { Show, createSignal } from "solid-js";
+import { createSignal, Show } from "solid-js";
 import { api } from "~/api/index.ts";
+import { storeServerinfo } from "~/stores/Serverinfo.store.ts";
 import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
 import { Button } from "../ui/button.tsx";
-import { TextField, TextFieldInput, TextFieldLabel } from "../ui/text-field.tsx";
-import {storeServerinfo} from "~/stores/Serverinfo.store.ts";
+import {
+  TextField,
+  TextFieldInput,
+  TextFieldLabel,
+} from "../ui/text-field.tsx";
 
 export default function Register() {
   const [inviteCode, setInviteCode] = createSignal("");
@@ -12,11 +16,12 @@ export default function Register() {
   const [result, setResult] = createSignal("");
 
   const signUp = async () => {
-    await api.user.register({
-      username: username(),
-      password: password(),
-      inviteCode: inviteCode() !== "" ? inviteCode() : undefined
-    })
+    await api.user
+      .register({
+        username: username(),
+        password: password(),
+        inviteCode: inviteCode() !== "" ? inviteCode() : undefined,
+      })
       .then((res) => {
         //console.log("Register :: signUp : res->", res);
         setResult("success");

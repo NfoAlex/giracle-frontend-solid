@@ -1,14 +1,34 @@
+import { IconCircle, IconList, IconPlus } from "@tabler/icons-solidjs";
 import { createSignal, For, onMount } from "solid-js";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "../ui/card.tsx"
+import { api } from "~/api/index.ts";
 import type { IRole } from "~/types/Role.ts";
 import { Button } from "../ui/button.tsx";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "../ui/card.tsx";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "../ui/hover-card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
 import { SidebarMenuButton } from "../ui/sidebar";
-import { TextField, TextFieldInput, TextFieldLabel } from "../ui/text-field.tsx";
-import { IconCircle, IconList, IconPlus } from "@tabler/icons-solidjs";
 import { Switch, SwitchControl, SwitchLabel, SwitchThumb } from "../ui/switch";
-import { api } from "~/api/index.ts";
-import { HoverCard, HoverCardContent, HoverCardTrigger } from "../ui/hover-card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
+import {
+  TextField,
+  TextFieldInput,
+  TextFieldLabel,
+} from "../ui/text-field.tsx";
 
 export default function ManageRole() {
   const [roles, setRoles] = createSignal<IRole[]>([]);
@@ -25,58 +45,69 @@ export default function ManageRole() {
     manageEmoji: false,
   });
   const roleChanged = () => {
-    return JSON.stringify(roleEditing()) !== JSON.stringify(roles().find((r)=>r.id === roleEditing().id))
+    return (
+      JSON.stringify(roleEditing()) !==
+      JSON.stringify(roles().find((r) => r.id === roleEditing().id))
+    );
   };
 
   /**
    * ロールの更新を保存する
    */
   const saveRole = () => {
-    api.role.update({ roleId: roleEditing().id, roleData: roleEditing() })
+    api.role
+      .update({ roleId: roleEditing().id, roleData: roleEditing() })
       .then((r) => {
         //console.log("ManageRole :: saveRole :: r->", r);
-        setRoles(roles().map((role) => role.id === roleEditing().id ? roleEditing() : role));
+        setRoles(
+          roles().map((role) =>
+            role.id === roleEditing().id ? roleEditing() : role,
+          ),
+        );
       })
       .catch((err) => console.error("ManageRole :: saveRole :: err->", err));
-  }
+  };
 
   /**
    * ロールを削除する
    */
   const deleteRole = () => {
-    api.role.delete({ roleId: roleEditing().id })
+    api.role
+      .delete({ roleId: roleEditing().id })
       .then((r) => {
         //console.log("ManageRole :: deleteRole :: r->", r);
         setRoles(roles().filter((role) => role.id !== roleEditing().id));
         setRoleEditing(roles()[1]);
       })
       .catch((err) => console.error("ManageRole :: deleteRole :: err->", err));
-  }
+  };
 
   /**
    * ロールを作成する
    */
   const createRole = () => {
-    api.role.create({ roleName: `ロール : ${new Date().toLocaleString()}` })
+    api.role
+      .create({ roleName: `ロール : ${new Date().toLocaleString()}` })
       .then((r) => {
         //console.log("ManageRole :: createRole :: r->", r);
         setRoles([...roles(), r.data]);
         setRoleEditing(r.data);
       })
       .catch((err) => console.error("ManageRole :: createRole :: err->", err));
-  }
+  };
 
   /**
    * ロール一覧を取得する
    */
   const fetchRole = () => {
-    api.role.list()
+    api.role
+      .list()
       .then((r) => {
         setRoles(r.data);
         setRoleEditing(r.data[1]);
       })
       .catch((err) => console.error("ManageRole :: fetchRole :: err->", err));
-  }
+  };
 
   onMount(() => {
     fetchRole();
@@ -95,7 +126,11 @@ export default function ManageRole() {
         <CardContent class="overflow-y-auto grow h-full pt-1 pb-3">
           <HoverCard>
             <HoverCardTrigger>
-              <SidebarMenuButton ondblclick={createRole} variant={"outline"} class="truncate">
+              <SidebarMenuButton
+                ondblclick={createRole}
+                variant={"outline"}
+                class="truncate"
+              >
                 <IconPlus />
                 <p>ロールを作成</p>
               </SidebarMenuButton>
@@ -104,13 +139,13 @@ export default function ManageRole() {
               <p>ダブルクリックでロールを作成</p>
             </HoverCardContent>
           </HoverCard>
-          
+
           <hr class="my-2" />
 
           <For each={roles()}>
             {(role, index) => (
               <SidebarMenuButton
-                onclick={()=>setRoleEditing(role)}
+                onclick={() => setRoleEditing(role)}
                 variant={roleEditing().id === role.id ? "outline" : "default"}
                 tabIndex={index()}
                 class="w-full truncate"
@@ -128,34 +163,35 @@ export default function ManageRole() {
       <Card class="md:hidden">
         <Select
           value={roleEditing()}
-          onChange={(role) => role ? setRoleEditing(role) : null}
+          onChange={(role) => (role ? setRoleEditing(role) : null)}
           options={roles()}
           optionValue={(role) => role.name}
           placeholder="ロールを選択..."
-          itemComponent={
-            (props) =>
+          itemComponent={(props) => (
             <SelectItem item={props.item}>
               <span class="flex items-center gap-1">
                 <IconCircle style={`color: ${props.item.rawValue.color}`} />
                 <p>{props.item.rawValue.name}</p>
               </span>
             </SelectItem>
-          }
+          )}
         >
           <SelectTrigger aria-label="role-select">
             <SelectValue<IRole>>
-              {
-                (state) => <span class="flex items-center">
-                  <IconCircle style={`color: ${state.selectedOption()?.color}`} />
+              {(state) => (
+                <span class="flex items-center">
+                  <IconCircle
+                    style={`color: ${state.selectedOption()?.color}`}
+                  />
                   {state.selectedOption()?.name}
                 </span>
-              }
+              )}
             </SelectValue>
           </SelectTrigger>
           <SelectContent />
         </Select>
       </Card>
-      
+
       <Card class="grow h-fit">
         <CardHeader>
           <CardTitle>ロール編集</CardTitle>
@@ -165,7 +201,12 @@ export default function ManageRole() {
             <TextFieldLabel>ロール名</TextFieldLabel>
             <TextFieldInput
               value={roleEditing().name}
-              onchange={e=>setRoleEditing({...roleEditing(), name: e.currentTarget.value})}
+              onchange={(e) =>
+                setRoleEditing({
+                  ...roleEditing(),
+                  name: e.currentTarget.value,
+                })
+              }
             />
           </TextField>
           <TextField>
@@ -175,7 +216,12 @@ export default function ManageRole() {
             </TextFieldLabel>
             <TextFieldInput
               value={roleEditing().color}
-              onchange={e=>setRoleEditing({...roleEditing(), color: e.currentTarget.value})}
+              onchange={(e) =>
+                setRoleEditing({
+                  ...roleEditing(),
+                  color: e.currentTarget.value,
+                })
+              }
             />
           </TextField>
         </CardContent>
@@ -183,7 +229,9 @@ export default function ManageRole() {
         <span class="mx-2 flex flex-col gap-4">
           <Switch
             checked={roleEditing().manageServer}
-            onChange={(e) => setRoleEditing({...roleEditing(), manageServer: e.valueOf()})}
+            onChange={(e) =>
+              setRoleEditing({ ...roleEditing(), manageServer: e.valueOf() })
+            }
             class="flex items-center space-x-4"
           >
             <SwitchControl>
@@ -194,7 +242,9 @@ export default function ManageRole() {
 
           <Switch
             checked={roleEditing().manageChannel}
-            onChange={(e) => setRoleEditing({...roleEditing(), manageChannel: e.valueOf()})}
+            onChange={(e) =>
+              setRoleEditing({ ...roleEditing(), manageChannel: e.valueOf() })
+            }
             class="flex items-center space-x-4"
           >
             <SwitchControl>
@@ -205,7 +255,9 @@ export default function ManageRole() {
 
           <Switch
             checked={roleEditing().manageRole}
-            onChange={(e) => setRoleEditing({...roleEditing(), manageRole: e.valueOf()})}
+            onChange={(e) =>
+              setRoleEditing({ ...roleEditing(), manageRole: e.valueOf() })
+            }
             class="flex items-center space-x-4"
           >
             <SwitchControl>
@@ -216,7 +268,9 @@ export default function ManageRole() {
 
           <Switch
             checked={roleEditing().manageUser}
-            onChange={(e) => setRoleEditing({...roleEditing(), manageUser: e.valueOf()})}
+            onChange={(e) =>
+              setRoleEditing({ ...roleEditing(), manageUser: e.valueOf() })
+            }
             class="flex items-center space-x-4"
           >
             <SwitchControl>
@@ -227,7 +281,9 @@ export default function ManageRole() {
 
           <Switch
             checked={roleEditing().manageEmoji}
-            onChange={(e) => setRoleEditing({...roleEditing(), manageEmoji: e.valueOf()})}
+            onChange={(e) =>
+              setRoleEditing({ ...roleEditing(), manageEmoji: e.valueOf() })
+            }
             class="flex items-center space-x-4"
           >
             <SwitchControl>
@@ -241,15 +297,28 @@ export default function ManageRole() {
 
         <CardFooter class="flex flex-row-reverse items-center gap-2">
           <Button
-            onclick={()=>setRoleEditing(roles().find((r)=>r.id === roleEditing().id) || roleEditing())}
+            onclick={() =>
+              setRoleEditing(
+                roles().find((r) => r.id === roleEditing().id) || roleEditing(),
+              )
+            }
             variant={"outline"}
             disabled={!roleChanged()}
-          >復元</Button>
-          <Button onClick={saveRole} disabled={!roleChanged() || roleEditing().name === ""}>保存</Button>
+          >
+            復元
+          </Button>
+          <Button
+            onClick={saveRole}
+            disabled={!roleChanged() || roleEditing().name === ""}
+          >
+            保存
+          </Button>
           <span class="mr-auto">
             <HoverCard>
               <HoverCardTrigger>
-                <Button ondblclick={deleteRole} variant={"destructive"}>削除</Button>
+                <Button ondblclick={deleteRole} variant={"destructive"}>
+                  削除
+                </Button>
               </HoverCardTrigger>
               <HoverCardContent>
                 <p>ダブルクリックでロールを削除</p>

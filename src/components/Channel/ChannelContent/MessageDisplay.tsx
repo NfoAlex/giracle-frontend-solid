@@ -1,38 +1,49 @@
-import { Accessor, createEffect, createSignal, on, onCleanup, Setter, Show } from "solid-js";
+import {
+  type Accessor,
+  createEffect,
+  createSignal,
+  on,
+  onCleanup,
+  type Setter,
+  Show,
+} from "solid-js";
 import { storeHistory } from "~/stores/History.store.ts";
-import { IMessage } from "~/types/Message.ts";
-import { Badge } from "../../ui/badge.tsx";
-import UserinfoModalWrapper from "../../unique/UserinfoModalWrapper.tsx";
-import { Avatar, AvatarFallback, AvatarImage } from "../../ui/avatar.tsx";
 import { storeMyUserinfo } from "~/stores/MyUserinfo.store.ts";
 import { storeMessageReadTime } from "~/stores/Readtime.store.ts";
+import type { IMessage } from "~/types/Message.ts";
+import { Avatar, AvatarFallback, AvatarImage } from "../../ui/avatar.tsx";
+import { Badge } from "../../ui/badge.tsx";
+import UserinfoModalWrapper from "../../unique/UserinfoModalWrapper.tsx";
 import DisplayReply from "./MessageDisplay/DisplayReply.tsx";
 import EditMessage from "./MessageDisplay/EditMessage.tsx";
+import HoverMenu from "./MessageDisplay/HoverMenu.tsx";
 import MentionReadWrapper from "./MessageDisplay/MentionReadWrapper.tsx";
 import MessageRender from "./MessageDisplay/MessageRender.tsx";
-import HoverMenu from "./MessageDisplay/HoverMenu.tsx";
 import NewMessageLine from "./MessageDisplay/NewMessageLine.tsx";
 
 export default function MessageDisplay(props: {
-  messageArrayIndex: number,
-  message: IMessage,
-  displayAvatar: boolean,
-  stateEdit: [Accessor<string>, Setter<string>],
+  messageArrayIndex: number;
+  message: IMessage;
+  displayAvatar: boolean;
+  stateEdit: [Accessor<string>, Setter<string>];
 }) {
   let messageRef: HTMLDivElement | undefined;
   const [hovered, setHovered] = createSignal(false);
   const [reacting, setReacting] = createSignal(false);
-  const editing =()=> props.stateEdit[0]() === props.message.id;
+  const editing = () => props.stateEdit[0]() === props.message.id;
 
   //新着線表示用の既読時間取得
   const targetMessageReadTimeBefore = () => {
     return storeMessageReadTime.find(
-      (c) => c.channelId === props.message.channelId
+      (c) => c.channelId === props.message.channelId,
     )?.readTimeBefore;
   };
 
   const displayDateLine = () => {
-    const previousMessage = storeHistory[props.message.channelId]?.history[props.messageArrayIndex + 1];
+    const previousMessage =
+      storeHistory[props.message.channelId]?.history[
+        props.messageArrayIndex + 1
+      ];
     if (previousMessage === undefined) return true;
 
     const prevDate = new Date(previousMessage.createdAt);
@@ -50,15 +61,19 @@ export default function MessageDisplay(props: {
   };
 
   //ホバー状態で外クリック検知を有効化
-  createEffect(on(
-    () => hovered(),
-    () => {
-      if (hovered()) {
-        document.addEventListener("click", handleClickOutside);
-        onCleanup(() => document.removeEventListener("click", handleClickOutside));
-      }
-    }
-  ));
+  createEffect(
+    on(
+      () => hovered(),
+      () => {
+        if (hovered()) {
+          document.addEventListener("click", handleClickOutside);
+          onCleanup(() =>
+            document.removeEventListener("click", handleClickOutside),
+          );
+        }
+      },
+    ),
+  );
 
   return (
     <div
@@ -71,34 +86,41 @@ export default function MessageDisplay(props: {
       <Show when={displayDateLine()}>
         <div class="flex justify-center items-center gap-3 py-1">
           <hr class={"grow"} />
-          <Badge class={"shrink-0"} variant={"secondary"}>{new Date(props.message.createdAt).toLocaleDateString()}</Badge>
+          <Badge class={"shrink-0"} variant={"secondary"}>
+            {new Date(props.message.createdAt).toLocaleDateString()}
+          </Badge>
           <hr class={"grow"} />
         </div>
       </Show>
 
-      { //返信先の表示
-        props.message.replyingMessageId !== null
-        &&
-        <div class="ml-auto mt-1" style={"width: calc(100% - 45px);"}>
-          <DisplayReply replyingMessageId={props.message.replyingMessageId} channelId={props.message.channelId} />
-        </div>
+      {
+        //返信先の表示
+        props.message.replyingMessageId !== null && (
+          <div class="ml-auto mt-1" style={"width: calc(100% - 45px);"}>
+            <DisplayReply
+              replyingMessageId={props.message.replyingMessageId}
+              channelId={props.message.channelId}
+            />
+          </div>
+        )
       }
 
-      <div
-        class="flex flex-row items-start"
-      >
-        { //メッセージ表示
-          !props.message.isSystemMessage //システムメッセージかどうか
-            ?
-
+      <div class="flex flex-row items-start">
+        {
+          //メッセージ表示
+          !props.message.isSystemMessage ? ( //システムメッセージかどうか
             <>
               {/* アイコン表示部分 */}
               <div class="w-[40px] shrink-0">
                 <Show when={props.displayAvatar}>
-                  <UserinfoModalWrapper userId={props.message.userId} >
+                  <UserinfoModalWrapper userId={props.message.userId}>
                     <Avatar class="mx-auto">
-                      <AvatarImage src={`/api/user/icon/${props.message.userId}`} />
-                      <AvatarFallback>{props.message.userId.slice(0, 2)}</AvatarFallback>
+                      <AvatarImage
+                        src={`/api/user/icon/${props.message.userId}`}
+                      />
+                      <AvatarFallback>
+                        {props.message.userId.slice(0, 2)}
+                      </AvatarFallback>
                     </Avatar>
                   </UserinfoModalWrapper>
                 </Show>
@@ -107,67 +129,65 @@ export default function MessageDisplay(props: {
               {/* ホバー判定部分 */}
               <article
                 id={`messageId::${props.message.id}::content`}
-                class={
-                  `relative shrink-0 grow-0 rounded-md px-2 ml-auto ${hovered() ? "hover:bg-accent" : ""} ${props.message.content.includes(`@<${storeMyUserinfo.id}>`) && "border-2"}`
-                }
+                class={`relative shrink-0 grow-0 rounded-md px-2 ml-auto ${hovered() ? "hover:bg-accent" : ""} ${props.message.content.includes(`@<${storeMyUserinfo.id}>`) && "border-2"}`}
                 style="width:calc(100% - 45px)"
                 onmouseenter={() => setHovered(true)}
                 onmouseleave={() => setHovered(false)}
                 on:touchend={() => setHovered(true) /* スマホ用 */}
               >
-                { //メッセージ表示部分。編集モードか否かで表示を変える
-                  editing()
-                    ?
+                {
+                  //メッセージ表示部分。編集モードか否かで表示を変える
+                  editing() ? (
                     <EditMessage
                       messageId={props.message.id}
                       content={props.message.content}
-                      onCancelEdit={() => { props.stateEdit[1]("") }}
+                      onCancelEdit={() => {
+                        props.stateEdit[1]("");
+                      }}
                     />
-                    :
+                  ) : (
                     <MentionReadWrapper messageId={props.message.id}>
                       <MessageRender
                         message={props.message}
                         displayUserName={props.displayAvatar}
                       />
                     </MentionReadWrapper>
+                  )
                 }
-                { //ホバーメニュー(リアクション用の絵文字選択途中も表示を残す)
-                  (hovered() || reacting())
-                  &&
-                  <div class={"absolute right-1 z-50"} style={"bottom:calc(100% - 15px);"}>
-                    <HoverMenu
-                      message={props.message}
-                      onEditMode={(msgId) => { setHovered(false); props.stateEdit[1](msgId) }}
-                      onReacting={(mode) => { setReacting(mode); }}
-                    />
-                  </div>
+                {
+                  //ホバーメニュー(リアクション用の絵文字選択途中も表示を残す)
+                  (hovered() || reacting()) && (
+                    <div
+                      class={"absolute right-1 z-50"}
+                      style={"bottom:calc(100% - 15px);"}
+                    >
+                      <HoverMenu
+                        message={props.message}
+                        onEditMode={(msgId) => {
+                          setHovered(false);
+                          props.stateEdit[1](msgId);
+                        }}
+                        onReacting={(mode) => {
+                          setReacting(mode);
+                        }}
+                      />
+                    </div>
+                  )
                 }
               </article>
             </>
-
-            :
-
-            <MessageRender
-              message={props.message}
-              displayUserName={false}
-            />
+          ) : (
+            <MessageRender message={props.message} displayUserName={false} />
+          )
         }
       </div>
 
       {/* 新着線の表示 */}
-      {
-        (
-          (
-            targetMessageReadTimeBefore() //一つ古い既読時間
-            ===
-            props.message.createdAt.valueOf() //メッセージの時間
-          )
-          &&
-          props.messageArrayIndex !== 0 //最新メッセージ以外条件
-        )
-        &&
-        (<NewMessageLine />)
-      }
+      {targetMessageReadTimeBefore() === //一つ古い既読時間
+        props.message.createdAt.valueOf() && //メッセージの時間
+        props.messageArrayIndex !== 0 && ( //最新メッセージ以外条件
+          <NewMessageLine />
+        )}
     </div>
   );
 }

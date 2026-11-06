@@ -15,7 +15,10 @@ export default function BotApprovalBadge(props: {
 }) {
   return (
     <Badge
-      variant={APPROVE_STATUS_LABEL[String(props.isApproved) as "true" | "false"].variant}
+      variant={
+        APPROVE_STATUS_LABEL[String(props.isApproved) as "true" | "false"]
+          .variant
+      }
       class={props.class}
     >
       {APPROVE_STATUS_LABEL[String(props.isApproved) as "true" | "false"].label}

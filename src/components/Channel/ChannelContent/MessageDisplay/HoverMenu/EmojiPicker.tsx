@@ -1,12 +1,15 @@
-import {createSignal, onCleanup, onMount} from "solid-js";
-import {Picker} from "emoji-picker-element";
-import type {EmojiClickEvent} from "emoji-picker-element/shared.ts";
-import ja from 'emoji-picker-element/i18n/ja.js';
+import { Picker } from "emoji-picker-element";
+import ja from "emoji-picker-element/i18n/ja.js";
+import type { EmojiClickEvent } from "emoji-picker-element/shared.ts";
+import { createSignal, onCleanup, onMount } from "solid-js";
 import { api } from "~/api/index.ts";
-import type {IMessage} from "~/types/Message.ts";
-import {useStoreCustomEmoji} from "~/stores/CustomEmoji.store.ts";
+import { useStoreCustomEmoji } from "~/stores/CustomEmoji.store.ts";
+import type { IMessage } from "~/types/Message.ts";
 
-export default function EmojiPicker(props: {message: IMessage, onClicked: () => void}) {
+export default function EmojiPicker(props: {
+  message: IMessage;
+  onClicked: () => void;
+}) {
   let elementRef: HTMLDivElement | undefined;
   const [onUpperHalf, setOnUpperHalf] = createSignal(false);
   const [shiftPressed, setShiftPressed] = createSignal(false);
@@ -33,15 +36,28 @@ export default function EmojiPicker(props: {message: IMessage, onClicked: () => 
     if (emojiCode === undefined) return;
 
     //自分のリアクションを抜き出し
-    const currentMyReaction = props.message.reactionSummary.filter(reaction => reaction.includingYou);
+    const currentMyReaction = props.message.reactionSummary.filter(
+      (reaction) => reaction.includingYou,
+    );
 
     //もし対象メッセージに自分からの同じ絵文字コードによるリアクションがあるのなら削除、違うならリアクション
-    if (currentMyReaction.some((reaction) => reaction.emojiCode === emojiCode[0])) {
+    if (
+      currentMyReaction.some((reaction) => reaction.emojiCode === emojiCode[0])
+    ) {
       //削除
-      api.message.deleteEmojiReaction({ messageId: props.message.id, channelId: props.message.channelId, emojiCode: emojiCode[0] })
-        .catch((e) => console.error("EmojiPicker :: emojiClickHandler(DELETE_MESSAGE_DELETE_EMOJI_REACTION) : e->", e));
+      api.message
+        .deleteEmojiReaction({
+          messageId: props.message.id,
+          channelId: props.message.channelId,
+          emojiCode: emojiCode[0],
+        })
+        .catch((e) =>
+          console.error(
+            "EmojiPicker :: emojiClickHandler(DELETE_MESSAGE_DELETE_EMOJI_REACTION) : e->",
+            e,
+          ),
+        );
     } else {
-
       //自分のが１０個以上あるなら停止
       if (currentMyReaction.length >= 10) {
         alert("同一ユーザーによるリアクションは10個までです。");
@@ -49,34 +65,44 @@ export default function EmojiPicker(props: {message: IMessage, onClicked: () => 
       }
 
       //リアクション
-      api.message.emojiReaction({ messageId: props.message.id, channelId: props.message.channelId, emojiCode: emojiCode[0] })
+      api.message
+        .emojiReaction({
+          messageId: props.message.id,
+          channelId: props.message.channelId,
+          emojiCode: emojiCode[0],
+        })
         .catch((e) => {
-          console.error("EmojiPicker :: emojiClickHandler(POST_MESSAGE_EMOJI_REACTION) : e->", e)
+          console.error(
+            "EmojiPicker :: emojiClickHandler(POST_MESSAGE_EMOJI_REACTION) : e->",
+            e,
+          );
         });
     }
-
 
     //Shiftキーが押されていたら閉じない
     if (!shiftPressed()) {
       props.onClicked();
     }
-  }
-
+  };
 
   //Shiftキー押下時のハンドラ
   const shiftDownHandler = (e: KeyboardEvent) => {
     if (e.key === "Shift") setShiftPressed(true);
-  }
+  };
   const shiftUpHandler = (e: KeyboardEvent) => {
     if (e.key === "Shift") setShiftPressed(false);
-  }
+  };
 
   const applyPickerSize = () => {
     if (!elementRef) return;
 
     //履歴表示領域と、絶対配置の基準要素の位置を取得
-    const historyRect = document.getElementById("history")?.getBoundingClientRect();
-    const anchorRect = (elementRef.offsetParent as HTMLElement | null)?.getBoundingClientRect();
+    const historyRect = document
+      .getElementById("history")
+      ?.getBoundingClientRect();
+    const anchorRect = (
+      elementRef.offsetParent as HTMLElement | null
+    )?.getBoundingClientRect();
     if (!historyRect || !anchorRect) return;
 
     //履歴の上下端から8px内側を表示可能範囲とする
@@ -91,8 +117,11 @@ export default function EmojiPicker(props: {message: IMessage, onClicked: () => 
 
     setOnUpperHalf(openBelow);
     const height = Math.min(400, openBelow ? spaceBelow : spaceAbove);
-    const offset = openBelow ? belowTop - anchorRect.bottom : anchorRect.top - aboveBottom;
-    elementRef.style.transform = offset > 0 ? `translateY(${openBelow ? offset : -offset}px)` : "";
+    const offset = openBelow
+      ? belowTop - anchorRect.bottom
+      : anchorRect.top - aboveBottom;
+    elementRef.style.transform =
+      offset > 0 ? `translateY(${openBelow ? offset : -offset}px)` : "";
     picker.style.setProperty("height", `${height}px`);
     elementRef.style.maxHeight = `${height}px`;
   };
@@ -107,29 +136,34 @@ export default function EmojiPicker(props: {message: IMessage, onClicked: () => 
       applyPickerSize();
 
       //スタイル適用
-      const htmlTheme: string = document.querySelector("html")?.style.getPropertyValue("color-scheme") as string; //テーマ取得
-      picker.style.setProperty("--background", htmlTheme==="light" ? "white" : "black"); //テーマに合わせた背景色
+      const htmlTheme: string = document
+        .querySelector("html")
+        ?.style.getPropertyValue("color-scheme") as string; //テーマ取得
+      picker.style.setProperty(
+        "--background",
+        htmlTheme === "light" ? "white" : "black",
+      ); //テーマに合わせた背景色
       picker.style.setProperty("--border-radius", "0.5rem");
       picker.style.setProperty("max-width", "90vw");
       picker.style.setProperty("--border-size", "1.5px");
 
       //絵文字クリックしたときのハンドラリンク
-      picker.addEventListener('emoji-click', emojiClickHandler);
+      picker.addEventListener("emoji-click", emojiClickHandler);
     }
 
     //ウィンドウサイズ変更時に高さと表示位置を再計算
-    window.addEventListener('resize', applyPickerSize);
+    window.addEventListener("resize", applyPickerSize);
 
     //Shiftキー押下時のハンドラリンク
-    window.addEventListener('keydown', shiftDownHandler);
-    window.addEventListener('keyup', shiftUpHandler);
+    window.addEventListener("keydown", shiftDownHandler);
+    window.addEventListener("keyup", shiftUpHandler);
   });
 
   onCleanup(() => {
-    picker.removeEventListener('emoji-click', emojiClickHandler);
-    window.removeEventListener('resize', applyPickerSize);
-    window.removeEventListener('keydown', shiftDownHandler);
-    window.removeEventListener('keyup', shiftUpHandler);
+    picker.removeEventListener("emoji-click", emojiClickHandler);
+    window.removeEventListener("resize", applyPickerSize);
+    window.removeEventListener("keydown", shiftDownHandler);
+    window.removeEventListener("keyup", shiftUpHandler);
   });
 
   return (
@@ -145,8 +179,7 @@ export default function EmojiPicker(props: {message: IMessage, onClicked: () => 
         ref={elementRef}
         class={`z-50 absolute ${onUpperHalf() ? "top-full" : "bottom-full"} right-0`}
         style={"max-height: 50vh;"}
-      >
-      </div>
+      ></div>
     </>
-  )
+  );
 }

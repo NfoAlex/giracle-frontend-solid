@@ -1,10 +1,22 @@
-import { Card } from "../ui/card.tsx";
-import { IconPencil, IconPlus, IconReload, IconTrash } from "@tabler/icons-solidjs";
+import {
+  IconPencil,
+  IconPlus,
+  IconReload,
+  IconTrash,
+} from "@tabler/icons-solidjs";
 import { createSignal, For, onMount, Show } from "solid-js";
 import { api } from "~/api/index.ts";
-import { Button } from "../ui/button.tsx";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "../ui/dialog.tsx";
 import { Badge } from "../ui/badge.tsx";
+import { Button } from "../ui/button.tsx";
+import { Card } from "../ui/card.tsx";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "../ui/dialog.tsx";
 import { TextField, TextFieldInput } from "../ui/text-field.tsx";
 
 interface ISession {
@@ -13,7 +25,7 @@ interface ISession {
   userId: string;
   createdAt: Date;
   thisIsYou: boolean;
-};
+}
 
 export default function ConfigSession() {
   const [sessions, setSessions] = createSignal<ISession[]>([]);
@@ -21,12 +33,14 @@ export default function ConfigSession() {
     fetching: false,
     deleting: false,
     changingName: false,
-    fetchedBottom: false
+    fetchedBottom: false,
   });
   const [reachedSessionEnd, setReachedSessionEnd] = createSignal(false);
   const [newSessionName, setNewSessionName] = createSignal("");
-  const [targetDeletingSession, setTargetDeletingSession] = createSignal<ISession>();
-  const [targetNameChangingSession, setTargetNameChangingSession] = createSignal<ISession>();
+  const [targetDeletingSession, setTargetDeletingSession] =
+    createSignal<ISession>();
+  const [targetNameChangingSession, setTargetNameChangingSession] =
+    createSignal<ISession>();
   let sessionFetcherCursor: number = 1;
   //モーダル制御用
   const [modalDeletionOpen, setModalDeletionOpen] = createSignal(false);
@@ -35,7 +49,8 @@ export default function ConfigSession() {
   const sessionFetcher = async (options?: { reset?: boolean }) => {
     setFlags({ ...flags(), fetching: true });
     const cursor = options?.reset ? 1 : sessionFetcherCursor;
-    await api.user.getSession({ cursor })
+    await api.user
+      .getSession({ cursor })
       .then((r) => {
         if (options?.reset) {
           setSessions(r.data);
@@ -50,7 +65,9 @@ export default function ConfigSession() {
         }
       })
       .catch((err) => {
-        console.error("ConfigSession :: err->", err, { cursor: sessionFetcherCursor });
+        console.error("ConfigSession :: err->", err, {
+          cursor: sessionFetcherCursor,
+        });
       })
       .finally(() => {
         setFlags({ ...flags(), fetching: false });
@@ -59,14 +76,18 @@ export default function ConfigSession() {
 
   const removeSession = async (sessionId: number) => {
     setFlags({ ...flags(), deleting: true });
-    await api.user.deleteSession({ sessionId })
+    await api.user
+      .deleteSession({ sessionId })
       .then((r) => {
         const deletedSessionId = r.data.sessionId;
         const _sessions = sessions().filter((s) => s.id !== deletedSessionId);
         setSessions(_sessions);
       })
       .catch(() => {
-        console.error("ConfigSession :: removeSession : セッションを削除できませんでした", sessionId);
+        console.error(
+          "ConfigSession :: removeSession : セッションを削除できませんでした",
+          sessionId,
+        );
       })
       .finally(() => {
         setFlags({ ...flags(), deleting: false });
@@ -76,19 +97,34 @@ export default function ConfigSession() {
 
   const changeSessionName = async () => {
     const targetSession = targetNameChangingSession();
-    if (targetSession === undefined) throw new Error("Target session data is undefined");
+    if (targetSession === undefined)
+      throw new Error("Target session data is undefined");
     setFlags({ ...flags(), changingName: true });
 
-    await api.user.changeSessionName({ sessionId: targetSession.id, name: newSessionName() })
+    await api.user
+      .changeSessionName({
+        sessionId: targetSession.id,
+        name: newSessionName(),
+      })
       .then((r) => {
-        const sessionIndex = sessions().findIndex((s) => s.id === targetSession.id);
+        const sessionIndex = sessions().findIndex(
+          (s) => s.id === targetSession.id,
+        );
         setSessions((s) => {
           const _sessions = [...s];
-          _sessions[sessionIndex] = { ..._sessions[sessionIndex], name: r.data.name };
+          _sessions[sessionIndex] = {
+            ..._sessions[sessionIndex],
+            name: r.data.name,
+          };
           return _sessions;
         });
       })
-      .catch((e) => console.error("ConfigSession :: changeSessionName : セッション名を変更できませんでした ", e))
+      .catch((e) =>
+        console.error(
+          "ConfigSession :: changeSessionName : セッション名を変更できませんでした ",
+          e,
+        ),
+      )
       .finally(() => {
         setFlags({ ...flags(), changingName: false });
         setModalNameChangingOpen(false);
@@ -99,7 +135,6 @@ export default function ConfigSession() {
 
   return (
     <div class="md:max-w-[750px] h-full flex flex-col mx-auto">
-
       {/* セッションログアウト確認用モーダル */}
       <Dialog open={modalDeletionOpen()} onOpenChange={setModalDeletionOpen}>
         <DialogContent>
@@ -110,7 +145,9 @@ export default function ConfigSession() {
             <p>遠隔でセッションをログアウトします。よろしいですか？</p>
             <span class="truncate flex items-center gap-2">
               <p class="shrink-0">ログアウトするセッション:</p>
-              <span class="font-bold truncate w-32 md:w-[256px]">{targetDeletingSession()?.name ?? "?"}</span>
+              <span class="font-bold truncate w-32 md:w-[256px]">
+                {targetDeletingSession()?.name ?? "?"}
+              </span>
             </span>
           </DialogDescription>
           <DialogFooter>
@@ -118,17 +155,26 @@ export default function ConfigSession() {
               onClick={() => setModalDeletionOpen(false)}
               variant={"ghost"}
               disabled={flags().deleting}
-            >キャンセル</Button>
+            >
+              キャンセル
+            </Button>
             <Button
-              onClick={() => { removeSession(targetDeletingSession()?.id || 0) }}
+              onClick={() => {
+                removeSession(targetDeletingSession()?.id || 0);
+              }}
               variant={"destructive"}
               disabled={flags().deleting}
-            >ログアウトする</Button>
+            >
+              ログアウトする
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
       {/* セッション名変更用モーダル */}
-      <Dialog open={modalNameChangingOpen()} onOpenChange={setModalNameChangingOpen}>
+      <Dialog
+        open={modalNameChangingOpen()}
+        onOpenChange={setModalNameChangingOpen}
+      >
         <DialogContent>
           <DialogHeader>
             <DialogTitle>セッション名の変更</DialogTitle>
@@ -137,7 +183,9 @@ export default function ConfigSession() {
             <p>変更先のセッション名を入力してください。</p>
             <span class="flex truncate items-center gap-2">
               <p>現在 : </p>
-              <span class="font-bold truncate overflow-x-auto w-64 md:w-[256px]">{targetNameChangingSession()?.name ?? "?"}</span>
+              <span class="font-bold truncate overflow-x-auto w-64 md:w-[256px]">
+                {targetNameChangingSession()?.name ?? "?"}
+              </span>
             </span>
           </DialogDescription>
           <TextField>
@@ -153,8 +201,15 @@ export default function ConfigSession() {
               onClick={() => setModalNameChangingOpen(false)}
               variant={"ghost"}
               disabled={flags().changingName}
-            >キャンセル</Button>
-            <Button onClick={() => changeSessionName()} disabled={flags().changingName}>変更する</Button>
+            >
+              キャンセル
+            </Button>
+            <Button
+              onClick={() => changeSessionName()}
+              disabled={flags().changingName}
+            >
+              変更する
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -179,7 +234,10 @@ export default function ConfigSession() {
             <Card class="p-4 flex flex-col md:flex-row item-start md:items-center gap-2">
               <span class="truncate shrink flex flex-row items-center gap-2">
                 <Button
-                  onClick={() => { setTargetNameChangingSession(session); setModalNameChangingOpen(true); }}
+                  onClick={() => {
+                    setTargetNameChangingSession(session);
+                    setModalNameChangingOpen(true);
+                  }}
                   class="shrink-0"
                   size={"icon"}
                   variant={"ghost"}
@@ -189,10 +247,15 @@ export default function ConfigSession() {
                 <p class="truncate shrink">{session.name}</p>
               </span>
               <span class="shrink-0 ml-auto flex flex-row items-center gap-4">
-                <Badge variant={"outline"}>{new Date(session.createdAt).toLocaleString()}</Badge>
+                <Badge variant={"outline"}>
+                  {new Date(session.createdAt).toLocaleString()}
+                </Badge>
                 <Show when={!session.thisIsYou}>
                   <Button
-                    onClick={() => { setTargetDeletingSession(session); setModalDeletionOpen(true); }}
+                    onClick={() => {
+                      setTargetDeletingSession(session);
+                      setModalDeletionOpen(true);
+                    }}
                     size={"sm"}
                     variant={"destructive"}
                   >
@@ -212,7 +275,9 @@ export default function ConfigSession() {
         </Show>
         <Show when={!reachedSessionEnd()}>
           <Button
-            onClick={() => { sessionFetcher(); }}
+            onClick={() => {
+              sessionFetcher();
+            }}
             class="mx-auto"
             variant={"secondary"}
             disabled={flags().fetching}
@@ -222,7 +287,6 @@ export default function ConfigSession() {
           </Button>
         </Show>
       </div>
-
     </div>
-  )
+  );
 }

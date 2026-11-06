@@ -3,13 +3,23 @@ import { IconArrowRight, IconSearch } from "@tabler/icons-solidjs";
 import { createEffect, createMemo, createSignal, For, Show } from "solid-js";
 import { api } from "~/api/index.ts";
 import MessageRender from "~/components/Channel/ChannelContent/MessageDisplay/MessageRender.tsx";
-import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar.tsx";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "~/components/ui/avatar.tsx";
 import { Button } from "~/components/ui/button.tsx";
 import { Card } from "~/components/ui/card.tsx";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~/components/ui/select.tsx";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "~/components/ui/select.tsx";
 import { TextField, TextFieldInput } from "~/components/ui/text-field.tsx";
-import SidebarTriggerWithDot from "~/components/unique/SidebarTriggerWithDot.tsx";
 import BotBadge from "~/components/unique/BotBadge.tsx";
+import SidebarTriggerWithDot from "~/components/unique/SidebarTriggerWithDot.tsx";
 import UserinfoModalWrapper from "~/components/unique/UserinfoModalWrapper.tsx";
 import { useStoreChannelInfo } from "~/stores/ChannelInfo.store.ts";
 import { storeMyUserinfo } from "~/stores/MyUserinfo.store.ts";
@@ -22,7 +32,11 @@ const CHANNEL_FILTER_ALL = "__all__";
 type TSearchSortOrder = "asc" | "desc";
 type TSearchFileFilter = "any" | "with_file" | "without_file";
 const sortOptions: TSearchSortOrder[] = ["desc", "asc"];
-const fileFilterOptions: TSearchFileFilter[] = ["any", "with_file", "without_file"];
+const fileFilterOptions: TSearchFileFilter[] = [
+  "any",
+  "with_file",
+  "without_file",
+];
 const sortLabels: Record<TSearchSortOrder, string> = {
   desc: "新しい順",
   asc: "古い順",
@@ -39,16 +53,19 @@ export default function Search() {
   const [searchedOnce, setSearchedOnce] = createSignal(false);
   const [loadIndex, setLoadIndex] = createSignal(1);
   const [processing, setProcessing] = createSignal(false);
-  const [selectedChannelId, setSelectedChannelId] = createSignal(CHANNEL_FILTER_ALL);
+  const [selectedChannelId, setSelectedChannelId] =
+    createSignal(CHANNEL_FILTER_ALL);
   const [sortOrder, setSortOrder] = createSignal<TSearchSortOrder>("desc");
   const [fileFilter, setFileFilter] = createSignal<TSearchFileFilter>("any");
   const [lastFetchedRawCount, setLastFetchedRawCount] = createSignal(0);
   // 条件変更後に「もっと読み込む」で別条件を混ぜないため、直近検索条件を記録する
-  const [lastSearchedConditionKey, setLastSearchedConditionKey] = createSignal("");
+  const [lastSearchedConditionKey, setLastSearchedConditionKey] =
+    createSignal("");
 
-  const channelOptions = createMemo(
-    () => [CHANNEL_FILTER_ALL, ...new Set(storeMyUserinfo.ChannelJoin.map((cj) => cj.channelId))],
-  );
+  const channelOptions = createMemo(() => [
+    CHANNEL_FILTER_ALL,
+    ...new Set(storeMyUserinfo.ChannelJoin.map((cj) => cj.channelId)),
+  ]);
 
   createEffect(() => {
     if (!channelOptions().includes(selectedChannelId())) {
@@ -65,14 +82,18 @@ export default function Search() {
     return {
       content: query(),
       channelId:
-        selectedChannelId() === CHANNEL_FILTER_ALL ? undefined : selectedChannelId(),
+        selectedChannelId() === CHANNEL_FILTER_ALL
+          ? undefined
+          : selectedChannelId(),
       sort: sortOrder(),
       hasFileAttachment:
         fileFilter() === "any" ? undefined : fileFilter() === "with_file",
     };
   });
 
-  const currentSearchConditionKey = createMemo(() => JSON.stringify(currentSearchCondition()));
+  const currentSearchConditionKey = createMemo(() =>
+    JSON.stringify(currentSearchCondition()),
+  );
 
   const buildSearchParams = (nextLoadIndex: number) => {
     return {
@@ -83,9 +104,9 @@ export default function Search() {
 
   const canLoadMore = () => {
     return (
-      searchedOnce()
-      && lastFetchedRawCount() === SEARCH_PAGE_SIZE
-      && lastSearchedConditionKey() === currentSearchConditionKey()
+      searchedOnce() &&
+      lastFetchedRawCount() === SEARCH_PAGE_SIZE &&
+      lastSearchedConditionKey() === currentSearchConditionKey()
     );
   };
 
@@ -94,7 +115,8 @@ export default function Search() {
     const nextLoadIndex = insertMode ? loadIndex() + 1 : 1;
     const searchConditionKey = currentSearchConditionKey();
     setProcessing(true);
-    api.message.search(buildSearchParams(nextLoadIndex))
+    api.message
+      .search(buildSearchParams(nextLoadIndex))
       .then((r) => {
         setLastFetchedRawCount(r.data.length);
         //システムメッセージを除外
@@ -114,7 +136,7 @@ export default function Search() {
       })
       .catch((e) => console.error("Search :: search :: e ->", e))
       .finally(() => setProcessing(false));
-  }
+  };
 
   return (
     <div class="h-svh pt-2 px-2 overflow-y-hidden flex flex-col">
@@ -138,14 +160,18 @@ export default function Search() {
           size={"icon"}
           class="md:w-10 md:h-10 h-12 w-12"
           disabled={processing()}
-        ><IconSearch /></Button>
+        >
+          <IconSearch />
+        </Button>
       </span>
 
       <div class="mt-2 grid grid-cols-1 md:grid-cols-3 gap-2">
         <Select
           options={channelOptions()}
           value={selectedChannelId()}
-          onChange={(value) => setSelectedChannelId(value ?? CHANNEL_FILTER_ALL)}
+          onChange={(value) =>
+            setSelectedChannelId(value ?? CHANNEL_FILTER_ALL)
+          }
           itemComponent={(props) => (
             <SelectItem item={props.item}>
               {getChannelFilterLabel(props.item.rawValue)}
@@ -154,7 +180,13 @@ export default function Search() {
         >
           <SelectTrigger aria-label="search-channel-filter">
             <SelectValue<string>>
-              {(state) => <p>{getChannelFilterLabel(state.selectedOption() ?? CHANNEL_FILTER_ALL)}</p>}
+              {(state) => (
+                <p>
+                  {getChannelFilterLabel(
+                    state.selectedOption() ?? CHANNEL_FILTER_ALL,
+                  )}
+                </p>
+              )}
             </SelectValue>
           </SelectTrigger>
           <SelectContent />
@@ -190,7 +222,9 @@ export default function Search() {
         >
           <SelectTrigger aria-label="search-file-filter">
             <SelectValue<TSearchFileFilter>>
-              {(state) => <p>{fileFilterLabels[state.selectedOption() ?? "any"]}</p>}
+              {(state) => (
+                <p>{fileFilterLabels[state.selectedOption() ?? "any"]}</p>
+              )}
             </SelectValue>
           </SelectTrigger>
           <SelectContent />
@@ -201,19 +235,37 @@ export default function Search() {
 
       <div class="w-full grow overflow-y-auto pt-2 pb-4">
         <span class="flex flex-col gap-6 md:gap-2 overflow-y-auto overflow-x-hidden">
-          {!searchedOnce() && <p class="text-center">メッセージ文を検索してください。</p>}
-          {searchedOnce() && searchResults().length === 0 && <p class="text-center">結果が見つかりませんでした...</p>}
+          {!searchedOnce() && (
+            <p class="text-center">メッセージ文を検索してください。</p>
+          )}
+          {searchedOnce() && searchResults().length === 0 && (
+            <p class="text-center">結果が見つかりませんでした...</p>
+          )}
           <For each={searchResults()}>
             {(message) => (
               <Card class="p-3 flex flex-col gap-3">
                 <span>
-                  <UserinfoModalWrapper userId={message.userId} class="flex flex-row items-center gap-2 hover:underline">
+                  <UserinfoModalWrapper
+                    userId={message.userId}
+                    class="flex flex-row items-center gap-2 hover:underline"
+                  >
                     <Avatar class="w-10 h-10">
                       <AvatarImage src={"/api/user/icon/" + message.userId} />
-                      <AvatarFallback>{useStoreUserinfo.getterUserinfo(message.userId).name[0]}</AvatarFallback>
+                      <AvatarFallback>
+                        {
+                          useStoreUserinfo.getterUserinfo(message.userId)
+                            .name[0]
+                        }
+                      </AvatarFallback>
                     </Avatar>
-                    <p>{useStoreUserinfo.getterUserinfo(message.userId).name}</p>
-                    <Show when={useStoreUserinfo.getterUserinfo(message.userId).isBot}>
+                    <p>
+                      {useStoreUserinfo.getterUserinfo(message.userId).name}
+                    </p>
+                    <Show
+                      when={
+                        useStoreUserinfo.getterUserinfo(message.userId).isBot
+                      }
+                    >
                       <BotBadge />
                     </Show>
                   </UserinfoModalWrapper>
@@ -223,9 +275,18 @@ export default function Search() {
                 </span>
                 <hr />
                 <div class="flex flex-row gap-2 items-center">
-                  <span class="shrink-0 text-sm text-gray-500">{new Date(message.createdAt).toLocaleString()}</span>
+                  <span class="shrink-0 text-sm text-gray-500">
+                    {new Date(message.createdAt).toLocaleString()}
+                  </span>
                   <span>・</span>
-                  <span class="shrink text-sm text-gray-500 truncate">#{useStoreChannelInfo.directGetterChannelInfo(message.channelId).name}</span>
+                  <span class="shrink text-sm text-gray-500 truncate">
+                    #
+                    {
+                      useStoreChannelInfo.directGetterChannelInfo(
+                        message.channelId,
+                      ).name
+                    }
+                  </span>
 
                   <Button
                     as={A}
@@ -233,19 +294,25 @@ export default function Search() {
                     variant={"secondary"}
                     size={"icon"}
                     class="shrink-0 ml-auto"
-                  ><IconArrowRight /></Button>
+                  >
+                    <IconArrowRight />
+                  </Button>
                 </div>
               </Card>
             )}
           </For>
 
-          {
-            canLoadMore()
-            &&
-            <Button onClick={() => searchIt(true)} variant={"secondary"} disabled={processing()}>もっと読み込む</Button>
-          }
+          {canLoadMore() && (
+            <Button
+              onClick={() => searchIt(true)}
+              variant={"secondary"}
+              disabled={processing()}
+            >
+              もっと読み込む
+            </Button>
+          )}
         </span>
       </div>
-    </div >
+    </div>
   );
 }

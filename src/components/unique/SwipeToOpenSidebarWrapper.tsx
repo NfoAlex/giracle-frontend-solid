@@ -1,7 +1,8 @@
-import {JSX, onCleanup, onMount} from "solid-js";
+import { type JSX, onCleanup, onMount } from "solid-js";
 
-export default function SwipeToOpenSidebarWrapper(props: { children: JSX.Element }) {
-
+export default function SwipeToOpenSidebarWrapper(props: {
+  children: JSX.Element;
+}) {
   let xDown: number | null = null;
   let yDown: number | null = null;
 
@@ -15,20 +16,22 @@ export default function SwipeToOpenSidebarWrapper(props: { children: JSX.Element
       return;
     }
 
-    let xUp = evt.touches[0].clientX;
-    let yUp = evt.touches[0].clientY;
+    const xUp = evt.touches[0].clientX;
+    const yUp = evt.touches[0].clientY;
 
-    let xDiff = xDown - xUp;
-    let yDiff = yDown - yUp;
+    const xDiff = xDown - xUp;
+    const yDiff = yDown - yUp;
 
-    if ( Math.abs( xDiff ) > Math.abs( yDiff ) ) {/*most significant*/
+    if (Math.abs(xDiff) > Math.abs(yDiff)) {
+      /*most significant*/
       const triggerEl = document.getElementById("sidebarTriggerButton"); //サイドバートリガー要素
       const sidebarEl = document.getElementById("sidebar-content"); //サイドバー要素
-      if ( xDiff > 0 ) {
+      if (xDiff > 0) {
         /* right swipe */
         //console.log("SwipeToOpenSidebarWrapper :: handleTouchMove : 右からスワイプされたはず");
         //サイドバーを開く
-        if (triggerEl && sidebarEl) { //サイドバーが開いていない場合のみ開く
+        if (triggerEl && sidebarEl) {
+          //サイドバーが開いていない場合のみ開く
           triggerEl.click();
         }
       } else {
@@ -46,18 +49,14 @@ export default function SwipeToOpenSidebarWrapper(props: { children: JSX.Element
   };
 
   onMount(() => {
-    document.addEventListener('touchstart', handleTouchStart, false);
-    document.addEventListener('touchmove', handleTouchMove, false);
+    document.addEventListener("touchstart", handleTouchStart, false);
+    document.addEventListener("touchmove", handleTouchMove, false);
   });
 
   onCleanup(() => {
-    document.removeEventListener('touchstart', handleTouchStart, false);
-    document.removeEventListener('touchmove', handleTouchMove, false);
+    document.removeEventListener("touchstart", handleTouchStart, false);
+    document.removeEventListener("touchmove", handleTouchMove, false);
   });
 
-  return (
-    <>
-      {props.children}
-    </>
-  );
+  return <>{props.children}</>;
 }

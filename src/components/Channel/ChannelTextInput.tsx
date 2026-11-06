@@ -1,32 +1,38 @@
-import { createSignal, For, Show } from "solid-js";
 import { useParams } from "@solidjs/router";
 import { IconSend, IconUpload } from "@tabler/icons-solidjs";
+import { createSignal, For, Show } from "solid-js";
 import { api } from "~/api/index.ts";
-import storeReplyingMessageId from "~/stores/ReplyingMessageId.store.ts";
-import ReplyMessageDisplay from "./ChannelTextInput/ReplyMessageDisplay.tsx";
-import FileUploadPreview from "./ChannelTextInput/FileUploadPreview.tsx";
-import { Button } from "../ui/button.tsx";
 import { storeClientConfig } from "~/stores/ClientConfig.store.ts";
+import storeReplyingMessageId from "~/stores/ReplyingMessageId.store.ts";
+import type { IChannel } from "~/types/Channel.ts";
+import type { IUser } from "~/types/User.ts";
+import { Button } from "../ui/button.tsx";
 import { Card } from "../ui/card.tsx";
-import { IChannel } from "~/types/Channel.ts";
-import { IUser } from "~/types/User.ts";
+import FileUploadPreview from "./ChannelTextInput/FileUploadPreview.tsx";
+import ReplyMessageDisplay from "./ChannelTextInput/ReplyMessageDisplay.tsx";
 
 export default function ChannelTextInput() {
   const params = useParams(); //URLパラメータを取得するやつ
   const [text, setText] = createSignal(""); //メッセージテキスト
   const [fileIds, setFileIds] = createSignal<string[]>([]); //送信に使うファイルIDの配列
-  const pushFileIds = (fileId: string) => { //ファイルIDを追加するようの関数
+  const pushFileIds = (fileId: string) => {
+    //ファイルIDを追加するようの関数
     setFileIds([...fileIds(), fileId]);
     //console.log("ChannelTextInput :: pushFileIds : fileId->", fileId, fileIds());
-  }
+  };
   const [fileInput, setFileInput] = createSignal<File[]>([]); //ファイル選択ダイアログからのファイル入力受け取り用配列
   const [userSearchResult, setUserSearchResult] = createSignal<IUser[]>([]); //ユーザー検索結果
   let cursorPosition = 0; //フォーム上のカーソル位置
-  let [searchOptions, setSearchOptions] = createSignal<{ type:"user"|"channel", isEnabled:boolean, query: string, selectIndex: number }>({
+  const [searchOptions, setSearchOptions] = createSignal<{
+    type: "user" | "channel";
+    isEnabled: boolean;
+    query: string;
+    selectIndex: number;
+  }>({
     type: "user",
     isEnabled: false,
     query: "",
-    selectIndex: 0
+    selectIndex: 0,
   });
 
   const sendMsg = () => {
@@ -35,12 +41,14 @@ export default function ChannelTextInput() {
     //空メッセージは送信しない
     if (text().trim() === "" && fileIds().length === 0) return;
 
-    api.message.send({
-      channelId: params.channelId,
-      message: text(),
-      fileIds: fileIds(),
-      replyingMessageId: storeReplyingMessageId[params.channelId] || undefined,
-    })
+    api.message
+      .send({
+        channelId: params.channelId,
+        message: text(),
+        fileIds: fileIds(),
+        replyingMessageId:
+          storeReplyingMessageId[params.channelId] || undefined,
+      })
       .then(() => {
         //console.log("POST_MESSAGE_SEND :: r->", r);
       })
@@ -62,7 +70,7 @@ export default function ChannelTextInput() {
       query: "",
       selectIndex: 0,
     });
-  }
+  };
 
   /**
    * 検索モードの条件判別、設定をする
@@ -71,21 +79,25 @@ export default function ChannelTextInput() {
     //メンションを検索する
     const searchQueryMatches = [...text().matchAll(/@\S+/g)];
     //カーソル位置までの入力されたメンションクエリーを取得
-    const matchesFilter = searchQueryMatches.filter((obj) => cursorPosition >= obj.index);
+    const matchesFilter = searchQueryMatches.filter(
+      (obj) => cursorPosition >= obj.index,
+    );
 
     //カーソル位置がメンションクエリー文字の範囲中にあるかどうか
     for (const query of matchesFilter) {
       //console.log("ChannelTextInput :: checkMode : arr->", arr.index, (arr.index + arr[0].length));
-      if (query.index <= cursorPosition && cursorPosition <= (query.index + query[0].length + 1)) {
+      if (
+        query.index <= cursorPosition &&
+        cursorPosition <= query.index + query[0].length + 1
+      ) {
         setSearchOptions({
           type: "user",
           isEnabled: true,
           query: query[0].slice(1),
           selectIndex: 0,
-        })
+        });
         //ユーザーを検索する
-        if (query[0].length >= 2)
-          searchUser(searchOptions().query);
+        if (query[0].length >= 2) searchUser(searchOptions().query);
 
         return;
       }
@@ -93,22 +105,23 @@ export default function ChannelTextInput() {
     //console.log("ChannelTextInput :: checkMode : cursorPosition->", cursorPosition, " matches->", matches, matchesFilter);
 
     //メンション検索が無効の場合
-    setSearchOptions(
-      {
-        type: "user",
-        isEnabled: false,
-        query: "",
-        selectIndex: 0,
-      }
-    );
-  }
+    setSearchOptions({
+      type: "user",
+      isEnabled: false,
+      query: "",
+      selectIndex: 0,
+    });
+  };
 
   /**
    * 検索結果から選択した情報メッセージ文へバインドする
    * @param item バインドする情報
    * @param type バインドする情報の種類
    */
-  const bindSearchedItem = (item: IChannel | IUser, type: "user" | "channel") => {
+  const bindSearchedItem = (
+    item: IChannel | IUser,
+    type: "user" | "channel",
+  ) => {
     //検索結果未取得の状態（debounce中など）ではバインドしない
     if (type === "user" && !item) return;
     if (type === "user") {
@@ -127,7 +140,7 @@ export default function ChannelTextInput() {
     if (type === "channel") {
       // これから
     }
-  }
+  };
 
   /**
    * メンション用のユーザー検索
@@ -138,7 +151,8 @@ export default function ChannelTextInput() {
   const searchUser = (query: string) => {
     clearTimeout(searchUserTimer);
     searchUserTimer = setTimeout(() => {
-      api.user.list({ username: query, joinedChannel: params.channelId })
+      api.user
+        .list({ username: query, joinedChannel: params.channelId })
         .then((r) => {
           // 古いクエリの応答で新しい結果を上書きしない
           if (searchOptions().query !== query) return;
@@ -147,13 +161,15 @@ export default function ChannelTextInput() {
         })
         .catch((e) => console.error("GET_USER_SEARCH :: e->", e));
     }, 200);
-  }
+  };
 
   /**
    * ファイル選択ダイアログを開く
    */
   const bindFiles = () => {
-    const fileInputEl = document.getElementById("fileInput") as HTMLInputElement;
+    const fileInputEl = document.getElementById(
+      "fileInput",
+    ) as HTMLInputElement;
     fileInputEl.click();
     fileInputEl.onchange = (e) => {
       const files = (e.target as HTMLInputElement).files;
@@ -162,8 +178,8 @@ export default function ChannelTextInput() {
         setFileInput([...fileInput(), ...files]);
         //console.log("ChannelTextInput :: bindFiles : fileInput->", fileInput());
       }
-    }
-  }
+    };
+  };
 
   /**
    * ペーストイベントからのファイルを受け取る
@@ -184,16 +200,16 @@ export default function ChannelTextInput() {
       setFileInput([...fileInput(), ...files]);
       //console.log("ChannelTextInput :: receiveFiles : fileInput->", fileInput());
     }
-  }
+  };
 
   /**
    * ファイル用のデータ群から特定のファイル分を削る
    * @param fileId
    */
   const removeFileId = (fileId: string, fileName: string) => {
-    setFileInput(fileInput().filter(f=>f.name!==fileName));
-    setFileIds(fileIds().filter(id => id !== fileId));
-  }
+    setFileInput(fileInput().filter((f) => f.name !== fileName));
+    setFileIds(fileIds().filter((id) => id !== fileId));
+  };
 
   return (
     <div class={"flex flex-col gap-2 pb-1"}>
@@ -207,7 +223,9 @@ export default function ChannelTextInput() {
                   <FileUploadPreview
                     file={file}
                     dataSetter={pushFileIds}
-                    onRemove={(fileId, fileName)=>{ removeFileId(fileId, fileName) }}
+                    onRemove={(fileId, fileName) => {
+                      removeFileId(fileId, fileName);
+                    }}
                   />
                 </div>
               );
@@ -229,12 +247,25 @@ export default function ChannelTextInput() {
       <div class="w-full relative flex items-center gap-1">
         <input type={"file"} id={"fileInput"} class={"hidden"} />
 
-        <Button onClick={bindFiles} variant={"secondary"} size={"icon"} class="shrink-0"><IconUpload /></Button>
+        <Button
+          onClick={bindFiles}
+          variant={"secondary"}
+          size={"icon"}
+          class="shrink-0"
+        >
+          <IconUpload />
+        </Button>
 
         <textarea
           id={"messageInput"}
-          class={"shrink min-w-0 grow p-2 bg-background resize-none border rounded-md break-all h-fit whitespace-pre-wrap max-h-40"}
-          rows={text().match(/\n/g)?.length===0 ? 1 : (text().match(/\n/g)?.length ?? 0) + 1}
+          class={
+            "shrink min-w-0 grow p-2 bg-background resize-none border rounded-md break-all h-fit whitespace-pre-wrap max-h-40"
+          }
+          rows={
+            text().match(/\n/g)?.length === 0
+              ? 1
+              : (text().match(/\n/g)?.length ?? 0) + 1
+          }
           value={text()}
           onInput={(e) => {
             cursorPosition = e.currentTarget?.selectionStart || 0;
@@ -242,12 +273,15 @@ export default function ChannelTextInput() {
             checkMode();
           }}
           onKeyDown={(e) => {
-            switch(e.key) {
+            switch (e.key) {
               case "Enter": {
                 //検索モードが有効なら選択した情報をメッセージ文にバインド
                 if (searchOptions().isEnabled) {
                   e.preventDefault();
-                  bindSearchedItem(userSearchResult()[searchOptions().selectIndex], "user");
+                  bindSearchedItem(
+                    userSearchResult()[searchOptions().selectIndex],
+                    "user",
+                  );
                   break;
                 }
                 //Macなら変換での勝手な送信をブロックする
@@ -264,19 +298,30 @@ export default function ChannelTextInput() {
                 sendMsg();
                 break;
               }
-              case "ArrowUp": { //検索モード用の選択移動
+              case "ArrowUp": {
+                //検索モード用の選択移動
                 if (searchOptions().isEnabled) {
                   e.preventDefault();
                   if (0 < searchOptions().selectIndex)
-                    setSearchOptions({...searchOptions(), selectIndex: searchOptions().selectIndex - 1});
+                    setSearchOptions({
+                      ...searchOptions(),
+                      selectIndex: searchOptions().selectIndex - 1,
+                    });
                 }
                 break;
               }
-              case "ArrowDown": { //検索モード用の選択移動
+              case "ArrowDown": {
+                //検索モード用の選択移動
                 if (searchOptions().isEnabled) {
                   e.preventDefault();
-                  if (userSearchResult().length > searchOptions().selectIndex + 1)
-                    setSearchOptions({...searchOptions(), selectIndex: searchOptions().selectIndex + 1});
+                  if (
+                    userSearchResult().length >
+                    searchOptions().selectIndex + 1
+                  )
+                    setSearchOptions({
+                      ...searchOptions(),
+                      selectIndex: searchOptions().selectIndex + 1,
+                    });
                 }
                 break;
               }
@@ -285,11 +330,19 @@ export default function ChannelTextInput() {
           onPaste={(e) => receiveFiles(e)}
         />
 
-        <Button onClick={sendMsg} size={"icon"} class={"shrink-0"}><IconSend /></Button>
+        <Button onClick={sendMsg} size={"icon"} class={"shrink-0"}>
+          <IconSend />
+        </Button>
 
         {/* メンション用ユーザー検索 */}
-        <Show when={searchOptions().isEnabled && searchOptions().type === "user"}>
-          <Card class={"absolute left-0 bottom-full border-b-0 w-full p-2 overflow-y-auto max-h-40 cursor-pointer"}>
+        <Show
+          when={searchOptions().isEnabled && searchOptions().type === "user"}
+        >
+          <Card
+            class={
+              "absolute left-0 bottom-full border-b-0 w-full p-2 overflow-y-auto max-h-40 cursor-pointer"
+            }
+          >
             <Show when={userSearchResult().length === 0}>
               <p class={"text-center"}>...</p>
             </Show>
@@ -297,17 +350,20 @@ export default function ChannelTextInput() {
               {(user, index) => {
                 return (
                   <div
-                    onClick={()=>bindSearchedItem(user, "user")}
-                    class={`flex items-center gap-2 p-2 rounded hover:bg-border ${searchOptions().selectIndex === index()&&"bg-border"}`}
+                    onClick={() => bindSearchedItem(user, "user")}
+                    class={`flex items-center gap-2 p-2 rounded hover:bg-border ${searchOptions().selectIndex === index() && "bg-border"}`}
                   >
-                    <img alt={user.name} src={`/api/user/icon/${user.id}`} class={"w-8 h-8 rounded-full"} />
+                    <img
+                      alt={user.name}
+                      src={`/api/user/icon/${user.id}`}
+                      class={"w-8 h-8 rounded-full"}
+                    />
                     <div class={"flex-grow"}>
                       <p>{user.name}</p>
                     </div>
                   </div>
                 );
-              }
-            }
+              }}
             </For>
           </Card>
         </Show>

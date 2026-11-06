@@ -1,12 +1,25 @@
-import { IconCircleFilled, IconReload, IconSearch } from "@tabler/icons-solidjs";
 import { useSearchParams } from "@solidjs/router";
+import {
+  IconCircleFilled,
+  IconReload,
+  IconSearch,
+} from "@tabler/icons-solidjs";
 import { createMemo, createSignal, For, onMount, Show } from "solid-js";
 import { api } from "~/api/index.ts";
-import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar.tsx";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "~/components/ui/avatar.tsx";
 import { Badge } from "~/components/ui/badge.tsx";
 import { Button } from "~/components/ui/button.tsx";
 import { Card } from "~/components/ui/card.tsx";
-import { Switch, SwitchControl, SwitchLabel, SwitchThumb } from "~/components/ui/switch.tsx";
+import {
+  Switch,
+  SwitchControl,
+  SwitchLabel,
+  SwitchThumb,
+} from "~/components/ui/switch.tsx";
 import { TextField, TextFieldInput } from "~/components/ui/text-field.tsx";
 import RoleChip from "~/components/unique/RoleChip.tsx";
 import SidebarTriggerWithDot from "~/components/unique/SidebarTriggerWithDot.tsx";
@@ -181,7 +194,9 @@ export default function Members() {
 
               <div class="ml-auto flex items-center gap-1 shrink-0">
                 <For each={user.RoleLink}>
-                  {(role) => <RoleChip deletable={false} roleId={role.roleId} />}
+                  {(role) => (
+                    <RoleChip deletable={false} roleId={role.roleId} />
+                  )}
                 </For>
               </div>
             </UserinfoModalWrapper>

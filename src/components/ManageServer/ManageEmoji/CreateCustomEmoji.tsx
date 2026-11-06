@@ -1,17 +1,23 @@
-import {Dialog, DialogContent, DialogFooter, DialogHeader, DialogTrigger} from "~/components/ui/dialog.tsx";
-import {IconPlus} from "@tabler/icons-solidjs";
-import {Button} from "~/components/ui/button.tsx";
-import {TextField, TextFieldInput} from "~/components/ui/text-field.tsx";
-import {Label} from "~/components/ui/label.tsx";
-import {Card} from "~/components/ui/card.tsx";
-import {createSignal, Show} from "solid-js";
+import { IconPlus } from "@tabler/icons-solidjs";
+import { createSignal, Show } from "solid-js";
 import type { DOMElement } from "solid-js/jsx-runtime";
 import { api } from "~/api/index.ts";
-import {Callout, CalloutContent, CalloutTitle} from "~/components/ui/callout";
+import { Button } from "~/components/ui/button.tsx";
+import { Callout, CalloutContent, CalloutTitle } from "~/components/ui/callout";
+import { Card } from "~/components/ui/card.tsx";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTrigger,
+} from "~/components/ui/dialog.tsx";
+import { Label } from "~/components/ui/label.tsx";
+import { TextField, TextFieldInput } from "~/components/ui/text-field.tsx";
 
 export default function CreateCustomEmoji() {
   const [dialogDisplay, setDialogDisplay] = createSignal<boolean>(false);
-  const [customEmoji, setCustomEmoji] = createSignal<File|null>(null);
+  const [customEmoji, setCustomEmoji] = createSignal<File | null>(null);
   const [customEmojiCode, setCustomEmojiCode] = createSignal<string>("");
   const [emojiPreviewUrl, setEmojiPreviewUrl] = createSignal<string>("");
   const [processing, setProcessing] = createSignal<boolean>(false);
@@ -22,7 +28,8 @@ export default function CreateCustomEmoji() {
     //処理中と設定
     setProcessing(true);
 
-    api.server.customEmojiUpload({ emojiCode: customEmojiCode(), emoji: emojiFile })
+    api.server
+      .customEmojiUpload({ emojiCode: customEmojiCode(), emoji: emojiFile })
       .then((r) => {
         //console.log("CreateCustomEmoji :: uploadEmoji :: r->", r);
         //ダイアログを閉じる
@@ -33,16 +40,18 @@ export default function CreateCustomEmoji() {
         alert("アップロードに失敗しました。 エラー : " + err);
         setProcessing(false);
       });
-  }
+  };
 
   /**
    * 絵文字作成用のファイルを入力ハンドラ
    * @param event
    */
-  const fileInput = (event: InputEvent & {
-    currentTarget: HTMLInputElement
-    target: DOMElement
-  }) => {
+  const fileInput = (
+    event: InputEvent & {
+      currentTarget: HTMLInputElement;
+      target: DOMElement;
+    },
+  ) => {
     //イベントターゲットの要素取得
     const currentTarget = event.currentTarget;
     if (currentTarget === null) return;
@@ -55,13 +64,13 @@ export default function CreateCustomEmoji() {
 
     //ファイルプレビューをするためのURL生成
     const reader = new FileReader();
-      //格納
+    //格納
     reader.onload = () => {
       setEmojiPreviewUrl(reader.result as string);
-    }
-      //ここで生成
+    };
+    //ここで生成
     reader.readAsDataURL(files[0]);
-  }
+  };
 
   return (
     <Dialog open={dialogDisplay()} onOpenChange={setDialogDisplay}>
@@ -78,31 +87,35 @@ export default function CreateCustomEmoji() {
               value={customEmojiCode()}
               style={"font-family: consolas;"}
               onInput={(e) =>
-                e.currentTarget.value.length<=32 && setCustomEmojiCode(e.currentTarget.value)
+                e.currentTarget.value.length <= 32 &&
+                setCustomEmojiCode(e.currentTarget.value)
               }
             />
             <Show when={customEmojiCode().includes(" ")}>
               <Callout variant={"error"} class={"my-2"}>
-                <CalloutTitle>絵文字コードに空白は含められません。</CalloutTitle>
+                <CalloutTitle>
+                  絵文字コードに空白は含められません。
+                </CalloutTitle>
               </Callout>
             </Show>
-            <Show when={(/[^\u0020-\u007E]/).test(customEmojiCode())}>
+            <Show when={/[^\u0020-\u007E]/.test(customEmojiCode())}>
               <Callout variant={"error"} class={"my-2"}>
-                <CalloutTitle>絵文字コードに全角文字は使えません。</CalloutTitle>
+                <CalloutTitle>
+                  絵文字コードに全角文字は使えません。
+                </CalloutTitle>
               </Callout>
             </Show>
           </TextField>
 
           <TextField>
             <Label>カスタム絵文字ファイルのアップロード</Label>
-            <TextFieldInput
-              type={"file"}
-              onInput={fileInput}
-            />
+            <TextFieldInput type={"file"} onInput={fileInput} />
             <Show when={customEmoji()?.type === "image/png"}>
               <Callout variant={"warning"} class={"my-2"}>
                 <CalloutTitle>注意</CalloutTitle>
-                <CalloutContent>この画像がAPNGファイルの場合、作成時アニメーションが削除されます。アニメーションを保持したい場合、GIF画像を使用してください。</CalloutContent>
+                <CalloutContent>
+                  この画像がAPNGファイルの場合、作成時アニメーションが削除されます。アニメーションを保持したい場合、GIF画像を使用してください。
+                </CalloutContent>
               </Callout>
             </Show>
           </TextField>
@@ -112,12 +125,20 @@ export default function CreateCustomEmoji() {
             <Card class={"flex items-center p-0"}>
               <div class={"bg-white rounded w-1/2 py-6 text-center"}>
                 <Show when={emojiPreviewUrl() !== ""}>
-                  <img src={emojiPreviewUrl()} alt={"絵文字プレビュー"} class={"w-8 h-8 mx-auto"} />
+                  <img
+                    src={emojiPreviewUrl()}
+                    alt={"絵文字プレビュー"}
+                    class={"w-8 h-8 mx-auto"}
+                  />
                 </Show>
               </div>
               <div class={"bg-black rounded w-1/2 py-6 text-center"}>
                 <Show when={emojiPreviewUrl() !== ""}>
-                  <img src={emojiPreviewUrl()} alt={"絵文字プレビュー"} class={"w-8 h-8 mx-auto"} />
+                  <img
+                    src={emojiPreviewUrl()}
+                    alt={"絵文字プレビュー"}
+                    class={"w-8 h-8 mx-auto"}
+                  />
                 </Show>
               </div>
             </Card>
@@ -128,9 +149,15 @@ export default function CreateCustomEmoji() {
           <Button
             onClick={uploadEmoji}
             disabled={
-              emojiPreviewUrl()==="" || customEmojiCode()==="" || processing() || (/[^\u0020-\u007E]/).test(customEmojiCode()) || customEmojiCode().includes(" ")
+              emojiPreviewUrl() === "" ||
+              customEmojiCode() === "" ||
+              processing() ||
+              /[^\u0020-\u007E]/.test(customEmojiCode()) ||
+              customEmojiCode().includes(" ")
             }
-          >アップロードする</Button>
+          >
+            アップロードする
+          </Button>
         </DialogFooter>
       </DialogContent>
 
@@ -141,5 +168,5 @@ export default function CreateCustomEmoji() {
         </Button>
       </DialogTrigger>
     </Dialog>
-  )
+  );
 }

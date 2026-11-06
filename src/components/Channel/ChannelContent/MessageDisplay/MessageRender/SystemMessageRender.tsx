@@ -1,7 +1,7 @@
-import {Card} from "~/components/ui/card.tsx";
-import type {ISystemMessage} from "~/types/Message.ts";
-import {useStoreUserinfo} from "~/stores/Userinfo.store.ts";
+import { Card } from "~/components/ui/card.tsx";
 import UserinfoModalWrapper from "~/components/unique/UserinfoModalWrapper.tsx";
+import { useStoreUserinfo } from "~/stores/Userinfo.store.ts";
+import type { ISystemMessage } from "~/types/Message.ts";
 
 export default function SystemMessageRender(props: { content: string }) {
   const systemMsg: ISystemMessage = JSON.parse(props.content);
@@ -10,37 +10,57 @@ export default function SystemMessageRender(props: { content: string }) {
     <Card class={"px-4 py-2 my-1"}>
       {systemMsg.messageTerm === "WELCOME" && (
         <p>
-          <UserinfoModalWrapper userId={systemMsg.targetUserId} class={"hover:underline truncate"}>
+          <UserinfoModalWrapper
+            userId={systemMsg.targetUserId}
+            class={"hover:underline truncate"}
+          >
             {useStoreUserinfo.getterUserinfo(systemMsg.targetUserId).name}
-          </UserinfoModalWrapper>さんがGiracleに参加しました!ようこそ
+          </UserinfoModalWrapper>
+          さんがGiracleに参加しました!ようこそ
         </p>
       )}
       {systemMsg.messageTerm === "CHANNEL_JOIN" && (
         <p>
-          <UserinfoModalWrapper userId={systemMsg.targetUserId} class={"hover:underline truncate"}>
+          <UserinfoModalWrapper
+            userId={systemMsg.targetUserId}
+            class={"hover:underline truncate"}
+          >
             {useStoreUserinfo.getterUserinfo(systemMsg.targetUserId).name}
-          </UserinfoModalWrapper>さんがチャンネルへ参加しました！
+          </UserinfoModalWrapper>
+          さんがチャンネルへ参加しました！
         </p>
       )}
       {systemMsg.messageTerm === "CHANNEL_LEFT" && (
         <p>
-          <UserinfoModalWrapper userId={systemMsg.targetUserId} class={"hover:underline truncate"}>
+          <UserinfoModalWrapper
+            userId={systemMsg.targetUserId}
+            class={"hover:underline truncate"}
+          >
             {useStoreUserinfo.getterUserinfo(systemMsg.targetUserId).name}
-          </UserinfoModalWrapper>さんがチャンネルを退出しました。
+          </UserinfoModalWrapper>
+          さんがチャンネルを退出しました。
         </p>
       )}
       {systemMsg.messageTerm === "CHANNEL_INVITED" && (
         <p>
-          <UserinfoModalWrapper userId={systemMsg.targetUserId} class={"hover:underline truncate"}>
+          <UserinfoModalWrapper
+            userId={systemMsg.targetUserId}
+            class={"hover:underline truncate"}
+          >
             {useStoreUserinfo.getterUserinfo(systemMsg.targetUserId).name}
-          </UserinfoModalWrapper>さんが招待されました!
+          </UserinfoModalWrapper>
+          さんが招待されました!
         </p>
       )}
       {systemMsg.messageTerm === "CHANNEL_KICKED" && (
         <p>
-          <UserinfoModalWrapper userId={systemMsg.targetUserId} class={"hover:underline truncate"}>
+          <UserinfoModalWrapper
+            userId={systemMsg.targetUserId}
+            class={"hover:underline truncate"}
+          >
             {useStoreUserinfo.getterUserinfo(systemMsg.targetUserId).name}
-          </UserinfoModalWrapper>さんがチャンネルからキックされました。
+          </UserinfoModalWrapper>
+          さんがチャンネルからキックされました。
         </p>
       )}
     </Card>

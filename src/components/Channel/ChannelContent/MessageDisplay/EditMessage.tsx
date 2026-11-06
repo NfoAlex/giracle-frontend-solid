@@ -1,12 +1,16 @@
-import {Card} from "~/components/ui/card.tsx";
-import {Button} from "~/components/ui/button.tsx";
-import {IconCancel, IconCheck} from "@tabler/icons-solidjs";
-import {createSignal, onMount} from "solid-js";
-import {TextField, TextFieldTextArea} from "~/components/ui/text-field.tsx";
+import { IconCancel, IconCheck } from "@tabler/icons-solidjs";
+import { createSignal, onMount } from "solid-js";
 import { api } from "~/api/index.ts";
+import { Button } from "~/components/ui/button.tsx";
+import { Card } from "~/components/ui/card.tsx";
+import { TextField, TextFieldTextArea } from "~/components/ui/text-field.tsx";
 import { storeClientConfig } from "~/stores/ClientConfig.store.ts";
 
-export default function EditMessage(props: { messageId: string, content: string, onCancelEdit: () => void }) {
+export default function EditMessage(props: {
+  messageId: string;
+  content: string;
+  onCancelEdit: () => void;
+}) {
   const [messageContent, setMessageContent] = createSignal(props.content);
   const [processing, setProcessing] = createSignal(false);
 
@@ -21,11 +25,14 @@ export default function EditMessage(props: { messageId: string, content: string,
   const updateMessage = async () => {
     setProcessing(true);
     //console.log("EditMessage :: updateMessage : messageContent->", props.messageId, messageContent());
-    await api.message.edit({ messageId: props.messageId, message: messageContent() })
+    await api.message
+      .edit({ messageId: props.messageId, message: messageContent() })
       .then(() => {
         setProcessing(false);
         //メッセージ入力部分にフォーカスする
-        const msgInputEl = document.getElementById("messageInput") as HTMLInputElement;
+        const msgInputEl = document.getElementById(
+          "messageInput",
+        ) as HTMLInputElement;
         msgInputEl?.focus();
         //キャンセル処理を行う(編集モードを抜ける)
         props.onCancelEdit();
@@ -35,18 +42,20 @@ export default function EditMessage(props: { messageId: string, content: string,
         //alert("メッセージの編集に失敗しました. エラー: " + e);
         setProcessing(false);
       });
-  }
+  };
 
   /**
    * 編集モードを抜け出してメッセ入力部分にフォーカスする
    */
   const escapeEdit = () => {
     //メッセージ入力部分にフォーカスする
-    const msgInputEl = document.getElementById("messageInput") as HTMLInputElement;
+    const msgInputEl = document.getElementById(
+      "messageInput",
+    ) as HTMLInputElement;
     msgInputEl?.focus();
     //編集モードを抜ける
     props.onCancelEdit();
-  }
+  };
 
   return (
     <Card class={"p-2 flex flex-col gap-2"}>
@@ -61,38 +70,43 @@ export default function EditMessage(props: { messageId: string, content: string,
             disabled={processing()}
             autofocus
             autoResize
-            placeholder={props.content.slice(0,5) + "..."}
-            onKeyDown={
-              (e) => {
-                switch(e.key) {
-                  case "Enter": {
-                    //もしCtrlキーでの送信をオンにしているならCtrlキーで編集するようにする
-                    if (storeClientConfig.chat.sendWithCtrlKey && !e.ctrlKey) break;
-                    //Shiftキーでの改行用の条件を挟む
-                    if (!e.shiftKey) {
-                      if (messageContent() !== props.content) {
-                        updateMessage();
-                      } else {
-                        escapeEdit();
-                        break;
-                      }
+            placeholder={props.content.slice(0, 5) + "..."}
+            onKeyDown={(e) => {
+              switch (e.key) {
+                case "Enter": {
+                  //もしCtrlキーでの送信をオンにしているならCtrlキーで編集するようにする
+                  if (storeClientConfig.chat.sendWithCtrlKey && !e.ctrlKey)
+                    break;
+                  //Shiftキーでの改行用の条件を挟む
+                  if (!e.shiftKey) {
+                    if (messageContent() !== props.content) {
+                      updateMessage();
+                    } else {
+                      escapeEdit();
+                      break;
                     }
-                    break;
                   }
-                  case "Escape": {
-                    escapeEdit();
-                    break;
-                  }
+                  break;
+                }
+                case "Escape": {
+                  escapeEdit();
+                  break;
                 }
               }
-            }
+            }}
           />
         </TextField>
       </div>
       <span class={"flex items-center gap-2 justify-end"}>
-        <div class={"shrink mr-auto py-1 hidden sm:flex items-center gap-4 text-sm overflow-x-scroll"}>
+        <div
+          class={
+            "shrink mr-auto py-1 hidden sm:flex items-center gap-4 text-sm overflow-x-scroll"
+          }
+        >
           <span class={"shrink-0 flex items-center gap-1"}>
-            { storeClientConfig.chat.sendWithCtrlKey && <kbd class={"border p-1 rounded"}>Ctrl</kbd> }
+            {storeClientConfig.chat.sendWithCtrlKey && (
+              <kbd class={"border p-1 rounded"}>Ctrl</kbd>
+            )}
             <kbd class={"border p-1 rounded"}>Enter</kbd>で更新
           </span>
           <span class={"shrink-0"}>
@@ -105,15 +119,21 @@ export default function EditMessage(props: { messageId: string, content: string,
           disabled={processing()}
           size={"sm"}
           class={"grow sm:grow-0"}
-        ><IconCheck/>更新する</Button>
+        >
+          <IconCheck />
+          更新する
+        </Button>
         <Button
           onClick={props.onCancelEdit}
           disabled={processing()}
           variant={"secondary"}
           size={"sm"}
           class={"grow sm:grow-0"}
-        ><IconCancel/>キャンセル</Button>
+        >
+          <IconCancel />
+          キャンセル
+        </Button>
       </span>
     </Card>
-  )
+  );
 }

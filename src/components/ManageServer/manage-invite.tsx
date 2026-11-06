@@ -1,12 +1,12 @@
+import { IconRefresh } from "@tabler/icons-solidjs";
 import type { ColumnDef } from "@tanstack/solid-table";
 import { createSignal, onMount } from "solid-js";
 import { api } from "~/api/index.ts";
 import type { IInvite } from "~/types/Server.ts";
-import { InviteTable } from "./ManageInvite/InviteTable";
+import { Button } from "../ui/button.tsx";
 import { Checkbox } from "../ui/checkbox";
 import CreateInvite from "./ManageInvite/CreateInvite";
-import { Button } from "../ui/button.tsx";
-import { IconRefresh } from "@tabler/icons-solidjs";
+import { InviteTable } from "./ManageInvite/InviteTable";
 
 export default function ManageInvite() {
   const [invites, setInvites] = createSignal<IInvite[]>([]);
@@ -40,26 +40,29 @@ export default function ManageInvite() {
       id: "maxUsage",
       header: "上限",
       cell: (props) => (
-        <span>{props.getValue() === -1 ? "無限" : (props.renderValue() as number)}</span>
+        <span>
+          {props.getValue() === -1 ? "無限" : (props.renderValue() as number)}
+        </span>
       ),
     },
     {
       accessorKey: "usedCount",
       id: "usedCount",
       header: "使用回数",
-    }
+    },
   ];
 
   const fetchInvites = () => {
-    api.server.getInvite()
+    api.server
+      .getInvite()
       .then((r) => {
         //console.log("ManageInvite :: fetchInvites :: r->", r);
         setInvites(r.data);
       })
       .catch((e) => {
         console.error("ManageInvite :: fetchInvites :: e->", e);
-      })
-  }
+      });
+  };
 
   /**
    * 招待に対し操作されたあとにリストを再取得する
@@ -69,26 +72,30 @@ export default function ManageInvite() {
     //console.log("ManageInvite :: sig : dat->", dat);
 
     fetchInvites();
-  }
+  };
 
   onMount(fetchInvites);
 
   return (
     <div class="flex flex-col overflow-y-auto">
-      <InviteTable columns={col} data={invites()} inviteActionTaken={inviteActionTaken} />
+      <InviteTable
+        columns={col}
+        data={invites()}
+        inviteActionTaken={inviteActionTaken}
+      />
 
-      <div class={"fixed z-50 bottom-10 right-5 md:right-10 flex flex-col gap-4 md:gap-2"}>
+      <div
+        class={
+          "fixed z-50 bottom-10 right-5 md:right-10 flex flex-col gap-4 md:gap-2"
+        }
+      >
         {/* 再取得ボタン */}
-        <Button
-          onclick={fetchInvites}
-          class="w-14 h-14"
-          variant={"secondary"}
-        >
+        <Button onclick={fetchInvites} class="w-14 h-14" variant={"secondary"}>
           <IconRefresh />
         </Button>
         {/* 招待作成ボタン */}
         <CreateInvite inviteActionTaken={inviteActionTaken} />
       </div>
     </div>
-  )
+  );
 }

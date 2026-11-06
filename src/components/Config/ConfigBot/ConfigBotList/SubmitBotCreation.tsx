@@ -3,8 +3,20 @@ import { createSignal, Show } from "solid-js";
 import { api } from "~/api";
 import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert";
 import { Button } from "~/components/ui/button";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogTitle, DialogTrigger } from "~/components/ui/dialog";
-import { TextField, TextFieldInput, TextFieldLabel, TextFieldTextArea } from "~/components/ui/text-field";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogTitle,
+  DialogTrigger,
+} from "~/components/ui/dialog";
+import {
+  TextField,
+  TextFieldInput,
+  TextFieldLabel,
+  TextFieldTextArea,
+} from "~/components/ui/text-field";
 import type { TBotListItem } from "~/types/Server";
 
 export default function SubmitBotCreation(props: {
@@ -26,12 +38,13 @@ export default function SubmitBotCreation(props: {
     setProcessing(true);
     setError(null);
 
-    api.bot.create({
-      name: botName(),
-      // 概要が未入力ならキーごと送らない。
-      // バックエンドは指定時に1文字以上を要求するため、空文字を送ると422になる
-      introduction: description() || undefined,
-    })
+    api.bot
+      .create({
+        name: botName(),
+        // 概要が未入力ならキーごと送らない。
+        // バックエンドは指定時に1文字以上を要求するため、空文字を送ると422になる
+        introduction: description() || undefined,
+      })
       .then((r) => {
         // PUT /bot の応答は BotManage 行そのもので remoteUserName を含まないため、
         // 同じ応答の remoteUser.name から補う
@@ -50,14 +63,12 @@ export default function SubmitBotCreation(props: {
       .finally(() => {
         setProcessing(false);
       });
-  }
+  };
 
   return (
     <Dialog open={open()} onOpenChange={setOpen}>
       <DialogContent>
-        <DialogTitle>
-          Botの作成
-        </DialogTitle>
+        <DialogTitle>Botの作成</DialogTitle>
         <DialogDescription class="flex flex-col gap-4">
           <TextField class="grid w-full items-center gap-2">
             <TextFieldLabel for="bot-name">Bot名</TextFieldLabel>
@@ -67,7 +78,7 @@ export default function SubmitBotCreation(props: {
               placeholder="Bot名"
               maxLength={32}
               value={botName()}
-              onInput={(e)=>setBotName(e.currentTarget.value)}
+              onInput={(e) => setBotName(e.currentTarget.value)}
             />
             <p class="text-xs text-muted-foreground text-right">
               {botName().length}/32
@@ -80,7 +91,7 @@ export default function SubmitBotCreation(props: {
               placeholder="概要"
               maxLength={128}
               value={description()}
-              onInput={(e)=>setDescription(e.currentTarget.value)}
+              onInput={(e) => setDescription(e.currentTarget.value)}
             />
           </TextField>
         </DialogDescription>
@@ -96,7 +107,9 @@ export default function SubmitBotCreation(props: {
             onClick={createBotRequest}
             disabled={botName() === "" || processing()}
             type="submit"
-          >作成</Button>
+          >
+            作成
+          </Button>
         </DialogFooter>
       </DialogContent>
       <DialogTrigger disabled={props.disabled}>

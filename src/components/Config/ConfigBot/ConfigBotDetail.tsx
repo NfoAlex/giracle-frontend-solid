@@ -13,13 +13,20 @@ import { api } from "~/api";
 import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert";
 import { Button } from "~/components/ui/button";
 import { Card } from "~/components/ui/card";
-import { TextField, TextFieldInput, TextFieldTextArea } from "~/components/ui/text-field";
-import type { IBot, TBotListItem } from "~/types/Server";
-import { useStoreUserinfo } from "~/stores/Userinfo.store";
-import DialogConfirmDeleteBot from "./ConfigBotDetail/DialogConfirmDeleteBot";
+import {
+  TextField,
+  TextFieldInput,
+  TextFieldTextArea,
+} from "~/components/ui/text-field";
 import BotApprovalBadge from "~/components/unique/BotApprovalBadge";
+import { useStoreUserinfo } from "~/stores/Userinfo.store";
+import type { IBot, TBotListItem } from "~/types/Server";
+import DialogConfirmDeleteBot from "./ConfigBotDetail/DialogConfirmDeleteBot";
 
-export default function ConfigBotDetail(props: { returnToListProxy: () => void; bot?: TBotListItem }) {
+export default function ConfigBotDetail(props: {
+  returnToListProxy: () => void;
+  bot?: TBotListItem;
+}) {
   const [tokenVisible, setTokenVisible] = createSignal(false);
   const [tokenCopied, setTokenCopied] = createSignal(false);
   // 承認状態は管理者操作で変わり得るため、一覧行の値とは別に取り直して優先する
@@ -33,16 +40,15 @@ export default function ConfigBotDetail(props: { returnToListProxy: () => void; 
   const [error, setError] = createSignal<string | null>(null);
 
   if (props.bot === undefined) {
-    return (
-      <p class="text-center">Bot情報が見つかりません。</p>
-    )
+    return <p class="text-center">Bot情報が見つかりません。</p>;
   }
   // 選択済みの一覧行をそのまま表示する（tokenCodeとBot名はこの応答にしか含まれない）
   const bot = props.bot;
 
   // 承認状態は管理者操作や改名で変わり得るため、表示前に取り直す（失敗時は一覧行の値で続行）
   const fetchRemoteBot = () => {
-    api.bot.getByRemoteUserId({ remoteUserId: bot.remoteUserId })
+    api.bot
+      .getByRemoteUserId({ remoteUserId: bot.remoteUserId })
       .then((res) => setRemoteBot(res.data))
       .catch((e) => console.error("ConfigBotDetail :: fetchBot : ", e));
   };
@@ -86,11 +92,12 @@ export default function ConfigBotDetail(props: { returnToListProxy: () => void; 
     if (target === "name" && draft().length < 2) return;
     setProcessing(true);
     setError(null);
-    api.bot.update(
-      target === "name"
-        ? { botId: bot.id, name: draft() }
-        : { botId: bot.id, selfIntroduction: draft() },
-    )
+    api.bot
+      .update(
+        target === "name"
+          ? { botId: bot.id, name: draft() }
+          : { botId: bot.id, selfIntroduction: draft() },
+      )
       .then((res) => {
         if (target === "name") {
           setUpdatedBotName(res.data.name ?? draft());
@@ -149,7 +156,7 @@ export default function ConfigBotDetail(props: { returnToListProxy: () => void; 
             <Button
               size="icon"
               variant="ghost"
-              onClick={() => setTokenVisible(v => !v)}
+              onClick={() => setTokenVisible((v) => !v)}
               aria-label={tokenVisible() ? "トークンを隠す" : "トークンを表示"}
               disabled={bot.tokenCode === undefined}
             >
@@ -162,7 +169,11 @@ export default function ConfigBotDetail(props: { returnToListProxy: () => void; 
               aria-label="トークンをコピー"
               disabled={bot.tokenCode === undefined}
             >
-              {tokenCopied() ? <IconCheck class="text-success" /> : <IconCopy />}
+              {tokenCopied() ? (
+                <IconCheck class="text-success" />
+              ) : (
+                <IconCopy />
+              )}
             </Button>
           </div>
         </Card>
@@ -238,7 +249,10 @@ export default function ConfigBotDetail(props: { returnToListProxy: () => void; 
               fallback={
                 <span class="ml-auto min-w-0 flex items-center gap-1">
                   <p class="whitespace-pre-wrap break-all text-right">
-                    {useStoreUserinfo.getterUserinfo(bot.remoteUserId).selfIntroduction}
+                    {
+                      useStoreUserinfo.getterUserinfo(bot.remoteUserId)
+                        .selfIntroduction
+                    }
                   </p>
                   <Button
                     size="icon"
@@ -289,7 +303,9 @@ export default function ConfigBotDetail(props: { returnToListProxy: () => void; 
           <hr />
           <div class="flex items-center w-full gap-2">
             <p class="shrink-0">作成者</p>
-            <p class="ml-auto">{useStoreUserinfo.getterUserinfo(bot.createdBy).name}</p>
+            <p class="ml-auto">
+              {useStoreUserinfo.getterUserinfo(bot.createdBy).name}
+            </p>
           </div>
         </Card>
 

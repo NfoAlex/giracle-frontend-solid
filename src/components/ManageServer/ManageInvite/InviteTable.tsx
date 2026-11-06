@@ -1,40 +1,47 @@
-import { createSignal, For, Show } from "solid-js"
-import { type ColumnDef, createSolidTable, flexRender, getCoreRowModel } from "@tanstack/solid-table"
+import {
+  type ColumnDef,
+  createSolidTable,
+  flexRender,
+  getCoreRowModel,
+} from "@tanstack/solid-table";
+import { createSignal, For, Show } from "solid-js";
+import { api } from "~/api/index.ts";
+import { Button } from "~/components/ui/button.tsx";
+import { Card } from "~/components/ui/card.tsx";
 import {
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableHeader,
-  TableRow
-} from "~/components/ui/table"
-import { Button } from "~/components/ui/button.tsx"
-import { Card } from "~/components/ui/card.tsx"
-import { api } from "~/api/index.ts"
-import type { IInvite } from "~/types/Server.ts"
- 
+  TableRow,
+} from "~/components/ui/table";
+import type { IInvite } from "~/types/Server.ts";
+
 interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[]
-  data: TData[],
-  inviteActionTaken: (data: IInvite) => void
+  columns: ColumnDef<TData, TValue>[];
+  data: TData[];
+  inviteActionTaken: (data: IInvite) => void;
 }
- 
-export function InviteTable<TData, TValue>(props: DataTableProps<TData, TValue>) {
-  const [rowSelection, setRowSelection] = createSignal({})
-  
+
+export function InviteTable<TData, TValue>(
+  props: DataTableProps<TData, TValue>,
+) {
+  const [rowSelection, setRowSelection] = createSignal({});
+
   const table = createSolidTable({
     get data() {
-      return props.data
+      return props.data;
     },
     get columns() {
-      return props.columns
+      return props.columns;
     },
     getCoreRowModel: getCoreRowModel(),
     onRowSelectionChange: setRowSelection,
     state: {
       get rowSelection() {
-        return rowSelection()
-      }
+        return rowSelection();
+      },
     },
   });
 
@@ -46,7 +53,8 @@ export function InviteTable<TData, TValue>(props: DataTableProps<TData, TValue>)
       const inviteData = row.original as IInvite;
 
       //id指定でエラーが出てますがきちんと割り当てられています。
-      api.server.deleteInvite({ inviteId: inviteData.id })
+      api.server
+        .deleteInvite({ inviteId: inviteData.id })
         .then((r) => {
           //console.log("ManageInvite :: deleteInvite :: r->", r);
           setRowSelection({}); // 選択を解除
@@ -56,18 +64,20 @@ export function InviteTable<TData, TValue>(props: DataTableProps<TData, TValue>)
           console.error("ManageInvite :: deleteInvite :: e->", e);
         });
     }
-  }
- 
+  };
+
   return (
     <div class="flex flex-col gap-2">
       <Card class="px-4 py-2 flex items-center gap-2 sticky top-0 z-50">
-        <p>{ Object.keys(rowSelection()).length }件を選択中</p>
+        <p>{Object.keys(rowSelection()).length}件を選択中</p>
         <Button
           ondblclick={deleteInvite}
           variant={"destructive"}
           disabled={Object.keys(rowSelection()).length === 0}
           class={"ml-auto"}
-        >ダブルクリックで招待を削除</Button>
+        >
+          ダブルクリックで招待を削除
+        </Button>
       </Card>
 
       <div class="rounded-md border h-full">
@@ -78,45 +88,54 @@ export function InviteTable<TData, TValue>(props: DataTableProps<TData, TValue>)
                 <TableRow>
                   <For each={headerGroup.headers}>
                     {(header) => (
-                        <TableHead colSpan={header.colSpan}>
-                          <Show when={!header.isPlaceholder}>
-                            {flexRender(header.column.columnDef.header, header.getContext())}
-                          </Show>
-                        </TableHead>
-                      )}
+                      <TableHead colSpan={header.colSpan}>
+                        <Show when={!header.isPlaceholder}>
+                          {flexRender(
+                            header.column.columnDef.header,
+                            header.getContext(),
+                          )}
+                        </Show>
+                      </TableHead>
+                    )}
                   </For>
                 </TableRow>
               )}
             </For>
           </TableHeader>
           <TableBody>
-              <Show
-                when={table.getRowModel().rows?.length}
-                fallback={
-                  <TableRow>
-                    <TableCell colSpan={props.columns.length} class="h-24 text-center">
-                      結果が見つかりませんでした。
-                    </TableCell>
+            <Show
+              when={table.getRowModel().rows?.length}
+              fallback={
+                <TableRow>
+                  <TableCell
+                    colSpan={props.columns.length}
+                    class="h-24 text-center"
+                  >
+                    結果が見つかりませんでした。
+                  </TableCell>
+                </TableRow>
+              }
+            >
+              <For each={table.getRowModel().rows}>
+                {(row) => (
+                  <TableRow data-state={row.getIsSelected() && "selected"}>
+                    <For each={row.getVisibleCells()}>
+                      {(cell) => (
+                        <TableCell>
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext(),
+                          )}
+                        </TableCell>
+                      )}
+                    </For>
                   </TableRow>
-                }
-              >
-                <For each={table.getRowModel().rows}>
-                  {(row) => (
-                    <TableRow data-state={row.getIsSelected() && "selected"}>
-                      <For each={row.getVisibleCells()}>
-                        {(cell) => (
-                          <TableCell>
-                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                          </TableCell>
-                        )}
-                      </For>
-                    </TableRow>
-                  )}
-                </For>
-              </Show>
-            </TableBody>
+                )}
+              </For>
+            </Show>
+          </TableBody>
         </Table>
       </div>
     </div>
-  )
+  );
 }

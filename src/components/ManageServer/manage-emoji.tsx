@@ -1,30 +1,35 @@
-import {Card} from "~/components/ui/card.tsx";
-import {For, Show} from "solid-js";
-import {storeCustomEmoji} from "~/stores/CustomEmoji.store.ts";
-import CreateCustomEmoji from "~/components/ManageServer/ManageEmoji/CreateCustomEmoji";
-import {useStoreUserinfo} from "~/stores/Userinfo.store.ts";
+import { IconTrash } from "@tabler/icons-solidjs";
+import { For, Show } from "solid-js";
 import { api } from "~/api/index.ts";
-import {Table, TableBody, TableHead, TableHeader, TableRow} from "~/components/ui/table";
-import {IconTrash} from "@tabler/icons-solidjs";
-import {Button} from "~/components/ui/button.tsx";
+import CreateCustomEmoji from "~/components/ManageServer/ManageEmoji/CreateCustomEmoji";
+import { Button } from "~/components/ui/button.tsx";
+import { Card } from "~/components/ui/card.tsx";
+import {
+  Table,
+  TableBody,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "~/components/ui/table";
+import { storeCustomEmoji } from "~/stores/CustomEmoji.store.ts";
+import { useStoreUserinfo } from "~/stores/Userinfo.store.ts";
 
 export default function ManageEmoji() {
-
   /**
    * カスタム絵文字を削除する
    * @param emojiCode
    */
   const deleteEmoji = (emojiCode: string) => {
-    api.server.customEmojiDelete({ emojiCode })
+    api.server
+      .customEmojiDelete({ emojiCode })
       .then((r) => {
         //console.log("ManageEmoji :: deleteEmoji : r->", r);
       })
       .catch((e) => console.error("ManageEmoji :: deleteEmoji : e->", e));
-  }
+  };
 
   return (
     <div class="flex flex-col overflow-y-auto h-full gap-2">
-
       <CreateCustomEmoji />
 
       <Card class={"p-2 max-h-full overflow-y-auto flex flex-col"}>
@@ -46,23 +51,34 @@ export default function ManageEmoji() {
 
           <TableBody class={"overflow-y-auto pb-80"}>
             <For each={storeCustomEmoji}>
-              {
-                (emoji) => (
-                  <TableRow>
-                    <td>
-                      <img src={"/api/server/custom-emoji/" + emoji.code} alt={emoji.code} class={"my-1 w-8 h-8"}/>
-                    </td>
-                    <td><code>{emoji.code}</code></td>
-                    <td class={"overflow-x-auto"}>{useStoreUserinfo.getterUserinfo(emoji.uploadedUserId).name}</td>
-                    <td class={"text-right"}>
-                      <Button ondblclick={() => deleteEmoji(emoji.code)} class={"text-red-500 my-1"} size={"sm"} variant={"outline"}>
-                        <IconTrash />
-                        <p>削除</p>
-                      </Button>
-                    </td>
-                  </TableRow>
-                )
-              }
+              {(emoji) => (
+                <TableRow>
+                  <td>
+                    <img
+                      src={"/api/server/custom-emoji/" + emoji.code}
+                      alt={emoji.code}
+                      class={"my-1 w-8 h-8"}
+                    />
+                  </td>
+                  <td>
+                    <code>{emoji.code}</code>
+                  </td>
+                  <td class={"overflow-x-auto"}>
+                    {useStoreUserinfo.getterUserinfo(emoji.uploadedUserId).name}
+                  </td>
+                  <td class={"text-right"}>
+                    <Button
+                      ondblclick={() => deleteEmoji(emoji.code)}
+                      class={"text-red-500 my-1"}
+                      size={"sm"}
+                      variant={"outline"}
+                    >
+                      <IconTrash />
+                      <p>削除</p>
+                    </Button>
+                  </td>
+                </TableRow>
+              )}
             </For>
           </TableBody>
         </Table>

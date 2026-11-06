@@ -1,19 +1,19 @@
-import { Card } from "~/components/ui/card.tsx";
-import type { IMessage } from "~/types/Message.ts";
-import { createSignal, For, Show } from "solid-js";
-import { Button } from "~/components/ui/button.tsx";
-import { Badge } from "~/components/ui/badge.tsx";
-import UserinfoModalWrapper from "~/components/unique/UserinfoModalWrapper.tsx";
-import BotBadge from "~/components/unique/BotBadge.tsx";
-import { Avatar, AvatarImage } from "~/components/ui/avatar.tsx";
-import { useStoreUserinfo } from "~/stores/Userinfo.store.ts";
 import { IconBrowserMaximize } from "@tabler/icons-solidjs";
-import { storeMyUserinfo } from "~/stores/MyUserinfo.store.ts";
-import MessageTextRender from "./MessageTextRender.tsx";
-import URLPreview from "./URLPreview.tsx";
+import { createSignal, For, Show } from "solid-js";
+import { Avatar, AvatarImage } from "~/components/ui/avatar.tsx";
+import { Badge } from "~/components/ui/badge.tsx";
+import { Button } from "~/components/ui/button.tsx";
+import { Card } from "~/components/ui/card.tsx";
 import { Dialog, DialogContent } from "~/components/ui/dialog.tsx";
+import BotBadge from "~/components/unique/BotBadge.tsx";
+import UserinfoModalWrapper from "~/components/unique/UserinfoModalWrapper.tsx";
+import { storeMyUserinfo } from "~/stores/MyUserinfo.store.ts";
+import { useStoreUserinfo } from "~/stores/Userinfo.store.ts";
+import type { IMessage } from "~/types/Message.ts";
 import FilePreview from "./FilePreview.tsx";
+import MessageTextRender from "./MessageTextRender.tsx";
 import RenderEmojiReactions from "./RenderEmojiReactions.tsx";
+import URLPreview from "./URLPreview.tsx";
 
 export default function LongTextDisplay(props: { message: IMessage }) {
   const [open, setOpen] = createSignal(false);
@@ -31,37 +31,46 @@ export default function LongTextDisplay(props: { message: IMessage }) {
     <>
       {/* メッセージ展開の表示 */}
       <Dialog open={open()} onOpenChange={setOpen}>
-        <DialogContent class={"overflow-y-auto w-[100vw] md:w-[75vw]"} style={"max-width:750px;"}>
+        <DialogContent
+          class={"overflow-y-auto w-[100vw] md:w-[75vw]"}
+          style={"max-width:750px;"}
+        >
           {/* アバターの名前表示 */}
           <span class={"mt-5 flex items-center gap-3 truncate"}>
-            <UserinfoModalWrapper userId={props.message.userId} >
+            <UserinfoModalWrapper userId={props.message.userId}>
               <Avatar class="mx-auto w-8 h-8">
                 <AvatarImage src={`/api/user/icon/${props.message.userId}`} />
               </Avatar>
             </UserinfoModalWrapper>
-            <p class={"line-clamp-1 truncate"}>{useStoreUserinfo.getterUserinfo(props.message.userId).name}</p>
-            <Show when={useStoreUserinfo.getterUserinfo(props.message.userId).isBot}>
+            <p class={"line-clamp-1 truncate"}>
+              {useStoreUserinfo.getterUserinfo(props.message.userId).name}
+            </p>
+            <Show
+              when={useStoreUserinfo.getterUserinfo(props.message.userId).isBot}
+            >
               <BotBadge />
             </Show>
-            <Badge variant={"secondary"} class={"ml-auto"}>{new Date(props.message.createdAt).toLocaleString()}</Badge>
+            <Badge variant={"secondary"} class={"ml-auto"}>
+              {new Date(props.message.createdAt).toLocaleString()}
+            </Badge>
           </span>
           <hr />
 
           {/* ここから内容 */}
           <MessageTextRender content={props.message.content} />
 
-          { //URLプレビュー
-            (props.message.MessageUrlPreview?.length > 0)
-            &&
-            <For each={props.message.MessageUrlPreview}>
-              {(urlPreview) => <URLPreview urlPreview={urlPreview} />}
-            </For>
+          {
+            //URLプレビュー
+            props.message.MessageUrlPreview?.length > 0 && (
+              <For each={props.message.MessageUrlPreview}>
+                {(urlPreview) => <URLPreview urlPreview={urlPreview} />}
+              </For>
+            )
           }
 
-          { //ファイルプレビュー
-            props.message.MessageFileAttached?.length > 0
-            &&
-            (
+          {
+            //ファイルプレビュー
+            props.message.MessageFileAttached?.length > 0 && (
               <For each={props.message.MessageFileAttached}>
                 {(f) => <FilePreview file={f} />}
               </For>
@@ -74,8 +83,17 @@ export default function LongTextDisplay(props: { message: IMessage }) {
           </Show>
 
           {/* 絵文字リアクション表示 */}
-          <Show when={props.message.reactionSummary && props.message.reactionSummary.length > 0}>
-            <RenderEmojiReactions reaction={props.message.reactionSummary} messageId={props.message.id} channelId={props.message.channelId} />
+          <Show
+            when={
+              props.message.reactionSummary &&
+              props.message.reactionSummary.length > 0
+            }
+          >
+            <RenderEmojiReactions
+              reaction={props.message.reactionSummary}
+              messageId={props.message.id}
+              channelId={props.message.channelId}
+            />
           </Show>
         </DialogContent>
       </Dialog>
@@ -84,7 +102,11 @@ export default function LongTextDisplay(props: { message: IMessage }) {
       <Card class={"w-full p-3 my-1 flex flex-col gap-2"}>
         {/* メッセージレンダー、改行が多ければ省略表示する文字数を減らす */}
         <MessageTextRender
-          content={breakLinesNum() > 5 ? props.message.content.slice(0, 10) + "..." : props.message.content.slice(0, 100) + "..."}
+          content={
+            breakLinesNum() > 5
+              ? props.message.content.slice(0, 10) + "..."
+              : props.message.content.slice(0, 100) + "..."
+          }
         />
         <hr />
         <span class={"flex items-center"}>
@@ -95,10 +117,12 @@ export default function LongTextDisplay(props: { message: IMessage }) {
 
           <span class={"ml-auto flex items-center gap-2"}>
             {/* 自分宛てのメンションがあったときのバッジ表示 */}
-            <Show when={props.message.content.includes("@<" + storeMyUserinfo.id + ">")}>
-              <Badge>
-                @メンションされています
-              </Badge>
+            <Show
+              when={props.message.content.includes(
+                "@<" + storeMyUserinfo.id + ">",
+              )}
+            >
+              <Badge>@メンションされています</Badge>
             </Show>
 
             <Badge variant={"secondary"}>

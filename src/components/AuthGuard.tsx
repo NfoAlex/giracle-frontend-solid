@@ -1,14 +1,14 @@
-import {createEffect, JSX, on, onMount} from "solid-js";
-import {useNavigate} from "@solidjs/router";
-import {storeAppStatus} from "~/stores/AppStatus.store.ts";
-import {useStoreHasNewMessage} from "~/stores/HasNewMessage.store.ts";
+import { useNavigate } from "@solidjs/router";
+import { createEffect, type JSX, on, onMount } from "solid-js";
+import { storeAppStatus } from "~/stores/AppStatus.store.ts";
+import { useStoreHasNewMessage } from "~/stores/HasNewMessage.store.ts";
 
-export default function AuthGuard(props: {children?: JSX.Element}) {
+export default function AuthGuard(props: { children?: JSX.Element }) {
   const navi = useNavigate();
 
   const checkAuth = () => {
     if (!storeAppStatus.loggedIn) navi(`/auth?redirect=${location.pathname}`);
-  }
+  };
 
   onMount(checkAuth);
 
@@ -20,27 +20,22 @@ export default function AuthGuard(props: {children?: JSX.Element}) {
 
   //新着状態監視用
   createEffect(
-    on(() => useStoreHasNewMessage.HasAnythingNew(),
+    on(
+      () => useStoreHasNewMessage.HasAnythingNew(),
       () => {
         //タブのテキストとfaviconを変更
         if (useStoreHasNewMessage.HasAnythingNew()) {
-          document.title = "(*) Giracle"
+          document.title = "(*) Giracle";
           const link = document.getElementById("favicon") as HTMLLinkElement;
-          if (link)
-            link.href = "/favicon_dot.svg";
+          if (link) link.href = "/favicon_dot.svg";
         } else {
           document.title = "Giracle";
           const link = document.getElementById("favicon") as HTMLLinkElement;
-          if (link)
-            link.href = "/favicon.svg";
+          if (link) link.href = "/favicon.svg";
         }
-      }
-    )
+      },
+    ),
   );
 
-  return (
-    <div class="w-full h-screen">
-      {props.children}
-    </div>
-  );
+  return <div class="w-full h-screen">{props.children}</div>;
 }

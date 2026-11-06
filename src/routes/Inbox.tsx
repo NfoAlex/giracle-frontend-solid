@@ -1,12 +1,17 @@
-import { Card } from "~/components/ui/card.tsx";
-import { storeInbox } from "~/stores/Inbox.store.ts";
-import { createSignal, Show } from "solid-js";
 import { IconBed } from "@tabler/icons-solidjs";
+import { createSignal, Show } from "solid-js";
 import { api } from "~/api/index.ts";
-import SidebarTriggerWithDot from "~/components/unique/SidebarTriggerWithDot.tsx";
-import { Switch, SwitchControl, SwitchLabel, SwitchThumb } from "~/components/ui/switch.tsx";
 import DisplayInboxByChannel from "~/components/Inbox/DisplayInboxByChannel";
 import DisplayInboxByDate from "~/components/Inbox/DisplayInboxByDate";
+import { Card } from "~/components/ui/card.tsx";
+import {
+  Switch,
+  SwitchControl,
+  SwitchLabel,
+  SwitchThumb,
+} from "~/components/ui/switch.tsx";
+import SidebarTriggerWithDot from "~/components/unique/SidebarTriggerWithDot.tsx";
+import { storeInbox } from "~/stores/Inbox.store.ts";
 
 export default function Inbox() {
   const [groupByChannel, setGroupByChannel] = createSignal(false);
@@ -16,10 +21,13 @@ export default function Inbox() {
    * @param messageId 既読にするメッセージId
    */
   const readIt = (messageId: string) => {
-    api.message.inboxRead({ messageId }).then((r) => {
-      //console.log("Inbox :: readIt : r->", r);
-    }).catch((e) => console.error("Inbox :: readIt : e->", e));
-  }
+    api.message
+      .inboxRead({ messageId })
+      .then((r) => {
+        //console.log("Inbox :: readIt : r->", r);
+      })
+      .catch((e) => console.error("Inbox :: readIt : e->", e));
+  };
 
   return (
     <div class={"p-2 flex flex-col gap-2"}>

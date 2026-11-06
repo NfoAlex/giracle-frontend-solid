@@ -1,12 +1,12 @@
 import { createMemo, For, type JSX } from "solid-js";
-import { useStoreChannelInfo } from "~/stores/ChannelInfo.store.ts";
-import { useStoreUserinfo } from "~/stores/Userinfo.store.ts";
-import { storeMyUserinfo } from "~/stores/MyUserinfo.store.ts";
 import UserinfoModalWrapper from "~/components/unique/UserinfoModalWrapper.tsx";
+import { useStoreChannelInfo } from "~/stores/ChannelInfo.store.ts";
+import { storeMyUserinfo } from "~/stores/MyUserinfo.store.ts";
+import { useStoreUserinfo } from "~/stores/Userinfo.store.ts";
 import MessageLink from "./MessageTextRender/MessageLink";
 
 const urlPattern =
-  /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/gi;
+  /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#/%?=~_|!:,.;]*[-A-Z0-9+&@#/%=~_|])/gi;
 const messageLinkPattern = /&<([a-f0-9-]+):([a-f0-9-]+)>/g;
 const mentionPattern = /@<([a-f0-9-]+)>/g;
 const channelPattern = /#<([a-f0-9-]+)>/g;
@@ -83,7 +83,7 @@ export default function MessageTextRender(props: { content: string }) {
         // textSegment を改行文字 (\n) で分割し、それぞれを span でラップするか、
         // 単一の span に white-space: pre-wrap を適用する
         messageRenderingFinal.push(
-          <span class="whitespace-pre-wrap break-words">{textSegment}</span>
+          <span class="whitespace-pre-wrap break-words">{textSegment}</span>,
         );
       }
 
@@ -91,51 +91,62 @@ export default function MessageTextRender(props: { content: string }) {
       switch (obj.type) {
         case "link":
           messageRenderingFinal.push(
-            <a href={obj.idOrValue} target="_blank" rel="noopener noreferrer" class="underline whitespace-pre-wrap break-words text-blue-500">
+            <a
+              href={obj.idOrValue}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="underline whitespace-pre-wrap break-words text-blue-500"
+            >
               {obj.idOrValue}
-            </a>
+            </a>,
           );
           break;
 
-        case "messageLink":
+        case "messageLink": {
           const channelId = obj.idOrValue.split("/")[0];
           const messageId = obj.idOrValue.split("/")[1];
 
           messageRenderingFinal.push(
-            <MessageLink channelId={channelId} messageId={messageId} />
+            <MessageLink channelId={channelId} messageId={messageId} />,
           );
           break;
+        }
 
-        case "userId":
+        case "userId": {
           // createMemo 内でリアクティブな値を参照すると、その値の変更時にメモが再計算される
           const userInfo = useStoreUserinfo.getterUserinfo(obj.idOrValue);
           const isMe = () => storeMyUserinfo.id === obj.idOrValue; // storeMyUserinfo.id もリアクティブに追跡
           messageRenderingFinal.push(
             <UserinfoModalWrapper userId={userInfo.id} class="cursor-pointer">
-              <span class={`${isMe() ? "bg-primary text-primary-foreground" : "bg-border"} hover:underline my-auto mx-px align-baseline inline-flex rounded px-1`}>
+              <span
+                class={`${isMe() ? "bg-primary text-primary-foreground" : "bg-border"} hover:underline my-auto mx-px align-baseline inline-flex rounded px-1`}
+              >
                 @{userInfo?.name ?? obj.idOrValue}
               </span>
-            </UserinfoModalWrapper>
+            </UserinfoModalWrapper>,
           );
           break;
+        }
 
-        case "channel":
-          const channelInfo = useStoreChannelInfo.directGetterChannelInfo(obj.idOrValue);
+        case "channel": {
+          const channelInfo = useStoreChannelInfo.directGetterChannelInfo(
+            obj.idOrValue,
+          );
           messageRenderingFinal.push(
             <span class="font-medium cursor-pointer hover:underline mx-px">
               #{channelInfo?.name ?? obj.idOrValue} {/* fallback */}
-            </span>
+            </span>,
           );
           break;
+        }
 
         case "inlineCode":
           messageRenderingFinal.push(
             <code class="bg-gray-200 dark:bg-gray-700 rounded px-1 py-0.5 text-sm font-mono mx-px">
               {obj.idOrValue}
-            </code>
+            </code>,
           );
           break;
-
       }
       lastProcessedIndex = obj.index + obj.context.length;
     }
@@ -144,7 +155,7 @@ export default function MessageTextRender(props: { content: string }) {
     if (lastProcessedIndex < props.content.length) {
       const remainingText = props.content.slice(lastProcessedIndex);
       messageRenderingFinal.push(
-        <span class="whitespace-pre-wrap break-words">{remainingText}</span>
+        <span class="whitespace-pre-wrap break-words">{remainingText}</span>,
       );
     }
 

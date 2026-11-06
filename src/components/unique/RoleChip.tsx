@@ -1,13 +1,13 @@
 import { IconCircleFilled, IconX } from "@tabler/icons-solidjs";
-import { Badge } from "../ui/badge.tsx";
-import { useStoreRoleInfo } from "~/stores/RoleInfo.store.ts";
 import { createSignal, Show } from "solid-js";
+import { useStoreRoleInfo } from "~/stores/RoleInfo.store.ts";
+import { Badge } from "../ui/badge.tsx";
 
 export default function RoleChip(props: {
-  deletable: boolean,
-  roleId: string,
-  onDelete?: (roleId: string) => void,
-  userId?: string
+  deletable: boolean;
+  roleId: string;
+  onDelete?: (roleId: string) => void;
+  userId?: string;
 }) {
   const [hovered, setHovered] = createSignal(false);
 
@@ -19,7 +19,7 @@ export default function RoleChip(props: {
     if (props.onDelete === undefined) return;
 
     props.onDelete(props.roleId);
-  }
+  };
 
   return (
     <Badge variant="outline">
@@ -27,20 +27,22 @@ export default function RoleChip(props: {
         <Show when={!hovered()}>
           <IconCircleFilled
             size={12}
-            color={ useStoreRoleInfo.getterRoleInfo(props.roleId).color }
-            onMouseEnter={()=>{if(props.deletable) setHovered(true)}}
+            color={useStoreRoleInfo.getterRoleInfo(props.roleId).color}
+            onMouseEnter={() => {
+              if (props.deletable) setHovered(true);
+            }}
           />
         </Show>
         <Show when={hovered()}>
           <IconX
             size={12}
-            color={ useStoreRoleInfo.getterRoleInfo(props.roleId).color }
-            onMouseLeave={()=>setHovered(false)}
+            color={useStoreRoleInfo.getterRoleInfo(props.roleId).color}
+            onMouseLeave={() => setHovered(false)}
             onclick={deleteIt}
           />
         </Show>
-        <p>{ useStoreRoleInfo.getterRoleInfo(props.roleId).name }</p>
+        <p>{useStoreRoleInfo.getterRoleInfo(props.roleId).name}</p>
       </span>
     </Badge>
-  )
+  );
 }
