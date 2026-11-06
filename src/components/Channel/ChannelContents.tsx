@@ -254,20 +254,21 @@ export default function ChannelContents() {
             produce((prev) => Object.assign(prev, r.data.ImageDimensions)),
           );
 
-          //新着線へ移動させる
-          if (_scrollToNewMessageLine) {
-            const firstMessageId = r.data.history.at(-1);
-            if (firstMessageId) {
-              FnHistoryControllers.scrollToMessage(firstMessageId.id);
-              return; //移動できたらここで停止
-            }
-          }
-
           //スクロール位置記憶
           let anchor = null;
           anchor = FnBrowserApis.captureScrollAnchor();
 
           useStoreHistory.insertHistory(r.data.history);
+
+          //新着線へ移動させる
+          if (_scrollToNewMessageLine) {
+            const firstMessageId = r.data.history.at(-1);
+            if (firstMessageId) {
+              FnHistoryControllers.scrollToMessage(firstMessageId.id);
+              console.log("ChannelContents :: FnHistoryControllers.fetchHistory : 新着線へ移動");
+              return; //移動できたらここで停止
+            }
+          }
 
           await FnBrowserApis.waitForDomToSettle();
           FnBrowserApis.restoreScrollFromAnchor(anchor);
