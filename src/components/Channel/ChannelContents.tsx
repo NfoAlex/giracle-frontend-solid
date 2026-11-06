@@ -265,7 +265,8 @@ export default function ChannelContents() {
             await FnBrowserApis.waitForDomToSettle();
             const newLine = document.querySelector("#NEW_LINE");
             if (newLine) {
-              newLine.scrollIntoView({ behavior: "smooth", block: "center" });
+              //smooth 中に他経路の restoreScrollFromAnchor が scrollTop を上書きして中断されるため即時移動（auto は CSS の scroll-behavior 依存）
+              newLine.scrollIntoView({ behavior: "instant", block: "center" });
               return; //移動できたらここで停止
             }
           }
