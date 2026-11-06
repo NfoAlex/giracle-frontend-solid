@@ -43,9 +43,9 @@ export default function MessageLink(props: {
         #
         {useStoreChannelInfo.directGetterChannelInfo(props.channelId).name
           .length > 18
-          ? useStoreChannelInfo
+          ? `${useStoreChannelInfo
               .directGetterChannelInfo(props.channelId)
-              .name.slice(0, 18) + "..."
+              .name.slice(0, 18)}...`
           : useStoreChannelInfo.directGetterChannelInfo(props.channelId)
               .name}{" "}
         のメッセージ
