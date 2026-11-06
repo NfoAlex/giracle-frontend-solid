@@ -1,17 +1,26 @@
-import { Card } from "~/components/ui/card.tsx";
-import { IconMoodHappy, IconPencil, IconTrash, IconCornerUpLeft, IconLink } from "@tabler/icons-solidjs";
-import { api } from "~/api/index.ts";
-import { useStoreMyUserinfo, storeMyUserinfo } from "~/stores/MyUserinfo.store.ts";
-import type { IMessage } from "~/types/Message.ts";
-import { Button } from "~/components/ui/button.tsx";
+import {
+  IconCornerUpLeft,
+  IconLink,
+  IconMoodHappy,
+  IconPencil,
+  IconTrash,
+} from "@tabler/icons-solidjs";
 import { createSignal } from "solid-js";
+import { api } from "~/api/index.ts";
+import { Button } from "~/components/ui/button.tsx";
+import { Card } from "~/components/ui/card.tsx";
+import {
+  storeMyUserinfo,
+  useStoreMyUserinfo,
+} from "~/stores/MyUserinfo.store.ts";
 import storeReplyingMessageId from "~/stores/ReplyingMessageId.store.ts";
+import type { IMessage } from "~/types/Message.ts";
 import EmojiPicker from "./HoverMenu/EmojiPicker.tsx";
 
 export default function HoverMenu(props: {
-  message: IMessage,
-  onEditMode: (id: string) => void,
-  onReacting: (mode: boolean) => void
+  message: IMessage;
+  onEditMode: (id: string) => void;
+  onReacting: (mode: boolean) => void;
 }) {
   const [openEmoji, setOpenEmoji] = createSignal(false);
 
@@ -19,21 +28,22 @@ export default function HoverMenu(props: {
    * メッセージの削除
    */
   const deleteMessage = () => {
-    api.message.delete({ messageId: props.message.id })
+    api.message
+      .delete({ messageId: props.message.id })
       .then(() => {
         //console.log("DELETE_MESSAGE_DELETE :: r->", r);
       })
       .catch((e) => {
         console.error("DELETE_MESSAGE_DELETE :: e->", e);
       });
-  }
+  };
 
   /**
    * 編集モードに入る
    */
   const enterEditMode = () => {
     props.onEditMode(props.message.id);
-  }
+  };
 
   /**
    * リアクション画面表示を切り替える、また親コンポにも伝える
@@ -46,25 +56,36 @@ export default function HoverMenu(props: {
       setOpenEmoji(true);
       props.onReacting(true);
     }
-  }
+  };
 
   return (
     <Card class={"p-2 flex items-center"}>
-      <p class={"text-sm font-extralight mr-2"}>{new Date(props.message.createdAt).toLocaleString()}</p>
+      <p class={"text-sm font-extralight mr-2"}>
+        {new Date(props.message.createdAt).toLocaleString()}
+      </p>
 
       <div class={"md:relative"}>
-        <Button onClick={() => toggleOpenEmoji()} variant={"ghost"} class={"w-8 h-8"}><IconMoodHappy /></Button>
-        {
-          openEmoji()
-          &&
+        <Button
+          onClick={() => toggleOpenEmoji()}
+          variant={"ghost"}
+          class={"w-8 h-8"}
+        >
+          <IconMoodHappy />
+        </Button>
+        {openEmoji() && (
           <EmojiPicker
             message={props.message}
-            onClicked={() => { setOpenEmoji(false); props.onReacting(false); }}
+            onClicked={() => {
+              setOpenEmoji(false);
+              props.onReacting(false);
+            }}
           />
-        }
+        )}
       </div>
       <Button
-        onClick={() => storeReplyingMessageId[props.message.channelId] = props.message.id}
+        onClick={() =>
+          (storeReplyingMessageId[props.message.channelId] = props.message.id)
+        }
         size="icon"
         variant={"ghost"}
         class={"w-8 h-8"}
@@ -83,16 +104,24 @@ export default function HoverMenu(props: {
       >
         <IconLink />
       </Button>
+      {storeMyUserinfo.id === props.message.userId && (
+        <Button onclick={enterEditMode} variant={"ghost"} class={"w-8 h-8"}>
+          <IconPencil />
+        </Button>
+      )}
       {
-        storeMyUserinfo.id === props.message.userId
-        &&
-        <Button onclick={enterEditMode} variant={"ghost"} class={"w-8 h-8"}><IconPencil /></Button>
-      }
-      { //削除ボタン
-        (useStoreMyUserinfo.getRolePower("manageUser") || storeMyUserinfo.id === props.message.userId)
-        &&
-        <Button ondblclick={deleteMessage} variant={"ghost"} class={"w-8 h-8"}><IconTrash color={"hsl(var(--destructive))"} /></Button>
+        //削除ボタン
+        (useStoreMyUserinfo.getRolePower("manageUser") ||
+          storeMyUserinfo.id === props.message.userId) && (
+          <Button
+            ondblclick={deleteMessage}
+            variant={"ghost"}
+            class={"w-8 h-8"}
+          >
+            <IconTrash color={"hsl(var(--destructive))"} />
+          </Button>
+        )
       }
     </Card>
-  )
+  );
 }

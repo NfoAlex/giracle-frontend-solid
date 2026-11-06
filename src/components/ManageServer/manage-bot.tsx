@@ -6,9 +6,9 @@ import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert.tsx";
 import { Button } from "~/components/ui/button.tsx";
 import { Card } from "~/components/ui/card.tsx";
 import { TextField, TextFieldInput } from "~/components/ui/text-field.tsx";
+import BotApprovalBadge from "~/components/unique/BotApprovalBadge.tsx";
 import { useStoreUserinfo } from "~/stores/Userinfo.store.ts";
 import type { TBotListItem } from "~/types/Server.ts";
-import BotApprovalBadge from "~/components/unique/BotApprovalBadge.tsx";
 import BotApprovalModal from "./ManageBot/BotApprovalModal.tsx";
 
 // 1回の取得で読み込むボット数。APIは上限まで返すと続きがある可能性がある
@@ -29,7 +29,7 @@ export default function ManageBot() {
   const [reviewingBotId, setReviewingBotId] = createSignal<string>();
   // 一覧の行を唯一の情報源にして、承認後の表示が古い値を指さないようにする
   const reviewingBot = createMemo(() =>
-    bots().find((b) => b.id === reviewingBotId())
+    bots().find((b) => b.id === reviewingBotId()),
   );
 
   /**

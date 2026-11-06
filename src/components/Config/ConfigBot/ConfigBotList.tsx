@@ -5,10 +5,10 @@ import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert";
 import { Button } from "~/components/ui/button";
 import { Card } from "~/components/ui/card";
 import { TextField, TextFieldInput } from "~/components/ui/text-field";
+import BotApprovalBadge from "~/components/unique/BotApprovalBadge";
 import { storeServerinfo } from "~/stores/Serverinfo.store";
 import type { TBotListItem } from "~/types/Server";
 import SubmitBotCreation from "./ConfigBotList/SubmitBotCreation";
-import BotApprovalBadge from "~/components/unique/BotApprovalBadge";
 
 // 1回の取得で読み込むボット数。APIは上限まで返すと続きがある可能性がある
 const PAGE_LENGTH = 50;

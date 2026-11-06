@@ -1,12 +1,11 @@
+import { IconKeyboard } from "@tabler/icons-solidjs";
 import { storeClientConfig } from "~/stores/ClientConfig.store.ts";
 import { Card } from "../ui/card.tsx";
-import { IconKeyboard } from "@tabler/icons-solidjs";
 import { Switch, SwitchControl, SwitchThumb } from "../ui/switch";
 
-export default function ConfigChat() {  
+export default function ConfigChat() {
   return (
     <div class="flex flex-col gap-6">
-
       {/* メッセージ送信にCtrlキーを必要に設定する */}
       <Card class="p-4 flex flex-col gap-4">
         <span class="flex items-center">
@@ -16,7 +15,7 @@ export default function ConfigChat() {
           </span>
           <div class={"ml-auto flex items-center gap-2"}>
             <Switch
-              onChange={(v) => storeClientConfig.chat.sendWithCtrlKey = v}
+              onChange={(v) => (storeClientConfig.chat.sendWithCtrlKey = v)}
               defaultChecked={storeClientConfig.chat.sendWithCtrlKey}
             >
               <SwitchControl>
@@ -32,7 +31,6 @@ export default function ConfigChat() {
           メッセージを送信する際に、Enterキーと同時にCtrlキーを押す必要があるように設定します。(無効だとEnterキーのみで送信されます。)
         </div>
       </Card>
-
     </div>
-  )
+  );
 }

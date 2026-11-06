@@ -1,34 +1,51 @@
 import { useParams } from "@solidjs/router";
-import { createEffect, createSignal, Show, Switch, Match } from "solid-js";
 import { IconBell, IconBellOff, IconLock } from "@tabler/icons-solidjs";
-import SidebarTriggerWithDot from "../unique/SidebarTriggerWithDot.tsx";
-import { Card } from "../ui/card.tsx";
-import { Button } from "../ui/button.tsx";
-import { useStoreChannelInfo, storeChannelFetchStatus } from "~/stores/ChannelInfo.store.ts";
-import { HoverCard, HoverCardContent, HoverCardTrigger } from "../ui/hover-card.tsx";
-import type { IChannel } from "~/types/Channel.ts";
-import { Dialog, DialogContent, DialogDescription, DialogHeader } from "../ui/dialog.tsx";
-import { TabsList, TabsTrigger, TabsContent, Tabs } from "../ui/tabs.tsx";
-import ChannelInfo from "./ChannelHeader/ChannelManage/ChannelInfos.tsx";
-import ChannelMembers from "./ChannelHeader/ChannelManage/ChannelMembers.tsx";
+import { createEffect, createSignal, Match, Show, Switch } from "solid-js";
+import { api } from "~/api/index.ts";
+import {
+  storeChannelFetchStatus,
+  useStoreChannelInfo,
+} from "~/stores/ChannelInfo.store.ts";
 import {
   setStoreMutedChannels,
   storeMutedChannels,
   useStoreNotification,
 } from "~/stores/Notification.store.ts";
-import { api } from "~/api/index.ts";
+import type { IChannel } from "~/types/Channel.ts";
+import { Button } from "../ui/button.tsx";
+import { Card } from "../ui/card.tsx";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+} from "../ui/dialog.tsx";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "../ui/hover-card.tsx";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs.tsx";
 import { showToast } from "../ui/toast.tsx";
+import SidebarTriggerWithDot from "../unique/SidebarTriggerWithDot.tsx";
+import ChannelInfo from "./ChannelHeader/ChannelManage/ChannelInfos.tsx";
+import ChannelMembers from "./ChannelHeader/ChannelManage/ChannelMembers.tsx";
 
 export default function ChannelHeader() {
   const params = useParams();
-  const [currentChannelId, setCurrentChannelId] = createSignal<string>(params.channelId ?? params.id ?? "");
-  const [currentChannelInfo, setCurrentChannelInfo] = createSignal<IChannel | null>(null);
+  const [currentChannelId, setCurrentChannelId] = createSignal<string>(
+    params.channelId ?? params.id ?? "",
+  );
+  const [currentChannelInfo, setCurrentChannelInfo] =
+    createSignal<IChannel | null>(null);
   const [modalManageOpen, setModalManageOpen] = createSignal(false);
 
   createEffect(() => {
     if (params.channelId !== undefined) {
       setCurrentChannelId(params.channelId);
-      setCurrentChannelInfo(useStoreChannelInfo.directGetterChannelInfo(params.channelId));
+      setCurrentChannelInfo(
+        useStoreChannelInfo.directGetterChannelInfo(params.channelId),
+      );
     }
   });
 
@@ -64,16 +81,23 @@ export default function ChannelHeader() {
     <>
       {/* チャンネル情報モーダル */}
       <Dialog open={modalManageOpen()} onOpenChange={setModalManageOpen}>
-        <DialogContent class={"flex flex-col gap-0 pt-10 w-full h-5/6 md:h-3/4"}>
+        <DialogContent
+          class={"flex flex-col gap-0 pt-10 w-full h-5/6 md:h-3/4"}
+        >
           <DialogHeader>
             <p class={"ml-2"}>チャンネル情報</p>
           </DialogHeader>
-          <div class={"overflow-x-hidden mt-2 md:px-2 w-full grow flex flex-col"}>
-
+          <div
+            class={"overflow-x-hidden mt-2 md:px-2 w-full grow flex flex-col"}
+          >
             <Tabs defaultValue="info" class="w-full grow flex flex-col">
               <TabsList class="w-full md:w-fit">
-                <TabsTrigger class="w-1/2 md:w-fit" value="info">概要</TabsTrigger>
-                <TabsTrigger class="w-1/2 md:w-fit" value="users">参加者</TabsTrigger>
+                <TabsTrigger class="w-1/2 md:w-fit" value="info">
+                  概要
+                </TabsTrigger>
+                <TabsTrigger class="w-1/2 md:w-fit" value="users">
+                  参加者
+                </TabsTrigger>
               </TabsList>
 
               <TabsContent value="info" class="grow">
@@ -83,13 +107,14 @@ export default function ChannelHeader() {
                 <ChannelMembers channelId={currentChannelId()} />
               </TabsContent>
             </Tabs>
-
           </div>
         </DialogContent>
       </Dialog>
 
       {/* チャンネルヘッダー */}
-      <Switch fallback={<div>{storeChannelFetchStatus[currentChannelId()]}</div>}>
+      <Switch
+        fallback={<div>{storeChannelFetchStatus[currentChannelId()]}</div>}
+      >
         <Match when={storeChannelFetchStatus[currentChannelId()] === "LOADING"}>
           <Card class="py-3 px-5 flex items-center w-full gap-2">
             <SidebarTriggerWithDot />
@@ -99,7 +124,9 @@ export default function ChannelHeader() {
           </Card>
         </Match>
 
-        <Match when={storeChannelFetchStatus[currentChannelId()] === "AVAILABLE"}>
+        <Match
+          when={storeChannelFetchStatus[currentChannelId()] === "AVAILABLE"}
+        >
           <Card
             onClick={() => setModalManageOpen(true)}
             class="py-3 px-5 flex items-center w-full gap-2 cursor-pointer hover:bg-muted has-[button:hover]:bg-transparent has-[button:hover]:dark:bg-transparent"
@@ -124,7 +151,11 @@ export default function ChannelHeader() {
               <p class={"truncate"}>{currentChannelInfo()?.name}</p>
             </span>
             <p class="text-gray-400 mx-1"> | </p>
-            <span class={"shrink-[2] md:shrink max-w-1/2 line-clamp-1 md:max-w-full"}>
+            <span
+              class={
+                "shrink-[2] md:shrink max-w-1/2 line-clamp-1 md:max-w-full"
+              }
+            >
               <p class={"truncate"}>{currentChannelInfo()?.description}</p>
             </span>
 
@@ -161,11 +192,12 @@ export default function ChannelHeader() {
                 </HoverCardContent>
               </HoverCard>
             </div>
-
           </Card>
         </Match>
 
-        <Match when={storeChannelFetchStatus[currentChannelId()] === "NOT_FOUND"}>
+        <Match
+          when={storeChannelFetchStatus[currentChannelId()] === "NOT_FOUND"}
+        >
           <Card class="py-3 px-5 flex items-center w-full gap-2">
             <SidebarTriggerWithDot />
             <span class={"shrink line-clamp-1"}>

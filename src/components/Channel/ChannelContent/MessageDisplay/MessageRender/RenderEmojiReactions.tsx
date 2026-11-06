@@ -1,18 +1,24 @@
-import type { IMessage } from "~/types/Message.ts";
 import { createEffect, createSignal, For, on, Show } from "solid-js";
-import { Card } from "~/components/ui/card.tsx";
-import { api } from "~/api/index.ts";
-import RenderEmoji from "~/components/unique/RenderEmoji.tsx";
 import { createMutable } from "solid-js/store";
-import { useStoreUserinfo } from "~/stores/Userinfo.store.ts";
-import DisplayAllReactedUserModal from "./RenderEmojiReactions/DisplayAllReactedUserModal.tsx";
-import { Button } from "~/components/ui/button.tsx";
+import { api } from "~/api/index.ts";
 import { Badge } from "~/components/ui/badge.tsx";
+import { Button } from "~/components/ui/button.tsx";
+import { Card } from "~/components/ui/card.tsx";
+import RenderEmoji from "~/components/unique/RenderEmoji.tsx";
+import { useStoreUserinfo } from "~/stores/Userinfo.store.ts";
+import type { IMessage } from "~/types/Message.ts";
+import DisplayAllReactedUserModal from "./RenderEmojiReactions/DisplayAllReactedUserModal.tsx";
 
-export default function RenderEmojiReactions(props: { reaction: IMessage["reactionSummary"], messageId: string, channelId: string }) {
+export default function RenderEmojiReactions(props: {
+  reaction: IMessage["reactionSummary"];
+  messageId: string;
+  channelId: string;
+}) {
   //リアクションをしているユーザー取得のためのデータJSONと取得状態用JSON
   const reactedUserArrs = createMutable<{ [emojiCode: string]: string[] }>({});
-  const statusFetchingEmojiCode = createMutable<{ [emojiCode: string]: boolean }>({});
+  const statusFetchingEmojiCode = createMutable<{
+    [emojiCode: string]: boolean;
+  }>({});
   //ホバー状態に入っている絵文字コード
   const [hoveringEmojiCode, setHoverEmojiCode] = createSignal<string>("");
 
@@ -24,20 +30,32 @@ export default function RenderEmojiReactions(props: { reaction: IMessage["reacti
    * @param emojiCode
    */
   const deleteReaction = async (emojiCode: string) => {
-    api.message.deleteEmojiReaction({ messageId: props.messageId, channelId: props.channelId, emojiCode })
-      .catch((e) => console.error("RenderEmojiReactions :: deleteReaction : e->", e));
-  }
+    api.message
+      .deleteEmojiReaction({
+        messageId: props.messageId,
+        channelId: props.channelId,
+        emojiCode,
+      })
+      .catch((e) =>
+        console.error("RenderEmojiReactions :: deleteReaction : e->", e),
+      );
+  };
 
   /**
    * リアクションを追加する
    * @param emojiCode
    */
   const addReaction = async (emojiCode: string) => {
-    api.message.emojiReaction({ messageId: props.messageId, channelId: props.channelId, emojiCode })
+    api.message
+      .emojiReaction({
+        messageId: props.messageId,
+        channelId: props.channelId,
+        emojiCode,
+      })
       .catch((e) => {
-        console.error("EmojiPicker :: emojiClickHandler : e->", e)
+        console.error("EmojiPicker :: emojiClickHandler : e->", e);
       });
-  }
+  };
 
   /**
    * 対象のリアクションをしているユーザーを取得する
@@ -51,13 +69,16 @@ export default function RenderEmojiReactions(props: { reaction: IMessage["reacti
     if (reactedUserArrs[emojiCode]) return;
     //取得、格納
     statusFetchingEmojiCode[emojiCode] = true;
-    api.message.whoReacted({ messageId: props.messageId, emojiCode })
+    api.message
+      .whoReacted({ messageId: props.messageId, emojiCode })
       .then((res) => {
         reactedUserArrs[emojiCode] = res.data;
       })
-      .catch((e) => console.error("RenderEmojiReactions :: fetchReactedUser : e->", e))
-      .finally(() => statusFetchingEmojiCode[emojiCode] = false);
-  }
+      .catch((e) =>
+        console.error("RenderEmojiReactions :: fetchReactedUser : e->", e),
+      )
+      .finally(() => (statusFetchingEmojiCode[emojiCode] = false));
+  };
 
   //リアクションデータの変更を監視してリアクションしたユーザーデータを初期化
   createEffect(
@@ -72,87 +93,97 @@ export default function RenderEmojiReactions(props: { reaction: IMessage["reacti
         if (hoveringEmojiCode() !== "") {
           fetchReactedUser(hoveringEmojiCode());
         }
-      }
-    )
+      },
+    ),
   );
 
   return (
     <div class={"py-1 flex items-center flex-wrap gap-1"}>
       <For each={props.reaction}>
-        {
-          (r) => {
-            return (
-              <Card
-                onClick={() => r.includingYou ? deleteReaction(r.emojiCode) : addReaction(r.emojiCode)}
-                onMouseEnter={() => {
-                  setHoverEmojiCode(r.emojiCode);
-                  setTimeout(() => { if (hoveringEmojiCode() !== "") fetchReactedUser(r.emojiCode); }, 500)
-                }}
-                onMouseLeave={() => setHoverEmojiCode("")}
-                class={`select-none relative p-1 text-sm flex items-center gap-1 cursor-pointer hover:bg-accent hover:border-background border-accent ${r.includingYou ? "bg-accent border-primary" : ""}`}
-              >
-                <RenderEmoji emojiCode={r.emojiCode} />
-                <span>{r.count}</span>
+        {(r) => {
+          return (
+            <Card
+              onClick={() =>
+                r.includingYou
+                  ? deleteReaction(r.emojiCode)
+                  : addReaction(r.emojiCode)
+              }
+              onMouseEnter={() => {
+                setHoverEmojiCode(r.emojiCode);
+                setTimeout(() => {
+                  if (hoveringEmojiCode() !== "") fetchReactedUser(r.emojiCode);
+                }, 500);
+              }}
+              onMouseLeave={() => setHoverEmojiCode("")}
+              class={`select-none relative p-1 text-sm flex items-center gap-1 cursor-pointer hover:bg-accent hover:border-background border-accent ${r.includingYou ? "bg-accent border-primary" : ""}`}
+            >
+              <RenderEmoji emojiCode={r.emojiCode} />
+              <span>{r.count}</span>
 
-                {/* ホバー表示 */}
-                <Show when={hoveringEmojiCode() === r.emojiCode}>
-                  <Card
-                    onClick={(e) => e.stopPropagation()}
-                    onMouseEnter={(e) => e.stopPropagation()}
-                    class="absolute bottom-full p-2 left-0 w-max max-w-52 z-50 cursor-default"
-                  >
-                    <span class="flex items-center gap-1">
-                      <span class="shrink-0">
-                        <RenderEmoji emojiCode={r.emojiCode} />
-                      </span>
-                      <p class="line-clamp-2 overflow-x-auto">{r.emojiCode}</p>
+              {/* ホバー表示 */}
+              <Show when={hoveringEmojiCode() === r.emojiCode}>
+                <Card
+                  onClick={(e) => e.stopPropagation()}
+                  onMouseEnter={(e) => e.stopPropagation()}
+                  class="absolute bottom-full p-2 left-0 w-max max-w-52 z-50 cursor-default"
+                >
+                  <span class="flex items-center gap-1">
+                    <span class="shrink-0">
+                      <RenderEmoji emojiCode={r.emojiCode} />
                     </span>
-                    <hr class="my-1" />
-                    <span class="flex flex-wrap gap-1">
-                      {
-                        reactedUserArrs[r.emojiCode] !== undefined
-                          ?
-                          <>
+                    <p class="line-clamp-2 overflow-x-auto">{r.emojiCode}</p>
+                  </span>
+                  <hr class="my-1" />
+                  <span class="flex flex-wrap gap-1">
+                    {reactedUserArrs[r.emojiCode] !== undefined ? (
+                      <>
+                        <For each={reactedUserArrs[r.emojiCode]}>
+                          {(userId) => {
+                            return (
+                              <span class="text-sm text-primary">
+                                <Badge variant={"secondary"}>
+                                  {useStoreUserinfo.getterUserinfo(userId)
+                                    ?.name ?? userId}
+                                </Badge>
+                              </span>
+                            );
+                          }}
+                        </For>
 
-                            <For each={reactedUserArrs[r.emojiCode]}>
-                              {(userId) => {
-                                return (
-                                  <span class="text-sm text-primary">
-                                    <Badge variant={"secondary"}>
-                                      {useStoreUserinfo.getterUserinfo(userId)?.name ?? userId}
-                                    </Badge>
-                                  </span>
-                                )
-                              }}
-                            </For>
-
-                            {/* 改行用 */}
-                            <span class="w-full"></span>
-                            { //リアクションした人が5人以上いる場合はもっと見るボタンを表示(詳細モーダル表示)
-                              reactedUserArrs[r.emojiCode].length >= 5 &&
-                              <Button
-                                onClick={() => setDialogOpen(true)}
-                                class="w-full cursor-pointer"
-                                size={"sm"}
-                              >もっと見る</Button>
-                            }
-
-                          </>
-                          :
-                          <p>...</p>
-                      }
-                    </span>
-                  </Card>
-                </Show>
-              </Card>
-            )
-          }
-        }
+                        {/* 改行用 */}
+                        <span class="w-full"></span>
+                        {
+                          //リアクションした人が5人以上いる場合はもっと見るボタンを表示(詳細モーダル表示)
+                          reactedUserArrs[r.emojiCode].length >= 5 && (
+                            <Button
+                              onClick={() => setDialogOpen(true)}
+                              class="w-full cursor-pointer"
+                              size={"sm"}
+                            >
+                              もっと見る
+                            </Button>
+                          )
+                        }
+                      </>
+                    ) : (
+                      <p>...</p>
+                    )}
+                  </span>
+                </Card>
+              </Show>
+            </Card>
+          );
+        }}
       </For>
 
       <Show when={dialogOpen()}>
-        <DisplayAllReactedUserModal messageId={props.messageId} emojiCode={hoveringEmojiCode()} onOpen={dialogOpen()} onOpenChange={setDialogOpen} />
+        <DisplayAllReactedUserModal
+          messageId={props.messageId}
+          emojiCode={hoveringEmojiCode()}
+          onOpen={dialogOpen()}
+          onOpenChange={setDialogOpen}
+        />
       </Show>
     </div>
-  )
+  );
 }

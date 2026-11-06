@@ -1,15 +1,36 @@
 import { IconPlus } from "@tabler/icons-solidjs";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogTitle, DialogTrigger } from "../../ui/dialog.tsx";
 import { createSignal } from "solid-js";
-import { TextField, TextFieldInput, TextFieldLabel } from "../../ui/text-field";
-import { Button } from "~/components/ui/button.tsx";
 import { api } from "~/api/index.ts";
-import type { IInvite } from "~/types/Server.ts";
-import { NumberField, NumberFieldDecrementTrigger, NumberFieldErrorMessage, NumberFieldGroup, NumberFieldIncrementTrigger, NumberFieldInput } from "~/components/ui/number-field.tsx";
+import { Button } from "~/components/ui/button.tsx";
 import { Label } from "~/components/ui/label.tsx";
-import { Switch, SwitchControl, SwitchLabel, SwitchThumb } from "~/components/ui/switch.tsx";
+import {
+  NumberField,
+  NumberFieldDecrementTrigger,
+  NumberFieldErrorMessage,
+  NumberFieldGroup,
+  NumberFieldIncrementTrigger,
+  NumberFieldInput,
+} from "~/components/ui/number-field.tsx";
+import {
+  Switch,
+  SwitchControl,
+  SwitchLabel,
+  SwitchThumb,
+} from "~/components/ui/switch.tsx";
+import type { IInvite } from "~/types/Server.ts";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogTitle,
+  DialogTrigger,
+} from "../../ui/dialog.tsx";
+import { TextField, TextFieldInput, TextFieldLabel } from "../../ui/text-field";
 
-export default function CreateInvite(props: { inviteActionTaken: (dat: IInvite) => void }) {
+export default function CreateInvite(props: {
+  inviteActionTaken: (dat: IInvite) => void;
+}) {
   const [code, setCode] = createSignal<string>("");
   const [open, setOpen] = createSignal(false); //ダイアログの開閉
   const [maxUsage, setMaxUsage] = createSignal(5);
@@ -19,7 +40,11 @@ export default function CreateInvite(props: { inviteActionTaken: (dat: IInvite) 
    * 招待を作成する
    */
   const createInvite = () => {
-    api.server.createInvite({ inviteCode: code(), maxUsage: unlimitedInvites() ? -1 : maxUsage() })
+    api.server
+      .createInvite({
+        inviteCode: code(),
+        maxUsage: unlimitedInvites() ? -1 : maxUsage(),
+      })
       .then((r) => {
         //console.log("CreateInvite :: createInvite :: r->", r);
         setCode("");
@@ -29,14 +54,12 @@ export default function CreateInvite(props: { inviteActionTaken: (dat: IInvite) 
       .catch((e) => {
         console.error("CreateInvite :: createInvite :: e->", e);
       });
-  }
+  };
 
   return (
     <Dialog open={open()} onOpenChange={setOpen}>
       <DialogContent id="dialogCreateInvite">
-        <DialogTitle>
-          招待を作成する
-        </DialogTitle>
+        <DialogTitle>招待を作成する</DialogTitle>
         <DialogDescription class="flex flex-col gap-4">
           <TextField class="grid w-full items-center gap-2">
             <TextFieldLabel for="email">招待コード</TextFieldLabel>
@@ -44,7 +67,7 @@ export default function CreateInvite(props: { inviteActionTaken: (dat: IInvite) 
               type="text"
               placeholder="abc123!@*"
               value={code()}
-              onInput={(e)=>setCode(e.currentTarget.value)}
+              onInput={(e) => setCode(e.currentTarget.value)}
             />
           </TextField>
 
@@ -60,7 +83,9 @@ export default function CreateInvite(props: { inviteActionTaken: (dat: IInvite) 
               <NumberFieldIncrementTrigger />
               <NumberFieldDecrementTrigger />
             </NumberFieldGroup>
-            <NumberFieldErrorMessage>1以上に設定してください</NumberFieldErrorMessage>
+            <NumberFieldErrorMessage>
+              1以上に設定してください
+            </NumberFieldErrorMessage>
           </NumberField>
           <Switch
             checked={unlimitedInvites()}
@@ -72,14 +97,11 @@ export default function CreateInvite(props: { inviteActionTaken: (dat: IInvite) 
             </SwitchControl>
             <SwitchLabel class="ml-2">上限を設定しない</SwitchLabel>
           </Switch>
-
         </DialogDescription>
         <DialogFooter>
-          <Button
-            onClick={createInvite}
-            disabled={code() === ""}
-            type="submit"
-          >作成</Button>
+          <Button onClick={createInvite} disabled={code() === ""} type="submit">
+            作成
+          </Button>
         </DialogFooter>
       </DialogContent>
       <DialogTrigger>

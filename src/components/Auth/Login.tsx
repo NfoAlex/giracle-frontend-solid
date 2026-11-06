@@ -1,10 +1,14 @@
 import { useNavigate } from "@solidjs/router";
-import { Show, createSignal } from "solid-js";
+import { createSignal, Show } from "solid-js";
 import { api } from "~/api/index.ts";
 import InitLoad from "~/utils/InitLoad.ts";
 import { Button } from "../ui/button.tsx";
-import { TextField, TextFieldInput, TextFieldLabel } from "../ui/text-field.tsx";
 import { Callout, CalloutContent } from "../ui/callout.tsx";
+import {
+  TextField,
+  TextFieldInput,
+  TextFieldLabel,
+} from "../ui/text-field.tsx";
 
 export default function Login() {
   const [username, setUsername] = createSignal("");
@@ -14,7 +18,8 @@ export default function Login() {
 
   //ログインする
   const loginIt = async () => {
-    api.user.login({ username: username(), password: password() })
+    api.user
+      .login({ username: username(), password: password() })
       .then((r) => {
         setResult("success");
         //console.log("r->", r);

@@ -10,5 +10,5 @@ export default function SkeletonLoader() {
         <Skeleton height={24} width={300} radius={10} />
       </div>
     </div>
-  )
+  );
 }

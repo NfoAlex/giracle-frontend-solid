@@ -9,9 +9,9 @@ import {
   DialogTitle,
 } from "~/components/ui/dialog.tsx";
 import { Switch, SwitchControl, SwitchThumb } from "~/components/ui/switch.tsx";
+import BotApprovalBadge from "~/components/unique/BotApprovalBadge.tsx";
 import { useStoreUserinfo } from "~/stores/Userinfo.store.ts";
 import type { TBotListItem } from "~/types/Server.ts";
-import BotApprovalBadge from "~/components/unique/BotApprovalBadge.tsx";
 
 export default function BotApprovalModal(props: {
   /** 審査対象のBot。undefined なら閉じている */
@@ -24,7 +24,13 @@ export default function BotApprovalModal(props: {
   const [error, setError] = createSignal<string | null>(null);
 
   // 別のBotを開いたとき(および閉じて開き直したとき)に前回のエラーを残さない
-  createEffect(on(() => props.bot?.id, () => setError(null), { defer: true }));
+  createEffect(
+    on(
+      () => props.bot?.id,
+      () => setError(null),
+      { defer: true },
+    ),
+  );
 
   /** 承認状態を変更し、成功したら親の一覧へ反映する */
   const changeApproval = (next: boolean) => {
@@ -33,7 +39,8 @@ export default function BotApprovalModal(props: {
     setProcessing(true);
     setError(null);
 
-    api.server.setBotApproved({ botId: bot.id, isApproved: next })
+    api.server
+      .setBotApproved({ botId: bot.id, isApproved: next })
       .then(() => props.approvalChanged(bot.id, next))
       .catch((e) => {
         console.error("BotApprovalModal :: changeApproval : ", e);
@@ -54,7 +61,10 @@ export default function BotApprovalModal(props: {
                 <span class="min-w-0 truncate">
                   {bot().remoteUserName ?? "(名称未設定)"}
                 </span>
-                <BotApprovalBadge isApproved={bot().isApproved} class="shrink-0" />
+                <BotApprovalBadge
+                  isApproved={bot().isApproved}
+                  class="shrink-0"
+                />
               </DialogTitle>
 
               <Show when={error()}>

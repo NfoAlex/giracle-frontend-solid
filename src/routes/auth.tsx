@@ -1,15 +1,19 @@
 import { useLocation, useNavigate } from "@solidjs/router";
-import { Show, onMount } from "solid-js";
+import { createSignal, onMount, Show } from "solid-js";
+import { api } from "~/api/index.ts";
 import Login from "~/components/Auth/Login.tsx";
 import Register from "~/components/Auth/Register.tsx";
+import { Button } from "~/components/ui/button.tsx";
 import { Card, CardContent } from "~/components/ui/card.tsx";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs.tsx";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "~/components/ui/tabs.tsx";
 import { storeServerinfo } from "~/stores/Serverinfo.store.ts";
 import GetCookie from "~/utils/GetCookie.ts";
 import InitLoad from "~/utils/InitLoad.ts";
-import { createSignal } from "solid-js";
-import { api } from "~/api/index.ts";
-import { Button } from "~/components/ui/button.tsx";
 
 export default function Auth() {
   const navi = useNavigate();
@@ -17,7 +21,8 @@ export default function Auth() {
   //サーバー情報の取得状態管理用変数群
   const [tempServerinfoLoaded, setTempServerinfoLoaded] = createSignal(false);
   const [tempServerinfo, setTempServerinfo] = createSignal(storeServerinfo);
-  const [errorFetchingServerinfo, setErrorFetchingServerinfo] = createSignal(false);
+  const [errorFetchingServerinfo, setErrorFetchingServerinfo] =
+    createSignal(false);
 
   //Cookie認証トライとサーバー情報取得
   const firstTrigger = async () => {
@@ -25,7 +30,8 @@ export default function Auth() {
     setTempServerinfoLoaded(false);
 
     //Token検証を試みる
-    await api.user.verifyToken()
+    await api.user
+      .verifyToken()
       .then((r) => {
         InitLoad(r.data.userId, true);
         //もともと行こうとしていた場所を指定
@@ -48,15 +54,18 @@ export default function Auth() {
           throw new Error("timeout");
         }
       }, 3500);
-      await api.server.config().then((r) => {
-        setTempServerinfo({...tempServerinfo(), ...r.data});
-        setTempServerinfoLoaded(true);
-        setErrorFetchingServerinfo(false);
-        resolve(true);
-      }).catch((e) => {
-        console.error("Auth :: onMount(promise) : e->", e);
-        setErrorFetchingServerinfo(true);
-      })
+      await api.server
+        .config()
+        .then((r) => {
+          setTempServerinfo({ ...tempServerinfo(), ...r.data });
+          setTempServerinfoLoaded(true);
+          setErrorFetchingServerinfo(false);
+          resolve(true);
+        })
+        .catch((e) => {
+          console.error("Auth :: onMount(promise) : e->", e);
+          setErrorFetchingServerinfo(true);
+        });
     });
   };
 
@@ -67,37 +76,42 @@ export default function Auth() {
       <p class="text-2xl">{tempServerinfo().name || "Giracle"}</p>
       <Card class="w-full mx-auto py-4">
         <CardContent class="gap-3 p-6">
-          { //情報取得エラー時の表示
-            errorFetchingServerinfo()
-            ?
-            <div class="flex flex-col gap-4">
-              <p>
-                インスタンス情報を取得できませんでした。
-                しばらくしてからもう一度お試しください。
-              </p>
-              <Button
-                onClick={firstTrigger}
-                class="w-full"
-              >再取得する</Button>
-            </div>
-            :
-            <Tabs defaultValue="login">
-              <TabsList class="grid w-full grid-cols-2">
-                <TabsTrigger value="login">ログイン</TabsTrigger>
-                <TabsTrigger value="register" disabled={!tempServerinfo().RegisterAvailable}>新規登録</TabsTrigger>
-              </TabsList>
-              <Show
-                when={tempServerinfoLoaded()}
-                fallback={<p class={"text-center"}>loading...</p>}
-              >
-                <TabsContent value="login">
-                  <Login />
-                </TabsContent>
-                <TabsContent value="register">
-                  <Register />
-                </TabsContent>
-              </Show>
-            </Tabs>
+          {
+            //情報取得エラー時の表示
+            errorFetchingServerinfo() ? (
+              <div class="flex flex-col gap-4">
+                <p>
+                  インスタンス情報を取得できませんでした。
+                  しばらくしてからもう一度お試しください。
+                </p>
+                <Button onClick={firstTrigger} class="w-full">
+                  再取得する
+                </Button>
+              </div>
+            ) : (
+              <Tabs defaultValue="login">
+                <TabsList class="grid w-full grid-cols-2">
+                  <TabsTrigger value="login">ログイン</TabsTrigger>
+                  <TabsTrigger
+                    value="register"
+                    disabled={!tempServerinfo().RegisterAvailable}
+                  >
+                    新規登録
+                  </TabsTrigger>
+                </TabsList>
+                <Show
+                  when={tempServerinfoLoaded()}
+                  fallback={<p class={"text-center"}>loading...</p>}
+                >
+                  <TabsContent value="login">
+                    <Login />
+                  </TabsContent>
+                  <TabsContent value="register">
+                    <Register />
+                  </TabsContent>
+                </Show>
+              </Tabs>
+            )
           }
         </CardContent>
       </Card>
@@ -106,7 +120,7 @@ export default function Auth() {
         <p class={"font-bold"}>Giracle</p>
         <p class={"ml-auto"}>
           {
-            //@ts-ignore: __VERSION__はvite.config.tsで定義されている
+            //@ts-expect-error: __VERSION__はvite.config.tsで定義されている
             __VERSION__
           }
         </p>

@@ -5,8 +5,26 @@ import {
   IconBellX,
   IconVolumeOff,
 } from "@tabler/icons-solidjs";
+import { createSignal, For, onMount, Show } from "solid-js";
+import { api } from "~/api/index.ts";
+import {
+  storeChannelInfo,
+  useStoreChannelInfo,
+} from "~/stores/ChannelInfo.store.ts";
+import {
+  setStoreMutedChannels,
+  setStoreNotificationConfig,
+  storeMutedChannels,
+  storeNotificationConfig,
+} from "~/stores/Notification.store.ts";
+import {
+  getCurrentPushSubscription,
+  isPushSupported,
+  subscribeToPush,
+  unsubscribeFromPush,
+} from "~/utils/PushSubscription.ts";
+import { Button } from "../ui/button.tsx";
 import { Card } from "../ui/card.tsx";
-import { Switch, SwitchControl, SwitchThumb } from "../ui/switch";
 import {
   Select,
   SelectContent,
@@ -14,23 +32,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select.tsx";
-import { Button } from "../ui/button.tsx";
+import { Switch, SwitchControl, SwitchThumb } from "../ui/switch";
 import { showToast } from "../ui/toast.tsx";
-import { For, Show, createSignal, onMount } from "solid-js";
-import { useStoreChannelInfo, storeChannelInfo } from "~/stores/ChannelInfo.store.ts";
-import {
-  setStoreMutedChannels,
-  setStoreNotificationConfig,
-  storeMutedChannels,
-  storeNotificationConfig,
-} from "~/stores/Notification.store.ts";
-import { api } from "~/api/index.ts";
-import {
-  getCurrentPushSubscription,
-  isPushSupported,
-  subscribeToPush,
-  unsubscribeFromPush,
-} from "~/utils/PushSubscription.ts";
 
 type Mode = "off" | "mention" | "all";
 const MODE_OPTIONS: Mode[] = ["off", "mention", "all"];
@@ -102,7 +105,10 @@ export default function ConfigNotification() {
         await subscribeToPush();
         setPushSubscribed(true);
         setNotifyOk(true);
-        showToast({ title: "プッシュ通知を有効にしました", variant: "success" });
+        showToast({
+          title: "プッシュ通知を有効にしました",
+          variant: "success",
+        });
       } else {
         await unsubscribeFromPush();
         setPushSubscribed(false);
@@ -123,7 +129,9 @@ export default function ConfigNotification() {
   const unmuteChannel = async (channelId: string) => {
     try {
       await api.notification.unmuteChannel({ channelId });
-      setStoreMutedChannels("ids", (prev) => prev.filter((id) => id !== channelId));
+      setStoreMutedChannels("ids", (prev) =>
+        prev.filter((id) => id !== channelId),
+      );
     } catch (e) {
       showToast({
         title: "ミュート解除に失敗しました",
@@ -162,7 +170,9 @@ export default function ConfigNotification() {
           <div class="ml-auto flex items-center gap-2">
             <Show
               when={pushSupported()}
-              fallback={<span class="text-sm text-muted-foreground">未対応</span>}
+              fallback={
+                <span class="text-sm text-muted-foreground">未対応</span>
+              }
             >
               <Switch
                 checked={pushSubscribed()}
@@ -201,9 +211,7 @@ export default function ConfigNotification() {
           </div>
         </span>
         <hr />
-        <div class="text-sm">
-          オフにすると全ての通知が届かなくなります。
-        </div>
+        <div class="text-sm">オフにすると全ての通知が届かなくなります。</div>
       </Card>
 
       {/* 通知モード */}
@@ -236,8 +244,14 @@ export default function ConfigNotification() {
         </span>
         <hr />
         <div class="text-sm">
-          <div><strong>メンションのみ</strong>: 自分宛のメンションと返信のみ通知します。</div>
-          <div><strong>全ての通知</strong>: 参加中の全チャンネルの新規メッセージも通知します。</div>
+          <div>
+            <strong>メンションのみ</strong>:
+            自分宛のメンションと返信のみ通知します。
+          </div>
+          <div>
+            <strong>全ての通知</strong>:
+            参加中の全チャンネルの新規メッセージも通知します。
+          </div>
         </div>
       </Card>
 
@@ -264,12 +278,15 @@ export default function ConfigNotification() {
           <div class="flex flex-col gap-2">
             <For each={storeMutedChannels.ids}>
               {(channelId) => {
-                const info = useStoreChannelInfo.directGetterChannelInfo(channelId);
+                const info =
+                  useStoreChannelInfo.directGetterChannelInfo(channelId);
                 return (
                   <div class="flex items-center justify-between gap-2 py-1">
                     <span class="flex items-center gap-2">
                       <IconBellOff class="w-4 h-4" />
-                      <span>{storeChannelInfo[channelId]?.name ?? info.name}</span>
+                      <span>
+                        {storeChannelInfo[channelId]?.name ?? info.name}
+                      </span>
                     </span>
                     <Button
                       size="sm"

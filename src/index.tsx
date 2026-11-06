@@ -1,33 +1,42 @@
 /* @refresh reload */
-import { render } from 'solid-js/web';
+
 import { Route, Router, useLocation, useNavigate } from "@solidjs/router";
+import { render } from "solid-js/web";
 
-import '@fontsource-variable/noto-sans-jp';
-import './index.css';
+import "@fontsource-variable/noto-sans-jp";
+import "./index.css";
 
-import { lazy, onCleanup, onMount, Show, Suspense } from 'solid-js';
-import { storeAppStatus } from './stores/AppStatus.store.ts';
-import { SidebarProvider } from './components/ui/sidebar.tsx';
-import { AppSidebar } from './components/Sidebar.tsx';
-import Channel from './routes/channel/[id].tsx';
-import { api } from './api/index.ts';
-import { setStoreServerinfo, storeServerinfo } from './stores/Serverinfo.store.ts';
-import { ColorModeProvider, ColorModeScript, createLocalStorageManager } from "@kobalte/core";
+import {
+  ColorModeProvider,
+  ColorModeScript,
+  createLocalStorageManager,
+} from "@kobalte/core";
+import { lazy, onCleanup, onMount, Show, Suspense } from "solid-js";
 import AuthGuard from "~/components/AuthGuard.tsx";
 import SwipeToOpenSidebarWrapper from "~/components/unique/SwipeToOpenSidebarWrapper.tsx";
-import { ExternalNavigater } from './utils/ExternalNavigater.ts';
-import { Toaster } from './components/ui/toast.tsx';
+import { api } from "./api/index.ts";
+import { AppSidebar } from "./components/Sidebar.tsx";
+import { SidebarProvider } from "./components/ui/sidebar.tsx";
+import { Toaster } from "./components/ui/toast.tsx";
+import Channel from "./routes/channel/[id].tsx";
+import { storeAppStatus } from "./stores/AppStatus.store.ts";
+import {
+  setStoreServerinfo,
+  storeServerinfo,
+} from "./stores/Serverinfo.store.ts";
+import { ExternalNavigater } from "./utils/ExternalNavigater.ts";
 
-const root = document.getElementById('root');
+const root = document.getElementById("root");
 
 if (import.meta.env.DEV && !(root instanceof HTMLElement)) {
   throw new Error(
-    'Root element not found. Did you forget to add it to your index.html? Or maybe the id attribute got misspelled?',
+    "Root element not found. Did you forget to add it to your index.html? Or maybe the id attribute got misspelled?",
   );
 }
 
 //サーバー情報を取得
-api.server.config()
+api.server
+  .config()
   .then((r) => {
     //console.log("AuthGuard : GET_SERVER_CONFIG r->", r);
     setStoreServerinfo({
@@ -44,63 +53,92 @@ const TopForMoving = () => {
   const navi = useNavigate();
   navi("/app");
 
-  return (
-    <p>移動します...</p>
-  )
-}
+  return <p>移動します...</p>;
+};
 
-const storageManager = createLocalStorageManager("vite-ui-theme")
-render(() =>
-  <Router root={
-    (props) => {
-      const navi = useNavigate();
+const storageManager = createLocalStorageManager("vite-ui-theme");
+render(
+  () => (
+    <Router
+      root={(props) => {
+        const navi = useNavigate();
 
-      onMount(() => {
-        ExternalNavigater.bind(({ to, options }) => {
-          navi(to, options);
+        onMount(() => {
+          ExternalNavigater.bind(({ to, options }) => {
+            navi(to, options);
+          });
         });
-      });
-      onCleanup(() => {
-        ExternalNavigater.unbind();
-      });
+        onCleanup(() => {
+          ExternalNavigater.unbind();
+        });
 
-      return (
-        <>
-          <ColorModeScript storageType={storageManager.type} />
-          <ColorModeProvider storageManager={storageManager}>
-            <Toaster />
-            <SidebarProvider>
-              <Show when={useLocation().pathname.startsWith("/app")}>
-                <AppSidebar />
-              </Show>
-              <Suspense>
-                {/* サイドバーを考慮した幅指定をしてメッセージレンダー部分の変なオーバーフローを無くす */}
-                <div class={"md:w-[calc(100%-16rem)] w-screen mx-auto"}>{props.children}</div>
-              </Suspense>
-            </SidebarProvider>
-          </ColorModeProvider>
-        </>
-      )
-    }
-  }>
-    <Route path="/" component={TopForMoving} />
-    <Route path="/auth" component={lazy(() => import("./routes/auth.tsx"))} />
-    <Route path="*paramName" component={lazy(() => import("./routes/[...404].tsx"))} />
-    <Route path="/app" component={AuthGuard}>
-      <SwipeToOpenSidebarWrapper>
-        <Route path="/" component={lazy(() => import("./routes/index.tsx"))} />
-        <Route path="/channel">
-          <Route path="/:channelId/:messageId?" component={Channel} />
-        </Route>
-        <Route path="/members" component={lazy(() => import("./routes/members.tsx"))} />
-        <Route path="/config" component={lazy(() => import("./routes/config.tsx"))} />
-        <Route path="/inbox" component={lazy(() => import("./routes/Inbox.tsx"))} />
-        <Route path="/channel-browser" component={lazy(() => import("./routes/channel-browser.tsx"))} />
-        <Route path="/search" component={lazy(() => import("./routes/search.tsx"))} />
-        <Route path="/manage-server" component={lazy(() => import("./routes/manage-server.tsx"))} />
-        <Route path="*paramName" component={lazy(() => import("./routes/[...404].tsx"))} />
-      </SwipeToOpenSidebarWrapper>
-    </Route>
-  </Router>,
-  root!
+        return (
+          <>
+            <ColorModeScript storageType={storageManager.type} />
+            <ColorModeProvider storageManager={storageManager}>
+              <Toaster />
+              <SidebarProvider>
+                <Show when={useLocation().pathname.startsWith("/app")}>
+                  <AppSidebar />
+                </Show>
+                <Suspense>
+                  {/* サイドバーを考慮した幅指定をしてメッセージレンダー部分の変なオーバーフローを無くす */}
+                  <div class={"md:w-[calc(100%-16rem)] w-screen mx-auto"}>
+                    {props.children}
+                  </div>
+                </Suspense>
+              </SidebarProvider>
+            </ColorModeProvider>
+          </>
+        );
+      }}
+    >
+      <Route path="/" component={TopForMoving} />
+      <Route path="/auth" component={lazy(() => import("./routes/auth.tsx"))} />
+      <Route
+        path="*paramName"
+        component={lazy(() => import("./routes/[...404].tsx"))}
+      />
+      <Route path="/app" component={AuthGuard}>
+        <SwipeToOpenSidebarWrapper>
+          <Route
+            path="/"
+            component={lazy(() => import("./routes/index.tsx"))}
+          />
+          <Route path="/channel">
+            <Route path="/:channelId/:messageId?" component={Channel} />
+          </Route>
+          <Route
+            path="/members"
+            component={lazy(() => import("./routes/members.tsx"))}
+          />
+          <Route
+            path="/config"
+            component={lazy(() => import("./routes/config.tsx"))}
+          />
+          <Route
+            path="/inbox"
+            component={lazy(() => import("./routes/Inbox.tsx"))}
+          />
+          <Route
+            path="/channel-browser"
+            component={lazy(() => import("./routes/channel-browser.tsx"))}
+          />
+          <Route
+            path="/search"
+            component={lazy(() => import("./routes/search.tsx"))}
+          />
+          <Route
+            path="/manage-server"
+            component={lazy(() => import("./routes/manage-server.tsx"))}
+          />
+          <Route
+            path="*paramName"
+            component={lazy(() => import("./routes/[...404].tsx"))}
+          />
+        </SwipeToOpenSidebarWrapper>
+      </Route>
+    </Router>
+  ),
+  root!,
 );

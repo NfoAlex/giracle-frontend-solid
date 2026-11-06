@@ -1,15 +1,15 @@
 import { For, Show } from "solid-js";
-import type { IMessage } from "~/types/Message.ts";
-import MessageTextRender from "./MessageRender/MessageTextRender.tsx";
-import { useStoreUserinfo } from "~/stores/Userinfo.store.ts";
-import UserinfoModalWrapper from "~/components/unique/UserinfoModalWrapper.tsx";
-import SystemMessageRender from "./MessageRender/SystemMessageRender.tsx";
-import FilePreview from "./MessageRender/FilePreview.tsx";
-import URLPreview from "./MessageRender/URLPreview.tsx";
-import LongTextDisplay from "./MessageRender/LongTextDisplay.tsx";
-import RenderEmojiReactions from "./MessageRender/RenderEmojiReactions.tsx";
-import MessageLinkPreview from "./MessageRender/MessageLinkPreview.tsx";
 import BotBadge from "~/components/unique/BotBadge.tsx";
+import UserinfoModalWrapper from "~/components/unique/UserinfoModalWrapper.tsx";
+import { useStoreUserinfo } from "~/stores/Userinfo.store.ts";
+import type { IMessage } from "~/types/Message.ts";
+import FilePreview from "./MessageRender/FilePreview.tsx";
+import LongTextDisplay from "./MessageRender/LongTextDisplay.tsx";
+import MessageLinkPreview from "./MessageRender/MessageLinkPreview.tsx";
+import MessageTextRender from "./MessageRender/MessageTextRender.tsx";
+import RenderEmojiReactions from "./MessageRender/RenderEmojiReactions.tsx";
+import SystemMessageRender from "./MessageRender/SystemMessageRender.tsx";
+import URLPreview from "./MessageRender/URLPreview.tsx";
 
 const messageLinkPattern = /&<([a-f0-9-]+):([a-f0-9-]+)>/g;
 
@@ -39,7 +39,10 @@ export default function MessageRender(props: {
       return timeObj.toLocaleString();
     }
     // 1ヶ月以上あるいは１日前のメッセージはすべて表示
-    if (timeObj.getMonth() !== now.getMonth() || timeObj.getDate() !== now.getDate()) {
+    if (
+      timeObj.getMonth() !== now.getMonth() ||
+      timeObj.getDate() !== now.getDate()
+    ) {
       return timeObj.toLocaleString();
     }
     //時間のみ返す
@@ -56,7 +59,9 @@ export default function MessageRender(props: {
   }
 
   //メッセージLink抽出。重複防止でSet
-  const messageLinks = [...new Set(props.message.content.match(messageLinkPattern))];
+  const messageLinks = [
+    ...new Set(props.message.content.match(messageLinkPattern)),
+  ];
 
   return (
     <div class="w-full">
@@ -64,48 +69,56 @@ export default function MessageRender(props: {
       <Show when={props.displayUserName}>
         <UserinfoModalWrapper userId={props.message.userId}>
           <span class={"flex items-center gap-2"}>
-            <p class="min-w-0 truncate font-bold hover:underline">{useStoreUserinfo.getterUserinfo(props.message.userId).name}</p>
-            <Show when={useStoreUserinfo.getterUserinfo(props.message.userId).isBot}>
+            <p class="min-w-0 truncate font-bold hover:underline">
+              {useStoreUserinfo.getterUserinfo(props.message.userId).name}
+            </p>
+            <Show
+              when={useStoreUserinfo.getterUserinfo(props.message.userId).isBot}
+            >
               <BotBadge />
             </Show>
-            <p class="shrink-0 text-sm text-muted-foreground">{displayDate(props.message.createdAt)}</p>
+            <p class="shrink-0 text-sm text-muted-foreground">
+              {displayDate(props.message.createdAt)}
+            </p>
           </span>
         </UserinfoModalWrapper>
       </Show>
       <div class="flex flex-col gap-1 py-1">
         {/* メッセージ本文 */}
+        {props.message.content.length > 500 || breakLinesNum() > 5 ? (
+          <LongTextDisplay message={props.message} />
+        ) : (
+          <MessageTextRender content={props.message.content} />
+        )}
+
         {
-          props.message.content.length > 500 || breakLinesNum() > 5
-            ?
-            <LongTextDisplay message={props.message} />
-            :
-            <MessageTextRender content={props.message.content} />
-        }
-
-        { //メッセージリンクプレビュー
+          //メッセージリンクプレビュー
           <For each={messageLinks}>
-            {
-              (messageLink) => {
-                const channelId = messageLink.split(":")[0].slice(2);
-                const messageId = messageLink.split(":")[1].slice(0, -1);
-                return <MessageLinkPreview channelId={channelId} messageId={messageId} />
-              }
-            }
+            {(messageLink) => {
+              const channelId = messageLink.split(":")[0].slice(2);
+              const messageId = messageLink.split(":")[1].slice(0, -1);
+              return (
+                <MessageLinkPreview
+                  channelId={channelId}
+                  messageId={messageId}
+                />
+              );
+            }}
           </For>
         }
 
-        { //URLプレビュー
-          (props.message.MessageUrlPreview?.length > 0)
-          &&
-          <For each={props.message.MessageUrlPreview}>
-            {(urlPreview) => <URLPreview urlPreview={urlPreview} />}
-          </For>
+        {
+          //URLプレビュー
+          props.message.MessageUrlPreview?.length > 0 && (
+            <For each={props.message.MessageUrlPreview}>
+              {(urlPreview) => <URLPreview urlPreview={urlPreview} />}
+            </For>
+          )
         }
 
-        { //ファイルプレビュー
-          props.message.MessageFileAttached?.length > 0
-          &&
-          (
+        {
+          //ファイルプレビュー
+          props.message.MessageFileAttached?.length > 0 && (
             <For each={props.message.MessageFileAttached}>
               {(f) => <FilePreview file={f} />}
             </For>
@@ -118,8 +131,17 @@ export default function MessageRender(props: {
         </Show>
 
         {/* 絵文字リアクション表示 */}
-        <Show when={props.message.reactionSummary && props.message.reactionSummary.length > 0}>
-          <RenderEmojiReactions reaction={props.message.reactionSummary} messageId={props.message.id} channelId={props.message.channelId} />
+        <Show
+          when={
+            props.message.reactionSummary &&
+            props.message.reactionSummary.length > 0
+          }
+        >
+          <RenderEmojiReactions
+            reaction={props.message.reactionSummary}
+            messageId={props.message.id}
+            channelId={props.message.channelId}
+          />
         </Show>
       </div>
     </div>

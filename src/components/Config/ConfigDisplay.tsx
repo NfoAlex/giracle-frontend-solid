@@ -1,16 +1,27 @@
+import { useColorMode } from "@kobalte/core/color-mode";
+import {
+  IconBrush,
+  IconLink,
+  IconMoonFilled,
+  IconSpacingVertical,
+  IconSunFilled,
+} from "@tabler/icons-solidjs";
 import { storeClientConfig } from "~/stores/ClientConfig.store.ts";
 import { Card } from "../ui/card.tsx";
+import {
+  NumberField,
+  NumberFieldDecrementTrigger,
+  NumberFieldGroup,
+  NumberFieldIncrementTrigger,
+  NumberFieldInput,
+} from "../ui/number-field.tsx";
 import { Slider, SliderFill, SliderThumb, SliderTrack } from "../ui/slider";
-import { useColorMode } from "@kobalte/core/color-mode";
-import { IconBrush, IconLink, IconMoonFilled, IconSpacingVertical, IconSunFilled } from "@tabler/icons-solidjs";
-import { NumberField, NumberFieldDecrementTrigger, NumberFieldGroup, NumberFieldIncrementTrigger, NumberFieldInput } from "../ui/number-field.tsx";
 
 export default function ConfigDisplay() {
-  const { setColorMode, colorMode } = useColorMode()
+  const { setColorMode, colorMode } = useColorMode();
 
   return (
     <div class="flex flex-col gap-6">
-
       {/* テーマ */}
       <Card class="p-4 flex flex-col gap-4">
         <span class="flex items-center">
@@ -20,8 +31,12 @@ export default function ConfigDisplay() {
           </span>
           <div class={"ml-auto flex items-center gap-2"}>
             <p class="italic text-sm">クリックで変更</p>
-            {colorMode() === "dark" && <IconMoonFilled onClick={() => setColorMode("light")} />}
-            {colorMode() === "light" && <IconSunFilled onClick={() => setColorMode("dark")} />}
+            {colorMode() === "dark" && (
+              <IconMoonFilled onClick={() => setColorMode("light")} />
+            )}
+            {colorMode() === "light" && (
+              <IconSunFilled onClick={() => setColorMode("dark")} />
+            )}
           </div>
         </span>
 
@@ -45,7 +60,9 @@ export default function ConfigDisplay() {
               minValue={0}
               maxValue={6}
               defaultValue={[storeClientConfig.display.messageGapLevel]}
-              onChange={(v) => storeClientConfig.display.messageGapLevel = v[0]}
+              onChange={(v) =>
+                (storeClientConfig.display.messageGapLevel = v[0])
+              }
             >
               <SliderTrack>
                 <SliderFill />
@@ -63,9 +80,7 @@ export default function ConfigDisplay() {
 
         <hr />
 
-        <div>
-          チャット画面でのメッセージ間の余白縦幅を調整します。
-        </div>
+        <div>チャット画面でのメッセージ間の余白縦幅を調整します。</div>
       </Card>
 
       {/* URLプレビュー概要の最大文字数 */}
@@ -80,8 +95,14 @@ export default function ConfigDisplay() {
               class="w-1/2 flex items-center gap-2"
               value={storeClientConfig.display.maxUrlPreviewTextLength}
               defaultValue={512 * 1024 * 1024} // 512MB
-              onRawValueChange={(e) => storeClientConfig.display.maxUrlPreviewTextLength = e}
-              validationState={storeClientConfig.display.maxUrlPreviewTextLength <= 0 ? "invalid" : "valid"}
+              onRawValueChange={(e) =>
+                (storeClientConfig.display.maxUrlPreviewTextLength = e)
+              }
+              validationState={
+                storeClientConfig.display.maxUrlPreviewTextLength <= 0
+                  ? "invalid"
+                  : "valid"
+              }
             >
               <NumberFieldGroup class="w-36">
                 <NumberFieldInput />
@@ -102,5 +123,5 @@ export default function ConfigDisplay() {
         </div>
       </Card>
     </div>
-  )
+  );
 }

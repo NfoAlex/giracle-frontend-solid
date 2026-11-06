@@ -1,11 +1,22 @@
+import {
+  IconExclamationCircle,
+  IconKey,
+  IconKeyFilled,
+  IconLockCode,
+} from "@tabler/icons-solidjs";
 import { createSignal, Show } from "solid-js";
 import { api } from "~/api/index.ts";
 import { Alert, AlertTitle } from "~/components/ui/alert";
 import { Button } from "~/components/ui/button.tsx";
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTrigger } from "~/components/ui/dialog.tsx";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTrigger,
+} from "~/components/ui/dialog.tsx";
 import { Label } from "~/components/ui/label.tsx";
 import { TextField, TextFieldInput } from "~/components/ui/text-field.tsx";
-import { IconExclamationCircle, IconLockCode, IconKeyFilled, IconKey } from '@tabler/icons-solidjs';
 
 export default function ChangePasswordModal() {
   const [currentPassword, setCurrentPassword] = createSignal("");
@@ -22,7 +33,7 @@ export default function ChangePasswordModal() {
     setSuccess(false);
     setProcessing(false);
     setDisplayError(false);
-  }
+  };
 
   /**
    * パスワードを変更
@@ -30,7 +41,11 @@ export default function ChangePasswordModal() {
   const changePassword = () => {
     setProcessing(true);
     setDisplayError(false);
-    api.user.changePassword({ currentPassword: currentPassword(), newPassword: newPassword() })
+    api.user
+      .changePassword({
+        currentPassword: currentPassword(),
+        newPassword: newPassword(),
+      })
       .then((r) => {
         console.log("changePassword :: r->", r);
         setSuccess(true);
@@ -42,27 +57,25 @@ export default function ChangePasswordModal() {
       .finally(() => {
         setProcessing(false);
       });
-  }
+  };
 
   return (
     <Dialog>
       <DialogTrigger class="w-full">
-        <Button onClick={initialize} class="w-full">パスワードを変更</Button>
+        <Button onClick={initialize} class="w-full">
+          パスワードを変更
+        </Button>
       </DialogTrigger>
 
       <DialogContent>
-        {
-        success()
-        ?
+        {success() ? (
           <div class="text-center flex flex-col gap-4">
             <IconKeyFilled class="w-8 h-8 mx-auto" />
             <p>パスワードを変更しました。</p>
           </div>
-          :
+        ) : (
           <>
-            <DialogHeader>
-              パスワードを変更する
-            </DialogHeader>
+            <DialogHeader>パスワードを変更する</DialogHeader>
 
             <TextField class="flex flex-col gap-2">
               <Label class="flex items-center gap-2">
@@ -106,20 +119,28 @@ export default function ChangePasswordModal() {
             <DialogFooter>
               <Button
                 onClick={() => changePassword()}
-                disabled={processing() || newPassword().length < 8 || newPassword() !== checkingPassword()}
-              >更新</Button>
+                disabled={
+                  processing() ||
+                  newPassword().length < 8 ||
+                  newPassword() !== checkingPassword()
+                }
+              >
+                更新
+              </Button>
             </DialogFooter>
 
             <Show when={displayError()}>
               <Alert variant={"destructive"}>
                 <IconExclamationCircle class="w-5 h-5" />
                 <AlertTitle>
-                  <p>エラーが発生しました。現在のパスワードが合っているか確認してください。</p>
+                  <p>
+                    エラーが発生しました。現在のパスワードが合っているか確認してください。
+                  </p>
                 </AlertTitle>
               </Alert>
             </Show>
           </>
-        }
+        )}
       </DialogContent>
     </Dialog>
   );

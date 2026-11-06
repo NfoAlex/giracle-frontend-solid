@@ -1,19 +1,30 @@
-import {IconTrash} from "@tabler/icons-solidjs";
-import { Button } from "../ui/button.tsx";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogTitle, DialogTrigger } from "../ui/dialog.tsx";
+import { IconTrash } from "@tabler/icons-solidjs";
 import { createSignal } from "solid-js";
 import { api } from "~/api/index.ts";
+import { Label } from "~/components/ui/label.tsx";
 import type { IChannel } from "~/types/Channel.ts";
-import {Label} from "~/components/ui/label.tsx";
+import { Button } from "../ui/button.tsx";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogTitle,
+  DialogTrigger,
+} from "../ui/dialog.tsx";
 
-export default function DeleteChannel(props: {fetchChannels: () => void, channel: IChannel}) {
+export default function DeleteChannel(props: {
+  fetchChannels: () => void;
+  channel: IChannel;
+}) {
   const [open, setOpen] = createSignal(false); //ダイアログの開閉
 
   /**
    * チャンネル削除
    */
   const deleteChannel = () => {
-    api.channel.delete({ channelId: props.channel.id })
+    api.channel
+      .delete({ channelId: props.channel.id })
       .then((_) => {
         //console.log("DeleteChannel :: deleteChannel :: r ->", r);
         setOpen(false); //ダイアログを閉じる
@@ -22,17 +33,15 @@ export default function DeleteChannel(props: {fetchChannels: () => void, channel
       .catch((err) => {
         console.error("DeleteChannel :: deleteChannel :: err ->", err);
       });
-  }
+  };
 
   return (
     <Dialog open={open()} onOpenChange={setOpen}>
       <DialogContent>
-        <DialogTitle>
-          チャンネルの削除
-        </DialogTitle>
+        <DialogTitle>チャンネルの削除</DialogTitle>
         <DialogDescription class="flex flex-col gap-4">
           次のチャンネルを本当に削除しますか？
-          <p class={"text-center text-3xl font-bold"}>{ props.channel.name }</p>
+          <p class={"text-center text-3xl font-bold"}>{props.channel.name}</p>
         </DialogDescription>
         <DialogFooter class={"flex items-center gap-2"}>
           <Label>ダブルクリックで削除</Label>
@@ -40,7 +49,9 @@ export default function DeleteChannel(props: {fetchChannels: () => void, channel
             ondblclick={deleteChannel}
             type="submit"
             variant={"destructive"}
-          >削除する</Button>
+          >
+            削除する
+          </Button>
         </DialogFooter>
       </DialogContent>
       <DialogTrigger>

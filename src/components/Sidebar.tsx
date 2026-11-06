@@ -1,5 +1,16 @@
 import { A, useLocation } from "@solidjs/router";
-import { Show, createSignal } from "solid-js";
+import {
+  IconBell,
+  IconCircleFilled,
+  IconDatabaseCog,
+  IconList,
+  IconSearch,
+  IconSettings,
+  IconUser,
+} from "@tabler/icons-solidjs";
+import { createSignal, Show } from "solid-js";
+import { Badge } from "~/components/ui/badge.tsx";
+import { Popover, PopoverTrigger } from "~/components/ui/popover.tsx";
 import {
   Sidebar,
   SidebarContent,
@@ -9,21 +20,21 @@ import {
   SidebarHeader,
   SidebarMenuButton,
 } from "~/components/ui/sidebar.tsx";
-import { Popover, PopoverTrigger } from "~/components/ui/popover.tsx";
-import { useStoreMyUserinfo, storeMyUserinfo } from "~/stores/MyUserinfo.store.ts";
-import { storeUserOnline } from "~/stores/Userinfo.store.ts";
-import { storeServerinfo } from "~/stores/Serverinfo.store.ts";
-import { Avatar, AvatarImage } from "./ui/avatar.tsx";
 import { storeAppStatus } from "~/stores/AppStatus.store.ts";
-import { IconBell, IconCircleFilled, IconDatabaseCog, IconList, IconSearch, IconSettings, IconUser } from "@tabler/icons-solidjs";
-import {storeInbox} from "~/stores/Inbox.store.ts";
-import {Badge} from "~/components/ui/badge.tsx";
-import ChannelButtons from "./Sidebar/ChannelButtons.tsx";
+import { storeInbox } from "~/stores/Inbox.store.ts";
+import {
+  storeMyUserinfo,
+  useStoreMyUserinfo,
+} from "~/stores/MyUserinfo.store.ts";
+import { storeServerinfo } from "~/stores/Serverinfo.store.ts";
+import { storeUserOnline } from "~/stores/Userinfo.store.ts";
 import MinesweeperPopup from "./Minesweeper/MinesweeperPopup.tsx";
+import ChannelButtons from "./Sidebar/ChannelButtons.tsx";
+import { Avatar, AvatarImage } from "./ui/avatar.tsx";
 
 export function AppSidebar() {
   const loc = useLocation();
-  const [isMinesweeperOpen, setIsMinesweeperOpen] = createSignal(false)
+  const [isMinesweeperOpen, setIsMinesweeperOpen] = createSignal(false);
 
   return (
     <Sidebar class={"h-screen"}>
@@ -38,43 +49,66 @@ export function AppSidebar() {
 
       <SidebarContent id={"sidebar-content flex flex-col"} class={"gap-0"}>
         <SidebarGroup class={"shrink-0"}>
-          {
-            storeAppStatus.wsConnected ?
-              <span class={"w-full"}>
-                <A href="/app/members?online=1">
-                  <Badge variant={"secondary"} class={"w-full flex items-center px-3 py-2"}>
-                    <p class="font-bold">オンラインユーザー : </p>
-                    <span class={"ml-auto flex items-center gap-1"}>
-                      <IconCircleFilled color={"green"} size={16} />
-                      { storeUserOnline.length }
-                    </span>
-                  </Badge>
-                </A>
-              </span>
-            :
-              <Badge variant={"secondary"} class={"px-3 py-2"}>再接続中...</Badge>
-          }
+          {storeAppStatus.wsConnected ? (
+            <span class={"w-full"}>
+              <A href="/app/members?online=1">
+                <Badge
+                  variant={"secondary"}
+                  class={"w-full flex items-center px-3 py-2"}
+                >
+                  <p class="font-bold">オンラインユーザー : </p>
+                  <span class={"ml-auto flex items-center gap-1"}>
+                    <IconCircleFilled color={"green"} size={16} />
+                    {storeUserOnline.length}
+                  </span>
+                </Badge>
+              </A>
+            </span>
+          ) : (
+            <Badge variant={"secondary"} class={"px-3 py-2"}>
+              再接続中...
+            </Badge>
+          )}
         </SidebarGroup>
 
         <hr />
 
         <div class={"flex flex-col overflow-y-auto"}>
-
           <SidebarGroup>
-            <SidebarMenuButton as={A} href="/app/inbox" variant={loc.pathname === "/app/inbox" ? "outline" : "default"}>
+            <SidebarMenuButton
+              as={A}
+              href="/app/inbox"
+              variant={loc.pathname === "/app/inbox" ? "outline" : "default"}
+            >
               <IconBell />
               <p>通知</p>
-              <p class={"ml-auto"}>{ storeInbox.length!==0?storeInbox.length:"" }</p>
+              <p class={"ml-auto"}>
+                {storeInbox.length !== 0 ? storeInbox.length : ""}
+              </p>
             </SidebarMenuButton>
-            <SidebarMenuButton as={A} href="/app/channel-browser" variant={loc.pathname === "/app/channel-browser" ? "outline" : "default"}>
+            <SidebarMenuButton
+              as={A}
+              href="/app/channel-browser"
+              variant={
+                loc.pathname === "/app/channel-browser" ? "outline" : "default"
+              }
+            >
               <IconList />
               チャンネル一覧
             </SidebarMenuButton>
-            <SidebarMenuButton as={A} href="/app/members" variant={loc.pathname === "/app/members" ? "outline" : "default"}>
+            <SidebarMenuButton
+              as={A}
+              href="/app/members"
+              variant={loc.pathname === "/app/members" ? "outline" : "default"}
+            >
               <IconUser />
               メンバーリスト
             </SidebarMenuButton>
-            <SidebarMenuButton as={A} href="/app/search" variant={loc.pathname === "/app/search" ? "outline" : "default"}>
+            <SidebarMenuButton
+              as={A}
+              href="/app/search"
+              variant={loc.pathname === "/app/search" ? "outline" : "default"}
+            >
               <IconSearch />
               検索
             </SidebarMenuButton>
@@ -86,18 +120,24 @@ export function AppSidebar() {
             <SidebarGroupLabel>参加チャンネル</SidebarGroupLabel>
             <ChannelButtons />
           </SidebarGroup>
-
         </div>
-
       </SidebarContent>
 
       <hr class="pb-2" />
-      <Show when={useStoreMyUserinfo.getRolePower("manageRole") || useStoreMyUserinfo.getRolePower("manageServer") || useStoreMyUserinfo.getRolePower("manageEmoji")}>
+      <Show
+        when={
+          useStoreMyUserinfo.getRolePower("manageRole") ||
+          useStoreMyUserinfo.getRolePower("manageServer") ||
+          useStoreMyUserinfo.getRolePower("manageEmoji")
+        }
+      >
         <SidebarFooter class="py-2">
           <SidebarMenuButton
             as={A}
             href="/app/manage-server"
-            variant={loc.pathname === "/app/manage-server" ? "outline" : "default"}
+            variant={
+              loc.pathname === "/app/manage-server" ? "outline" : "default"
+            }
           >
             <IconDatabaseCog />
             サーバー管理
@@ -110,7 +150,9 @@ export function AppSidebar() {
             <Avatar class="w-auto h-8">
               <AvatarImage src={`/api/user/icon/${storeMyUserinfo.id}`} />
             </Avatar>
-            <p class={loc.pathname === "/app/config" ? "font-bold" : ""}>{storeMyUserinfo.name}</p>
+            <p class={loc.pathname === "/app/config" ? "font-bold" : ""}>
+              {storeMyUserinfo.name}
+            </p>
 
             <IconSettings class="ml-auto w-5" />
           </div>

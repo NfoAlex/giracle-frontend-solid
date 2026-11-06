@@ -1,12 +1,16 @@
-import {IMessageFileAttached} from "~/types/Message.ts";
-import {Card} from "~/components/ui/card.tsx";
-import {IconDownload} from "@tabler/icons-solidjs";
-import ConvertSizeToHumanSize from "~/utils/ConvertSizeToHumanSize.ts";
-import {Button} from "~/components/ui/button.tsx";
+import { IconDownload } from "@tabler/icons-solidjs";
+import { createSignal, onCleanup, onMount } from "solid-js";
+import { Button } from "~/components/ui/button.tsx";
+import { Card } from "~/components/ui/card.tsx";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "~/components/ui/hover-card.tsx";
 import ImageWithModal from "~/components/unique/ImageWithModal.tsx";
 import { storeImageDimensions } from "~/stores/History.store.ts";
-import { createSignal, onCleanup, onMount } from "solid-js";
-import { HoverCard, HoverCardContent, HoverCardTrigger } from "~/components/ui/hover-card.tsx";
+import type { IMessageFileAttached } from "~/types/Message.ts";
+import ConvertSizeToHumanSize from "~/utils/ConvertSizeToHumanSize.ts";
 
 export default function FilePreview(props: { file: IMessageFileAttached }) {
   const [openFileNameCard, setOpenFileNameCard] = createSignal(false); //ファイル名表示のHoverCardの開閉状態
@@ -27,30 +31,39 @@ export default function FilePreview(props: { file: IMessageFileAttached }) {
       <div class={"py-2 overflow-hidden"}>
         <Card class={"px-6 py-4 lg:w-1/2"}>
           <div class="flex items-center gap-2">
-
-            <HoverCard open={openFileNameCard()} onOpenChange={setOpenFileNameCard}>
+            <HoverCard
+              open={openFileNameCard()}
+              onOpenChange={setOpenFileNameCard}
+            >
               <HoverCardTrigger>
                 <p
                   onClick={() => setOpenFileNameCard(true)}
-                  class={"truncate shrink grow-0 overflow-hidden text-wrap break-all line-clamp-1"}
+                  class={
+                    "truncate shrink grow-0 overflow-hidden text-wrap break-all line-clamp-1"
+                  }
                 >
                   {props.file.actualFileName}
                 </p>
               </HoverCardTrigger>
-              <HoverCardContent>
-                {props.file.actualFileName}
-              </HoverCardContent>
+              <HoverCardContent>{props.file.actualFileName}</HoverCardContent>
             </HoverCard>
 
-            <Card class={"ml-auto shrink-0 h-full p-2"}>{ ConvertSizeToHumanSize(props.file.size) }</Card>
-            
-            <Button onClick={downloadFile} size={"icon"} class={"shrink-0"} variant={"secondary"}>
+            <Card class={"ml-auto shrink-0 h-full p-2"}>
+              {ConvertSizeToHumanSize(props.file.size)}
+            </Card>
+
+            <Button
+              onClick={downloadFile}
+              size={"icon"}
+              class={"shrink-0"}
+              variant={"secondary"}
+            >
               <IconDownload />
             </Button>
           </div>
         </Card>
       </div>
-    )
+    );
   }
 
   //画像のDimensionデータが無いなら画像をそのまま表示
@@ -72,32 +85,37 @@ export default function FilePreview(props: { file: IMessageFileAttached }) {
   const imageHeight = storeImageDimensions[props.file.id]?.height ?? 256;
   const imageWidth = storeImageDimensions[props.file.id]?.width ?? 256;
   //画像のサムネイルの高さと横幅を保持するSignal
-  const [thumbnailDimension, setThumbnailDimension] = createSignal({ height: imageHeight, width: imageWidth });
+  const [thumbnailDimension, setThumbnailDimension] = createSignal({
+    height: imageHeight,
+    width: imageWidth,
+  });
 
   //画像のサムネイルの高さを画面と画像横幅を元に計算する関数
   const resizeHeight = () => {
     let calculatedHeight = imageHeight;
     //スマホUIかどうか調べる
-    const mediaQuery = window.matchMedia('(max-width: 767px)');
+    const mediaQuery = window.matchMedia("(max-width: 767px)");
 
     //サムネイル用高さを計算する(サイドバー分の256pxを引く、スマホUIなら引かない)
-    const contentWidth= !mediaQuery.matches ? window.innerWidth - 256 : window.innerWidth;
-    if ((imageWidth > contentWidth || imageHeight > imageWidth)) {
+    const contentWidth = !mediaQuery.matches
+      ? window.innerWidth - 256
+      : window.innerWidth;
+    if (imageWidth > contentWidth || imageHeight > imageWidth) {
       calculatedHeight = imageHeight / (imageWidth / contentWidth); //サムネイルの高さを計算
     }
 
     setThumbnailDimension({
       height: calculatedHeight,
-      width: imageWidth
+      width: imageWidth,
     });
-  }
+  };
 
   //ウィンドウのリサイズイベントにサムネイルの高さを再計算する関数を登録
   onMount(() => {
-    window.addEventListener('resize', resizeHeight);
-    
+    window.addEventListener("resize", resizeHeight);
+
     onCleanup(() => {
-      window.removeEventListener('resize', resizeHeight);
+      window.removeEventListener("resize", resizeHeight);
     });
   });
 

@@ -1,5 +1,7 @@
 import { IconCheck, IconUserCircle } from "@tabler/icons-solidjs";
-import { Show, createSignal } from "solid-js";
+import { createSignal, Show } from "solid-js";
+import { api } from "~/api/index.ts";
+import { TextField, TextFieldInput } from "~/components/ui/text-field.tsx";
 import { Button } from "../ui/button.tsx";
 import { Callout, CalloutContent, CalloutTitle } from "../ui/callout.tsx";
 import {
@@ -11,8 +13,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "../ui/dialog.tsx";
-import { api } from "~/api/index.ts";
-import {TextField, TextFieldInput} from "~/components/ui/text-field.tsx";
 
 export default function ChangeBanner() {
   const [file, setFile] = createSignal<File | null>(null);
@@ -26,7 +26,8 @@ export default function ChangeBanner() {
     const _file = file();
     if (_file === null) return;
     //バナーの変更
-    api.user.changeBanner({ banner: _file })
+    api.user
+      .changeBanner({ banner: _file })
       .then(() => {
         setResult("success");
       })

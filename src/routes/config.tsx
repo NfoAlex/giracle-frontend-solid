@@ -1,4 +1,11 @@
-import { IconBell, IconEye, IconHash, IconKey, IconRobot, IconUser } from "@tabler/icons-solidjs";
+import {
+  IconBell,
+  IconEye,
+  IconHash,
+  IconKey,
+  IconRobot,
+  IconUser,
+} from "@tabler/icons-solidjs";
 import { createEffect, createSignal, on } from "solid-js";
 import ConfigBot from "~/components/Config/ConfigBot";
 import ConfigChat from "~/components/Config/ConfigChat.tsx";
@@ -7,31 +14,44 @@ import ConfigNotification from "~/components/Config/ConfigNotification.tsx";
 import ConfigProfile from "~/components/Config/ConfigProfile.tsx";
 import ConfigSession from "~/components/Config/ConfigSession.tsx";
 import { Card } from "~/components/ui/card.tsx";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~/components/ui/select.tsx";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "~/components/ui/select.tsx";
 import { SidebarMenuButton } from "~/components/ui/sidebar.tsx";
 import SidebarTriggerWithDot from "~/components/unique/SidebarTriggerWithDot.tsx";
 import { storeAppStatus } from "~/stores/AppStatus.store.ts";
 import { storeClientConfig } from "~/stores/ClientConfig.store.ts";
 
-type TConfigTab = "profile" | "session" | "chat" | "notification" | "display" | "bot";
+type TConfigTab =
+  | "profile"
+  | "session"
+  | "chat"
+  | "notification"
+  | "display"
+  | "bot";
 
 export default function Config() {
   const [displayMode, setDisplayMode] = createSignal<TConfigTab>("profile");
 
   //設定の変更を監視してLocalStorageに保存する
-  createEffect(on(
-    () => JSON.stringify(storeClientConfig),
-    () => {
-      //もしログインしてなければ停止
-      if (!storeAppStatus.loggedIn) return;
-      //保存
-      localStorage.setItem("clientConfig", JSON.stringify(storeClientConfig));
-    }
-  ));
+  createEffect(
+    on(
+      () => JSON.stringify(storeClientConfig),
+      () => {
+        //もしログインしてなければ停止
+        if (!storeAppStatus.loggedIn) return;
+        //保存
+        localStorage.setItem("clientConfig", JSON.stringify(storeClientConfig));
+      },
+    ),
+  );
 
   return (
     <div class="px-2 pt-2 h-screen flex flex-col">
-
       {/* ヘッダー */}
       <Card class="w-full py-3 px-5 mb-2 flex md:flex-col flex-row gap-2">
         <div class="flex items-center gap-2">
@@ -41,15 +61,21 @@ export default function Config() {
       </Card>
 
       <div class="overflow-hidden h-full grow flex flex-col md:flex-row gap-1">
-
         {/* スマホ用設定ページ選択 */}
         <div class="w-full md:hidden h-fit">
           <Select
             value={displayMode()}
             defaultValue={"profile"}
             onChange={setDisplayMode}
-            options={["profile", "session", "chat", "notification", "display", "bot"]}
-            itemComponent={(props) =>
+            options={[
+              "profile",
+              "session",
+              "chat",
+              "notification",
+              "display",
+              "bot",
+            ]}
+            itemComponent={(props) => (
               <SelectItem item={props.item}>
                 {props.item.textValue === "profile" && "プロフィール"}
                 {props.item.textValue === "session" && "セッション管理"}
@@ -58,21 +84,24 @@ export default function Config() {
                 {props.item.textValue === "display" && "表示"}
                 {props.item.textValue === "bot" && "Bot管理"}
               </SelectItem>
-            }
+            )}
           >
             <SelectTrigger aria-label="manage-display-mode">
               <SelectValue<TConfigTab>>
-                {
-                  (state) =>
+                {(state) => (
                   <span class="flex items-center">
-                    { state.selectedOption() === "profile" && <p>プロフィール</p> }
-                    { state.selectedOption() === "session" && <p>セッション管理</p> }
-                    { state.selectedOption() === "chat" && <p>会話</p> }
-                    { state.selectedOption() === "notification" && <p>通知</p> }
-                    { state.selectedOption() === "display" && <p>表示</p> }
-                    { state.selectedOption() === "bot" && <p>Bot管理</p> }
+                    {state.selectedOption() === "profile" && (
+                      <p>プロフィール</p>
+                    )}
+                    {state.selectedOption() === "session" && (
+                      <p>セッション管理</p>
+                    )}
+                    {state.selectedOption() === "chat" && <p>会話</p>}
+                    {state.selectedOption() === "notification" && <p>通知</p>}
+                    {state.selectedOption() === "display" && <p>表示</p>}
+                    {state.selectedOption() === "bot" && <p>Bot管理</p>}
                   </span>
-                }
+                )}
               </SelectValue>
             </SelectTrigger>
             <SelectContent />
@@ -83,48 +112,48 @@ export default function Config() {
         <div class="shrink-0 pb-2 h-full w-64 hidden md:inline">
           <Card class="p-2 h-full w-full flex flex-col gap-1 overflow-y-auto text-left">
             <SidebarMenuButton
-              onClick={()=>setDisplayMode("profile")}
-              variant={displayMode()==="profile"?"outline":"default"}
+              onClick={() => setDisplayMode("profile")}
+              variant={displayMode() === "profile" ? "outline" : "default"}
               size={"lg"}
             >
               <IconUser />
               プロフィール
             </SidebarMenuButton>
             <SidebarMenuButton
-              onClick={()=>setDisplayMode("session")}
-              variant={displayMode()==="session"?"outline":"default"}
+              onClick={() => setDisplayMode("session")}
+              variant={displayMode() === "session" ? "outline" : "default"}
               size={"lg"}
             >
               <IconKey />
               セッション管理
             </SidebarMenuButton>
             <SidebarMenuButton
-              onClick={()=>setDisplayMode("chat")}
-              variant={displayMode()==="chat"?"outline":"default"}
+              onClick={() => setDisplayMode("chat")}
+              variant={displayMode() === "chat" ? "outline" : "default"}
               size={"lg"}
             >
               <IconHash />
               会話
             </SidebarMenuButton>
             <SidebarMenuButton
-              onClick={()=>setDisplayMode("notification")}
-              variant={displayMode()==="notification"?"outline":"default"}
+              onClick={() => setDisplayMode("notification")}
+              variant={displayMode() === "notification" ? "outline" : "default"}
               size={"lg"}
             >
               <IconBell />
               通知
             </SidebarMenuButton>
             <SidebarMenuButton
-              onClick={()=>setDisplayMode("display")}
-              variant={displayMode()==="display"?"outline":"default"}
+              onClick={() => setDisplayMode("display")}
+              variant={displayMode() === "display" ? "outline" : "default"}
               size={"lg"}
             >
               <IconEye />
               表示
             </SidebarMenuButton>
             <SidebarMenuButton
-              onClick={()=>setDisplayMode("bot")}
-              variant={displayMode()==="bot"?"outline":"default"}
+              onClick={() => setDisplayMode("bot")}
+              variant={displayMode() === "bot" ? "outline" : "default"}
               size={"lg"}
             >
               <IconRobot />
@@ -134,15 +163,14 @@ export default function Config() {
         </div>
 
         <div class="overflow-y-auto h-full grow md:px-2 md:pt-0 pt-4">
-          { displayMode()==="profile" && <ConfigProfile /> }
-          { displayMode()==="session" && <ConfigSession /> }
-          { displayMode()==="chat" && <ConfigChat /> }
-          { displayMode()==="display" && <ConfigDisplay /> }
-          { displayMode()==="notification" && <ConfigNotification /> }
-          { displayMode()==="bot" && <ConfigBot /> }
+          {displayMode() === "profile" && <ConfigProfile />}
+          {displayMode() === "session" && <ConfigSession />}
+          {displayMode() === "chat" && <ConfigChat />}
+          {displayMode() === "display" && <ConfigDisplay />}
+          {displayMode() === "notification" && <ConfigNotification />}
+          {displayMode() === "bot" && <ConfigBot />}
         </div>
-
       </div>
     </div>
-  )
+  );
 }
