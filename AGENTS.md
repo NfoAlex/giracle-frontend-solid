@@ -38,7 +38,9 @@ npx biome check --write .         # lint + format 自動修正
 - `--skipLibCheck` 付けても **src 配下に既存型エラー約20件**（`src/routes/channel/[id].tsx`、`src/WS/Message/ReadTimeUpdate.ts`、`ChannelTextInput` 周辺等）。「エラー0件」を合格基準にするな。**変更前後でエラー件数・内容比較 → 自分の変更で新規エラー増やしていないこと**が確認基準。
 
 - テスト無し。テストランナーも未導入。
-- Lint/format は Biome（[biome.json](biome.json)）。対象 `**/*.ts`（`src/components/ui` 除外）。ダブルクォート・スペース2幅・行幅80・import 自動整理（`organizeImports`）。`biome-ignore` コメントで個別除外可。npm script 未定義 → `npx biome check .` / `npx biome check --write .` 直接実行。
+- Lint/format は Biome（[biome.json](biome.json)）。対象 `**/*.ts` `**/*.tsx`（`src/components/ui` 除外）。ダブルクォート・スペース2幅・行幅80・import 自動整理（`organizeImports`）。`biome-ignore` コメントで個別除外可。npm script 未定義 → `npx biome check .` / `npx biome check --write .` 直接実行。
+- Solid 固有ルールは Biome の `solid` ドメイン由来の2つのみ有効化済み（`correctness/noSolidDestructuredProps`、`performance/useSolidForComponent`。どちらも recommended 外なので個別指定）。Biome は Solid のリアクティビティ（`solid/reactivity` 相当）を検査しない。
+- 注意: `.tsx` を対象に含めた時点で見つかった既存違反は約180件（大半は `format` と `organizeImports` の未適用）。`.ts` 側にも既存違反13件あり。「違反0件」を合格基準にするな。**変更前後で件数・内容を比較**する。
 
 ## 環境変数
 
