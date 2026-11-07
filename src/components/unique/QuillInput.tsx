@@ -142,8 +142,8 @@ export default function QuillInput(props: IQuillInputProps) {
     if (query.length >= 1) scheduleSearch(trigger, query);
   };
 
-  const scheduleUrlFormat = (index: number) => {
-    renderQueueInput.add(index);
+  // キューに積まれた行を次フレームでまとめて処理するだけ（index は受け取らない）
+  const scheduleUrlFormat = () => {
     if (urlRaf) return;
     urlRaf = requestAnimationFrame(() => {
       urlRaf = 0;
@@ -185,7 +185,7 @@ export default function QuillInput(props: IQuillInputProps) {
         index += op.retain;
       }
     }
-    scheduleUrlFormat(index);
+    scheduleUrlFormat();
     // Quill はタイピング時の selection-change を silent で出すため、入力時は text-change から検出する
     if (!composing) detectMention(quill?.getSelection()?.index ?? index);
   };
@@ -275,7 +275,9 @@ export default function QuillInput(props: IQuillInputProps) {
     quill.root.addEventListener("compositionend", () => {
       composing = false;
       const index = quill?.getSelection()?.index ?? 0;
-      scheduleUrlFormat(index);
+      // 変換中はキューを捨てているので、確定位置の行を改めて積む
+      renderQueueInput.add(index);
+      scheduleUrlFormat();
       detectMention(index);
     });
 
