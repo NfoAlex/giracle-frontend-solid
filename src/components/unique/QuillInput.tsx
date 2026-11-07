@@ -296,6 +296,9 @@ export default function QuillInput(props: IQuillInputProps) {
     wrapperEl.addEventListener("keydown", onKeyDown, true);
     wrapperEl.addEventListener("paste", onPaste);
 
+    // <img> は送信テキストに落とせず、表示と送信内容が食い違うため貼り付け時に捨てる
+    quill.clipboard.addMatcher("img", () => new Delta());
+
     // エディタ内コピペでチップをプレーンテキストに崩さない
     quill.clipboard.addMatcher(".quill-input-mention", (node) => {
       return new Delta().insert({
