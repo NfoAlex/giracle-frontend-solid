@@ -36,6 +36,7 @@ const CLOSED: IMentionState = {
 };
 const TRIGGER_CONTEXT_LENGTH = 64;
 const SEARCH_DEBOUNCE_MS = 200;
+const URL_DECORATE_BUDGET_MS = 8; // 1 フレームあたりの行内装飾の上限時間
 
 export default function QuillInput(props: IQuillInputProps) {
   let hostEl!: HTMLDivElement;
@@ -156,19 +157,23 @@ export default function QuillInput(props: IQuillInputProps) {
     scheduleSearch(trigger, query);
   };
 
-  // キューに積まれた行を次フレームでまとめて処理するだけ（index は受け取らない）
+  // キューに積まれた行を次フレーム以降で少しずつ処理する（大量貼り付けでも 1 フレームを塞がない）
   const scheduleUrlFormat = () => {
     if (urlRaf) return;
     urlRaf = requestAnimationFrame(() => {
       urlRaf = 0;
-      if (composing) {
+      if (composing || !quill) {
         renderQueueInput.clear();
         return;
       }
-      const lines = [...renderQueueInput];
-      renderQueueInput.clear();
-      if (!quill) return;
-      for (const i of lines) applyInlinePatterns(quill, i);
+      // formatText は文書全体を走査するため、行数ではなく時間で区切る
+      const deadline = performance.now() + URL_DECORATE_BUDGET_MS;
+      for (const i of renderQueueInput) {
+        applyInlinePatterns(quill, i);
+        renderQueueInput.delete(i);
+        if (performance.now() >= deadline) break;
+      }
+      if (renderQueueInput.size > 0) scheduleUrlFormat();
     });
   };
 
