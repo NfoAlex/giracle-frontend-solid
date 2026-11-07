@@ -22,6 +22,7 @@ interface IMentionState {
   index: number; // トリガー文字の絶対 index
   items: IQuillInputTriggerItem[];
   selectIndex: number;
+  searching: boolean; // 検索が flight 中（パネルの "..." 表示用）
 }
 
 const CLOSED: IMentionState = {
@@ -31,6 +32,7 @@ const CLOSED: IMentionState = {
   index: 0,
   items: [],
   selectIndex: 0,
+  searching: false,
 };
 const TRIGGER_CONTEXT_LENGTH = 64;
 const SEARCH_DEBOUNCE_MS = 200;
@@ -89,10 +91,11 @@ export default function QuillInput(props: IQuillInputProps) {
         const current = mention();
         if (seq !== searchSeq || !current.open) return;
         if (current.trigger !== trigger || current.query !== query) return;
-        setMention({ ...current, items, selectIndex: 0 });
+        setMention({ ...current, items, selectIndex: 0, searching: false });
       } catch (e) {
         console.error("QuillInput :: search : e->", e);
-        if (seq === searchSeq) setMention({ ...mention(), items: [] });
+        if (seq === searchSeq)
+          setMention({ ...mention(), items: [], searching: false });
       }
     }, SEARCH_DEBOUNCE_MS);
   };
@@ -123,23 +126,34 @@ export default function QuillInput(props: IQuillInputProps) {
     const trigger = match[1];
     const query = match[2];
     const current = mention();
-    // 同一トリガー・同一クエリなら状態を触らない（毎キー再レンダー防止）
+    // クエリが空（"@" だけ）の間は候補もパネルも出さない。Enter を奪わないため
+    if (query.length === 0) {
+      if (current.open) setMention(CLOSED);
+      return;
+    }
+    const triggerIndex = index - query.length - 1;
+    // 同一トリガー・同一クエリなら検索結果は使い回し、トリガー位置だけ更新する
+    // （位置を比較しないと、別出現箇所へジャンプした際に古い index のまま置換してしまう）
     if (
       current.open &&
       current.trigger === trigger &&
       current.query === query
     ) {
+      if (current.index !== triggerIndex) {
+        setMention({ ...current, index: triggerIndex });
+      }
       return;
     }
     setMention({
       open: true,
       trigger,
       query,
-      index: index - query.length - 1,
+      index: triggerIndex,
       items: [],
       selectIndex: 0,
+      searching: true,
     });
-    if (query.length >= 1) scheduleSearch(trigger, query);
+    scheduleSearch(trigger, query);
   };
 
   // キューに積まれた行を次フレームでまとめて処理するだけ（index は受け取らない）
@@ -203,37 +217,33 @@ export default function QuillInput(props: IQuillInputProps) {
 
   const onKeyDown = (e: KeyboardEvent) => {
     // IME 変換確定の Enter を送信・候補確定に使わない
-    if (e.isComposing) return;
+    // Safari は変換確定 Enter で isComposing が false になるため keyCode 229 も見る
+    if (e.isComposing || e.keyCode === 229) return;
 
     const m = mention();
-    if (m.open) {
+    if (m.open && e.key === "Escape") {
+      e.preventDefault();
+      setMention(CLOSED);
+      return;
+    }
+    // 候補が無い間（検索中・0 件）は Enter/Tab/矢印を奪わない
+    if (m.open && m.items.length > 0) {
       switch (e.key) {
         case "ArrowDown":
           e.preventDefault();
-          if (m.items.length > 0) {
-            setMention({
-              ...m,
-              selectIndex: Math.min(m.selectIndex + 1, m.items.length - 1),
-            });
-          }
+          setMention({
+            ...m,
+            selectIndex: Math.min(m.selectIndex + 1, m.items.length - 1),
+          });
           return;
         case "ArrowUp":
           e.preventDefault();
-          if (m.items.length > 0) {
-            setMention({ ...m, selectIndex: Math.max(m.selectIndex - 1, 0) });
-          }
+          setMention({ ...m, selectIndex: Math.max(m.selectIndex - 1, 0) });
           return;
         case "Enter":
-        case "Tab": {
+        case "Tab":
           e.preventDefault();
-          const item = m.items[m.selectIndex];
-          if (item) selectMention(item);
-          else setMention(CLOSED);
-          return;
-        }
-        case "Escape":
-          e.preventDefault();
-          setMention(CLOSED);
+          selectMention(m.items[m.selectIndex]);
           return;
         default:
           return;
@@ -243,6 +253,7 @@ export default function QuillInput(props: IQuillInputProps) {
     if (e.key !== "Enter" || e.shiftKey) return;
     if (props.submitWithCtrlKey && !e.ctrlKey && !e.metaKey) return;
     e.preventDefault();
+    if (m.open) setMention(CLOSED);
     props.onSubmit?.(getText());
   };
 
@@ -320,7 +331,9 @@ export default function QuillInput(props: IQuillInputProps) {
       <Show when={mention().open}>
         <Card class="absolute left-0 bottom-full mb-1 z-10 w-full max-h-40 overflow-y-auto p-2 border-b-0 cursor-pointer">
           <Show when={mention().items.length === 0}>
-            <p class="text-center">...</p>
+            <p class="text-center text-muted-foreground">
+              {mention().searching ? "..." : "候補なし"}
+            </p>
           </Show>
           <For each={mention().items}>
             {(item, index) => (
