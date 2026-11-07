@@ -36,7 +36,9 @@ const CLOSED: IMentionState = {
 };
 const TRIGGER_CONTEXT_LENGTH = 64;
 const SEARCH_DEBOUNCE_MS = 200;
-const URL_DECORATE_BUDGET_MS = 8; // 1 フレームあたりの行内装飾の上限時間
+// shortcut: 1 フレームで装飾する行数の上限。1000 行ドキュメントで updateContents 1 回は
+// 256 行 ≒ 3ms / 1000 行 ≒ 10ms（実測）なので 256 で頭打ちにする
+const URL_DECORATE_MAX_LINES = 256;
 
 export default function QuillInput(props: IQuillInputProps) {
   let hostEl!: HTMLDivElement;
@@ -166,13 +168,14 @@ export default function QuillInput(props: IQuillInputProps) {
         renderQueueInput.clear();
         return;
       }
-      // formatText は文書全体を走査するため、行数ではなく時間で区切る
-      const deadline = performance.now() + URL_DECORATE_BUDGET_MS;
+      // 1 フレーム分の行をまとめ、文書更新は 1 回だけにする
+      const batch: number[] = [];
       for (const i of renderQueueInput) {
-        applyInlinePatterns(quill, i);
+        batch.push(i);
         renderQueueInput.delete(i);
-        if (performance.now() >= deadline) break;
+        if (batch.length >= URL_DECORATE_MAX_LINES) break;
       }
+      applyInlinePatterns(quill, batch);
       if (renderQueueInput.size > 0) scheduleUrlFormat();
     });
   };
