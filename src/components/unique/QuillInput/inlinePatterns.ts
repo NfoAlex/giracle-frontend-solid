@@ -30,9 +30,12 @@ export function applyInlinePatterns(
   index: number,
   patterns: IQuillInputInlinePattern[] = DEFAULT_INLINE_PATTERNS,
 ): void {
+  //該当箇所のBlockを取得
   const bounded = Math.max(0, Math.min(index, quill.getLength() - 1));
   const [line] = quill.getLine(bounded);
   if (!line) return;
+
+  //該当行の開始位置と文字数
   const lineStart = quill.getIndex(line);
   const lineLength = line.length() - 1; // Block の長さは末尾 "\n" を含む
   if (lineLength <= 0) return;
@@ -41,11 +44,12 @@ export function applyInlinePatterns(
   const segments: ILineSegment[] = [];
   let text = "";
   for (const op of quill.getContents(lineStart, lineLength).ops) {
+    // \uFFFC はオブジェクトのプレイスホルダーを示すUnicode文字
     const str = typeof op.insert === "string" ? op.insert : "\uFFFC";
     segments.push({
       start: text.length,
       end: text.length + str.length,
-      attributes: op.attributes,
+      attributes: op.attributes, //formatオブジェクト。 { url: true } や { mention: { trigger: ... } } など
     });
     text += str;
   }
@@ -55,6 +59,7 @@ export function applyInlinePatterns(
     const re = pattern.flags.includes("g")
       ? pattern
       : new RegExp(pattern.source, `${pattern.flags}g`);
+    //gがつくことによりlastIndex開始にできる
     re.lastIndex = 0;
     const ranges: ILineSegment[] = [];
     for (let m = re.exec(text); m; m = re.exec(text)) {
