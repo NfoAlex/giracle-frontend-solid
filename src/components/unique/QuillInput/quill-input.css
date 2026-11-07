@@ -19,6 +19,12 @@
   font-style: normal;
 }
 
+/* Quill core の .ql-editor { outline: none } を打ち消す */
+.ql-editor:focus {
+  outline: 2px solid hsl(var(--ring));
+  outline-offset: -2px;
+}
+
 .quill-input-url {
   @apply underline break-all text-blue-500;
 }
