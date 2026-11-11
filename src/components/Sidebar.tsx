@@ -8,9 +8,8 @@ import {
   IconSettings,
   IconUser,
 } from "@tabler/icons-solidjs";
-import { createSignal, Show } from "solid-js";
+import { Show } from "solid-js";
 import { Badge } from "~/components/ui/badge.tsx";
-import { Popover, PopoverTrigger } from "~/components/ui/popover.tsx";
 import {
   Sidebar,
   SidebarContent,
@@ -28,23 +27,16 @@ import {
 } from "~/stores/MyUserinfo.store.ts";
 import { storeServerinfo } from "~/stores/Serverinfo.store.ts";
 import { storeUserOnline } from "~/stores/Userinfo.store.ts";
-import MinesweeperPopup from "./Minesweeper/MinesweeperPopup.tsx";
 import ChannelButtons from "./Sidebar/ChannelButtons.tsx";
 import { Avatar, AvatarImage } from "./ui/avatar.tsx";
 
 export function AppSidebar() {
   const loc = useLocation();
-  const [isMinesweeperOpen, setIsMinesweeperOpen] = createSignal(false);
 
   return (
     <Sidebar class={"h-screen"}>
       <SidebarHeader>
-        <Popover open={isMinesweeperOpen()} onOpenChange={setIsMinesweeperOpen}>
-          <PopoverTrigger class="w-fit appearance-none border-0 bg-transparent p-0 text-left text-sidebar-foreground hover:bg-transparent">
-            <p class="text-xl">{storeServerinfo.name}</p>
-          </PopoverTrigger>
-          <MinesweeperPopup isOpen={isMinesweeperOpen()} />
-        </Popover>
+        <p class="text-xl">{storeServerinfo.name}</p>
       </SidebarHeader>
 
       <SidebarContent id={"sidebar-content flex flex-col"} class={"gap-0"}>

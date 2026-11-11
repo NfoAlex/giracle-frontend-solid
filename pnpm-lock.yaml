@@ -175,9 +175,6 @@ importers:
       '@kobalte/core':
         specifier: ^0.13.14
         version: 0.13.14(solid-js@1.9.18)
-      '@maxxam0n/minesweeper-engine':
-        specifier: ^0.3.0
-        version: 0.3.0
       '@solidjs/router':
         specifier: ^1.0.1
         version: 1.0.1(solid-js@1.9.18)
@@ -875,9 +872,6 @@ packages:
     resolution: {integrity: sha512-jRVXr+zsVHxzDXRoh+CDeXzvCsFJ6uiHhqqNQ26Cw9ZsZ3D6nqPUBt1gGVtj2ZPmRL3a9Uk1v8D1aJ8/I12Dow==}
     peerDependencies:
       solid-js: ^1.8.8
-
-  '@maxxam0n/minesweeper-engine@0.3.0':
-    resolution: {integrity: sha512-T3hLEbzX0V5jIle2YM/XPDI+sOie8A5kHkZSmbvTrDdjVlyOqU0TqO/5qCywEuPI6BxFt5n1OfB6jSOf9KfzuA==}
 
   '@nodelib/fs.scandir@2.1.5':
     resolution: {integrity: sha512-vq24Bq3ym5HEQm2NKCr3yXDwjc7vTsEThRDnkp2DK9p1uqLR+DHurm/NOTo0KG7HYHU7eppKZj3MyqYuMBf62g==}
@@ -3528,8 +3522,6 @@ snapshots:
       '@solid-primitives/refs': 1.1.4(solid-js@1.9.18)
       '@solid-primitives/utils': 6.4.1(solid-js@1.9.18)
       solid-js: 1.9.18
-
-  '@maxxam0n/minesweeper-engine@0.3.0': {}
 
   '@nodelib/fs.scandir@2.1.5':
     dependencies:
