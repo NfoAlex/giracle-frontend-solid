@@ -518,7 +518,13 @@ export const routes: MockRoute[] = [
     method: "GET",
     pattern: /^\/api\/server\/log-group$/,
     handler: (ctx) => {
-      json(ctx.res, "Fetched log group", { group: [], firstDayLog: undefined });
+      const date =
+        ctx.url.searchParams.get("cursorLogDate") ??
+        new Date().toLocaleDateString("sv-SE", { timeZone: "Asia/Tokyo" });
+      json(ctx.res, "Fetched log group", {
+        group: [{ date, successCount: 0, errorCount: 0, otherCount: 0 }],
+        firstDayLog: [],
+      });
     },
   },
   {
