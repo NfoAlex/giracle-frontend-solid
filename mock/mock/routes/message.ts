@@ -4,13 +4,8 @@ import type {
   IMessage,
   IMessageFileAttached,
 } from "../../../src/types/Message.ts";
-import { json, type MockRoute, text } from "../http.ts";
-import { serializeMessage, userById, uuid } from "../store.ts";
-
-const obj = (body: unknown): Record<string, unknown> =>
-  body !== null && typeof body === "object"
-    ? (body as Record<string, unknown>)
-    : {};
+import { json, type MockRoute, obj, parseMultipart, text } from "../http.ts";
+import { canViewChannel, serializeMessage, userById, uuid } from "../store.ts";
 
 const PNG_1X1 = Buffer.from(
   "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==",
@@ -312,19 +307,35 @@ export const routes: MockRoute[] = [
       const content = q.get("content");
       const channelId = q.get("channelId");
       const userId = q.get("userId");
+      const hasUrlPreview = q.get("hasUrlPreview");
+      const hasFileAttachment = q.get("hasFileAttachment");
+      const sort = q.get("sort");
+      // フロントは loadIndex を 1 始まりで送る。ページサイズは src/routes/search.tsx と一致させる
+      const loadIndex = Number(q.get("loadIndex") ?? 0) || 0;
+      const offset = loadIndex > 0 ? (loadIndex - 1) * 30 : 0;
       const data = ctx.store.messages
-        .filter(
-          (m) =>
+        .filter((m) => {
+          const channel = ctx.store.channels.find((c) => c.id === m.channelId);
+          if (channel === undefined || !canViewChannel(ctx.userId, channel))
+            return false;
+          return (
             (content === null ||
               m.content.toLowerCase().includes(content.toLowerCase())) &&
             (channelId === null || m.channelId === channelId) &&
-            (userId === null || m.userId === userId),
-        )
-        .sort(
-          (a, b) =>
-            new Date(b.createdAt).valueOf() - new Date(a.createdAt).valueOf(),
-        )
-        .slice(0, 50)
+            (userId === null || m.userId === userId) &&
+            (hasUrlPreview === null ||
+              m.MessageUrlPreview.length > 0 === (hasUrlPreview === "true")) &&
+            (hasFileAttachment === null ||
+              m.MessageFileAttached.length > 0 ===
+                (hasFileAttachment === "true"))
+          );
+        })
+        .sort((a, b) => {
+          const diff =
+            new Date(a.createdAt).valueOf() - new Date(b.createdAt).valueOf();
+          return sort === "asc" ? diff : -diff;
+        })
+        .slice(offset, offset + 30)
         .map((m) => serializeMessage(m, ctx.userId));
       json(ctx.res, "Searched messages", data);
     },
@@ -379,6 +390,13 @@ export const routes: MockRoute[] = [
     handler: (ctx) => {
       const message = ctx.store.messages.find((m) => m.id === ctx.params[0]);
       if (message === undefined) {
+        text(ctx.res, 404, "Message not found");
+        return;
+      }
+      const channel = ctx.store.channels.find(
+        (c) => c.id === message.channelId,
+      );
+      if (channel === undefined || !canViewChannel(ctx.userId, channel)) {
         text(ctx.res, 404, "Message not found");
         return;
       }
