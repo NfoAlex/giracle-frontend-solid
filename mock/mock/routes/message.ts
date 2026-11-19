@@ -354,15 +354,17 @@ export const routes: MockRoute[] = [
     pattern: /^\/api\/message\/file\/upload$/,
     handler: (ctx) => {
       const id = uuid();
+      const parts = parseMultipart(ctx.rawBody);
+      const file = parts.find((p) => p.name === "file");
       ctx.store.files[id] = {
         id,
         userId: ctx.userId,
         channelId: "",
         messageId: null,
-        actualFileName: "uploaded-file",
+        actualFileName: file?.filename ?? "uploaded-file",
         savedFileName: id,
-        size: 0,
-        type: "application/octet-stream",
+        size: file?.data.length ?? 0,
+        type: file?.contentType ?? "application/octet-stream",
       };
       ctx.res.statusCode = 200;
       ctx.res.setHeader("Content-Type", "application/json; charset=utf-8");

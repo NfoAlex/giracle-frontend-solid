@@ -4,15 +4,12 @@ import {
   json,
   type MockCtx,
   type MockRoute,
+  obj,
+  parseMultipart,
   setTokenCookie,
   text,
 } from "../http.ts";
 import { isJoined, publicUser, userById, uuid } from "../store.ts";
-
-const obj = (body: unknown): Record<string, unknown> =>
-  body !== null && typeof body === "object"
-    ? (body as Record<string, unknown>)
-    : {};
 
 const escapeXml = (value: string) => {
   const table: Record<string, string> = {
@@ -424,9 +421,12 @@ export const routes: MockRoute[] = [
     method: "PUT",
     pattern: /^\/api\/server\/custom-emoji\/upload$/,
     handler: (ctx) => {
+      const parts = parseMultipart(ctx.rawBody);
+      const codePart = parts.find((p) => p.name === "emojiCode");
+      const code = codePart?.data.toString("utf8").trim() ?? "";
       const emoji = {
         id: uuid(),
-        code: `emoji${ctx.store.customEmojis.length + 1}`,
+        code: code !== "" ? code : `emoji${ctx.store.customEmojis.length + 1}`,
         uploadedUserId: ctx.userId,
       };
       ctx.store.customEmojis.push(emoji);
