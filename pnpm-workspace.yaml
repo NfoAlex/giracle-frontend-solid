@@ -1,3 +1,5 @@
 # for solid-ui
 overrides:
   "tailwindcss": "^3.4.19"
+  # glob@11はdeprecatedかつminimatch 10系DoS脆弱性の経路。workbox-buildの動作保証外のため要ビルド検証
+  "glob": "14.0.6"
