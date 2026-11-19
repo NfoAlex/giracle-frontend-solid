@@ -23,6 +23,14 @@ export function attachMockWs(httpServer: HttpServer, store: IMockStore) {
     }
   };
 
+  // 実 backend は channel::<id> トピックへ publish するため、参加者だけへ送る
+  hub.toChannel = (channelId, signal, data) => {
+    for (const [ws, id] of clients) {
+      if (store.joins.some((j) => j.userId === id && j.channelId === channelId))
+        sendPayload(ws, signal, data);
+    }
+  };
+
   httpServer.on("upgrade", (req, socket, head) => {
     const { pathname } = new URL(req.url ?? "/", "http://localhost");
     // Vite の HMR など他 upgrade は素通し（サーバ側で別途処理される）
@@ -57,6 +65,8 @@ export function attachMockWs(httpServer: HttpServer, store: IMockStore) {
           // フロントは ping 以外送らないため無視
         }
       });
+
+      ws.on("error", () => ws.close());
 
       ws.on("close", () => {
         clients.delete(ws);

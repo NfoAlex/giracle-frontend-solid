@@ -54,11 +54,13 @@ export interface IMockStore extends IMockSeed {
 export interface MockHub {
   broadcast(signal: string, data: unknown): void;
   toUser(userId: string, signal: string, data: unknown): void;
+  toChannel(channelId: string, signal: string, data: unknown): void;
 }
 
 export const hub: MockHub = {
   broadcast() {},
   toUser() {},
+  toChannel() {},
 };
 
 export const store: IMockStore = {

@@ -46,7 +46,11 @@ export const routes: MockRoute[] = [
         reactionSummary: [],
       };
       ctx.store.messages.push(message);
-      ctx.hub.broadcast("message::SendMessage", serializeMessage(message, ""));
+      ctx.hub.toChannel(
+        channelId,
+        "message::SendMessage",
+        serializeMessage(message, ""),
+      );
 
       const happendAt = new Date().toISOString();
       const notified = new Set<string>();
@@ -106,7 +110,7 @@ export const routes: MockRoute[] = [
       }
       if (typeof b.message === "string") message.content = b.message;
       message.isEdited = true;
-      ctx.hub.broadcast("message::UpdateMessage", {
+      ctx.hub.toChannel(message.channelId, "message::UpdateMessage", {
         id: message.id,
         content: message.content,
         channelId: message.channelId,
@@ -134,6 +138,7 @@ export const routes: MockRoute[] = [
       ctx.store.inbox = ctx.store.inbox.filter(
         (i) => i.messageId !== messageId,
       );
+      // 実 backend は GLOBAL へ publish する（未参加でも履歴保持者に削除を届ける）
       ctx.hub.broadcast("message::MessageDeleted", {
         messageId,
         channelId: message.channelId,
@@ -164,7 +169,7 @@ export const routes: MockRoute[] = [
       };
       if (existing === undefined) {
         ctx.store.reactions.push(reaction);
-        ctx.hub.broadcast("message::AddReaction", reaction);
+        ctx.hub.toChannel(channelId, "message::AddReaction", reaction);
       }
       json(ctx.res, "Message reacted.", reaction);
     },
@@ -187,7 +192,11 @@ export const routes: MockRoute[] = [
         return;
       }
       const [reaction] = ctx.store.reactions.splice(index, 1);
-      ctx.hub.broadcast("message::DeleteReaction", reaction);
+      ctx.hub.toChannel(
+        reaction.channelId,
+        "message::DeleteReaction",
+        reaction,
+      );
       json(ctx.res, "Message reacted.", reaction);
     },
   },
