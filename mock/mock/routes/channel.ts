@@ -1,5 +1,5 @@
 import type { IChannel } from "../../../src/types/Channel.ts";
-import { json, type MockRoute, text } from "../http.ts";
+import { json, type MockRoute, obj, text } from "../http.ts";
 import {
   canViewChannel,
   channelMessages,
@@ -7,11 +7,6 @@ import {
   serializeMessage,
   uuid,
 } from "../store.ts";
-
-const obj = (body: unknown): Record<string, unknown> =>
-  body !== null && typeof body === "object"
-    ? (body as Record<string, unknown>)
-    : {};
 
 export const routes: MockRoute[] = [
   {
@@ -30,7 +25,7 @@ export const routes: MockRoute[] = [
     pattern: /^\/api\/channel\/get-info\/([^/]+)$/,
     handler: (ctx) => {
       const channel = ctx.store.channels.find((c) => c.id === ctx.params[0]);
-      if (channel === undefined) {
+      if (channel === undefined || !canViewChannel(ctx.userId, channel)) {
         text(ctx.res, 404, "Channel not found");
         return;
       }
@@ -42,7 +37,9 @@ export const routes: MockRoute[] = [
     pattern: /^\/api\/channel\/get-history\/([^/]+)$/,
     handler: (ctx) => {
       const channelId = ctx.params[0];
-      if (!ctx.store.channels.some((c) => c.id === channelId)) {
+      const channel = ctx.store.channels.find((c) => c.id === channelId);
+      // 実 backend は権限不足も存在不明と同じ 404
+      if (channel === undefined || !canViewChannel(ctx.userId, channel)) {
         text(ctx.res, 404, "Channel not found");
         return;
       }
@@ -65,12 +62,13 @@ export const routes: MockRoute[] = [
       if (indexFrom !== -1) {
         if (b.fetchDirection === "newer") {
           const start = Math.max(0, indexFrom - len);
-          history = list.slice(start, indexFrom);
+          history = list.slice(start, indexFrom + 1);
           atEnd = start === 0;
           atTop = false;
         } else {
-          history = list.slice(indexFrom + 1, indexFrom + 1 + len);
-          atTop = indexFrom + 1 + len >= list.length;
+          // 実 backend は基準メッセージを含む（重複除去はフロント側が行う）
+          history = list.slice(indexFrom, indexFrom + len);
+          atTop = indexFrom + len >= list.length;
           atEnd = false;
         }
       } else if (
@@ -186,6 +184,22 @@ export const routes: MockRoute[] = [
       ctx.store.joins = ctx.store.joins.filter(
         (j) => j.channelId !== channelId,
       );
+      const removed = ctx.store.messages.filter(
+        (m) => m.channelId === channelId,
+      );
+      ctx.store.messages = ctx.store.messages.filter(
+        (m) => m.channelId !== channelId,
+      );
+      ctx.store.reactions = ctx.store.reactions.filter(
+        (r) => r.channelId !== channelId,
+      );
+      ctx.store.inbox = ctx.store.inbox.filter(
+        (i) => i.Message.channelId !== channelId,
+      );
+      for (const message of removed) {
+        for (const file of message.MessageFileAttached)
+          delete ctx.store.files[file.id];
+      }
       ctx.hub.broadcast("channel::Deleted", { channelId });
       json(ctx.res, "Channel deleted");
     },
