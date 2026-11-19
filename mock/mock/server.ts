@@ -20,22 +20,30 @@ const PUBLIC_PATHS = new Set([
   "/api/server/config",
 ]);
 
-const readBody = async (req: IncomingMessage): Promise<unknown> => {
+const readBody = async (
+  req: IncomingMessage,
+): Promise<{
+  body: unknown;
+  rawBody?: { buffer: Buffer; contentType: string };
+}> => {
   const chunks: Buffer[] = [];
   for await (const chunk of req) chunks.push(chunk as Buffer);
-  if (chunks.length === 0) return undefined;
+  if (chunks.length === 0) return { body: undefined };
+  const buffer = Buffer.concat(chunks);
   const contentType = req.headers["content-type"] ?? "";
-  if (!contentType.includes("application/json")) return undefined;
-  try {
-    return JSON.parse(Buffer.concat(chunks).toString("utf8"));
-  } catch {
-    return undefined;
+  if (contentType.includes("application/json")) {
+    try {
+      return { body: JSON.parse(buffer.toString("utf8")) };
+    } catch {
+      return { body: undefined };
+    }
   }
+  return { body: undefined, rawBody: { buffer, contentType } };
 };
 
 const handle = async (req: IncomingMessage, res: ServerResponse, url: URL) => {
   const method = req.method ?? "GET";
-  const body = await readBody(req);
+  const { body, rawBody } = await readBody(req);
 
   const matched = ROUTES.map((route) => {
     if (route.method !== method) return undefined;
@@ -60,11 +68,10 @@ const handle = async (req: IncomingMessage, res: ServerResponse, url: URL) => {
   }
 
   const ctx: MockCtx = {
-    req,
     res,
     url,
-    method,
     body,
+    rawBody,
     params: matched.params,
     userId,
     store,
