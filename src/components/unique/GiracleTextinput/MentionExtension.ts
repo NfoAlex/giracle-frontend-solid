@@ -18,6 +18,7 @@ import {
   KEY_ESCAPE_COMMAND,
   type LexicalEditor,
   mergeRegister,
+  type TextNode,
 } from "lexical";
 import { api } from "~/api/index.ts";
 import type { IUser } from "~/types/User.ts";
@@ -45,29 +46,39 @@ export const EMPTY_MENTION_STATE: MentionState = {
   selectIndex: 0,
 };
 
+/** カーソル直前の未確定 `@query` を取得する(確定済み `@<user-id>` は対象外) */
+function $getMentionQuery(): {
+  anchorNode: TextNode;
+  offset: number;
+  query: string;
+  matchLength: number;
+} | null {
+  const selection = $getSelection();
+  if (!$isRangeSelection(selection) || !selection.isCollapsed()) return null;
+  const anchorNode = selection.anchor.getNode();
+  if (!$isTextNode(anchorNode) || $isMentionNode(anchorNode)) return null;
+  const offset = selection.anchor.offset;
+  const match = /@(\S*)$/.exec(anchorNode.getTextContent().slice(0, offset));
+  if (!match || match[1].startsWith("<")) return null;
+  return { anchorNode, offset, query: match[1], matchLength: match[0].length };
+}
+
 /**
  * メンションユーザーの挿入
  * カーソル直前の `@query` をMentionNodeへ置換し、直後にスペースを挿入する
  */
 export function $insertMention(editor: LexicalEditor, user: IUser): void {
   editor.update(() => {
-    const selection = $getSelection();
-    if (!$isRangeSelection(selection) || !selection.isCollapsed()) return;
-
-    const anchorNode = selection.anchor.getNode();
-    if (!$isTextNode(anchorNode) || $isMentionNode(anchorNode)) return;
-
-    const offset = selection.anchor.offset;
-    const match = /@(\S*)$/.exec(anchorNode.getTextContent().slice(0, offset));
-    // 確定済みの `@<user-id>` は置換対象にしない
-    if (!match || match[1].startsWith("<")) return;
+    const found = $getMentionQuery();
+    if (!found) return;
+    const { anchorNode, offset, matchLength } = found;
 
     // `@query` 部分だけを切り出す(前後のテキストは残す)
-    const start = offset - match[0].length;
+    const start = offset - matchLength;
     let target = start === 0 ? anchorNode : anchorNode.splitText(start)[1];
     if (!target) return;
-    if (target.getTextContentSize() > match[0].length) {
-      target = target.splitText(match[0].length)[0];
+    if (target.getTextContentSize() > matchLength) {
+      target = target.splitText(matchLength)[0];
     }
 
     const mentionNode = $createMentionNode(user.id);
@@ -98,6 +109,19 @@ export function defineMentionExtension(
 
       const reset = () => state.set(EMPTY_MENTION_STATE);
 
+      const removeRange = (
+        anchorKey: string,
+        anchorOffset: number,
+        focusKey: string,
+        focusOffset: number,
+      ) => {
+        const range = $createRangeSelection();
+        range.anchor.set(anchorKey, anchorOffset, "text");
+        range.focus.set(focusKey, focusOffset, "text");
+        $setSelection(range);
+        range.removeText();
+      };
+
       // 入力毎のAPI発火を避けるため200msでdebounceする
       const searchUser = (query: string) => {
         clearTimeout(searchTimer);
@@ -118,38 +142,13 @@ export function defineMentionExtension(
         // カーソル直前の `@query` を検出してメニュー状態を更新
         editor.registerUpdateListener(({ editorState }) => {
           editorState.read(() => {
+            const found = $getMentionQuery();
             const prev = state.signal();
-            const selection = $getSelection();
-            if (
-              !$isRangeSelection(selection) ||
-              !selection.isCollapsed() ||
-              !$isTextNode(selection.anchor.getNode())
-            ) {
+            if (!found) {
               if (prev.isEnabled) reset();
               return;
             }
-
-            const anchorNode = selection.anchor.getNode();
-            // メンションノード自身は検出対象外
-            if (
-              !$isTextNode(anchorNode) ||
-              anchorNode.getType() === "mention"
-            ) {
-              if (prev.isEnabled) reset();
-              return;
-            }
-
-            const before = anchorNode
-              .getTextContent()
-              .slice(0, selection.anchor.offset);
-            const match = /@(\S*)$/.exec(before);
-            // 確定済みの `@<user-id>` は検出しない
-            if (!match || match[1].startsWith("<")) {
-              if (prev.isEnabled) reset();
-              return;
-            }
-
-            const query = match[1];
+            const query = found.query;
             // 同じクエリなら検索結果や選択位置をそのまま維持する
             if (prev.isEnabled && prev.query === query) return;
             state.set({ isEnabled: true, query, users: [], selectIndex: 0 });
@@ -212,15 +211,12 @@ export function defineMentionExtension(
             // メンションノード上にカーソルがある場合はノード全体を削除
             if ($isMentionNode(anchorNode)) {
               event.preventDefault();
-              const range = $createRangeSelection();
-              range.anchor.set(anchorNode.getKey(), 0, "text");
-              range.focus.set(
+              removeRange(
+                anchorNode.getKey(),
+                0,
                 anchorNode.getKey(),
                 anchorNode.getTextContentSize(),
-                "text",
               );
-              $setSelection(range);
-              range.removeText();
               return true;
             }
             if (!$isTextNode(anchorNode)) return false;
@@ -237,11 +233,12 @@ export function defineMentionExtension(
             if (!isAtTokenEnd && !isOnSpacer) return false;
 
             event.preventDefault();
-            const range = $createRangeSelection();
-            range.anchor.set(prevNode.getKey(), 0, "text");
-            range.focus.set(anchorNode.getKey(), anchor.offset, "text");
-            $setSelection(range);
-            range.removeText();
+            removeRange(
+              prevNode.getKey(),
+              0,
+              anchorNode.getKey(),
+              anchor.offset,
+            );
             return true;
           },
           COMMAND_PRIORITY_HIGH,
