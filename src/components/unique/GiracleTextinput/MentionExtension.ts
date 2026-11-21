@@ -42,6 +42,10 @@ export interface MentionState {
   query: string;
   users: IUser[];
   selectIndex: number;
+  /** 候補を検索した時点の channelId(切替検出用) */
+  channelId: string | undefined;
+  /** debounce 検索が未完了の間 true(Enter の誤送信防止) */
+  isSearching: boolean;
 }
 
 export const EMPTY_MENTION_STATE: MentionState = {
@@ -49,6 +53,8 @@ export const EMPTY_MENTION_STATE: MentionState = {
   query: "",
   users: [],
   selectIndex: 0,
+  channelId: undefined,
+  isSearching: false,
 };
 
 /** カーソル直前の未確定 `@query` を取得する(確定済み `@<user-id>` は対象外) */
@@ -142,6 +148,11 @@ export function defineMentionExtension(
 
       const reset = () => state.set(EMPTY_MENTION_STATE);
 
+      const resolveChannelId = () =>
+        typeof options.channelId === "function"
+          ? options.channelId()
+          : options.channelId;
+
       const removeRange = (
         anchorKey: string,
         anchorOffset: number,
@@ -156,23 +167,32 @@ export function defineMentionExtension(
       };
 
       // 入力毎のAPI発火を避けるため200msでdebounceする
-      const searchUser = (query: string) => {
+      const searchUser = (query: string, channelId: string | undefined) => {
         clearTimeout(searchTimer);
         searchTimer = setTimeout(() => {
-          // チャンネル切り替え後も最新値を参照する
-          const channelId =
-            typeof options.channelId === "function"
-              ? options.channelId()
-              : options.channelId;
+          // 切替後の channelId と異なる = 古いチャンネル向けの検索なので破棄
+          if (resolveChannelId() !== channelId) return;
           api.user
             .list({ username: query, joinedChannel: channelId })
             .then((r) => {
               // 古いクエリの応答で新しい結果を上書きしない
               const current = state.signal();
               if (current.query !== query) return;
-              state.set({ ...current, users: r.data, selectIndex: 0 });
+              state.set({
+                ...current,
+                users: r.data,
+                selectIndex: 0,
+                isSearching: false,
+              });
             })
-            .catch((e) => console.error("MENTION_USER_SEARCH :: e->", e));
+            .catch((e) => {
+              console.error("MENTION_USER_SEARCH :: e->", e);
+              // 失敗時も isSearching を戻さないと Enter が握りつぶされ続ける
+              const current = state.signal();
+              if (current.query === query) {
+                state.set({ ...current, isSearching: false });
+              }
+            });
         }, 200);
       };
 
@@ -187,10 +207,23 @@ export function defineMentionExtension(
               return;
             }
             const query = found.query;
-            // 同じクエリなら検索結果や選択位置をそのまま維持する
-            if (prev.isEnabled && prev.query === query) return;
-            state.set({ isEnabled: true, query, users: [], selectIndex: 0 });
-            searchUser(query);
+            const channelId = resolveChannelId();
+            // 同じクエリかつ同一チャンネルなら検索結果や選択位置をそのまま維持する
+            if (
+              prev.isEnabled &&
+              prev.query === query &&
+              prev.channelId === channelId
+            )
+              return;
+            state.set({
+              isEnabled: true,
+              query,
+              users: [],
+              selectIndex: 0,
+              channelId,
+              isSearching: true,
+            });
+            searchUser(query, channelId);
           });
         }),
         // メンションの内部にカーソルが入らないよう、前後どちらかの端へスナップする

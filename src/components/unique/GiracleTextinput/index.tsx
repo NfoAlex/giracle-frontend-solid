@@ -8,7 +8,14 @@ import {
   KEY_ENTER_COMMAND,
   type LexicalEditorWithDispose,
 } from "lexical";
-import { createMemo, createSignal, onCleanup, onMount, Show } from "solid-js";
+import {
+  createEffect,
+  createMemo,
+  createSignal,
+  onCleanup,
+  onMount,
+  Show,
+} from "solid-js";
 import type { IUser } from "~/types/User.ts";
 import {
   $insertMention,
@@ -31,6 +38,12 @@ export default function GiracleTextinput(props: {
 
   const [mentionState, setMentionState] =
     createSignal<MentionState>(EMPTY_MENTION_STATE);
+
+  // チャンネルを跨いだ古い候補が残らないよう、切替時に即座に閉じる
+  createEffect(() => {
+    void props.channelId;
+    setMentionState(EMPTY_MENTION_STATE);
+  });
 
   const menuItems = createMemo(() =>
     mentionState().users.map((u) => ({
