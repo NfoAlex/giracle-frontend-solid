@@ -147,6 +147,14 @@ html {
   }
 }
 
+/* メンションノード(Lexical) */
+.mention-node {
+  color: hsl(var(--primary));
+  background: hsl(var(--accent));
+  border-radius: 4px;
+  padding: 0 2px;
+}
+
 ::-webkit-scrollbar {
   width: 16px;
 }
