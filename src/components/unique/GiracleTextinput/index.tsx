@@ -22,7 +22,7 @@ export default function GiracleTextinput(props: { channelId?: string }) {
     mentionState().users.map((u) => ({
       id: u.id,
       name: u.name,
-      iconUrl: `/api/user/icon/${u.id}`,
+      iconUrl: `/api/user/icon/${encodeURIComponent(u.id)}`,
     })),
   );
 
