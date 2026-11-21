@@ -104,15 +104,6 @@ export function AppSidebar() {
               <IconSearch />
               検索
             </SidebarMenuButton>
-            <SidebarMenuButton
-              as={A}
-              href="/app/debug-input"
-              variant={loc.pathname === "/app/debug-input" ? "outline" : "default"}
-              class="border-orange-300 border"
-            >
-              <p>d</p>
-              input debug
-            </SidebarMenuButton>
           </SidebarGroup>
 
           <hr />
