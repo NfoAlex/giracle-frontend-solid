@@ -1,36 +1,50 @@
 import { For, Show } from "solid-js";
 import { Card } from "~/components/ui/card.tsx";
-import type { IUser } from "~/types/User.ts";
-import type { MentionState } from "./MentionExtension.ts";
+
+export interface IMentionMenuItem {
+  id: string;
+  name: string;
+  iconUrl?: string;
+}
 
 export default function MentionMenu(props: {
-  state: MentionState;
-  onSelect: (user: IUser) => void;
+  items: IMentionMenuItem[];
+  selectIndex: number;
+  onSelect: (item: IMentionMenuItem) => void;
 }) {
   return (
     <div class="absolute left-0 bottom-full w-full z-10">
       <Card
         class={"border-b-0 w-full p-2 overflow-y-auto max-h-40 cursor-pointer"}
       >
-        <Show when={props.state.users.length === 0}>
+        <Show when={props.items.length === 0}>
           <p class={"text-center"}>...</p>
         </Show>
-        <For each={props.state.users}>
-          {(user, index) => (
+        <For each={props.items}>
+          {(item, index) => (
             <button
               type="button"
-              onClick={() => props.onSelect(user)}
+              onClick={() => props.onSelect(item)}
               class={`flex items-center gap-2 p-2 rounded hover:bg-border w-full text-left ${
-                props.state.selectIndex === index() ? "bg-border" : ""
+                props.selectIndex === index() ? "bg-border" : ""
               }`}
             >
-              <img
-                alt={user.name}
-                src={`/api/user/icon/${user.id}`}
-                class={"w-8 h-8 rounded-full"}
-              />
+              <Show
+                when={item.iconUrl}
+                fallback={
+                  <span class="w-8 h-8 rounded-full bg-border flex items-center justify-center text-sm shrink-0">
+                    #
+                  </span>
+                }
+              >
+                <img
+                  alt={item.name}
+                  src={item.iconUrl}
+                  class={"w-8 h-8 rounded-full"}
+                />
+              </Show>
               <div class={"flex-grow"}>
-                <p>{user.name}</p>
+                <p>{item.name}</p>
               </div>
             </button>
           )}

@@ -54,8 +54,16 @@ export default function GiracleTextinput(props: { channelId?: string }) {
       />
       <Show when={mentionState().isEnabled}>
         <MentionMenu
-          state={mentionState()}
-          onSelect={(user) => insertMention(user)}
+          items={mentionState().users.map((u) => ({
+            id: u.id,
+            name: u.name,
+            iconUrl: `/api/user/icon/${u.id}`,
+          }))}
+          selectIndex={mentionState().selectIndex}
+          onSelect={(item) => {
+            const user = mentionState().users.find((u) => u.id === item.id);
+            if (user) insertMention(user);
+          }}
         />
       </Show>
     </div>
