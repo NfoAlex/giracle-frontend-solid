@@ -256,13 +256,6 @@ export function defineMentionExtension(
           },
           COMMAND_PRIORITY_HIGH,
         ),
-        // デバッグ用: 平文に `@<user-id>` が入っているか確認する
-        editor.registerUpdateListener(({ editorState }) => {
-          console.log(
-            "GiracleTextinput :: onUpdate :",
-            editorState.read(() => $getRoot().getTextContent()),
-          );
-        }),
         () => clearTimeout(searchTimer),
       );
     },
