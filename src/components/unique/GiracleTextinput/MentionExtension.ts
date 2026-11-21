@@ -81,7 +81,7 @@ export function $insertMention(editor: LexicalEditor, user: IUser): void {
       target = target.splitText(matchLength)[0];
     }
 
-    const mentionNode = $createMentionNode(user.id);
+    const mentionNode = $createMentionNode(user.id, user.name);
     mentionNode.setFormat(target.getFormat());
     mentionNode.setStyle(target.getStyle());
     target.replace(mentionNode);
