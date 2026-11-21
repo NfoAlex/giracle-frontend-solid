@@ -1,4 +1,5 @@
 import { buildEditorFromExtensions, HMRExtension } from "@lexical/extension";
+import { HistoryExtension } from "@lexical/history";
 import { configExtension, type LexicalEditorWithDispose } from "lexical";
 import { createMemo, createSignal, onCleanup, onMount, Show } from "solid-js";
 import type { IUser } from "~/types/User.ts";
@@ -39,6 +40,8 @@ export default function GiracleTextinput(props: { channelId?: string }) {
 
     editor = buildEditorFromExtensions(
       MentionExtension,
+      // Undo/Redo (Ctrl+Z / Ctrl+Shift+Z)。maxDepthで履歴の肥大化を防ぐ
+      configExtension(HistoryExtension, { maxDepth: 100 }),
       configExtension(HMRExtension, { hot: import.meta.hot ?? null }),
     );
     editor.setRootElement(editorRoot ?? null);
