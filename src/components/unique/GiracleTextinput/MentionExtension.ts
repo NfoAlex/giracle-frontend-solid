@@ -23,7 +23,7 @@ import {
   mergeRegister,
   type PointType,
   SELECTION_CHANGE_COMMAND,
-  type TextNode,
+  TextNode,
 } from "lexical";
 import { api } from "~/api/index.ts";
 import type { IUser } from "~/types/User.ts";
@@ -286,6 +286,18 @@ export function defineMentionExtension(
           },
           COMMAND_PRIORITY_HIGH,
         ),
+        // メンション直後が非空白で始まるテキストの場合はスペースを強制する。
+        // 受信側は `@<user-id>https://…` をリンク化するため、表示が `@bobhttps://…`
+        // のままだと下線が付かず送信後の描画と食い違う(B4)
+        editor.registerNodeTransform(TextNode, (node) => {
+          // IME 変換中に構成中ノードを書き換えると変換が壊れる
+          if (editor.isComposing()) return;
+          if ($isMentionNode(node)) return;
+          const prev = node.getPreviousSibling();
+          if (!$isMentionNode(prev)) return;
+          if (node.getTextContent().startsWith(" ")) return;
+          node.insertBefore($createTextNode(" "));
+        }),
         editor.registerCommand(
           KEY_ARROW_DOWN_COMMAND,
           (event) => {
