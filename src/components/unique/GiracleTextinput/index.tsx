@@ -12,7 +12,7 @@ import {
 import MentionMenu from "./MentionMenu.tsx";
 import { defineUrlUnderlineExtension } from "./UrlUnderlineExtension.ts";
 
-export default function GiracleTextinput(props: { channelId?: string }) {
+export default function GiracleTextinput(props: { channelId?: string, displayMentionAtBottom?: boolean }) {
   let editor: LexicalEditorWithDispose | undefined;
   let editorRoot: HTMLDivElement | undefined;
 
@@ -73,6 +73,7 @@ export default function GiracleTextinput(props: { channelId?: string }) {
             const user = mentionState().users.find((u) => u.id === item.id);
             if (user) insertMention(user);
           }}
+          displayBottom={props.displayMentionAtBottom}
         />
       </Show>
     </div>

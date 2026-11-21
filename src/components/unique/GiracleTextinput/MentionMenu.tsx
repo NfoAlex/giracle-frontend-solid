@@ -11,9 +11,12 @@ export default function MentionMenu(props: {
   items: IMentionMenuItem[];
   selectIndex: number;
   onSelect: (item: IMentionMenuItem) => void;
+  displayBottom?: boolean;
 }) {
   return (
-    <div class="absolute left-0 bottom-full w-full z-10">
+    <div
+      class={`absolute left-0 ${props.displayBottom ? "top-full" : "bottom-full"} w-full z-10`}
+    >
       <Card
         class={"border-b-0 w-full p-2 overflow-y-auto max-h-40 cursor-pointer"}
       >
