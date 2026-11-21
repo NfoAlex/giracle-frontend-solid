@@ -145,6 +145,7 @@ export function defineMentionExtension(
     },
     register(editor) {
       let searchTimer: ReturnType<typeof setTimeout> | undefined;
+      let watchdogTimer: ReturnType<typeof setTimeout> | undefined;
 
       const reset = () => state.set(EMPTY_MENTION_STATE);
 
@@ -169,12 +170,21 @@ export function defineMentionExtension(
       // 入力毎のAPI発火を避けるため200msでdebounceする
       const searchUser = (query: string, channelId: string | undefined) => {
         clearTimeout(searchTimer);
+        clearTimeout(watchdogTimer);
         searchTimer = setTimeout(() => {
           // 切替後の channelId と異なる = 古いチャンネル向けの検索なので破棄
           if (resolveChannelId() !== channelId) return;
+          // 応答が永遠に来ない場合に Enter を復帰させる安全弁(指摘 3)
+          watchdogTimer = setTimeout(() => {
+            const current = state.signal();
+            if (current.query === query && current.isSearching) {
+              state.set({ ...current, isSearching: false });
+            }
+          }, 3000);
           api.user
             .list({ username: query, joinedChannel: channelId })
             .then((r) => {
+              clearTimeout(watchdogTimer);
               // 古いクエリの応答で新しい結果を上書きしない
               const current = state.signal();
               if (current.query !== query) return;
@@ -186,6 +196,7 @@ export function defineMentionExtension(
               });
             })
             .catch((e) => {
+              clearTimeout(watchdogTimer);
               console.error("MENTION_USER_SEARCH :: e->", e);
               // 失敗時も isSearching を戻さないと Enter が握りつぶされ続ける
               const current = state.signal();
@@ -381,7 +392,10 @@ export function defineMentionExtension(
           },
           COMMAND_PRIORITY_HIGH,
         ),
-        () => clearTimeout(searchTimer),
+        () => {
+          clearTimeout(searchTimer);
+          clearTimeout(watchdogTimer);
+        },
       );
     },
   });
