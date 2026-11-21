@@ -267,8 +267,16 @@ export function defineMentionExtension(
           KEY_ENTER_COMMAND,
           (event) => {
             const current = state.signal();
+            if (!current.isEnabled) return false;
             const user = current.users[current.selectIndex];
-            if (!current.isEnabled || !user) return false;
+            if (!user) {
+              // debounce 検索が未完了の間は、確定も送信もせず Enter を消費する
+              if (current.isSearching) {
+                event?.preventDefault();
+                return true;
+              }
+              return false;
+            }
             event?.preventDefault();
             // コマンド実行中のupdate内で入れ子にeditor.updateを呼ぶとDOM選択が
             // 壊れるため、コマンド処理後に挿入する
