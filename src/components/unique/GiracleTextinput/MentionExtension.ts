@@ -62,6 +62,13 @@ function $getMentionQuery(): {
   const offset = selection.anchor.offset;
   const match = /@(\S*)$/.exec(anchorNode.getTextContent().slice(0, offset));
   if (!match || match[1].startsWith("<")) return null;
+  // `foo@bar` (メール/URL内の@) をメンション開始とみなさない。
+  // CJKは \p{L} に含まれるためUnicodeクラスでなくASCII文字種判定にする
+  // (日本語の「こんにちは@田中」のようなスペースなしメンションを殺さないため)
+  const at = offset - match[0].length;
+  if (at > 0 && /[A-Za-z0-9_]/.test(anchorNode.getTextContent()[at - 1])) {
+    return null;
+  }
   return { anchorNode, offset, query: match[1], matchLength: match[0].length };
 }
 
