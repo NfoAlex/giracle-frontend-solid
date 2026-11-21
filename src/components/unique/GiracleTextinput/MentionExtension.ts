@@ -4,6 +4,7 @@ import {
   $createParagraphNode,
   $createRangeSelection,
   $createTextNode,
+  $getPreviousSelection,
   $getRoot,
   $getSelection,
   $isElementNode,
@@ -20,6 +21,8 @@ import {
   type LexicalEditor,
   type LexicalNode,
   mergeRegister,
+  type PointType,
+  SELECTION_CHANGE_COMMAND,
   type TextNode,
 } from "lexical";
 import { api } from "~/api/index.ts";
@@ -185,6 +188,43 @@ export function defineMentionExtension(
             searchUser(query);
           });
         }),
+        // メンションの内部にカーソルが入らないよう、前後どちらかの端へスナップする
+        editor.registerCommand(
+          SELECTION_CHANGE_COMMAND,
+          () => {
+            // IME変換中の選択変更には触らない
+            if (editor.isComposing()) return false;
+            const selection = $getSelection();
+            if (!$isRangeSelection(selection)) return false;
+            const prev = $getPreviousSelection();
+            const points: [PointType, PointType | null][] = [
+              [selection.anchor, $isRangeSelection(prev) ? prev.anchor : null],
+              [selection.focus, $isRangeSelection(prev) ? prev.focus : null],
+            ];
+            for (const [point, prevAnchor] of points) {
+              const node = point.getNode();
+              if (!$isMentionNode(node) || point.type !== "text") continue;
+              const size = node.getTextContentSize();
+              if (point.offset <= 0 || point.offset >= size) continue;
+              // 直前の位置がメンションの前後どちらだったかで、抜ける方向を決める
+              const target =
+                prevAnchor?.key === node.getPreviousSibling()?.getKey()
+                  ? size
+                  : prevAnchor?.key === node.getNextSibling()?.getKey()
+                    ? 0
+                    : prevAnchor?.key === point.key
+                      ? prevAnchor.offset > point.offset
+                        ? 0
+                        : size
+                      : point.offset < size / 2
+                        ? 0
+                        : size;
+              point.set(point.key, target, "text");
+            }
+            return false;
+          },
+          COMMAND_PRIORITY_HIGH,
+        ),
         editor.registerCommand(
           KEY_ENTER_COMMAND,
           (event) => {
