@@ -63,6 +63,7 @@ export function definePlainTextOnlyExtension() {
           (event) => {
             const dt = event.dataTransfer;
             if (dt === null) return false;
+            if (dt.types.includes("application/x-lexical-drag")) return false;
             event.preventDefault();
             editor.update(() => $insertPlainText(dt));
             return true;
