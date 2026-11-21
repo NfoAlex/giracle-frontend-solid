@@ -36,7 +36,7 @@ export class MentionNode extends TextNode {
     return "mention";
   }
 
-  // format/style/modeはTextNode.afterCloneFromが引き継ぐ
+  // format/style/modeはLexicalNode.afterCloneFromの__stateコピーで引き継がれる
   static clone(node: MentionNode): MentionNode {
     return new MentionNode(node.__userId, node.__name, node.__key);
   }
@@ -55,13 +55,21 @@ export class MentionNode extends TextNode {
     return {
       span: (domNode: HTMLElement) => {
         const userId = domNode.getAttribute("data-mention-user-id");
-        if (!userId) return null;
+        // 受信側mentionPatternと同じ文字種のみ受け付ける(`>` 注入・偽装防止)
+        if (!userId || !/^[a-f0-9-]{1,64}$/.test(userId)) return null;
+        // 巨大ペーストによるノード肥大化防止: 制御文字除去+128文字上限
+        const rawName = domNode.getAttribute("data-mention-name") ?? userId;
+        const name =
+          [...rawName]
+            .filter((c) => {
+              const code = c.charCodeAt(0);
+              return code > 0x1f && code !== 0x7f;
+            })
+            .join("")
+            .slice(0, 128) || userId;
         return {
           conversion: (): DOMConversionOutput => ({
-            node: $createMentionNode(
-              userId,
-              domNode.getAttribute("data-mention-name") ?? userId,
-            ),
+            node: $createMentionNode(userId, name),
           }),
           priority: 1,
         };
