@@ -1,5 +1,4 @@
 import {
-  $getRoot,
   $isElementNode,
   $isLineBreakNode,
   $isTextNode,
@@ -7,7 +6,7 @@ import {
   IS_UNDERLINE,
   type LexicalNode,
   type LineBreakNode,
-  type TextNode,
+  TextNode,
 } from "lexical";
 import { $isMentionNode } from "./MentionNode.ts";
 
@@ -124,27 +123,6 @@ function $applyUrlUnderline(node: LexicalNode): void {
   }
 }
 
-/** 各ブロックから代表ノードを1つ取り出す(ブロック単位で処理するため) */
-function $blockSampleNodes(): LexicalNode[] {
-  const samples: LexicalNode[] = [];
-  for (const block of $getRoot().getChildren()) {
-    if (!$isElementNode(block)) continue;
-    const first = block
-      .getChildren()
-      .find((c) => $isTextNode(c) || $isLineBreakNode(c));
-    if (first !== undefined) samples.push(first);
-  }
-  return samples;
-}
-
-/** ルート全体を走査して未適用のブロックだけ直す。変化が無ければ何もしない */
-function $underlineUrlsInRoot(): void {
-  for (const node of $blockSampleNodes()) {
-    if ($isUrlUnderlineApplied(node)) continue;
-    $applyUrlUnderline(node);
-  }
-}
-
 export function defineUrlUnderlineExtension() {
   return defineExtension({
     name: "giracle/url-underline",
@@ -153,17 +131,21 @@ export function defineUrlUnderlineExtension() {
       text: { underline: "underline" },
     },
     register(editor) {
-      // update listener 一本化。dirty ノード単位の transform は大量ペースト時に
-      // ブロック全体の再走査を dirty 数だけ繰り返す(transform ストーム)ため使わない。
-      // ブロック単位の判定・適用で 1コミットあたり O(文書長) に収める。
-      // 適用済みなら何もしない(無限更新しない)。履歴は直前の入力にまとめる
-      return editor.registerUpdateListener(({ editorState }) => {
+      // キー入力と同一 update 内で適用するため transform を使う。update listener +
+      // 後追い update(history-merge)だと入力と書式適用が別コミットになり、Undo が
+      // 種類を問わず1文字単位に断片化する。
+      // ParagraphNode の transform は段落自身が dirty にならない限り発火しない
+      // (既存テキストへの追記では text ノードだけが dirty)ため、必ず dirty になる
+      // TextNode 側に登録する。走査範囲は親ブロックのみでルート全体は見ない。
+      // shortcut: 分割・書式適用で dirty ノードが2つ以上になった update は
+      // @lexical/history がマージ不可(OTHER)と判定するため、URL を編集している間の
+      // Undo は1文字単位のまま。まとめたいなら履歴側の対処が要る
+      return editor.registerNodeTransform(TextNode, (node) => {
+        // IME 変換中に構成中ノードを splitText すると変換が壊れるためスキップ。
+        // 確定時の update でノードが再度 dirty になり、そのときに適用される
         if (editor.isComposing()) return;
-        const needsWork = editorState.read(() =>
-          $blockSampleNodes().some((node) => !$isUrlUnderlineApplied(node)),
-        );
-        if (!needsWork) return;
-        editor.update(() => $underlineUrlsInRoot(), { tag: "history-merge" });
+        if ($isUrlUnderlineApplied(node)) return;
+        $applyUrlUnderline(node);
       });
     },
   });
