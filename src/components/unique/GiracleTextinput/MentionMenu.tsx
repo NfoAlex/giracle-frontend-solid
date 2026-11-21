@@ -24,6 +24,7 @@ export default function MentionMenu(props: {
           {(item, index) => (
             <button
               type="button"
+              onMouseDown={(e) => e.preventDefault()}
               onClick={() => props.onSelect(item)}
               class={`flex items-center gap-2 p-2 rounded hover:bg-border w-full text-left ${
                 props.selectIndex === index() ? "bg-border" : ""
