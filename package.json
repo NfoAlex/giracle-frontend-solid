@@ -30,6 +30,7 @@
     "@lexical/clipboard": "^0.53.0",
     "@lexical/extension": "^0.53.0",
     "@lexical/history": "^0.53.0",
+    "@lexical/rich-text": "^0.53.0",
     "@solidjs/router": "^1.0.3",
     "@tabler/icons-solidjs": "^3.52.0",
     "@tanstack/solid-table": "^8.21.3",

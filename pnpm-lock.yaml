@@ -194,6 +194,9 @@ importers:
       '@lexical/history':
         specifier: ^0.53.0
         version: 0.53.0(typescript@7.0.2)
+      '@lexical/rich-text':
+        specifier: ^0.53.0
+        version: 0.53.0(typescript@7.0.2)
       '@solidjs/router':
         specifier: ^1.0.3
         version: 1.0.3(solid-js@1.9.19)
@@ -909,8 +912,24 @@ packages:
     peerDependencies:
       solid-js: ^1.8.8
 
+  '@lexical/a11y@0.53.0':
+    resolution: {integrity: sha512-Xmi6TDF7mkhxYMO7GNN1G5mgdNRN5mMKcvMk7zIWnteXIuBJ4li5LgYXDvnCfYU/qrkocIBQhlJNqaiXzvtktA==}
+    peerDependencies:
+      typescript: '>=5.2'
+    peerDependenciesMeta:
+      typescript:
+        optional: true
+
   '@lexical/clipboard@0.53.0':
     resolution: {integrity: sha512-QkSu7wiLtiNCoHBJzdcwmAD91Xz+Q29gPHcLwgk6NqTk255KBhqMEV2KHa87sJKHU4zBQMmhc52QkoaU3GkDxA==}
+    peerDependencies:
+      typescript: '>=5.2'
+    peerDependenciesMeta:
+      typescript:
+        optional: true
+
+  '@lexical/dragon@0.53.0':
+    resolution: {integrity: sha512-pulm9Nwg7Cl0tvrJesWGyRFVjUgs0C4gKJ/IBnssYAMP1Sk2Y4vVn5Bw0YJ75ChHa76VNPajUn7jDhLW9BWD2A==}
     peerDependencies:
       typescript: '>=5.2'
     peerDependenciesMeta:
@@ -951,6 +970,14 @@ packages:
 
   '@lexical/list@0.53.0':
     resolution: {integrity: sha512-wW+ufz4W40v+/fk2F98yxS8fXfmP1qOrEf5EPCmmV+lqxZ3FEPgN0JwPv8XUPF6/IaC8SyndT9eZgf4mJ1HCrQ==}
+    peerDependencies:
+      typescript: '>=5.2'
+    peerDependenciesMeta:
+      typescript:
+        optional: true
+
+  '@lexical/rich-text@0.53.0':
+    resolution: {integrity: sha512-Hz7Ari2IbuY/BEO/Q4wMToPClvOCjEoKSNdhFCJePDfdnGUVSMOXLl4SGvKgC7aQB302Pc5hTysLPuS8XwxlSw==}
     peerDependencies:
       typescript: '>=5.2'
     peerDependenciesMeta:
@@ -3638,6 +3665,14 @@ snapshots:
       '@solid-primitives/utils': 6.4.1(solid-js@1.9.19)
       solid-js: 1.9.19
 
+  '@lexical/a11y@0.53.0(typescript@7.0.2)':
+    dependencies:
+      '@lexical/extension': 0.53.0(typescript@7.0.2)
+      '@lexical/utils': 0.53.0(typescript@7.0.2)
+      lexical: 0.53.0(typescript@7.0.2)
+    optionalDependencies:
+      typescript: 7.0.2
+
   '@lexical/clipboard@0.53.0(typescript@7.0.2)':
     dependencies:
       '@lexical/extension': 0.53.0(typescript@7.0.2)
@@ -3647,6 +3682,13 @@ snapshots:
       '@lexical/selection': 0.53.0(typescript@7.0.2)
       '@lexical/utils': 0.53.0(typescript@7.0.2)
       '@types/trusted-types': 2.0.7
+      lexical: 0.53.0(typescript@7.0.2)
+    optionalDependencies:
+      typescript: 7.0.2
+
+  '@lexical/dragon@0.53.0(typescript@7.0.2)':
+    dependencies:
+      '@lexical/extension': 0.53.0(typescript@7.0.2)
       lexical: 0.53.0(typescript@7.0.2)
     optionalDependencies:
       typescript: 7.0.2
@@ -3687,6 +3729,19 @@ snapshots:
       '@lexical/extension': 0.53.0(typescript@7.0.2)
       '@lexical/html': 0.53.0(typescript@7.0.2)
       '@lexical/internal': 0.53.0(typescript@7.0.2)
+      '@lexical/utils': 0.53.0(typescript@7.0.2)
+      lexical: 0.53.0(typescript@7.0.2)
+    optionalDependencies:
+      typescript: 7.0.2
+
+  '@lexical/rich-text@0.53.0(typescript@7.0.2)':
+    dependencies:
+      '@lexical/a11y': 0.53.0(typescript@7.0.2)
+      '@lexical/clipboard': 0.53.0(typescript@7.0.2)
+      '@lexical/dragon': 0.53.0(typescript@7.0.2)
+      '@lexical/extension': 0.53.0(typescript@7.0.2)
+      '@lexical/html': 0.53.0(typescript@7.0.2)
+      '@lexical/selection': 0.53.0(typescript@7.0.2)
       '@lexical/utils': 0.53.0(typescript@7.0.2)
       lexical: 0.53.0(typescript@7.0.2)
     optionalDependencies:
