@@ -177,7 +177,11 @@ export function defineMentionExtension(
           // 応答が永遠に来ない場合に Enter を復帰させる安全弁(指摘 3)
           watchdogTimer = setTimeout(() => {
             const current = state.signal();
-            if (current.query === query && current.isSearching) {
+            if (
+              current.query === query &&
+              current.channelId === channelId &&
+              current.isSearching
+            ) {
               state.set({ ...current, isSearching: false });
             }
           }, 3000);
@@ -185,9 +189,10 @@ export function defineMentionExtension(
             .list({ username: query, joinedChannel: channelId })
             .then((r) => {
               clearTimeout(watchdogTimer);
-              // 古いクエリの応答で新しい結果を上書きしない
+              // 古いクエリ・古いチャンネル向けの応答で新しい結果を上書きしない
               const current = state.signal();
-              if (current.query !== query) return;
+              if (current.query !== query || current.channelId !== channelId)
+                return;
               state.set({
                 ...current,
                 users: r.data,
@@ -200,7 +205,7 @@ export function defineMentionExtension(
               console.error("MENTION_USER_SEARCH :: e->", e);
               // 失敗時も isSearching を戻さないと Enter が握りつぶされ続ける
               const current = state.signal();
-              if (current.query === query) {
+              if (current.query === query && current.channelId === channelId) {
                 state.set({ ...current, isSearching: false });
               }
             });
