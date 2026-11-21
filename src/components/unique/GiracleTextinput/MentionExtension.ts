@@ -6,6 +6,7 @@ import {
   $createTextNode,
   $getRoot,
   $getSelection,
+  $isElementNode,
   $isRangeSelection,
   $isTextNode,
   $setSelection,
@@ -17,6 +18,7 @@ import {
   KEY_ENTER_COMMAND,
   KEY_ESCAPE_COMMAND,
   type LexicalEditor,
+  type LexicalNode,
   mergeRegister,
   type TextNode,
 } from "lexical";
@@ -90,6 +92,25 @@ export function $insertMention(editor: LexicalEditor, user: IUser): void {
     mentionNode.insertAfter(spaceNode);
     spaceNode.select(1, 1);
   });
+}
+
+/** ノード単位の変換: メンションだけ `@<user-id>` へ置き換える */
+function $serializeNode(node: LexicalNode): string {
+  if ($isMentionNode(node)) return `@<${node.getUserId()}>`;
+  if ($isElementNode(node)) {
+    return node.getChildren().map($serializeNode).join("");
+  }
+  return node.getTextContent();
+}
+
+/**
+ * 送信用の本文文字列を取得する
+ * エディタ上の表示(`@名前`)をサーバ保存形式(`@<user-id>`)へ変換する
+ */
+export function getMessageText(editor: LexicalEditor): string {
+  return editor
+    .getEditorState()
+    .read(() => $getRoot().getChildren().map($serializeNode).join("\n"));
 }
 
 export function defineMentionExtension(
