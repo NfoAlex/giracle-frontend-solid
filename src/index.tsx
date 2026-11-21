@@ -133,6 +133,10 @@ render(
             component={lazy(() => import("./routes/manage-server.tsx"))}
           />
           <Route
+            path="/debug-input"
+            component={lazy(() => import("./routes/debug-input.tsx"))}
+          />
+          <Route
             path="*paramName"
             component={lazy(() => import("./routes/[...404].tsx"))}
           />
