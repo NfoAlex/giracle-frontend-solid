@@ -1,6 +1,8 @@
 import { buildEditorFromExtensions, HMRExtension } from "@lexical/extension";
 import { HistoryExtension } from "@lexical/history";
 import {
+  $createParagraphNode,
+  $getRoot,
   COMMAND_PRIORITY_NORMAL,
   configExtension,
   KEY_ENTER_COMMAND,
@@ -18,7 +20,11 @@ import {
 import MentionMenu from "./MentionMenu.tsx";
 import { defineUrlUnderlineExtension } from "./UrlUnderlineExtension.ts";
 
-export default function GiracleTextinput(props: { channelId?: string, displayMentionAtBottom?: boolean, onEnter?: (text: string) => void }) {
+export default function GiracleTextinput(props: {
+  channelId?: string;
+  displayMentionAtBottom?: boolean;
+  onEnter?: (text: string) => void;
+}) {
   let editor: LexicalEditorWithDispose | undefined;
   let editorRoot: HTMLDivElement | undefined;
 
@@ -61,8 +67,19 @@ export default function GiracleTextinput(props: { channelId?: string, displayMen
         if (!props.onEnter) return false;
         if (ed.isComposing()) return false;
         if (event?.shiftKey) return false;
+        const text = getMessageText(ed);
         event?.preventDefault();
-        props.onEnter(getMessageText(ed));
+        // 空行(空白のみ含む)の Enter は何もしない。改行も入れない
+        if (text.trim() === "") return true;
+        props.onEnter(text);
+        // 送信後のクリア。ChannelTextInput の sendMsg と同じく送信成否に依らず
+        // 無条件に消す(API 失敗時の復元は親の責任とする)
+        ed.update(() => {
+          const root = $getRoot();
+          root.clear();
+          root.append($createParagraphNode());
+        });
+        setMentionState(EMPTY_MENTION_STATE);
         return true;
       },
       COMMAND_PRIORITY_NORMAL,
