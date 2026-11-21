@@ -10,6 +10,7 @@ import {
   type MentionState,
 } from "./MentionExtension.ts";
 import MentionMenu from "./MentionMenu.tsx";
+import { defineUrlUnderlineExtension } from "./UrlUnderlineExtension.ts";
 
 export default function GiracleTextinput(props: { channelId?: string }) {
   let editor: LexicalEditorWithDispose | undefined;
@@ -40,6 +41,7 @@ export default function GiracleTextinput(props: { channelId?: string }) {
 
     editor = buildEditorFromExtensions(
       MentionExtension,
+      defineUrlUnderlineExtension(),
       // Undo/Redo (Ctrl+Z / Ctrl+Shift+Z)。maxDepthで履歴の肥大化を防ぐ
       configExtension(HistoryExtension, { maxDepth: 100 }),
       configExtension(HMRExtension, { hot: import.meta.hot ?? null }),
