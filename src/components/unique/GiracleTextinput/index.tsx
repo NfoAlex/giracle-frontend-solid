@@ -1,6 +1,6 @@
 import { buildEditorFromExtensions, HMRExtension } from "@lexical/extension";
 import { configExtension, type LexicalEditorWithDispose } from "lexical";
-import { createSignal, onCleanup, onMount, Show } from "solid-js";
+import { createMemo, createSignal, onCleanup, onMount, Show } from "solid-js";
 import type { IUser } from "~/types/User.ts";
 import {
   $insertMention,
@@ -16,6 +16,14 @@ export default function GiracleTextinput(props: { channelId?: string }) {
 
   const [mentionState, setMentionState] =
     createSignal<MentionState>(EMPTY_MENTION_STATE);
+
+  const menuItems = createMemo(() =>
+    mentionState().users.map((u) => ({
+      id: u.id,
+      name: u.name,
+      iconUrl: `/api/user/icon/${u.id}`,
+    })),
+  );
 
   const insertMention = (user: IUser) => {
     if (!editor) return;
@@ -54,11 +62,7 @@ export default function GiracleTextinput(props: { channelId?: string }) {
       />
       <Show when={mentionState().isEnabled}>
         <MentionMenu
-          items={mentionState().users.map((u) => ({
-            id: u.id,
-            name: u.name,
-            iconUrl: `/api/user/icon/${u.id}`,
-          }))}
+          items={menuItems()}
           selectIndex={mentionState().selectIndex}
           onSelect={(item) => {
             const user = mentionState().users.find((u) => u.id === item.id);
