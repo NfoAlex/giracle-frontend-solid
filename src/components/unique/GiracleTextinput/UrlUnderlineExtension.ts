@@ -1,12 +1,13 @@
 import {
   $getRoot,
   $isElementNode,
+  $isLineBreakNode,
   $isTextNode,
   defineExtension,
   IS_UNDERLINE,
   type LexicalNode,
-  mergeRegister,
-  TextNode,
+  type LineBreakNode,
+  type TextNode,
 } from "lexical";
 import { $isMentionNode } from "./MentionNode.ts";
 
@@ -21,12 +22,16 @@ const URL_PATTERN_SOURCE =
 
 type TRange = [start: number, end: number];
 
-/** テキストノードだけのブロックならその子を返す */
-function textChildren(node: LexicalNode): TextNode[] | null {
+/** 改行(LineBreak)を透過させてブロックの子を返す(分割・書式の対象にはしない) */
+function textChildren(node: LexicalNode): (TextNode | LineBreakNode)[] | null {
   const parent = node.getParent();
   if (parent === null || !$isElementNode(parent)) return null;
   const children = parent.getChildren();
-  return children.every($isTextNode) ? children : null;
+  // MentionNode は TextNode の一種なので含まれる。LineBreak は改行(\n)として
+  // オフセット計算にだけ使い、分割・書式変更は isPlainTextNode で除外する
+  return children.every((c) => $isTextNode(c) || $isLineBreakNode(c))
+    ? (children as (TextNode | LineBreakNode)[])
+    : null;
 }
 
 /** 分割・書式変更してよい素のテキストノード(メンション等は触らない) */
@@ -119,9 +124,22 @@ function $applyUrlUnderline(node: LexicalNode): void {
   }
 }
 
+/** 各ブロックから代表ノードを1つ取り出す(ブロック単位で処理するため) */
+function $blockSampleNodes(): LexicalNode[] {
+  const samples: LexicalNode[] = [];
+  for (const block of $getRoot().getChildren()) {
+    if (!$isElementNode(block)) continue;
+    const first = block
+      .getChildren()
+      .find((c) => $isTextNode(c) || $isLineBreakNode(c));
+    if (first !== undefined) samples.push(first);
+  }
+  return samples;
+}
+
 /** ルート全体を走査して未適用のブロックだけ直す。変化が無ければ何もしない */
 function $underlineUrlsInRoot(): void {
-  for (const node of $getRoot().getAllTextNodes()) {
+  for (const node of $blockSampleNodes()) {
     if ($isUrlUnderlineApplied(node)) continue;
     $applyUrlUnderline(node);
   }
@@ -135,23 +153,18 @@ export function defineUrlUnderlineExtension() {
       text: { underline: "underline" },
     },
     register(editor) {
-      return mergeRegister(
-        // 通常入力: 変更されたノードのコミットで走る
-        editor.registerNodeTransform(TextNode, $applyUrlUnderline),
-        // IME 確定など transform が走らない経路のフォールバック。
-        // 適用済みなら何もしない(無限更新しない)。履歴は直前の入力にまとめる
-        editor.registerUpdateListener(({ editorState }) => {
-          if (editor.isComposing()) return;
-          const needsWork = editorState.read(
-            () =>
-              !$getRoot()
-                .getAllTextNodes()
-                .every((node) => $isUrlUnderlineApplied(node)),
-          );
-          if (!needsWork) return;
-          editor.update(() => $underlineUrlsInRoot(), { tag: "history-merge" });
-        }),
-      );
+      // update listener 一本化。dirty ノード単位の transform は大量ペースト時に
+      // ブロック全体の再走査を dirty 数だけ繰り返す(transform ストーム)ため使わない。
+      // ブロック単位の判定・適用で 1コミットあたり O(文書長) に収める。
+      // 適用済みなら何もしない(無限更新しない)。履歴は直前の入力にまとめる
+      return editor.registerUpdateListener(({ editorState }) => {
+        if (editor.isComposing()) return;
+        const needsWork = editorState.read(() =>
+          $blockSampleNodes().some((node) => !$isUrlUnderlineApplied(node)),
+        );
+        if (!needsWork) return;
+        editor.update(() => $underlineUrlsInRoot(), { tag: "history-merge" });
+      });
     },
   });
 }
