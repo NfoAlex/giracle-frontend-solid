@@ -18,6 +18,7 @@ import {
   type MentionState,
 } from "./MentionExtension.ts";
 import MentionMenu from "./MentionMenu.tsx";
+import { definePlainTextOnlyExtension } from "./PlainTextOnlyExtension.ts";
 import { defineUrlUnderlineExtension } from "./UrlUnderlineExtension.ts";
 
 export default function GiracleTextinput(props: {
@@ -52,6 +53,7 @@ export default function GiracleTextinput(props: {
     );
 
     editor = buildEditorFromExtensions(
+      definePlainTextOnlyExtension(),
       MentionExtension,
       defineUrlUnderlineExtension(),
       // Undo/Redo (Ctrl+Z / Ctrl+Shift+Z)。maxDepthで履歴の肥大化を防ぐ
