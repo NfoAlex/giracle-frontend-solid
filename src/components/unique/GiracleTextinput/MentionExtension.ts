@@ -100,7 +100,9 @@ function $serializeNode(node: LexicalNode): string {
   if ($isElementNode(node)) {
     return node.getChildren().map($serializeNode).join("");
   }
-  return node.getTextContent();
+  // 素テキスト中の `@<` は受信側mentionPatternに偽メンションとして解釈されるため、
+  // ゼロ幅スペースを挟んでエスケープする(表示上は変化なし)
+  return node.getTextContent().replaceAll("@<", "@\u200B<");
 }
 
 /**
