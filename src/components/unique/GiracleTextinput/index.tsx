@@ -1,18 +1,24 @@
 import { buildEditorFromExtensions, HMRExtension } from "@lexical/extension";
 import { HistoryExtension } from "@lexical/history";
-import { configExtension, type LexicalEditorWithDispose } from "lexical";
+import {
+  COMMAND_PRIORITY_NORMAL,
+  configExtension,
+  KEY_ENTER_COMMAND,
+  type LexicalEditorWithDispose,
+} from "lexical";
 import { createMemo, createSignal, onCleanup, onMount, Show } from "solid-js";
 import type { IUser } from "~/types/User.ts";
 import {
   $insertMention,
   defineMentionExtension,
   EMPTY_MENTION_STATE,
+  getMessageText,
   type MentionState,
 } from "./MentionExtension.ts";
 import MentionMenu from "./MentionMenu.tsx";
 import { defineUrlUnderlineExtension } from "./UrlUnderlineExtension.ts";
 
-export default function GiracleTextinput(props: { channelId?: string, displayMentionAtBottom?: boolean }) {
+export default function GiracleTextinput(props: { channelId?: string, displayMentionAtBottom?: boolean, onEnter?: (text: string) => void }) {
   let editor: LexicalEditorWithDispose | undefined;
   let editorRoot: HTMLDivElement | undefined;
 
@@ -46,8 +52,21 @@ export default function GiracleTextinput(props: { channelId?: string, displayMen
       configExtension(HistoryExtension, { maxDepth: 100 }),
       configExtension(HMRExtension, { hot: import.meta.hot ?? null }),
     );
-    editor.setRootElement(editorRoot ?? null);
-
+    const ed = editor;
+    ed.setRootElement(editorRoot ?? null);
+    // メンション確定(HIGH)が先に処理され、未消費の Enter だけがここに届く
+    ed.registerCommand(
+      KEY_ENTER_COMMAND,
+      (event) => {
+        if (!props.onEnter) return false;
+        if (ed.isComposing()) return false;
+        if (event?.shiftKey) return false;
+        event?.preventDefault();
+        props.onEnter(getMessageText(ed));
+        return true;
+      },
+      COMMAND_PRIORITY_NORMAL,
+    );
     if (import.meta.hot && editor !== undefined) {
       import.meta.hot.accept();
       import.meta.hot.dispose(() => editor?.dispose());
