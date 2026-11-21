@@ -34,7 +34,7 @@ export default function GiracleTextinput(props: { channelId?: string }) {
 
   onMount(() => {
     const MentionExtension = defineMentionExtension(
-      { channelId: props.channelId },
+      { channelId: () => props.channelId },
       { signal: mentionState, set: setMentionState },
     );
 

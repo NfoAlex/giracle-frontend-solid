@@ -34,7 +34,7 @@ import {
 } from "./MentionNode.ts";
 
 export interface MentionExtensionOptions {
-  channelId?: string;
+  channelId?: string | (() => string | undefined);
 }
 
 export interface MentionState {
@@ -159,8 +159,13 @@ export function defineMentionExtension(
       const searchUser = (query: string) => {
         clearTimeout(searchTimer);
         searchTimer = setTimeout(() => {
+          // チャンネル切り替え後も最新値を参照する
+          const channelId =
+            typeof options.channelId === "function"
+              ? options.channelId()
+              : options.channelId;
           api.user
-            .list({ username: query, joinedChannel: options.channelId })
+            .list({ username: query, joinedChannel: channelId })
             .then((r) => {
               // 古いクエリの応答で新しい結果を上書きしない
               const current = state.signal();
