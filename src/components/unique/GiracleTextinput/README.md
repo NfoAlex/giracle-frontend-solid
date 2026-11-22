@@ -163,4 +163,5 @@ import GiracleTextinput from "~/components/unique/GiracleTextinput/index.tsx";
 - 外部アプリからのドロップは `DROP_COMMAND` で自前処理するため、**挿入位置は現在のキャレットでドロップ座標ではない**（`shortcut:` コメントあり）。位置合わせが必要になったらドロップ座標からのキャレット解決を実装する。
 - メンション直後のスペーサーは transform で強制されるため、Delete で消しても次に文字を打った時点で空白が戻る。これは受信側 `urlPattern` の `\b` 依存（`@<user-id>https://…` をリンク化させる）に合わせるための仕様。スペースを保持するノードと URL ノードは書式が違うため1ノードには統合されない。
 - メンション検索の API が応答しない(ハング)場合、Enter は最大 3 秒握りつぶされる。watchdog(`searchUser` 内 `watchdogTimer`)が `isSearching` を戻せば通常動作に復帰する。
+- エディタの contentEditable div は `id="messageInput"` を保つこと。`ChannelContents`（↑ キーで編集モード、入力有無は `textContent` で判定）と `EditMessage`（編集の保存・キャンセル後のフォーカス復帰）が `document.getElementById("messageInput")` で参照している。`<textarea>` 前提の `.value` 判定は div では常に `undefined` になりガードが効かない。
 - `RichTextExtension` を外すとタイピング・Enter・改行コマンドが壊れる。無効化は `PlainTextOnlyExtension` の経路遮断だけで行うこと（片方だけ塞ぐと書式が流入する）。
