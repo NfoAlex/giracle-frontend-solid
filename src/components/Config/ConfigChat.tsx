@@ -1,4 +1,4 @@
-import { IconKeyboard } from "@tabler/icons-solidjs";
+import { IconInputCheck, IconKeyboard } from "@tabler/icons-solidjs";
 import { storeClientConfig } from "~/stores/ClientConfig.store.ts";
 import { Card } from "../ui/card.tsx";
 import { Switch, SwitchControl, SwitchThumb } from "../ui/switch";
@@ -29,6 +29,32 @@ export default function ConfigChat() {
 
         <div>
           メッセージを送信する際に、Enterキーと同時にCtrlキーを押す必要があるように設定します。(無効だとEnterキーのみで送信されます。)
+        </div>
+      </Card>
+
+      {/* 旧式の入力コンポーネントを使うかどうか */}
+      <Card class="p-4 flex flex-col gap-4">
+        <span class="flex items-center">
+          <span class="font-bold flex items-center gap-2">
+            <IconInputCheck />
+            旧式のテキスト入力方式を使う
+          </span>
+          <div class={"ml-auto flex items-center gap-2"}>
+            <Switch
+              onChange={(v) => (storeClientConfig.chat.useOldInput = v)}
+              defaultChecked={storeClientConfig.chat.useOldInput}
+            >
+              <SwitchControl>
+                <SwitchThumb />
+              </SwitchControl>
+            </Switch>
+          </div>
+        </span>
+
+        <hr />
+
+        <div>
+          プレビューなどが適用されない、旧式の入力方式を適用します。入力が不安定な場合この設定をONにしてください。
         </div>
       </Card>
     </div>

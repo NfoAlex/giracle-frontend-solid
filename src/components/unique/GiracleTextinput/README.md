@@ -149,6 +149,10 @@ import GiracleTextinput from "~/components/unique/GiracleTextinput/index.tsx";
 
 - `channelId` を渡すと `api.user.list` の `joinedChannel` に載り、そのチャンネル参加者に絞られる。省略時は全ユーザー検索。
 - `onEnter` に渡るのは `getMessageText(editor)` の戻り値（`@名前` → `@<user-id>` 変換済みの送信文字列）。コールバック後、コンポーネントがエディタをクリアする（editor は外に出さない）。
+- `onPasteFiles(files)`: クリップボードにファイルがある場合に呼ばれる（テキスト挿入は通常どおり継続）。
+- `sendWithCtrlKey()`: true を返す間は Ctrl+Enter でのみ送信する。
+- `canSendEmpty()`: true を返す間は本文が空でも Enter を `onEnter("")` へ流す（添付のみ送信用）。
+- `ref(handle)`: `{ getText(), clear(), focus() }` を受け取る。送信ボタン等から本文取得・クリア・フォーカスに使う。
 
 ## 落とし穴
 
@@ -159,4 +163,5 @@ import GiracleTextinput from "~/components/unique/GiracleTextinput/index.tsx";
 - 外部アプリからのドロップは `DROP_COMMAND` で自前処理するため、**挿入位置は現在のキャレットでドロップ座標ではない**（`shortcut:` コメントあり）。位置合わせが必要になったらドロップ座標からのキャレット解決を実装する。
 - メンション直後のスペーサーは transform で強制されるため、Delete で消しても次に文字を打った時点で空白が戻る。これは受信側 `urlPattern` の `\b` 依存（`@<user-id>https://…` をリンク化させる）に合わせるための仕様。スペースを保持するノードと URL ノードは書式が違うため1ノードには統合されない。
 - メンション検索の API が応答しない(ハング)場合、Enter は最大 3 秒握りつぶされる。watchdog(`searchUser` 内 `watchdogTimer`)が `isSearching` を戻せば通常動作に復帰する。
+- エディタの contentEditable div は `id="messageInput"` を保つこと。`ChannelContents`（↑ キーで編集モード、入力有無は `textContent` で判定）と `EditMessage`（編集の保存・キャンセル後のフォーカス復帰）が `document.getElementById("messageInput")` で参照している。`<textarea>` 前提の `.value` 判定は div では常に `undefined` になりガードが効かない。
 - `RichTextExtension` を外すとタイピング・Enter・改行コマンドが壊れる。無効化は `PlainTextOnlyExtension` の経路遮断だけで行うこと（片方だけ塞ぐと書式が流入する）。
