@@ -149,6 +149,10 @@ import GiracleTextinput from "~/components/unique/GiracleTextinput/index.tsx";
 
 - `channelId` を渡すと `api.user.list` の `joinedChannel` に載り、そのチャンネル参加者に絞られる。省略時は全ユーザー検索。
 - `onEnter` に渡るのは `getMessageText(editor)` の戻り値（`@名前` → `@<user-id>` 変換済みの送信文字列）。コールバック後、コンポーネントがエディタをクリアする（editor は外に出さない）。
+- `onPasteFiles(files)`: クリップボードにファイルがある場合に呼ばれる（テキスト挿入は通常どおり継続）。
+- `sendWithCtrlKey()`: true を返す間は Ctrl+Enter でのみ送信する。
+- `canSendEmpty()`: true を返す間は本文が空でも Enter を `onEnter("")` へ流す（添付のみ送信用）。
+- `ref(handle)`: `{ getText(), clear(), focus() }` を受け取る。送信ボタン等から本文取得・クリア・フォーカスに使う。
 
 ## 落とし穴
 
