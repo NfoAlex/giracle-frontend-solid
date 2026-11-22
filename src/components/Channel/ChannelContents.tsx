@@ -216,6 +216,7 @@ export default function ChannelContents() {
   };
 
   let fetchFalingCount = 0;
+  let retryFetchTimer: ReturnType<typeof setTimeout> | undefined;
   const FnHistoryControllers = {
     /**
      * 履歴の取得、挿入
@@ -236,7 +237,8 @@ export default function ChannelContents() {
       //3回以上試行しているなら３秒待機
       if (fetchFalingCount >= 3) {
         console.error("ChannelContents :: FnHistoryControllers.fetchHistory : 履歴が取得に失敗しています...");
-        setTimeout(() => {
+        retryFetchTimer = setTimeout(() => {
+          retryFetchTimer = undefined;
           fetchFalingCount = 0;
           setStateFetchingHistory(false);
           FnExecutor.checkConditionToFecthHistory();
@@ -766,6 +768,8 @@ export default function ChannelContents() {
   });
 
   onCleanup(() => {
+    clearTimeout(retryFetchTimer);
+
     const el = FnBrowserApis.getHistoryElement();
     if (el)
       el.removeEventListener("scroll", BrowserEventHandlers.ScrollFns.handler);
