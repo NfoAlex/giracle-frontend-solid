@@ -38,7 +38,7 @@ export default function ChannelContents() {
   const [editingMsgId, setEditingMsgId] = createSignal("");
 
   const historyElementId = "history";
-  let globalStateFetchingHistory = false;
+  let [stateFetchingHistory, setStateFetchingHistory] = createSignal(false);
   let globalStateChannelMoveDone = false;
 
   const FnBrowserApis = {
@@ -215,6 +215,8 @@ export default function ChannelContents() {
     },
   };
 
+  let fetchFalingCount = 0;
+  let retryFetchTimer: ReturnType<typeof setTimeout> | undefined;
   const FnHistoryControllers = {
     /**
      * 履歴の取得、挿入
@@ -229,11 +231,20 @@ export default function ChannelContents() {
       _direction: "older" | "newer" = "older",
       _scrollToNewMessageLine: boolean = false, //新着線にスクロールさせる
     ) => {
-      if (globalStateFetchingHistory) return;
-      globalStateFetchingHistory = true;
+      if (stateFetchingHistory()) return;
+      setStateFetchingHistory(true);
 
-      //let anchor = null;
-      //anchor = FnBrowserApis.captureScrollAnchor();
+      //3回以上試行しているなら３秒待機
+      if (fetchFalingCount >= 3) {
+        console.error("ChannelContents :: FnHistoryControllers.fetchHistory : 履歴が取得に失敗しています...");
+        retryFetchTimer = setTimeout(() => {
+          retryFetchTimer = undefined;
+          fetchFalingCount = 0;
+          setStateFetchingHistory(false);
+          FnExecutor.checkConditionToFecthHistory();
+        }, 3000);
+        return;
+      }
 
       await api.channel
         .getHistory({
@@ -274,15 +285,16 @@ export default function ChannelContents() {
           await FnBrowserApis.waitForDomToSettle();
           FnBrowserApis.restoreScrollFromAnchor(anchor);
         })
-        .catch((e) =>
+        .catch((e) => {
+          fetchFalingCount++;
           console.warn(
             "ChannelContent :: FnHistoryControllers.fetchHistory : エラー->",
             _dat,
             e,
-          ),
-        )
+          );
+        })
         .finally(() => {
-          globalStateFetchingHistory = false;
+          setStateFetchingHistory(false);
         });
     },
 
@@ -756,6 +768,8 @@ export default function ChannelContents() {
   });
 
   onCleanup(() => {
+    clearTimeout(retryFetchTimer);
+
     const el = FnBrowserApis.getHistoryElement();
     if (el)
       el.removeEventListener("scroll", BrowserEventHandlers.ScrollFns.handler);
@@ -810,12 +824,13 @@ export default function ChannelContents() {
       </div>
 
       {
-        //TODO :: 最新に戻るボタン
+        //最新に戻るボタン
         !storeHistory[currentChannelId()]?.atEnd && (
           <div class="absolute bottom-10 right-10 z-10">
             <Button
               onClick={FnExecutor.executePreset.moveToNewest}
               class="w-16 h-16"
+              disabled={stateFetchingHistory()}
             >
               <IconArrowDown style="height:28px; width:28px;" />
             </Button>
