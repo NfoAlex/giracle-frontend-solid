@@ -604,7 +604,13 @@ export default function ChannelContents() {
       if (event.key === "ArrowUp" && editingMsgId() === "") {
         //もしテキストが入力された状態なら停止
         const inputEl = document.getElementById("messageInput");
-        if (inputEl && (inputEl.textContent ?? "").trim() !== "") return;
+        //旧式入力も含めた対応、将来削除予定
+        const inputText =
+          inputEl instanceof HTMLTextAreaElement ||
+          inputEl instanceof HTMLInputElement
+            ? inputEl.value
+            : (inputEl?.textContent ?? "");
+        if (inputText.trim() !== "") return;
 
         //一番近い自分のメッセージを探して編集モードにする
         const history = storeHistory[currentChannelId()]?.history;
