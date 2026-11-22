@@ -156,6 +156,7 @@ export default function GiracleTextinput(props: {
   return (
     <div class="w-full relative">
       <div
+        id="messageInput"
         class="min-h-10 max-h-40 overflow-y-auto p-2 bg-background border rounded-md"
         ref={editorRoot}
         contentEditable
