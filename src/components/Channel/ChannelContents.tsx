@@ -38,7 +38,7 @@ export default function ChannelContents() {
   const [editingMsgId, setEditingMsgId] = createSignal("");
 
   const historyElementId = "history";
-  let [stateFetchingHistory, setStateFetchingHistory] = false;
+  let [stateFetchingHistory, setStateFetchingHistory] = createSignal(false);
   let globalStateChannelMoveDone = false;
 
   const FnBrowserApis = {
