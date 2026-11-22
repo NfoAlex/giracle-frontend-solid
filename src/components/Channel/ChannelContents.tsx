@@ -215,6 +215,7 @@ export default function ChannelContents() {
     },
   };
 
+  let fetchFalingCount = 0;
   const FnHistoryControllers = {
     /**
      * 履歴の取得、挿入
@@ -232,8 +233,16 @@ export default function ChannelContents() {
       if (stateFetchingHistory()) return;
       setStateFetchingHistory(true);
 
-      //let anchor = null;
-      //anchor = FnBrowserApis.captureScrollAnchor();
+      //3回以上試行しているなら３秒待機
+      if (fetchFalingCount >= 3) {
+        console.error("ChannelContents :: FnHistoryControllers.fetchHistory : 履歴が取得に失敗しています...");
+        setTimeout(() => {
+          fetchFalingCount = 0;
+          setStateFetchingHistory(false);
+          FnExecutor.checkConditionToFecthHistory();
+        }, 3000);
+        return;
+      }
 
       await api.channel
         .getHistory({
@@ -274,13 +283,14 @@ export default function ChannelContents() {
           await FnBrowserApis.waitForDomToSettle();
           FnBrowserApis.restoreScrollFromAnchor(anchor);
         })
-        .catch((e) =>
+        .catch((e) => {
+          fetchFalingCount++;
           console.warn(
             "ChannelContent :: FnHistoryControllers.fetchHistory : エラー->",
             _dat,
             e,
-          ),
-        )
+          );
+        })
         .finally(() => {
           setStateFetchingHistory(false);
         });
