@@ -12,7 +12,8 @@ import FileUploadPreview from "./ChannelTextInput/FileUploadPreview.tsx";
 import ReplyMessageDisplay from "./ChannelTextInput/ReplyMessageDisplay.tsx";
 
 export default function ChannelTextInput() {
-  const params = useParams(); //URLパラメータを取得するやつ
+  // このコンポーネントは /channel/:channelId 配下でのみ描画される
+  const params = useParams<{ channelId: string }>(); //URLパラメータを取得するやつ
   const [fileIds, setFileIds] = createSignal<string[]>([]); //送信に使うファイルIDの配列
   const pushFileIds = (fileId: string) => {
     //ファイルIDを追加するようの関数
