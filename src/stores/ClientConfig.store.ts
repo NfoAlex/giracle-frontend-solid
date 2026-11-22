@@ -3,6 +3,7 @@ import { createMutable } from "solid-js/store";
 export const storeClientConfig = createMutable({
   chat: {
     sendWithCtrlKey: false,
+    useOldInput: false,
   },
   notification: {
     notifyInbox: true,
