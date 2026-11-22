@@ -3,7 +3,7 @@ import { IconSend, IconUpload } from "@tabler/icons-solidjs";
 import { createSignal, For, Show } from "solid-js";
 import { api } from "~/api/index.ts";
 import GiracleTextinput, {
-  type GiracleTextinputHandle,
+  type IGiracleTextinputHandle,
 } from "~/components/unique/GiracleTextinput/index.tsx";
 import { storeClientConfig } from "~/stores/ClientConfig.store.ts";
 import storeReplyingMessageId from "~/stores/ReplyingMessageId.store.ts";
@@ -20,7 +20,7 @@ export default function ChannelTextInput() {
     setFileIds([...fileIds(), fileId]);
   };
   const [fileInput, setFileInput] = createSignal<File[]>([]); //ファイル選択ダイアログからのファイル入力受け取り用配列
-  let textinputHandle: GiracleTextinputHandle | undefined;
+  let textinputHandle: IGiracleTextinputHandle | undefined;
 
   const sendMsg = (text: string) => {
     //空メッセージは送信しない

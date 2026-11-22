@@ -30,7 +30,7 @@ import MentionMenu from "./MentionMenu.tsx";
 import { definePlainTextOnlyExtension } from "./PlainTextOnlyExtension.ts";
 import { defineUrlUnderlineExtension } from "./UrlUnderlineExtension.ts";
 
-export interface GiracleTextinputHandle {
+export interface IGiracleTextinputHandle {
   /** getMessageText(ed) 相当の送信文字列(@名前 → @<user-id> 変換済み) */
   getText(): string;
   /** エディタ本文クリア + mentionState リセット */
@@ -49,7 +49,7 @@ export default function GiracleTextinput(props: {
   /** true を返す間、本文空でも Enter を onEnter へ流す(ファイル添付時の空本文送信用) */
   canSendEmpty?: () => boolean;
   /** onMount 時にハンドルを渡す(送信ボタン等、親から本文取得/クリアする用) */
-  ref?: (handle: GiracleTextinputHandle) => void;
+  ref?: (handle: IGiracleTextinputHandle) => void;
 }) {
   let editor: LexicalEditorWithDispose | undefined;
   let editorRoot: HTMLDivElement | undefined;
