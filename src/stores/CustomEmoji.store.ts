@@ -25,7 +25,7 @@ const applyEmojiDataset = () => {
 export namespace useStoreCustomEmoji {
   /**
    * 絵文字コードから絵文字データを取得する（同時実行は1回に集約）
-   * 完了したUnicode絵文字のみ長期キャッシュし、null・カスタム絵文字・失敗は再試行可能にする
+   * 完了した絵文字のみ長期キャッシュし、null・失敗は再試行可能にする
    */
   export const getEmoji = (emojiCode: string): Promise<Emoji | null> => {
     const cached = emojiRequestCache.get(emojiCode);
@@ -39,8 +39,8 @@ export namespace useStoreCustomEmoji {
     const request: Promise<Emoji | null> = emojiDB
       .getEmojiByShortcode(emojiCode)
       .then((emoji) => {
-        // Unicode絵文字以外は次回再取得できるようキャッシュから外す
-        if (emoji === null || "url" in emoji) {
+        // 未検出(null)は次回再取得できるようキャッシュから外す
+        if (emoji === null) {
           if (emojiRequestCache.get(emojiCode) === request) {
             emojiRequestCache.delete(emojiCode);
           }
