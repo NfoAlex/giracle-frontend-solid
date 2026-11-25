@@ -1,4 +1,4 @@
-import { createEffect, createSignal, For, on, Show } from "solid-js";
+import { createEffect, createSignal, For, on, onCleanup, Show } from "solid-js";
 import { createMutable } from "solid-js/store";
 import { api } from "~/api/index.ts";
 import { Badge } from "~/components/ui/badge.tsx";
@@ -14,13 +14,17 @@ export default function RenderEmojiReactions(props: {
   messageId: string;
   channelId: string;
 }) {
-  //リアクションをしているユーザー取得のためのデータJSONと取得状態用JSON
+  //リアクションをしているユーザー取得のためのデータJSON
   const reactedUserArrs = createMutable<{ [emojiCode: string]: string[] }>({});
-  const statusFetchingEmojiCode = createMutable<{
-    [emojiCode: string]: boolean;
-  }>({});
   //ホバー状態に入っている絵文字コード
   const [hoveringEmojiCode, setHoverEmojiCode] = createSignal<string>("");
+  //ホバー時の遅延取得タイマー(マウスが離れたら解除する)
+  let hoverTimerId: ReturnType<typeof setTimeout> | undefined;
+  //whoReactedのリクエスト世代(古いレスポンスの書き込みを防ぐ)
+  let fetchGeneration = 0;
+
+  //破棄時に保留中のホバー取得を止める
+  onCleanup(() => clearTimeout(hoverTimerId));
 
   //リアクションした人詳細表示モーダルのトリガー用
   const [dialogOpen, setDialogOpen] = createSignal(false);
@@ -67,28 +71,60 @@ export default function RenderEmojiReactions(props: {
     if (hoveringEmojiCode() !== emojiCode) return;
     //キャッシュが既にある場合は何もしない
     if (reactedUserArrs[emojiCode]) return;
-    //取得、格納
-    statusFetchingEmojiCode[emojiCode] = true;
+    //取得、格納(最後に発行したリクエストの結果だけを反映する)
+    const generation = ++fetchGeneration;
     api.message
       .whoReacted({ messageId: props.messageId, emojiCode })
       .then((res) => {
+        if (generation !== fetchGeneration) return;
         reactedUserArrs[emojiCode] = res.data;
       })
       .catch((e) =>
         console.error("RenderEmojiReactions :: fetchReactedUser : e->", e),
-      )
-      .finally(() => (statusFetchingEmojiCode[emojiCode] = false));
+      );
   };
 
-  //リアクションデータの変更を監視してリアクションしたユーザーデータを初期化
+  //前回のリアクション絵文字コード一覧(消えたコードのキャッシュ破棄用)
+  let prevReactionCodes = new Set<string>();
+
+  //リアクションデータの変更を監視して、変化した絵文字の取得済みユーザーデータのみ初期化
+  //(emojiCode にカンマやコロンが含まれうるため区切りは "|" と ",")
   createEffect(
     on(
-      () => props.reaction.map((r) => r.count).join(","),
-      () => {
-        //リアクションしたユーザーを初期化
-        for (const emojiCode of Object.keys(reactedUserArrs)) {
-          delete reactedUserArrs[emojiCode];
+      () =>
+        props.reaction
+          .map((r) => `${r.emojiCode}|${r.count}|${r.includingYou}`)
+          .join(","),
+      (_, prevKey) => {
+        //リアクションから消えた絵文字コードのキャッシュは比較対象外なので個別に破棄
+        const currentReactionCodes = new Set(
+          props.reaction.map((r) => r.emojiCode),
+        );
+        for (const emojiCode of prevReactionCodes) {
+          if (!currentReactionCodes.has(emojiCode)) {
+            delete reactedUserArrs[emojiCode];
+          }
         }
+        prevReactionCodes = currentReactionCodes;
+
+        const prevStateMap = new Map(
+          (prevKey ?? "")
+            .split(",")
+            .filter(Boolean)
+            .map((s) => {
+              const [emojiCode, count, includingYou] = s.split("|");
+              return [emojiCode, `${count}|${includingYou}`];
+            }),
+        );
+
+        for (const r of props.reaction) {
+          if (
+            prevStateMap.get(r.emojiCode) !== `${r.count}|${r.includingYou}`
+          ) {
+            delete reactedUserArrs[r.emojiCode];
+          }
+        }
+
         //もしホバー中なら再取得させる
         if (hoveringEmojiCode() !== "") {
           fetchReactedUser(hoveringEmojiCode());
@@ -110,11 +146,16 @@ export default function RenderEmojiReactions(props: {
               }
               onMouseEnter={() => {
                 setHoverEmojiCode(r.emojiCode);
-                setTimeout(() => {
+                clearTimeout(hoverTimerId);
+                hoverTimerId = setTimeout(() => {
                   if (hoveringEmojiCode() !== "") fetchReactedUser(r.emojiCode);
                 }, 500);
               }}
-              onMouseLeave={() => setHoverEmojiCode("")}
+              onMouseLeave={() => {
+                setHoverEmojiCode("");
+                clearTimeout(hoverTimerId);
+                hoverTimerId = undefined;
+              }}
               class={`select-none relative p-1 text-sm flex items-center gap-1 cursor-pointer hover:bg-accent hover:border-background border-accent ${r.includingYou ? "bg-accent border-primary" : ""}`}
             >
               <RenderEmoji emojiCode={r.emojiCode} />
@@ -137,7 +178,7 @@ export default function RenderEmojiReactions(props: {
                   <span class="flex flex-wrap gap-1">
                     {reactedUserArrs[r.emojiCode] !== undefined ? (
                       <>
-                        <For each={reactedUserArrs[r.emojiCode]}>
+                        <For each={reactedUserArrs[r.emojiCode].slice(0,5)}>
                           {(userId) => {
                             return (
                               <span class="text-sm text-primary">
