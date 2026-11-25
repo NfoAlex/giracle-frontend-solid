@@ -8,25 +8,33 @@ export const [storeCustomEmoji, setStoreCustomEmoji] = createStore<
 >([]);
 export const emojiDB = new Database();
 
+// 同一絵文字コードの検索を1つのPromiseに集約するキャッシュ(挿入順=LRU順)
+const EMOJI_REQUEST_CACHE_MAX_ENTRIES = 256;
+const emojiRequestCache = new Map<string, Promise<Emoji | null>>();
+
 /**
  * emojiDBへカスタム絵文字データセットを差分適用する
  * （new Database()での全件インデックス再構築を避ける）
  */
 const applyEmojiDataset = () => {
+  //カスタム絵文字は標準ショートコードを上書きできるため、古いキャッシュを捨てる
+  emojiRequestCache.clear();
   emojiDB.customEmoji = useStoreCustomEmoji.getEmojiDatasetWithCustomEmoji();
 };
 
 export namespace useStoreCustomEmoji {
-  // 同一絵文字コードの検索を1つのPromiseに集約するキャッシュ
-  const emojiRequestCache = new Map<string, Promise<Emoji | null>>();
-
   /**
    * 絵文字コードから絵文字データを取得する（同時実行は1回に集約）
    * 完了したUnicode絵文字のみ長期キャッシュし、null・カスタム絵文字・失敗は再試行可能にする
    */
   export const getEmoji = (emojiCode: string): Promise<Emoji | null> => {
     const cached = emojiRequestCache.get(emojiCode);
-    if (cached !== undefined) return cached;
+    if (cached !== undefined) {
+      //ヒットしたエントリを挿入順の末尾(=最新)へ移す
+      emojiRequestCache.delete(emojiCode);
+      emojiRequestCache.set(emojiCode, cached);
+      return cached;
+    }
 
     const request: Promise<Emoji | null> = emojiDB
       .getEmojiByShortcode(emojiCode)
@@ -41,6 +49,12 @@ export namespace useStoreCustomEmoji {
       });
 
     emojiRequestCache.set(emojiCode, request);
+
+    // 上限超過時は最も古いエントリを追い出す(実行中のPromiseは自分を再登録しない)
+    if (emojiRequestCache.size > EMOJI_REQUEST_CACHE_MAX_ENTRIES) {
+      const oldest = emojiRequestCache.keys().next();
+      if (!oldest.done) emojiRequestCache.delete(oldest.value);
+    }
 
     // 失敗時は再試行できるようキャッシュから外す（呼び出し側のrejectは維持）
     request.catch(() => {
