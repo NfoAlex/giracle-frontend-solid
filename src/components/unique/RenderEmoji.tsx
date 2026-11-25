@@ -24,7 +24,7 @@ export default function RenderEmoji(props: { emojiCode: string }) {
     }
 
     // カスタム絵文字（URL付き）
-    if (data.url !== undefined) {
+    if ("url" in data) {
       return {
         type: "custom",
         url: data.url,
