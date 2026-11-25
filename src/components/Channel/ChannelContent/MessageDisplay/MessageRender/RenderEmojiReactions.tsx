@@ -1,4 +1,4 @@
-import { createEffect, createSignal, For, on, Show } from "solid-js";
+import { createEffect, createSignal, For, on, onCleanup, Show } from "solid-js";
 import { createMutable } from "solid-js/store";
 import { api } from "~/api/index.ts";
 import { Badge } from "~/components/ui/badge.tsx";
@@ -20,6 +20,11 @@ export default function RenderEmojiReactions(props: {
   const [hoveringEmojiCode, setHoverEmojiCode] = createSignal<string>("");
   //ホバー時の遅延取得タイマー(マウスが離れたら解除する)
   let hoverTimerId: ReturnType<typeof setTimeout> | undefined;
+  //whoReactedのリクエスト世代(古いレスポンスの書き込みを防ぐ)
+  let fetchGeneration = 0;
+
+  //破棄時に保留中のホバー取得を止める
+  onCleanup(() => clearTimeout(hoverTimerId));
 
   //リアクションした人詳細表示モーダルのトリガー用
   const [dialogOpen, setDialogOpen] = createSignal(false);
@@ -66,10 +71,12 @@ export default function RenderEmojiReactions(props: {
     if (hoveringEmojiCode() !== emojiCode) return;
     //キャッシュが既にある場合は何もしない
     if (reactedUserArrs[emojiCode]) return;
-    //取得、格納
+    //取得、格納(最後に発行したリクエストの結果だけを反映する)
+    const generation = ++fetchGeneration;
     api.message
       .whoReacted({ messageId: props.messageId, emojiCode })
       .then((res) => {
+        if (generation !== fetchGeneration) return;
         reactedUserArrs[emojiCode] = res.data;
       })
       .catch((e) =>
