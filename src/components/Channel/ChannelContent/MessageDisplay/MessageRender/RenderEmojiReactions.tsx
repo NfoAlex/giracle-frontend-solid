@@ -84,6 +84,9 @@ export default function RenderEmojiReactions(props: {
       );
   };
 
+  //前回のリアクション絵文字コード一覧(消えたコードのキャッシュ破棄用)
+  let prevReactionCodes = new Set<string>();
+
   //リアクションデータの変更を監視して、変化した絵文字の取得済みユーザーデータのみ初期化
   //(emojiCode にカンマやコロンが含まれうるため区切りは "|" と ",")
   createEffect(
@@ -93,6 +96,17 @@ export default function RenderEmojiReactions(props: {
           .map((r) => `${r.emojiCode}|${r.count}|${r.includingYou}`)
           .join(","),
       (_, prevKey) => {
+        //リアクションから消えた絵文字コードのキャッシュは比較対象外なので個別に破棄
+        const currentReactionCodes = new Set(
+          props.reaction.map((r) => r.emojiCode),
+        );
+        for (const emojiCode of prevReactionCodes) {
+          if (!currentReactionCodes.has(emojiCode)) {
+            delete reactedUserArrs[emojiCode];
+          }
+        }
+        prevReactionCodes = currentReactionCodes;
+
         const prevStateMap = new Map(
           (prevKey ?? "")
             .split(",")
