@@ -1,14 +1,17 @@
 import type { Emoji } from "emoji-picker-element/shared.ts";
 import { createMemo, createSignal, onMount } from "solid-js";
-import { emojiDB } from "~/stores/CustomEmoji.store.ts";
+import { useStoreCustomEmoji } from "~/stores/CustomEmoji.store.ts";
 
 export default function RenderEmoji(props: { emojiCode: string }) {
   const [emojiData, setEmojiData] = createSignal<Emoji | null>(null);
 
   onMount(async () => {
-    //データ取得して格納
-    const _emojiData = await emojiDB.getEmojiByShortcode(props.emojiCode);
-    setEmojiData(_emojiData);
+    try {
+      // 共有キャッシュから取得して格納
+      setEmojiData(await useStoreCustomEmoji.getEmoji(props.emojiCode));
+    } catch (e) {
+      console.error("RenderEmoji :: onMount : e->", e);
+    }
   });
 
   // createMemoを使って絵文字表示用データを効率的に導出
