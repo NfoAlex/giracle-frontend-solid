@@ -178,7 +178,7 @@ export default function RenderEmojiReactions(props: {
                   <span class="flex flex-wrap gap-1">
                     {reactedUserArrs[r.emojiCode] !== undefined ? (
                       <>
-                        <For each={reactedUserArrs[r.emojiCode]}>
+                        <For each={reactedUserArrs[r.emojiCode].slice(0,5)}>
                           {(userId) => {
                             return (
                               <span class="text-sm text-primary">
