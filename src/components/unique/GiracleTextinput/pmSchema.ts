@@ -1,5 +1,5 @@
 import { type NodeSpec, type Node as PMNode, Schema } from "prosemirror-model";
-import type { EditorState, Transaction } from "prosemirror-state";
+import type { EditorState } from "prosemirror-state";
 
 /**
  * GiracleTextinput の ProseMirror スキーマ。
@@ -79,11 +79,23 @@ function serializeInline(block: PMNode): string {
     const child = block.child(i);
     if (child.type === pmSchema.nodes.mention) {
       out += `@<${child.attrs.userId}>`;
-    } else {
-      // 素テキスト中の `@<` は受信側 mentionPattern に偽メンションとして解釈されるため、
-      // ゼロ幅スペースを挟んでエスケープする(表示上は変化なし)
-      out += (child.text ?? "").replaceAll("@<", "@\u200B<");
+      continue;
     }
+    // Chrome はメンション隣の空白を NBSP に化けさせる。表示上は同じなので
+    // 送信文字列では通常の空白へ戻す(`\b` のリンク境界が崩れるため)
+    const text = (child.text ?? "").replaceAll("\u00a0", " ");
+    // メンション直後にスペース無しで文字が続く場合、受信側は `@<id>` と本文の
+    // リンク境界が崩れるため送信時だけ半角空白を補う
+    if (
+      i > 0 &&
+      block.child(i - 1).type === pmSchema.nodes.mention &&
+      !/^\s/.test(text)
+    ) {
+      out += " ";
+    }
+    // 素テキスト中の `@<` は受信側 mentionPattern に偽メンションとして解釈されるため、
+    // ゼロ幅スペースを挟んでエスケープする(表示上は変化なし)
+    out += text.replaceAll("@<", "@\u200B<");
   }
   return out;
 }
@@ -157,37 +169,4 @@ export function findUrlRanges(text: string): TUrlRange[] {
     ranges.push([match.index, match.index + match[0].length]);
   }
   return ranges;
-}
-
-/**
- * メンション直後のテキストが空白で始まらない場合に半角空白を 1 個補う。
- * 受信側は `@<user-id>https://…` をリンク化する(`\b` 境界)ため、表示が
- * `@bobhttps://…` のままだと送信後の描画と食い違う
- */
-export function withMentionSpacer(tr: Transaction): Transaction {
-  if (!tr.docChanged) return tr;
-  const inserts: number[] = [];
-  tr.doc.descendants((node, pos) => {
-    if (!node.isTextblock) return true;
-    let offset = 0;
-    for (let i = 0; i < node.childCount; i++) {
-      const child = node.child(i);
-      const prev = i > 0 ? node.child(i - 1) : null;
-      if (
-        prev?.type === pmSchema.nodes.mention &&
-        child.isText &&
-        !child.text?.startsWith(" ")
-      ) {
-        inserts.push(pos + 1 + offset);
-      }
-      offset += child.nodeSize;
-    }
-    // 段落の子は走査しない
-    return false;
-  });
-  // 後ろから挿入して座標のずれを避ける
-  for (const at of inserts.sort((a, b) => b - a)) {
-    tr.insert(at, pmSchema.text(" "));
-  }
-  return tr;
 }

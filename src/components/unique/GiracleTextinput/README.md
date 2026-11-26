@@ -7,7 +7,9 @@ ProseMirror ベースのテキスト入力。`@` でユーザー候補を出し�
 いないため、太字・斜体などのリッチ書式は構造的に流入できない。
 
 依存は `prosemirror-model` / `prosemirror-state` / `prosemirror-view` /
-`prosemirror-history` のみ。keymap・schema-basic は使わない（キー処理は自前、スキーマも自前定義）。
+`prosemirror-history` / `prosemirror-commands` / `prosemirror-keymap`。
+`baseKeymap` だけを keymap に載せる（段落結合・Ctrl+A 等の編集キー）。
+schema-basic は使わない（スキーマは自前定義）。
 
 ## ProseMirror の基本（このコードを読むための前提）
 
@@ -104,7 +106,8 @@ URL 範囲に `underline` クラス（Tailwind の `underline`）を付ける Pl
 
 ### `index.tsx`
 
-- `EditorView` の生成・破棄。plugin は `history()`（Undo/Redo）と `urlUnderlinePlugin()`。
+- `EditorView` の生成・破棄。plugin は `history()`（Undo/Redo）、`keymap(baseKeymap)`（段落結合・Ctrl+A 等の標準キー）、`urlUnderlinePlugin()`。
+  `handleKeyDown`（コンポーネント直下の prop）は plugin より先に評価されるため、composition ガードが常に最優先。
 - `mentionState` signal と `menuItems`（`createMemo`、アイコン URL は `encodeURIComponent`）。
 - `searchUser(query, channelId)` — 200ms debounce、切替後の `channelId` 不一致は破棄、応答も
   クエリ・チャンネル一致時のみ反映、失敗時は `isSearching` を戻す。3 秒 watchdog が
@@ -148,9 +151,11 @@ import GiracleTextinput from "~/components/unique/GiracleTextinput/index.tsx";
 - 受信側の `mentionPattern`（`/@<([a-f0-9-]+)>/g`）は `[a-f0-9-]` のみ受け付ける。`u1` のような ID を挿入しても、送信後の本文はメンションとして描画されず素テキストになる。
 - 段落結合は `\n`（単一）。送信経路が素の textarea（`ChannelTextInput.tsx`）と同じ形式で、受信側は `whitespace-pre-wrap` 描画のため。
 - ZWSP エスケープは本文・保存・通知文にそのまま残る。不可視で表示に影響はない。もしサーバ側が本文の `@<id>` を通知トリガーにしているなら、エスケープ済みテキストはトリガーにならない（偽装防止として意図通り）。
-- メンションは atom なので内部にキャレットが入らない。Backspace はブラウザ既定の contentEditable 編集でノードごと消え、その DOM 変更を ProseMirror が取り込む。ただしメンション直後の半角空白にカーソルがある場合だけは「空白だけ消えて無反応に見える」ため、`handleKeyDown` がメンションごと削除する。
-- メンション直後のスペーサーは doc 変更のある transaction ごとに強制されるため、Delete で消しても同一 transaction で再挿入される。これは受信側 `urlPattern` の `\b` 依存（`@<user-id>https://…` をリンク化させる）に合わせるための仕様。
+- メンションは atom なので内部にキャレットが入らない。Backspace はブラウザ既定の contentEditable 編集でノードごと消え、その DOM 変更を ProseMirror が取り込む。
+- メンション確定時に直後へ入れる空白は **NBSP**。通常の空白だと段落末で Chrome が折り畳み、次の 1 文字入力でその空白が置換される（メンションと本文がくっつく）。送信時に `serializeInline` が通常の空白へ戻す。
+- Chrome はメンション隣の空白も NBSP に置換する。doc 内の NBSP を transaction で書き換える補正は入れない（書き換え後の次の入力がその 1 文字を置換してしまい逆効果だった）。送信時に正規化する。
+- メンション直後に空白なしで文字が続く場合（NBSP を消してから入力した場合など）、送信文字列では `serializeInline` が半角空白を 1 個補う。受信側 `urlPattern` の `\b` 境界（`@<user-id>https://…` をリンク化させる）のため。
 - メンション検索の API が応答しない(ハング)場合、Enter は最大 3 秒握りつぶされる。watchdog（`searchUser` 内）が `isSearching` を戻せば通常動作に復帰する。
 - contentDOM は `id="messageInput"` を保つこと。`ChannelContents`（↑ キーで編集モード、入力有無は `textContent` で判定）と `EditMessage`（編集の保存・キャンセル後のフォーカス復帰）が `document.getElementById("messageInput")` で参照している。`<textarea>` 前提の `.value` 判定は div では常に `undefined` になりガードが効かない。
-- キー処理を keymap プラグインに分散させないこと。`handleKeyDown` 1 個で composition ガードを先頭に置く構造が、IME 変換中の誤送信・誤挿入を防いでいる。
+- 送信・確定・メニュー操作のキー処理は keymap に載せず `handleKeyDown` 1 個に集約すること。`handleKeyDown` は plugin より先に評価され、先頭の composition ガードが IME 変換中の誤送信・誤挿入を防いでいる。`keymap(baseKeymap)` は編集系キー専用。
 - スキーマに `marks` を足すと、ペースト経路や Ctrl+B で書式が流入する。装飾を増やす場合も `Decoration`（表示のみ）で行うこと。

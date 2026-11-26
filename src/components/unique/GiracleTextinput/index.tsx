@@ -1,4 +1,6 @@
+import { baseKeymap } from "prosemirror-commands";
 import { history, redo, undo } from "prosemirror-history";
+import { keymap } from "prosemirror-keymap";
 import {
   EditorState,
   TextSelection,
@@ -21,7 +23,6 @@ import {
   getMentionQuery,
   getMessageText,
   pmSchema,
-  withMentionSpacer,
 } from "./pmSchema.ts";
 import { urlUnderlinePlugin } from "./pmUrlUnderline.ts";
 
@@ -182,9 +183,9 @@ export default function GiracleTextinput(props: {
 
   const dispatchTransaction = (tr: Transaction) => {
     if (!view) return;
-    // IME 変換中にテキストノードを分割すると変換が壊れるため、スペーサー挿入は
-    // 変換終了後の transaction に任せる
-    const next = view.state.apply(view.composing ? tr : withMentionSpacer(tr));
+    const applied = view.state.apply(tr);
+    // IME 変換中はテキストノードを触らず、変換を壊さない
+    const next = applied;
     view.updateState(next);
     syncMentionState(next);
   };
@@ -210,9 +211,12 @@ export default function GiracleTextinput(props: {
       userId: user.id,
       name: user.name,
     });
+    // 直後の空白は NBSP で入れる。通常の空白を段落末に置くと Chrome が折り畳み、
+    // 次の入力でその1文字が置き換わる(表示上メンションと本文がくっつく)。
+    // 送信時に通常の空白へ戻す(serializeInline)
     const tr = view.state.tr.replaceWith(found.from, found.to, [
       mention,
-      pmSchema.text(" "),
+      pmSchema.text("\u00a0"),
     ]);
     tr.setSelection(TextSelection.create(tr.doc, found.from + 2));
     view.dispatch(tr);
@@ -284,32 +288,6 @@ export default function GiracleTextinput(props: {
       return true;
     }
 
-    // メンション直後の半角空白にカーソルがあるとき、空白だけ消えて「何も起きない」
-    // ように見えるため、メンションごと 1 回で削除する
-    if (event.key === "Backspace" && v.state.selection.empty) {
-      const $from = v.state.selection.$from;
-      const parent = $from.parent;
-      const index = $from.index();
-      const before = index > 0 ? parent.child(index - 1) : null;
-      const beforeMention = index > 1 ? parent.child(index - 2) : null;
-      if (
-        before?.isText &&
-        before.text !== undefined &&
-        before.text.length > 0 &&
-        before.text.trim() === "" &&
-        beforeMention?.type === pmSchema.nodes.mention
-      ) {
-        event.preventDefault();
-        v.dispatch(
-          v.state.tr.delete(
-            $from.pos - before.nodeSize - beforeMention.nodeSize,
-            $from.pos,
-          ),
-        );
-        return true;
-      }
-    }
-
     if (event.ctrlKey || event.metaKey) {
       const key = event.key.toLowerCase();
       if (key === "z") {
@@ -331,7 +309,7 @@ export default function GiracleTextinput(props: {
       state: EditorState.create({
         doc: createEmptyDoc(),
         schema: pmSchema,
-        plugins: [history(), urlUnderlinePlugin()],
+        plugins: [history(), keymap(baseKeymap), urlUnderlinePlugin()],
       }),
       dispatchTransaction,
       // 親(ChannelContents / EditMessage)は id で textContent 参照・focus する
