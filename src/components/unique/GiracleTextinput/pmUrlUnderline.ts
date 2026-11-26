@@ -5,6 +5,10 @@ import { findUrlRanges } from "./pmSchema.ts";
 
 const urlUnderlineKey = new PluginKey<DecorationSet>("giracle/url-underline");
 
+/** これを超える段落は下線を付けない(巨大ペーストで毎キー数千個の装飾を
+ * 作り直すと 20ms/キー級になるため)。下線は装飾のみで機能には影響しない */
+const MAX_DECORATE_CHARS = 20000;
+
 /**
  * 段落ごとに URL 範囲を求め `underline` クラスを付ける。
  * 受信側 MessageTextRender と同じ URL パターンなので下線範囲とリンク範囲が一致する。
@@ -13,6 +17,8 @@ function buildDecorations(doc: PMNode): DecorationSet {
   const decorations: Decoration[] = [];
   doc.descendants((node, pos) => {
     if (!node.isTextblock) return true;
+    // 文字列化の前にサイズで弾く(巨大な textBetween を避ける)
+    if (node.content.size > MAX_DECORATE_CHARS) return false;
     // メンション(atom)は 1 文字の代替文字として扱い、オフセットと doc 座標を 1:1 にする
     const text = node.textBetween(
       0,

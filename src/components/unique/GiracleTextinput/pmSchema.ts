@@ -129,12 +129,11 @@ export function getMentionQuery(state: EditorState): IMentionQuery | null {
 
   // メンション(atom)は 1 文字分の空白として扱う。
   // これにより `@` の後にチップが挟まる場合は \S* が途切れて検出されない
-  const before = $from.parent.textBetween(
-    0,
-    $from.parentOffset,
-    undefined,
-    () => " ",
-  );
+  // 段落全体ではなくカーソル直前の窓だけを見る(巨大ペーストで毎キー O(n)
+  // の文字列確保が走るのを防ぐ)。128 文字超のクエリはユーザー名に一致しない
+  const end = $from.parentOffset;
+  const start = Math.max(0, end - 128);
+  const before = $from.parent.textBetween(start, end, undefined, () => " ");
   const match = /@(\S*)$/.exec(before);
   if (!match || match[1].startsWith("<")) return null;
   // `$` は末尾の改行の直前にもマッチするため、真の末尾でなければ検出しない
@@ -144,6 +143,8 @@ export function getMentionQuery(state: EditorState): IMentionQuery | null {
   // CJKは \p{L} に含まれるためUnicodeクラスでなくASCII文字種判定にする
   // (日本語の「こんにちは@田中」のようなスペースなしメンションを殺さないため)
   const at = before.length - match[0].length;
+  // 窓の先頭で切れている = 直前の文字が確認できない 128 文字超のクエリ
+  if (at === 0 && start > 0) return null;
   if (at > 0 && /[A-Za-z0-9_]/.test(before[at - 1])) return null;
 
   const to = $from.pos;
