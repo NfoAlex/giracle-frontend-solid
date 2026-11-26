@@ -326,14 +326,18 @@ export default function GiracleTextinput(props: {
           node.type === pmSchema.nodes.mention ? `@${node.attrs.name}` : "",
         ),
       handleDOMEvents: {
-        // PM 既定は text/html を優先し、<br> を段落内の改行文字に、<li> を区切り無しの
-        // 連結にしてしまう(表示と送信文字列が食い違う)。旧実装同様 plain text 固定にする
+        // PM 既定は text/html を優先し、<br> を段落内の改行文字、<li> を区切り無しの
+        // 連結にしてしまう(表示と送信文字列が食い違う)。メンションを含まない HTML は
+        // 旧実装同様 plain text 固定にする
         paste: (v, event) => {
           const dt =
             event instanceof ClipboardEvent ? event.clipboardData : null;
           if (!dt) return false;
-          event.preventDefault();
           if (dt.files.length > 0) props.onPasteFiles?.([...dt.files]);
+          // 自前のチップ入り HTML だけは PM に解釈させる(parseDOM でチップへ戻る)
+          if (dt.getData("text/html").includes("data-mention-user-id"))
+            return false;
+          event.preventDefault();
           const text = plainTextFrom(dt);
           if (text !== "") v.dispatch(v.state.tr.insertText(text));
           return true;
