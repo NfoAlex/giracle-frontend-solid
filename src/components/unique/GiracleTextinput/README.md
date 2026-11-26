@@ -156,6 +156,7 @@ import GiracleTextinput from "~/components/unique/GiracleTextinput/index.tsx";
 - Chrome はメンション隣の空白も NBSP に置換する。doc 内の NBSP を transaction で書き換える補正は入れない（書き換え後の次の入力がその 1 文字を置換してしまい逆効果だった）。送信時に正規化する。
 - メンション直後に空白なしで文字が続く場合（NBSP を消してから入力した場合など）、送信文字列では `serializeInline` が半角空白を 1 個補う。受信側 `urlPattern` の `\b` 境界（`@<user-id>https://…` をリンク化させる）のため。
 - メンション検索の API が応答しない(ハング)場合、Enter は最大 3 秒握りつぶされる。watchdog（`searchUser` 内）が `isSearching` を戻せば通常動作に復帰する。
+- コピー時のテキスト化は `clipboardTextSerializer` を明示している。PM 既定の `Fragment.textBetween` は atom を空文字にするため、指定しないとコピーしたチップがテキストから消える（HTML 側には残る）。ペーストは plain text 固定なので、貼り付けたチップはチップではなく `@名前` のテキストになる（移行前と同じ）。
 - contentDOM は `id="messageInput"` を保つこと。`ChannelContents`（↑ キーで編集モード、入力有無は `textContent` で判定）と `EditMessage`（編集の保存・キャンセル後のフォーカス復帰）が `document.getElementById("messageInput")` で参照している。`<textarea>` 前提の `.value` 判定は div では常に `undefined` になりガードが効かない。
 - 送信・確定・メニュー操作のキー処理は keymap に載せず `handleKeyDown` 1 個に集約すること。`handleKeyDown` は plugin より先に評価され、先頭の composition ガードが IME 変換中の誤送信・誤挿入を防いでいる。`keymap(baseKeymap)` は編集系キー専用。
 - スキーマに `marks` を足すと、ペースト経路や Ctrl+B で書式が流入する。装飾を増やす場合も `Decoration`（表示のみ）で行うこと。

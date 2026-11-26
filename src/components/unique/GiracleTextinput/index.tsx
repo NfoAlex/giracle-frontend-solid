@@ -319,6 +319,12 @@ export default function GiracleTextinput(props: {
           "min-h-10 max-h-40 overflow-y-auto p-2 bg-background border rounded-md",
       },
       handleKeyDown,
+      // PM 既定のテキスト化は atom を空文字にするため、コピーしたチップが
+      // 消える。移行前(Lexical)同様、名前でコピーする
+      clipboardTextSerializer: (slice) =>
+        slice.content.textBetween(0, slice.content.size, "\n", (node) =>
+          node.type === pmSchema.nodes.mention ? `@${node.attrs.name}` : "",
+        ),
       handleDOMEvents: {
         // PM 既定は text/html を優先し、<br> を段落内の改行文字に、<li> を区切り無しの
         // 連結にしてしまう(表示と送信文字列が食い違う)。旧実装同様 plain text 固定にする
