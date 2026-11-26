@@ -14,6 +14,7 @@ function sanitizeMentionName(raw: string, fallback: string): string {
   const name = [...raw]
     .filter((c) => {
       const code = c.charCodeAt(0);
+      //0x00〜0x1F の制御文字と、0x7F（DEL）を除去する(表示に影響しない可視文字だけを許可)
       return code > 0x1f && code !== 0x7f;
     })
     .join("")
