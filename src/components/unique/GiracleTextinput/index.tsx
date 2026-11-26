@@ -316,7 +316,7 @@ export default function GiracleTextinput(props: {
       attributes: {
         id: "messageInput",
         class:
-          "min-h-10 max-h-40 overflow-y-auto p-2 bg-background border rounded-md",
+          "min-h-10 max-h-40 overflow-y-auto p-2 bg-background border rounded-md whitespace-pre-wrap",
       },
       handleKeyDown,
       // PM 既定のテキスト化は atom を空文字にするため、コピーしたチップが

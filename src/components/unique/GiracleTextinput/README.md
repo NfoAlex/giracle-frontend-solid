@@ -150,6 +150,7 @@ import GiracleTextinput from "~/components/unique/GiracleTextinput/index.tsx";
 
 - 受信側の `mentionPattern`（`/@<([a-f0-9-]+)>/g`）は `[a-f0-9-]` のみ受け付ける。`u1` のような ID を挿入しても、送信後の本文はメンションとして描画されず素テキストになる。
 - 段落結合は `\n`（単一）。送信経路が素の textarea（`ChannelTextInput.tsx`）と同じ形式で、受信側は `whitespace-pre-wrap` 描画のため。
+- contentDOM の class から `whitespace-pre-wrap` を外してはいけない。ペースト・ドロップの改行は段落ではなくテキストノード内の `\n` 文字で保持されるため、`pre-wrap` がないと表示上1行に折り畳まれる（送信文字列には `\n` が残るので表示と送信が食い違う）。旧 Lexical は `insertRawText` が `\n` を LineBreak(`<br>`)ノードに変換していたため不要だった。
 - ZWSP エスケープは本文・保存・通知文にそのまま残る。不可視で表示に影響はない。もしサーバ側が本文の `@<id>` を通知トリガーにしているなら、エスケープ済みテキストはトリガーにならない（偽装防止として意図通り）。
 - メンションは atom なので内部にキャレットが入らない。Backspace はブラウザ既定の contentEditable 編集でノードごと消え、その DOM 変更を ProseMirror が取り込む。
 - メンション確定時に直後へ入れる空白は **NBSP**。通常の空白だと段落末で Chrome が折り畳み、次の 1 文字入力でその空白が置換される（メンションと本文がくっつく）。送信時に `serializeInline` が通常の空白へ戻す。
