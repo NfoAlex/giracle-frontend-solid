@@ -8,6 +8,10 @@ import {
   type Transaction,
 } from "prosemirror-state";
 import { EditorView } from "prosemirror-view";
+// 同梱 CSS 未 import だと Tailwind preflight の `img { display: block }` が
+// `img.ProseMirror-separator`(atom 段落末のキャレット確保用)に効き、
+// チップ直後に空行が出る。必ず import する
+import "prosemirror-view/style/prosemirror.css";
 import {
   createEffect,
   createMemo,
