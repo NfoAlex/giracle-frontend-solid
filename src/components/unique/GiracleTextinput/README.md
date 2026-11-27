@@ -195,7 +195,7 @@ import GiracleTextinput from "~/components/unique/GiracleTextinput/index.tsx";
 - メンション検索の API が応答しない(ハング)場合、Enter は最大 3 秒握りつぶされる。watchdog（`searchUser` 内）が `isSearching` を戻せば通常動作に復帰する。
 - コピー時のテキスト化は `clipboardTextSerializer` を明示している。PM 既定の `Fragment.textBetween` は atom を空文字にするため、指定しないとコピーしたチップがテキストから消える（HTML 側には残る）。
 - ペーストは基本的に plain text 固定（`<br>`・`<li>` の取りこぼし回避）。ただし HTML に `data-pm-slice` と `data-mention-user-id` / `data-channel-id` を含む場合（＝自前のコピー）だけは PM にパースさせ、`parseDOM` でチップへ戻す。
-- 巨大ペースト対策の上限が 2 つある。URL 下線は段落 `content.size` が 20,000 超で付かない（`pmUrlUnderline.ts`。装飾のみで機能に影響しない）。トリガー検出はカーソル直前 128 文字だけを見る（`getTriggerQuery`。それ以上のクエリは候補名に一致しないため、窓先頭で切れた場合は未検出扱い）。
+- 巨大ペースト対策の上限が 3 つある。URL 下線は段落 `content.size` が 20,000 超の段落に付かず、装飾総数が 1,000 を超えるとそのメッセージ全体で付かない（`pmUrlUnderline.ts`。装飾のみで機能に影響しない。総数上限は実測で 10,000 装飾 ≒ 100ms/キーになるため）。トリガー検出はカーソル直前 128 文字だけを見る（`getTriggerQuery`。それ以上のクエリは候補名に一致しないため、窓先頭で切れた場合は未検出扱い）。
 - contentDOM は `id="messageInput"` を保つこと。`ChannelContents`（↑ キーで編集モード、入力有無は `textContent` で判定）と `EditMessage`（編集の保存・キャンセル後のフォーカス復帰）が `document.getElementById("messageInput")` で参照している。`<textarea>` 前提の `.value` 判定は div では常に `undefined` になりガードが効かない。
 - 送信・確定・メニューのキー処理は handleKeyDown に集約し 1 個にまとめること。`handleKeyDown` は plugin より先に評価され、先頭の composition ガードが IME 変換中の誤送信・誤挿入を防いでいる。`keymap(baseKeymap)` と Undo/Redo の keymap は編集系キー専用。
 - スキーマに `marks` を足すと、ペースト経路や Ctrl+B で書式が流入する。装飾を増やす場合も `Decoration`（表示のみ）で行うこと。
