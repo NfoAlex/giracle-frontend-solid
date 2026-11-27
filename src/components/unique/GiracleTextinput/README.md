@@ -21,8 +21,8 @@ schema-basic は使わない（スキーマは自前定義）。
 - `mention`（ユーザー）と `channelMention`（チャンネル）は `atom: true`（内部を持たない 1 単位の
   インラインノード）。`selectable: false` なので
   クリック・矢印でノード選択にならず、キャレットは前後どちらかに落ちる。DOM 上は
-  `contenteditable="false"` の span になり、**Backspace 1 回でノードごと消える**（メンション直後の
-  半角空白にカーソルがある場合だけ `handleKeyDown` が自前で消す）。
+  `contenteditable="false"` の span になり、**Backspace 1 回でノードごと消える**（自前の
+  Backspace 分岐は無い。ブラウザ既定の編集を ProseMirror が取り込む）。
 - 各ノード型は `toDOM`（DOM 生成）と `parseDOM`（HTML からの取り込み、ペースト・ドロップ経路）を持つ。
   `mention` の `parseDOM` は `span[data-mention-user-id]` を受け、`userId` を `/^[a-f0-9-]{1,64}$/`
   で検証し、`name` から制御文字を除去して 128 文字に切り詰める（受信側 `mentionPattern` と同じ文字種）。
@@ -31,8 +31,7 @@ schema-basic は使わない（スキーマは自前定義）。
 
 - `EditorState` は不変のスナップショット（doc + selection + plugin state）。
 - 変更は `state.tr`（Transaction）に積み、`view.dispatch(tr)` で適用する。
-- `index.tsx` は `dispatchTransaction` を自前実装しており、`tr` にメンション後スペーサーを
-  足してから `view.state.apply` → `view.updateState` する。**状態の反映点はここ 1 箇所**。
+- `index.tsx` は `dispatchTransaction` を自前実装しており、`view.state.apply` → `view.updateState` する。**状態の反映点はここ 1 箇所**。
   適用後に `getTriggerQuery` を読んでメニュー状態を更新する（再帰的に transaction を投げない）。
 - 座標は「ノード境界＝1 位置」で数える。text ノードは 1 文字 1 位置、`mention` も 1 位置。
 
@@ -48,7 +47,7 @@ schema-basic は使わない（スキーマは自前定義）。
 
 - `EditorView` はマウント先の div の中に `contenteditable` な contentDOM を作る。
   `attributes` で `id="messageInput"` と class を付けており、**id はこの contentDOM が持つ**。
-- キー処理は `handleKeyDown` 1 個に集約している（keymap プラグインは使わない）。先頭で
+- キー処理は `handleKeyDown` 1 個に集約している（編集系キーと Undo/Redo は keymap プラグイン、送信・確定・メニューは handleKeyDown）。先頭で
   `view.composing` を検査し、IME 変換中は一切横取りしない。これがスマホ Firefox での
   変換中断を避けるための要。
 
@@ -95,9 +94,6 @@ flowchart LR
   - 確定済み `@<` / `#<` は除外。`@` / `#` の直前が ASCII 英数字/`_` のケース（`foo@bar`）も除外。
     CJK は対象外なので `こんにちは@田中` / `こんにちは#一般` は検出される。コロンは前方ガード無し
     （`https://` や `12:30` でも候補が出るが、Esc で閉じられる通常候補として扱う）。
-- `withMentionSpacer(tr)` — メンション直後のテキストが空白以外で始まる場合、その先頭に半角空白を
-  1 個挿入する。受信側は `@<user-id>` の直後を `\b` 依存でリンク化するため、`@bobhttps://…` の
-  ままだと下線範囲と送信後の描画が食い違うのを防ぐ。挿入は座標のずれを避けて後ろから行う。
 - `URL_PATTERN_SOURCE` / `findUrlRanges(text)` — `MessageTextRender.tsx` の `urlPattern` と同一ソース。
   `g` フラグは共有せず、必要なたび `RegExp` を作る（`lastIndex` 残留を避ける）。
 
@@ -137,7 +133,7 @@ URL 範囲に `underline` クラス（Tailwind の `underline`）を付ける Pl
 
 ### `index.tsx`
 
-- `EditorView` の生成・破棄。plugin は `history()`（Undo/Redo）、`keymap(baseKeymap)`（段落結合・Ctrl+A 等の標準キー）、`urlUnderlinePlugin()`。
+- `EditorView` の生成・破棄。plugin は `history()`、Undo/Redo 用の `keymap({ "Mod-z": undo, "Shift-Mod-z": redo, "Mod-y": redo })`、`keymap(baseKeymap)`（段落結合・Ctrl+A 等の標準キー）、`urlUnderlinePlugin()`。
   `handleKeyDown`（コンポーネント直下の prop）は plugin より先に評価されるため、composition ガードが常に最優先。
 - `suggestionState` signal と `menuItems`（`createMemo`）。`menuItems` は `kind` で
   `suggestions/*` の `*MenuItem` に委譲する。
@@ -151,19 +147,23 @@ URL 範囲に `underline` クラス（Tailwind の `underline`）を付ける Pl
   1. `view.composing` なら `false`（IME 変換中のキーは一切触らない）。
   2. `Enter` — メニュー有効かつ候補ありなら `kind` ごとに確定（`user` / `channel` はチップ + 空白、
      `emoji` は `:code:` + 空白の素テキスト挿入）。候補 0 件でも `isSearching`（`user` 検索中）の間は `Enter` を消費して
-     誤送信を防ぐ（`isSearching` が false なら通常送信へ流す）。未消費の `Enter` は送信: Shift+Enter は `tr.split` で改行、`sendWithCtrlKey()` が
+     誤送信を防ぐ（`isSearching` が false なら通常送信へ流す）。未消費の `Enter` は送信: Shift+Enter は `splitBlock` で改行（選択範囲削除・scrollIntoView 付き）、`sendWithCtrlKey()` が
      true なら Ctrl 必須、本文が空白のみで `canSendEmpty()` が false なら何もしない。送信後は
      無条件に本文をクリアする（`ChannelTextInput` の `sendMsg` と同じ）。
   3. `ArrowUp` / `ArrowDown` — メニュー有効かつ `kind` の候補（`users` / `channels` / `emojiCodes`）が
      1 件以上のときだけ選択移動。それ以外は `false` を
      返し、親（`ChannelContents`）の ArrowUp 編集ショートカットへ流す。
   4. `Escape` — メニューを閉じる。
-  5. `Ctrl/Cmd+Z` / `Ctrl/Cmd+Shift+Z` / `Ctrl/Cmd+Y` — `prosemirror-history` の `undo` / `redo`。
-     Ctrl+B/I/U 等はハンドラ不要（marks が無いので書式は付かない）。
+  5. Undo/Redo は `handleKeyDown` ではなく keymap プラグインの `Mod-z` / `Shift-Mod-z` / `Mod-y` が担う。
+     `Ctrl+B/I/U` はスキーマに marks が無いため何も起きない。
 - `handleDOMEvents.paste` — 既定動作は使わず `preventDefault` して plain text だけを挿入する
   （PM 既定は `text/html` を優先し、`<br>` を段落内の改行文字・`<li>` を区切りの無い連結にするため、
   表示と送信文字列が食い違う）。クリップボードにファイルがあれば `onPasteFiles` へ渡す。
-  ドロップは既定処理（挿入位置はドロップ座標）。
+  複数行は段落 Slice に分割して `replaceSelection` する（CRLF も改行として扱う）。
+  自前コピーの判定は `data-pm-slice` と `data-mention-user-id` / `data-channel-id` の両立条件。
+  ドロップも paste 同様に plain text の段落 Slice へ変換する（ファイルは既定処理）。ただし
+  同一エディタ内のドラッグ移動（`view.dragging` が非 null）と `data-pm-slice` を含む HTML は
+  PM の既定処理（move / `parseDOM`）に任せる。
 - `ref(handle)` — `getText()` は `getMessageText(view.state.doc)`、`clear()` は doc を空段落へ置換、
   `focus()` は `view.focus()`。
 - `onCleanup` で debounce/watchdog タイマーを止め、`view.destroy()` する。
@@ -187,16 +187,15 @@ import GiracleTextinput from "~/components/unique/GiracleTextinput/index.tsx";
 
 - 受信側の `mentionPattern`（`/@<([a-f0-9-]+)>/g`）は `[a-f0-9-]` のみ受け付ける。`u1` のような ID を挿入しても、送信後の本文はメンションとして描画されず素テキストになる。
 - 段落結合は `\n`（単一）。送信経路が素の textarea（`ChannelTextInput.tsx`）と同じ形式で、受信側は `whitespace-pre-wrap` 描画のため。
-- contentDOM の class から `whitespace-pre-wrap` を外してはいけない。ペースト・ドロップの改行は段落ではなくテキストノード内の `\n` 文字で保持されるため、`pre-wrap` がないと表示上1行に折り畳まれる（送信文字列には `\n` が残るので表示と送信が食い違う）。旧 Lexical は `insertRawText` が `\n` を LineBreak(`<br>`)ノードに変換していたため不要だった。
+- contentDOM の class から `whitespace-pre-wrap` を外してはいけない。ペースト・ドロップの改行は段落 Slice として別段落に分割されるが、IME 変換や AI 入力など text ノード内に `\n` を含む経路が残るため、`pre-wrap` がないと表示上1行に折り畳まれる（送信文字列には `\n` が残るので表示と送信が食い違う）。旧 Lexical は `insertRawText` が `\n` を LineBreak(`<br>`)ノードに変換していたため不要だった。
 - ZWSP エスケープは本文・保存・通知文にそのまま残る。不可視で表示に影響はない。もしサーバ側が本文の `@<id>` を通知トリガーにしているなら、エスケープ済みテキストはトリガーにならない（偽装防止として意図通り）。
 - メンションは atom なので内部にキャレットが入らない。Backspace はブラウザ既定の contentEditable 編集でノードごと消え、その DOM 変更を ProseMirror が取り込む。
 - メンション確定時に直後へ入れる空白は **NBSP**。通常の空白だと段落末で Chrome が折り畳み、次の 1 文字入力でその空白が置換される（メンションと本文がくっつく）。送信時に `serializeInline` が通常の空白へ戻す。
 - Chrome はメンション隣の空白も NBSP に置換する。doc 内の NBSP を transaction で書き換える補正は入れない（書き換え後の次の入力がその 1 文字を置換してしまい逆効果だった）。送信時に正規化する。
-- メンション直後に空白なしで文字が続く場合（NBSP を消してから入力した場合など）、送信文字列では `serializeInline` が半角空白を 1 個補う。受信側 `urlPattern` の `\b` 境界（`@<user-id>https://…` をリンク化させる）のため。
 - メンション検索の API が応答しない(ハング)場合、Enter は最大 3 秒握りつぶされる。watchdog（`searchUser` 内）が `isSearching` を戻せば通常動作に復帰する。
 - コピー時のテキスト化は `clipboardTextSerializer` を明示している。PM 既定の `Fragment.textBetween` は atom を空文字にするため、指定しないとコピーしたチップがテキストから消える（HTML 側には残る）。
-- ペーストは基本的に plain text 固定（`<br>`・`<li>` の取りこぼし回避）。ただし HTML に `data-mention-user-id` か `data-channel-id` を含む場合（＝自前のコピー）だけは PM にパースさせ、`parseDOM` でチップへ戻す。
+- ペーストは基本的に plain text 固定（`<br>`・`<li>` の取りこぼし回避）。ただし HTML に `data-pm-slice` と `data-mention-user-id` / `data-channel-id` を含む場合（＝自前のコピー）だけは PM にパースさせ、`parseDOM` でチップへ戻す。
 - 巨大ペースト対策の上限が 2 つある。URL 下線は段落 `content.size` が 20,000 超で付かない（`pmUrlUnderline.ts`。装飾のみで機能に影響しない）。トリガー検出はカーソル直前 128 文字だけを見る（`getTriggerQuery`。それ以上のクエリは候補名に一致しないため、窓先頭で切れた場合は未検出扱い）。
 - contentDOM は `id="messageInput"` を保つこと。`ChannelContents`（↑ キーで編集モード、入力有無は `textContent` で判定）と `EditMessage`（編集の保存・キャンセル後のフォーカス復帰）が `document.getElementById("messageInput")` で参照している。`<textarea>` 前提の `.value` 判定は div では常に `undefined` になりガードが効かない。
-- 送信・確定・メニュー操作のキー処理は keymap に載せず `handleKeyDown` 1 個に集約すること。`handleKeyDown` は plugin より先に評価され、先頭の composition ガードが IME 変換中の誤送信・誤挿入を防いでいる。`keymap(baseKeymap)` は編集系キー専用。
+- 送信・確定・メニューのキー処理は handleKeyDown に集約し 1 個にまとめること。`handleKeyDown` は plugin より先に評価され、先頭の composition ガードが IME 変換中の誤送信・誤挿入を防いでいる。`keymap(baseKeymap)` と Undo/Redo の keymap は編集系キー専用。
 - スキーマに `marks` を足すと、ペースト経路や Ctrl+B で書式が流入する。装飾を増やす場合も `Decoration`（表示のみ）で行うこと。

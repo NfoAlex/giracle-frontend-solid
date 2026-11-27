@@ -14,6 +14,7 @@ const MAX_DECORATE_CHARS = 20000;
  * 受信側 MessageTextRender と同じ URL パターンなので下線範囲とリンク範囲が一致する。
  */
 function buildDecorations(doc: PMNode): DecorationSet {
+  if (doc.content.size > MAX_DECORATE_CHARS) return DecorationSet.empty;
   const decorations: Decoration[] = [];
   doc.descendants((node, pos) => {
     if (!node.isTextblock) return true;

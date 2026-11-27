@@ -120,16 +120,6 @@ function serializeInline(block: PMNode): string {
     // Chrome はメンション隣の空白を NBSP に化けさせる。表示上は同じなので
     // 送信文字列では通常の空白へ戻す(`\b` のリンク境界が崩れるため)
     const text = (child.text ?? "").replaceAll("\u00a0", " ");
-    // メンション直後にスペース無しで文字が続く場合、受信側は `@<id>` と本文の
-    // リンク境界が崩れるため送信時だけ半角空白を補う
-    const prevType = i > 0 ? block.child(i - 1).type : null;
-    if (
-      (prevType === pmSchema.nodes.mention ||
-        prevType === pmSchema.nodes.channelMention) &&
-      !/^\s/.test(text)
-    ) {
-      out += " ";
-    }
     // 素テキスト中の `@<` / `#<` は受信側の mentionPattern / channelPattern に
     // 偽メンションとして解釈されるため、ゼロ幅スペースを挟んでエスケープする
     // (表示上は変化なし)

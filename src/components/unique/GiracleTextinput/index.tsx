@@ -176,11 +176,8 @@ export default function GiracleTextinput(props: {
 
   const dispatchTransaction = (tr: Transaction) => {
     if (!view) return;
-    const applied = view.state.apply(tr);
-    // IME 変換中はテキストノードを触らず、変換を壊さない
-    const next = applied;
-    view.updateState(next);
-    syncSuggestionState(next);
+    view.updateState(view.state.apply(tr));
+    syncSuggestionState(view.state);
   };
 
   /** 本文を空段落へ置換する */
@@ -275,18 +272,6 @@ export default function GiracleTextinput(props: {
       return true;
     }
 
-    if (event.ctrlKey || event.metaKey) {
-      const key = event.key.toLowerCase();
-      if (key === "z") {
-        event.preventDefault();
-        const action = event.shiftKey ? redo : undo;
-        return action(v.state, (tr) => v.dispatch(tr));
-      }
-      if (key === "y") {
-        event.preventDefault();
-        return redo(v.state, (tr) => v.dispatch(tr));
-      }
-    }
     return false;
   };
 
@@ -297,7 +282,12 @@ export default function GiracleTextinput(props: {
       state: EditorState.create({
         doc: createEmptyDoc(),
         schema: pmSchema,
-        plugins: [history(), keymap(baseKeymap), urlUnderlinePlugin()],
+        plugins: [
+          history(),
+          keymap({ "Mod-z": undo, "Shift-Mod-z": redo, "Mod-y": redo }),
+          keymap(baseKeymap),
+          urlUnderlinePlugin(),
+        ],
       }),
       dispatchTransaction,
       // 親(ChannelContents / EditMessage)は id で textContent 参照・focus する
