@@ -1,6 +1,7 @@
 import { baseKeymap } from "prosemirror-commands";
 import { history, redo, undo } from "prosemirror-history";
 import { keymap } from "prosemirror-keymap";
+import { Fragment, Slice } from "prosemirror-model";
 import {
   EditorState,
   TextSelection,
@@ -69,6 +70,22 @@ function plainTextFrom(dt: DataTransfer): string {
   return text;
 }
 
+/** 改行を保ったまま段落 Slice にする(PM の DOM 再パースで空白が潰れるのを防ぐ) */
+function plainTextSlice(text: string): Slice {
+  const lines = text.split(/\r\n|\r|\n/);
+  return new Slice(
+    Fragment.from(
+      lines.map((line) =>
+        line
+          ? pmSchema.node("paragraph", null, pmSchema.text(line))
+          : pmSchema.node("paragraph"),
+      ),
+    ),
+    1,
+    1,
+  );
+}
+
 export default function GiracleTextinput(props: {
   channelId?: string;
   displayMentionAtBottom?: boolean;
@@ -85,8 +102,9 @@ export default function GiracleTextinput(props: {
   let view: EditorView | undefined;
   let editorRoot: HTMLDivElement | undefined;
 
-  const [suggestionState, setSuggestionState] =
-    createSignal<ISuggestionState>(EMPTY_SUGGESTION_STATE);
+  const [suggestionState, setSuggestionState] = createSignal<ISuggestionState>(
+    EMPTY_SUGGESTION_STATE,
+  );
 
   // チャンネルを跨いだ古い候補が残らないよう、切替時に即座に閉じる
   createEffect(() => {
@@ -314,17 +332,49 @@ export default function GiracleTextinput(props: {
           const clipboardData =
             event instanceof ClipboardEvent ? event.clipboardData : null;
           if (!clipboardData) return false;
-          if (clipboardData.files.length > 0) props.onPasteFiles?.([...clipboardData.files]);
-          // 自前のチップ入り HTML だけは PM に解釈させる(parseDOM でチップへ戻る)
+          if (clipboardData.files.length > 0)
+            props.onPasteFiles?.([...clipboardData.files]);
+          // 自前のコピーだけは PM に解釈させる(parseDOM でチップへ戻る)。
+          // data-pm-slice は PM のコピー経路でのみ付く
           const html = clipboardData.getData("text/html");
-          if (
-            html.includes("data-mention-user-id") ||
-            html.includes("data-channel-id")
-          )
-            return false;
+          const isOwnChip =
+            html.includes("data-pm-slice") &&
+            (html.includes("data-mention-user-id") ||
+              html.includes("data-channel-id"));
+          if (isOwnChip) return false;
           event.preventDefault();
           const text = plainTextFrom(clipboardData);
-          if (text !== "") v.dispatch(v.state.tr.insertText(text));
+          if (text !== "")
+            v.dispatch(
+              v.state.tr
+                .replaceSelection(plainTextSlice(text))
+                .scrollIntoView(),
+            );
+          return true;
+        },
+        // 外部からのドロップも plain text の段落 Slice にする(PM 既定は HTML 優先)
+        drop: (v, event) => {
+          if (!(event instanceof DragEvent)) return false;
+          const dt = event.dataTransfer;
+          // ファイルは親(onDropFiles 相当)の担当なので既定処理に任せる
+          if (!dt || dt.files.length > 0) return false;
+          // 同一エディタ内の移動は PM の move に任せる(ここで拾うと複製になる)
+          if (v.dragging) return false;
+          const text = plainTextFrom(dt);
+          if (text === "") {
+            event.preventDefault();
+            return true;
+          }
+          // PM 由来の HTML(自前チップ含む)は parseDOM で取り込ませる
+          if (dt.getData("text/html").includes("data-pm-slice")) return false;
+          const at = v.posAtCoords({ left: event.clientX, top: event.clientY });
+          if (!at) return false;
+          event.preventDefault();
+          const tr = v.state.tr;
+          tr.setSelection(TextSelection.create(tr.doc, at.pos));
+          v.dispatch(
+            tr.replaceSelection(plainTextSlice(text)).scrollIntoView(),
+          );
           return true;
         },
       },
