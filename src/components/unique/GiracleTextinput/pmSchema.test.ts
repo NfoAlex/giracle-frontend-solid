@@ -56,9 +56,6 @@ describe("GiracleTextinput pmSchema", () => {
     assert.equal(getMessageText(doc), "@<ab-12>です");
   });
 
-  it("getMessageText: NBSP を半角空白へ正規化する", () => {
-    const doc = docOf(paragraph(pmSchema.text("a\u00a0b")));
-    assert.equal(getMessageText(doc), "a b");
   });
 
   it("getMessageText: 素テキストの @< / #< を ZWSP でエスケープする", () => {

@@ -117,9 +117,10 @@ function serializeInline(block: PMNode): string {
       out += `#<${child.attrs.channelId}>`;
       continue;
     }
-    // Chrome はメンション隣の空白を NBSP に化けさせる。表示上は同じなので
-    // 送信文字列では通常の空白へ戻す(`\b` のリンク境界が崩れるため)
-    const text = (child.text ?? "").replaceAll("\u00a0", " ");
+    // NBSP は送信文字列でも保持する。通常の空白へ戻すと改行機会が生まれ、
+    // 入力欄(NBSP は改行不可)とメッセージ表示で折り返し位置がずれる。
+    // NBSP は非単語文字のため直後 URL への `\b` 境界は保たれる
+    const text = child.text ?? "";
     // 素テキスト中の `@<` / `#<` は受信側の mentionPattern / channelPattern に
     // 偽メンションとして解釈されるため、ゼロ幅スペースを挟んでエスケープする
     // (表示上は変化なし)

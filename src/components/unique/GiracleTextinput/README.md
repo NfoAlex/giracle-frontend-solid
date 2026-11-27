@@ -190,8 +190,8 @@ import GiracleTextinput from "~/components/unique/GiracleTextinput/index.tsx";
 - contentDOM の class から `whitespace-pre-wrap` を外してはいけない。ペースト・ドロップの改行は段落 Slice として別段落に分割されるが、IME 変換や AI 入力など text ノード内に `\n` を含む経路が残るため、`pre-wrap` がないと表示上1行に折り畳まれる（送信文字列には `\n` が残るので表示と送信が食い違う）。旧 Lexical は `insertRawText` が `\n` を LineBreak(`<br>`)ノードに変換していたため不要だった。
 - ZWSP エスケープは本文・保存・通知文にそのまま残る。不可視で表示に影響はない。もしサーバ側が本文の `@<id>` を通知トリガーにしているなら、エスケープ済みテキストはトリガーにならない（偽装防止として意図通り）。
 - メンションは atom なので内部にキャレットが入らない。Backspace はブラウザ既定の contentEditable 編集でノードごと消え、その DOM 変更を ProseMirror が取り込む。
-- メンション確定時に直後へ入れる空白は **NBSP**。通常の空白だと段落末で Chrome が折り畳み、次の 1 文字入力でその空白が置換される（メンションと本文がくっつく）。送信時に `serializeInline` が通常の空白へ戻す。
-- Chrome はメンション隣の空白も NBSP に置換する。doc 内の NBSP を transaction で書き換える補正は入れない（書き換え後の次の入力がその 1 文字を置換してしまい逆効果だった）。送信時に正規化する。
+ - メンション確定時に直後へ入れる空白は **NBSP**。通常の空白だと段落末で Chrome が折り畳み、次の 1 文字入力でその空白が置換される（メンションと本文がくっつく）。NBSP は送信データでも保持し、入力欄とメッセージ表示の折り返しを一致させる（NBSP は改行不可のため。直後 URL の `\b` 境界は保たれる）。
+ - Chrome はメンション隣の空白も NBSP に置換する。doc 内の NBSP を transaction で書き換える補正は入れない（書き換え後の次の入力がその 1 文字を置換してしまい逆効果だった）。
 - メンション検索の API が応答しない(ハング)場合、Enter は最大 3 秒握りつぶされる。watchdog（`searchUser` 内）が `isSearching` を戻せば通常動作に復帰する。
 - コピー時のテキスト化は `clipboardTextSerializer` を明示している。PM 既定の `Fragment.textBetween` は atom を空文字にするため、指定しないとコピーしたチップがテキストから消える（HTML 側には残る）。
 - ペーストは基本的に plain text 固定（`<br>`・`<li>` の取りこぼし回避）。ただし HTML に `data-pm-slice` と `data-mention-user-id` / `data-channel-id` を含む場合（＝自前のコピー）だけは PM にパースさせ、`parseDOM` でチップへ戻す。

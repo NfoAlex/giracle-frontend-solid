@@ -61,7 +61,7 @@ export function insertChip(view: EditorView, node: PMNode): void {
   if (!found) return;
   // 直後の空白は NBSP で入れる。通常の空白を段落末に置くと Chrome が折り畳み、
   // 次の入力でその1文字が置き換わる(表示上チップと本文がくっつく)。
-  // 送信時に通常の空白へ戻す(serializeInline)
+  // 送信データでも NBSP のまま送り、入力欄と表示の折り返しを一致させる(serializeInline)
   const tr = view.state.tr.replaceWith(found.from, found.to, [
     node,
     pmSchema.text("\u00a0"),
