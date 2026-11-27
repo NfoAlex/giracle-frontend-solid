@@ -162,9 +162,10 @@ const TRIGGER_PATTERNS: {
 }[] = [
   { kind: "user", pattern: /@(\S*)$/, boundary: true },
   { kind: "channel", pattern: /#(\S*)$/, boundary: true },
-  // 絵文字コードは英数字のみ。URL(`://`)や時刻(`12:30`)のコロンは候補になり得るが、
-  // 通常の候補として扱う(Esc で閉じられるため特別除外しない)
-  { kind: "emoji", pattern: /:([A-Za-z0-9_+-]*)$/, boundary: false },
+  // 絵文字コードは英数字のみ。直前が ASCII 英数字/`_` のコロン
+  // (時刻 `12:30`・URL `https://`・`foo:bar`)は候補にしない。
+  // CJK の直後は `@` / `#` と同じく検出する
+  { kind: "emoji", pattern: /:([A-Za-z0-9_+-]*)$/, boundary: true },
 ];
 
 /** カーソル直前の未確定トリガー(`@user` / `#channel` / `:emoji`)を取得する */
@@ -198,7 +199,7 @@ export function getTriggerQuery(state: EditorState): ITriggerQuery | null {
     // 確定済みの `@<user-id>` / `#<channel-id>` は対象外
     if (match[1].startsWith("<")) continue;
     if (boundary) {
-      // `foo@bar` (メール/URL内の@) をメンション開始とみなさない。
+      // `foo@bar` (メール/URL内の@)・時刻や URL のコロンを開始とみなさない。
       // CJKは \p{L} に含まれるためUnicodeクラスでなくASCII文字種判定にする
       // (日本語の「こんにちは@田中」のようなスペースなしメンションを殺さないため)
       // 窓の先頭で切れている = 直前の文字が確認できない 128 文字超のクエリ
