@@ -206,7 +206,7 @@ export default function GiracleTextinput(props: {
 
   const handleKeyDown = (v: EditorView, event: KeyboardEvent): boolean => {
     // IME 変換中のキーは一切横取りしない(変換確定 Enter の誤送信・誤挿入防止)
-    if (v.composing) return false;
+    if (v.composing || event.isComposing || event.keyCode === 229) return false;
     const current = suggestionState();
 
     if (event.key === "Enter") {
