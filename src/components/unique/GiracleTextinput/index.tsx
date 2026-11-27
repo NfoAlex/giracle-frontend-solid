@@ -1,4 +1,4 @@
-import { baseKeymap } from "prosemirror-commands";
+import { baseKeymap, splitBlock } from "prosemirror-commands";
 import { history, redo, undo } from "prosemirror-history";
 import { keymap } from "prosemirror-keymap";
 import { Fragment, Slice } from "prosemirror-model";
@@ -195,15 +195,6 @@ export default function GiracleTextinput(props: {
     setSuggestionState(EMPTY_SUGGESTION_STATE);
   };
 
-  /** Shift+Enter: 段落を分割して改行する */
-  const splitParagraph = (v: EditorView): boolean => {
-    const { state } = v;
-    const { $from } = state.selection;
-    if (!state.selection.empty || !$from.parent.isTextblock) return false;
-    v.dispatch(state.tr.split($from.pos));
-    return true;
-  };
-
   const handleKeyDown = (v: EditorView, event: KeyboardEvent): boolean => {
     // IME 変換中のキーは一切横取りしない(変換確定 Enter の誤送信・誤挿入防止)
     if (v.composing || event.isComposing || event.keyCode === 229) return false;
@@ -248,8 +239,10 @@ export default function GiracleTextinput(props: {
         // ここで false を返すと PM が Enter を preventDefault して無反応になる
       }
       // 改行: Shift+Enter / onEnter 未指定 / Ctrl 送信モードでの素の Enter
-      if (event.shiftKey || !props.onEnter) return splitParagraph(v);
-      if (props.sendWithCtrlKey?.() && !event.ctrlKey) return splitParagraph(v);
+      if (event.shiftKey || !props.onEnter)
+        return splitBlock(v.state, (tr) => v.dispatch(tr));
+      if (props.sendWithCtrlKey?.() && !event.ctrlKey)
+        return splitBlock(v.state, (tr) => v.dispatch(tr));
       const text = getMessageText(v.state.doc);
       event.preventDefault();
       // 空行(空白のみ含む)の Enter は何もしない。改行も入れない
