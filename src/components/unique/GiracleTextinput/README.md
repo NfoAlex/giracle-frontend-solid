@@ -125,8 +125,8 @@ URL 範囲に `underline` クラス（Tailwind の `underline`）を付ける Pl
   `{ search(query, channelId), dispose() }` を返す（200ms debounce・3 秒 watchdog・
   古いチャンネル向けの破棄）。`userMenuItem` / `insertUserMention`。
 - `channel.ts` — `searchChannels(query, ctx)`（`storeChannelInfo` を名前部分一致。未ロード分は
-  `api.channel.list()` を 1 回だけ補完し、応答後にもう一度絞り直す）/ `channelMenuItem` /
-  `insertChannelMention`.
+  `api.channel.list()` で補完し（成功後は再送なし・失敗時は次回再試行）、応答後にもう一度
+  絞り直す）/ `channelMenuItem` / `insertChannelMention`.
 - `emoji.ts` — `searchEmojiCodes(query, ctx)`（`storeCustomEmoji` の `code` 部分一致・大小無視）/
   `emojiMenuItem` / `insertEmoji`（`:code:` + 空白の素テキスト）。
 

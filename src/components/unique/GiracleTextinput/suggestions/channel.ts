@@ -9,19 +9,27 @@ import type { IMentionMenuItem } from "../MentionMenu.tsx";
 import { pmSchema } from "../pmSchema.ts";
 import { type ISearchContext, insertChip } from "./common.ts";
 
-let listRequested = false;
+let listRequest: Promise<void> | undefined;
 
 /**
- * 未ロードのチャンネル情報を1回だけ補完する
- * (ストアは共有なのでコンポーネントインスタンスを跨いで1回で足りる)
+ * 未ロードのチャンネル情報を補完する
+ * (ストアは共有なので成功後は再送しない。失敗時は次回再試行する)
  */
 const ensureChannelList = (): Promise<void> => {
-  if (listRequested) return Promise.resolve();
-  listRequested = true;
-  return api.channel.list().then((r) => {
-    for (const channel of r.data)
-      useStoreChannelInfo.updateChannelInfo(channel);
-  });
+  if (!listRequest) {
+    listRequest = api.channel
+      .list()
+      .then((r) => {
+        for (const channel of r.data)
+          useStoreChannelInfo.updateChannelInfo(channel);
+      })
+      .catch((e) => {
+        // 失敗時は次回の検索で再試行できるよう破棄する
+        listRequest = undefined;
+        throw e;
+      });
+  }
+  return listRequest;
 };
 
 /** チャンネル候補を state へ反映する(ストア同期フィルタ・候補0件でも送信は妨げない) */
@@ -36,7 +44,7 @@ export const searchChannels = (query: string, ctx: ISearchContext): void => {
       isSearching: false,
     });
   apply();
-  // 全件の補完は1回だけ。応答後にもう一度絞り直す
+  // 成功後は再送なし・失敗時は次回再試行。応答後にもう一度絞り直す
   ensureChannelList()
     .catch((e) => console.error("MENTION_CHANNEL_LIST :: e->", e))
     .finally(apply);
