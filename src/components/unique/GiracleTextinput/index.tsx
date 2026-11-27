@@ -15,44 +15,43 @@ import {
   onMount,
   Show,
 } from "solid-js";
-import { api } from "~/api/index.ts";
-import type { IUser } from "~/types/User.ts";
 import MentionMenu from "./MentionMenu.tsx";
 import {
   createEmptyDoc,
-  getMentionQuery,
   getMessageText,
+  getTriggerQuery,
   pmSchema,
 } from "./pmSchema.ts";
 import { urlUnderlinePlugin } from "./pmUrlUnderline.ts";
+import {
+  channelMenuItem,
+  insertChannelMention,
+  searchChannels,
+} from "./suggestions/channel.ts";
+import {
+  candidateCount,
+  EMPTY_SUGGESTION_STATE,
+  type ISearchContext,
+  type ISuggestionState,
+} from "./suggestions/common.ts";
+import {
+  emojiMenuItem,
+  insertEmoji,
+  searchEmojiCodes,
+} from "./suggestions/emoji.ts";
+import {
+  createUserSearch,
+  insertUserMention,
+  userMenuItem,
+} from "./suggestions/user.ts";
 
 export interface IGiracleTextinputHandle {
   /** getMessageText 相当の送信文字列(@名前 → @<user-id> 変換済み) */
   getText(): string;
-  /** エディタ本文クリア + mentionState リセット */
+  /** エディタ本文クリア + suggestionState リセット */
   clear(): void;
   focus(): void;
 }
-
-interface IMentionState {
-  isEnabled: boolean;
-  query: string;
-  users: IUser[];
-  selectIndex: number;
-  /** 候補を検索した時点の channelId(切替検出用) */
-  channelId: string | undefined;
-  /** debounce 検索が未完了の間 true(Enter の誤送信防止) */
-  isSearching: boolean;
-}
-
-const EMPTY_MENTION_STATE: IMentionState = {
-  isEnabled: false,
-  query: "",
-  users: [],
-  selectIndex: 0,
-  channelId: undefined,
-  isSearching: false,
-};
 
 /** DataTransfer から書式を落としたテキストだけを取り出す */
 function plainTextFrom(dt: DataTransfer): string {
@@ -85,100 +84,76 @@ export default function GiracleTextinput(props: {
 }) {
   let view: EditorView | undefined;
   let editorRoot: HTMLDivElement | undefined;
-  let searchTimer: ReturnType<typeof setTimeout> | undefined;
-  let watchdogTimer: ReturnType<typeof setTimeout> | undefined;
 
-  const [mentionState, setMentionState] =
-    createSignal<IMentionState>(EMPTY_MENTION_STATE);
+  const [suggestionState, setSuggestionState] =
+    createSignal<ISuggestionState>(EMPTY_SUGGESTION_STATE);
 
   // チャンネルを跨いだ古い候補が残らないよう、切替時に即座に閉じる
   createEffect(() => {
     void props.channelId;
-    setMentionState(EMPTY_MENTION_STATE);
+    setSuggestionState(EMPTY_SUGGESTION_STATE);
   });
 
-  const menuItems = createMemo(() =>
-    mentionState().users.map((u) => ({
-      id: u.id,
-      name: u.name,
-      iconUrl: `/api/user/icon/${encodeURIComponent(u.id)}`,
-    })),
-  );
+  const menuItems = createMemo(() => {
+    const current = suggestionState();
+    if (current.kind === "channel")
+      return current.channels.map(channelMenuItem);
+    if (current.kind === "emoji") return current.emojiCodes.map(emojiMenuItem);
+    return current.users.map(userMenuItem);
+  });
 
-  // 入力毎のAPI発火を避けるため200msでdebounceする
-  const searchUser = (query: string, channelId: string | undefined) => {
-    clearTimeout(searchTimer);
-    clearTimeout(watchdogTimer);
-    searchTimer = setTimeout(() => {
-      // 切替後の channelId と異なる = 古いチャンネル向けの検索なので破棄
-      if (props.channelId !== channelId) return;
-      // 応答が永遠に来ない場合に Enter を復帰させる安全弁。
-      // ハンドルはリクエスト毎に分離し、共有変数は最新分だけ保持する
-      const wid = setTimeout(() => {
-        const current = mentionState();
-        if (
-          current.query === query &&
-          current.channelId === channelId &&
-          current.isSearching
-        ) {
-          setMentionState({ ...current, isSearching: false });
-        }
-      }, 3000);
-      watchdogTimer = wid;
-      api.user
-        .list({ username: query, joinedChannel: channelId })
-        .then((r) => {
-          clearTimeout(wid);
-          if (watchdogTimer === wid) watchdogTimer = undefined;
-          // 古いクエリ・古いチャンネル向けの応答で新しい結果を上書きしない
-          const current = mentionState();
-          if (current.query !== query || current.channelId !== channelId)
-            return;
-          setMentionState({
-            ...current,
-            users: r.data,
-            selectIndex: 0,
-            isSearching: false,
-          });
-        })
-        .catch((e) => {
-          clearTimeout(wid);
-          if (watchdogTimer === wid) watchdogTimer = undefined;
-          console.error("MENTION_USER_SEARCH :: e->", e);
-          // 失敗時も isSearching を戻さないと Enter が握りつぶされ続ける
-          const current = mentionState();
-          if (current.query === query && current.channelId === channelId) {
-            setMentionState({ ...current, isSearching: false });
-          }
-        });
-    }, 200);
+  /** ドメイン検索が結果を反映する口。古い結果・切替後の結果はここで捨てる */
+  const searchContext: ISearchContext = {
+    channelId: () => props.channelId,
+    apply: (kind, query, patch) => {
+      const current = suggestionState();
+      if (
+        !current.isEnabled ||
+        current.kind !== kind ||
+        current.query !== query ||
+        current.channelId !== props.channelId
+      )
+        return;
+      setSuggestionState({ ...current, ...patch });
+    },
   };
 
-  /** カーソル直前の未確定 `@query` をメニュー状態へ反映する */
-  const syncMentionState = (state: EditorState) => {
-    const found = getMentionQuery(state);
-    const prev = mentionState();
+  // debounce/watchdog のタイマーはインスタンスごとに持つ
+  const userSearch = createUserSearch(searchContext);
+
+  /** カーソル直前の未確定トリガーをメニュー状態へ反映する */
+  const syncSuggestionState = (state: EditorState) => {
+    const found = getTriggerQuery(state);
+    const prev = suggestionState();
     if (!found) {
-      if (prev.isEnabled) setMentionState(EMPTY_MENTION_STATE);
+      if (prev.isEnabled) setSuggestionState(EMPTY_SUGGESTION_STATE);
       return;
     }
     const channelId = props.channelId;
-    // 同じクエリかつ同一チャンネルなら検索結果や選択位置をそのまま維持する
+    // 同じトリガー・同じクエリかつ同一チャンネルなら検索結果や選択位置を維持する
     if (
       prev.isEnabled &&
+      prev.kind === found.kind &&
       prev.query === found.query &&
       prev.channelId === channelId
     )
       return;
-    setMentionState({
+    setSuggestionState({
       isEnabled: true,
+      kind: found.kind,
       query: found.query,
       users: [],
+      channels: [],
+      emojiCodes: [],
       selectIndex: 0,
       channelId,
-      isSearching: true,
+      // 非同期検索が走るのは user だけ(Enter 消費の判定に使う)
+      isSearching: found.kind === "user",
     });
-    searchUser(found.query, channelId);
+    if (found.kind === "user") userSearch.search(found.query, channelId);
+    else if (found.kind === "channel")
+      searchChannels(found.query, searchContext);
+    else searchEmojiCodes(found.query, searchContext);
   };
 
   const dispatchTransaction = (tr: Transaction) => {
@@ -187,7 +162,7 @@ export default function GiracleTextinput(props: {
     // IME 変換中はテキストノードを触らず、変換を壊さない
     const next = applied;
     view.updateState(next);
-    syncMentionState(next);
+    syncSuggestionState(next);
   };
 
   /** 本文を空段落へ置換する */
@@ -199,28 +174,7 @@ export default function GiracleTextinput(props: {
     );
     tr.setSelection(TextSelection.create(tr.doc, 1));
     v.dispatch(tr);
-    setMentionState(EMPTY_MENTION_STATE);
-  };
-
-  /** カーソル直前の `@query` を mention ノード + 空白へ置換する */
-  const insertMention = (user: IUser) => {
-    if (!view || view.composing) return;
-    const found = getMentionQuery(view.state);
-    if (!found) return;
-    const mention = pmSchema.nodes.mention.create({
-      userId: user.id,
-      name: user.name,
-    });
-    // 直後の空白は NBSP で入れる。通常の空白を段落末に置くと Chrome が折り畳み、
-    // 次の入力でその1文字が置き換わる(表示上メンションと本文がくっつく)。
-    // 送信時に通常の空白へ戻す(serializeInline)
-    const tr = view.state.tr.replaceWith(found.from, found.to, [
-      mention,
-      pmSchema.text("\u00a0"),
-    ]);
-    tr.setSelection(TextSelection.create(tr.doc, found.from + 2));
-    view.dispatch(tr);
-    setMentionState(EMPTY_MENTION_STATE);
+    setSuggestionState(EMPTY_SUGGESTION_STATE);
   };
 
   /** Shift+Enter: 段落を分割して改行する */
@@ -235,18 +189,39 @@ export default function GiracleTextinput(props: {
   const handleKeyDown = (v: EditorView, event: KeyboardEvent): boolean => {
     // IME 変換中のキーは一切横取りしない(変換確定 Enter の誤送信・誤挿入防止)
     if (v.composing) return false;
-    const current = mentionState();
+    const current = suggestionState();
 
     if (event.key === "Enter") {
       // メニュー確定が最優先。未消費の Enter だけが送信へ流れる
       if (current.isEnabled) {
-        const user = current.users[current.selectIndex];
-        if (user) {
+        const index = current.selectIndex;
+        let inserted = false;
+        if (current.kind === "user") {
+          const user = current.users[index];
+          if (user) {
+            insertUserMention(v, user);
+            inserted = true;
+          }
+        } else if (current.kind === "channel") {
+          const channel = current.channels[index];
+          if (channel) {
+            insertChannelMention(v, channel);
+            inserted = true;
+          }
+        } else if (current.kind === "emoji") {
+          const code = current.emojiCodes[index];
+          if (code) {
+            insertEmoji(v, code);
+            inserted = true;
+          }
+        }
+        if (inserted) {
           event.preventDefault();
-          insertMention(user);
+          setSuggestionState(EMPTY_SUGGESTION_STATE);
           return true;
         }
-        // debounce 検索が未完了の間は、確定も送信もせず Enter を消費する
+        // user の debounce 検索が未完了の間は、確定も送信もせず Enter を消費する。
+        // channel/emoji は同期候補のみなので候補0件はそのまま送信へ流す
         if (current.isSearching) {
           event.preventDefault();
           return true;
@@ -271,20 +246,21 @@ export default function GiracleTextinput(props: {
 
     if (event.key === "ArrowDown" || event.key === "ArrowUp") {
       // 未処理なら false を返し、親の ArrowUp 編集ショートカットへ流す
-      if (!current.isEnabled || current.users.length === 0) return false;
+      const count = candidateCount(current);
+      if (!current.isEnabled || count === 0) return false;
       event.preventDefault();
       const next =
         event.key === "ArrowDown"
-          ? Math.min(current.selectIndex + 1, current.users.length - 1)
+          ? Math.min(current.selectIndex + 1, count - 1)
           : Math.max(current.selectIndex - 1, 0);
-      setMentionState({ ...current, selectIndex: next });
+      setSuggestionState({ ...current, selectIndex: next });
       return true;
     }
 
     if (event.key === "Escape") {
       if (!current.isEnabled) return false;
       event.preventDefault();
-      setMentionState(EMPTY_MENTION_STATE);
+      setSuggestionState(EMPTY_SUGGESTION_STATE);
       return true;
     }
 
@@ -323,9 +299,13 @@ export default function GiracleTextinput(props: {
       // PM 既定のテキスト化は atom を空文字にするため、コピーしたチップが
       // 消える。移行前(Lexical)同様、名前でコピーする
       clipboardTextSerializer: (slice) =>
-        slice.content.textBetween(0, slice.content.size, "\n", (node) =>
-          node.type === pmSchema.nodes.mention ? `@${node.attrs.name}` : "",
-        ),
+        slice.content.textBetween(0, slice.content.size, "\n", (node) => {
+          if (node.type === pmSchema.nodes.mention)
+            return `@${node.attrs.name}`;
+          if (node.type === pmSchema.nodes.channelMention)
+            return `#${node.attrs.name}`;
+          return "";
+        }),
       handleDOMEvents: {
         // PM 既定は text/html を優先し、<br> を段落内の改行文字、<li> を区切り無しの
         // 連結にしてしまう(表示と送信文字列が食い違う)。メンションを含まない HTML は
@@ -336,7 +316,11 @@ export default function GiracleTextinput(props: {
           if (!clipboardData) return false;
           if (clipboardData.files.length > 0) props.onPasteFiles?.([...clipboardData.files]);
           // 自前のチップ入り HTML だけは PM に解釈させる(parseDOM でチップへ戻る)
-          if (clipboardData.getData("text/html").includes("data-mention-user-id"))
+          const html = clipboardData.getData("text/html");
+          if (
+            html.includes("data-mention-user-id") ||
+            html.includes("data-channel-id")
+          )
             return false;
           event.preventDefault();
           const text = plainTextFrom(clipboardData);
@@ -355,21 +339,30 @@ export default function GiracleTextinput(props: {
   });
 
   onCleanup(() => {
-    clearTimeout(searchTimer);
-    clearTimeout(watchdogTimer);
+    userSearch.dispose();
     view?.destroy();
   });
 
   return (
     <div class="w-full relative">
       <div ref={editorRoot} />
-      <Show when={mentionState().isEnabled}>
+      <Show when={suggestionState().isEnabled}>
         <MentionMenu
           items={menuItems()}
-          selectIndex={mentionState().selectIndex}
+          selectIndex={suggestionState().selectIndex}
           onSelect={(item) => {
-            const user = mentionState().users.find((u) => u.id === item.id);
-            if (user) insertMention(user);
+            if (!view) return;
+            const current = suggestionState();
+            if (current.kind === "channel") {
+              const channel = current.channels.find((c) => c.id === item.id);
+              if (channel) insertChannelMention(view, channel);
+            } else if (current.kind === "emoji") {
+              insertEmoji(view, item.id);
+            } else {
+              const user = current.users.find((u) => u.id === item.id);
+              if (user) insertUserMention(view, user);
+            }
+            setSuggestionState(EMPTY_SUGGESTION_STATE);
           }}
           displayBottom={props.displayMentionAtBottom}
         />

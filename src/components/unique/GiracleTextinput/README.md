@@ -1,7 +1,8 @@
 # GiracleTextinput — メンション入力
 
-ProseMirror ベースのテキスト入力。`@` でユーザー候補を出し、選択するとメンションとして確定する。
-エディタ上の表示は `@ユーザー名`、送信時は `@<user-id>` にシリアライズする。
+ProseMirror ベースのテキスト入力。`@` / `#` / `:` でユーザー・チャンネル・カスタム絵文字の候補を出し、
+選択すると確定する。表示は `@名前` / `#名前` / `:code:`、送信時はユーザーとチャンネルを
+`@<user-id>` / `#<channel-id>` にシリアライズする（絵文字は素テキストのまま送る）。
 
 プロジェクト仕様として装飾は「メンション」と「URL の下線」だけ。スキーマに `marks` を定義して
 いないため、太字・斜体などのリッチ書式は構造的に流入できない。
@@ -16,8 +17,9 @@ schema-basic は使わない（スキーマは自前定義）。
 ### 1. スキーマとドキュメント
 
 - 文書構造は `Schema` で定義する（`pmSchema.ts`）。ここでは `doc → block+`、`paragraph → inline*`、
-  `inline` グループに `text` と `mention` だけ。
-- `mention` は `atom: true`（内部を持たない 1 単位のインラインノード）。`selectable: false` なので
+  `inline` グループに `text` と `mention` / `channelMention` だけ。
+- `mention`（ユーザー）と `channelMention`（チャンネル）は `atom: true`（内部を持たない 1 単位の
+  インラインノード）。`selectable: false` なので
   クリック・矢印でノード選択にならず、キャレットは前後どちらかに落ちる。DOM 上は
   `contenteditable="false"` の span になり、**Backspace 1 回でノードごと消える**（メンション直後の
   半角空白にカーソルがある場合だけ `handleKeyDown` が自前で消す）。
@@ -31,7 +33,7 @@ schema-basic は使わない（スキーマは自前定義）。
 - 変更は `state.tr`（Transaction）に積み、`view.dispatch(tr)` で適用する。
 - `index.tsx` は `dispatchTransaction` を自前実装しており、`tr` にメンション後スペーサーを
   足してから `view.state.apply` → `view.updateState` する。**状態の反映点はここ 1 箇所**。
-  適用後に `getMentionQuery` を読んでメニュー状態を更新する（再帰的に transaction を投げない）。
+  適用後に `getTriggerQuery` を読んでメニュー状態を更新する（再帰的に transaction を投げない）。
 - 座標は「ノード境界＝1 位置」で数える。text ノードは 1 文字 1 位置、`mention` も 1 位置。
 
 ### 3. Plugin
@@ -54,39 +56,45 @@ schema-basic は使わない（スキーマは自前定義）。
 
 ```mermaid
 flowchart LR
-  A["入力: @query"] --> B["dispatchTransaction<br/>→ syncMentionState"]
-  B --> C{未確定 @query?}
-  C -- なし --> D["state = EMPTY_MENTION_STATE"]
-  C -- あり --> E["state = {isEnabled, query, channelId,<br/>users: [], isSearching: true}"]
-  E --> F["searchUser: 200ms debounce"]
-  F --> G["api.user.list({username, joinedChannel})"]
-  G --> H["state.users"]
+  A["入力: @user / #channel / :emoji"] --> B["dispatchTransaction<br/>→ syncSuggestionState"]
+  B --> C{未確定トリガー?}
+  C -- なし --> D["state = EMPTY_SUGGESTION_STATE"]
+  C -- あり --> E["state = {isEnabled, kind, query, channelId,<br/>候補空, isSearching: kind===user}"]
+  E --> F["user: searchUser 200ms debounce<br/>channel/emoji: store 同期フィルタ"]
+  F --> G["api.user.list({username, joinedChannel})<br/>(user のみ非同期)"]
+  G --> H["state.users / channels / emojiCodes"]
   H --> I["MentionMenu 表示"]
   X["channelId 変更<br/>(createEffect)"] --> D
   I --> J{"Enter / クリック"}
-  J --> K["@query → mention ノード + 空白<br/>(doc 座標 from..to を置換)"]
-  K --> L["getMessageText<br/>mention → @&lt;user-id&gt;"]
+  J --> K["trigger → mention / channelMention ノード + 空白<br/>emoji → 素テキスト `:code: `"]
+  K --> L["getMessageText<br/>mention → @&lt;user-id&gt; / channelMention → #&lt;channel-id&gt;"]
 ```
 
-状態は `IMentionState`（`isEnabled` / `query` / `users` / `selectIndex` / `channelId` / `isSearching`）
-1 つだけ。`index.tsx` が signal を持ち、`dispatchTransaction` が更新する。`channelId` は検索時点の
-チャンネル（切替検出用）で、`createEffect` が切替時に即 `EMPTY_MENTION_STATE` へ戻す。
+状態は `ISuggestionState`（`isEnabled` / `kind` / `query` / `users` / `channels` / `emojiCodes` /
+`selectIndex` / `channelId` / `isSearching`）1 つだけ。`index.tsx` が signal を持ち、
+`dispatchTransaction` が更新する。`channelId` は候補を調べた時点のチャンネル（切替検出用）で、
+`createEffect` が切替時に即 `EMPTY_SUGGESTION_STATE` へ戻す。非同期検索は `user` だけで、
+`channel` / `emoji` はストア同期フィルタのため `isSearching` を立てない（候補 0 件でも送信を妨げない）。
 
 ## ファイルごとの役割
 
 ### `pmSchema.ts`
 
-- `pmSchema` — `doc` / `paragraph` / `text` / `mention` のみ。`marks` 無し。
+- `pmSchema` — `doc` / `paragraph` / `text` / `mention` / `channelMention` のみ。`marks` 無し。
 - `createEmptyDoc()` — 空段落 1 個の doc（初期状態・送信後クリア・`clear()` で使用）。
 - `getMessageText(doc)` — トップレベルのブロックを `\n` で結合。`mention` は `@<user-id>`、
-  素テキスト中の `@<` は `@\u200B<`（ゼロ幅スペース）にエスケープし、受信側で偽メンションとして
-  描画されるのを防ぐ。
-- `getMentionQuery(state)` — カーソル直前の未確定 `@query` を `{ query, from, to }`（doc 座標）で返す。
+  `channelMention` は `#<channel-id>`。素テキスト中の `@<` / `#<` は `@\u200B<` / `#\u200B<`
+  （ゼロ幅スペース）にエスケープし、受信側で偽メンションとして描画されるのを防ぐ。
+- `getTriggerQuery(state)` — カーソル直前の未確定トリガーを
+  `{ kind, query, from, to }`（doc 座標）で返す。`kind` は `"user"` / `"channel"` / `"emoji"`。
   - 選択が collapsed な text cursor のときだけ。
-  - 段落内のカーソル前テキストを `textBetween` で取り、`mention` は 1 文字分の空白として扱う。
-    これにより `@` の後ろにチップが挟まる場合は検出されない。
-  - 確定済み `@<` と、`@` 直前が ASCII 英数字/`_` のケース（`foo@bar`）は除外。CJK は対象外なので
-    `こんにちは@田中` は検出される。
+  - 段落内のカーソル前テキストを `textBetween` で取り、チップ（atom）は 1 文字分の空白として扱う。
+    これによりトリガー文字の後ろにチップが挟まる場合は検出されない。
+  - パターンは `@(\S*)$` / `#(\S*)$` / `:([A-Za-z0-9_+-]*)$`。複数該当した場合はカーソルに
+    最も近い（末尾にマッチした）1 件だけを返す。
+  - 確定済み `@<` / `#<` は除外。`@` / `#` の直前が ASCII 英数字/`_` のケース（`foo@bar`）も除外。
+    CJK は対象外なので `こんにちは@田中` / `こんにちは#一般` は検出される。コロンは前方ガード無し
+    （`https://` や `12:30` でも候補が出るが、Esc で閉じられる通常候補として扱う）。
 - `withMentionSpacer(tr)` — メンション直後のテキストが空白以外で始まる場合、その先頭に半角空白を
   1 個挿入する。受信側は `@<user-id>` の直後を `\b` 依存でリンク化するため、`@bobhttps://…` の
   ままだと下線範囲と送信後の描画が食い違うのを防ぐ。挿入は座標のずれを避けて後ろから行う。
@@ -104,21 +112,50 @@ URL 範囲に `underline` クラス（Tailwind の `underline`）を付ける Pl
 表示専用コンポーネント。`items` / `selectIndex` / `onSelect` を受け取るだけ。
 `onMouseDown` で `preventDefault` し、クリック時にエディタからフォーカスが外れないようにしている。
 
+### `suggestions/`
+
+トリガー種別（ドメイン）ごとの「検索・メニュー項目・確定挿入」。`index.tsx` は signal とその
+反映口 `ISearchContext` だけを持ち、検索・状態判定・挿入はここへ置く。
+
+- `common.ts` — `ISuggestionState` / `EMPTY_SUGGESTION_STATE` / `candidateCount(state)`、
+  チップ（`mention` / `channelMention`）+ NBSP へ置換する `insertChip(view, node)`、そして
+  検索結果の反映口 `ISearchContext`（`channelId()` と `apply(kind, query, patch)`）。
+  古い応答・チャンネル切替後の結果を捨てる判定は `index.tsx` の `searchContext.apply` 1 か所。
+- `user.ts` — `createUserSearch(ctx)` がインスタンスごとのタイマーを持つ検索器
+  `{ search(query, channelId), dispose() }` を返す（200ms debounce・3 秒 watchdog・
+  古いチャンネル向けの破棄）。`userMenuItem` / `insertUserMention`。
+- `channel.ts` — `searchChannels(query, ctx)`（`storeChannelInfo` を名前部分一致。未ロード分は
+  `api.channel.list()` を 1 回だけ補完し、応答後にもう一度絞り直す）/ `channelMenuItem` /
+  `insertChannelMention`.
+- `emoji.ts` — `searchEmojiCodes(query, ctx)`（`storeCustomEmoji` の `code` 部分一致・大小無視）/
+  `emojiMenuItem` / `insertEmoji`（`:code:` + 空白の素テキスト）。
+
+トリガー種別を増やすときは、このディレクトリに `<domain>.ts`（`search<Kind>s(query, ctx)` と
+`*MenuItem` / `insert*`）を追加し、`common.ts` の `ISuggestionState` に候補配列を、
+`pmSchema.ts` の `TRIGGER_PATTERNS` に検出パターンを 1 行足す。`index.tsx` 側は
+`syncSuggestionState` の分岐に 1 行呼び出しを足すだけで済む。
+
 ### `index.tsx`
 
 - `EditorView` の生成・破棄。plugin は `history()`（Undo/Redo）、`keymap(baseKeymap)`（段落結合・Ctrl+A 等の標準キー）、`urlUnderlinePlugin()`。
   `handleKeyDown`（コンポーネント直下の prop）は plugin より先に評価されるため、composition ガードが常に最優先。
-- `mentionState` signal と `menuItems`（`createMemo`、アイコン URL は `encodeURIComponent`）。
-- `searchUser(query, channelId)` — 200ms debounce、切替後の `channelId` 不一致は破棄、応答も
-  クエリ・チャンネル一致時のみ反映、失敗時は `isSearching` を戻す。3 秒 watchdog が
-  「応答が来ない間 Enter が握りつぶされる」状態を解除する。
+- `suggestionState` signal と `menuItems`（`createMemo`）。`menuItems` は `kind` で
+  `suggestions/*` の `*MenuItem` に委譲する。
+- `searchContext` — ドメイン検索が結果を反映する唯一の口。種別・クエリ・`channelId` が現在の
+  state と一致するときだけ patch を適用する（古い応答・切替後の結果はここで捨てる）。
+- `userSearch`（`createUserSearch(searchContext)`）— debounce と watchdog のタイマーはこの
+  インスタンスが持ち、`onCleanup` で `dispose()` する。非同期検索は `user` だけ。
+- 検索の実行は `syncSuggestionState` から各ドメイン（`userSearch.search` /
+  `searchChannels` / `searchEmojiCodes`）へ 1 行ずつ委譲するだけ。
 - `handleKeyDown` の分岐（上から順）:
   1. `view.composing` なら `false`（IME 変換中のキーは一切触らない）。
-  2. `Enter` — メニュー有効なら候補確定。候補 0 件でも `isSearching` の間は `Enter` を消費して
+  2. `Enter` — メニュー有効かつ候補ありなら `kind` ごとに確定（`user` / `channel` はチップ + 空白、
+     `emoji` は `:code:` + 空白の素テキスト挿入）。候補 0 件でも `isSearching`（`user` 検索中）の間は `Enter` を消費して
      誤送信を防ぐ（`isSearching` が false なら通常送信へ流す）。未消費の `Enter` は送信: Shift+Enter は `tr.split` で改行、`sendWithCtrlKey()` が
      true なら Ctrl 必須、本文が空白のみで `canSendEmpty()` が false なら何もしない。送信後は
      無条件に本文をクリアする（`ChannelTextInput` の `sendMsg` と同じ）。
-  3. `ArrowUp` / `ArrowDown` — メニュー有効かつ候補ありのときだけ選択移動。それ以外は `false` を
+  3. `ArrowUp` / `ArrowDown` — メニュー有効かつ `kind` の候補（`users` / `channels` / `emojiCodes`）が
+     1 件以上のときだけ選択移動。それ以外は `false` を
      返し、親（`ChannelContents`）の ArrowUp 編集ショートカットへ流す。
   4. `Escape` — メニューを閉じる。
   5. `Ctrl/Cmd+Z` / `Ctrl/Cmd+Shift+Z` / `Ctrl/Cmd+Y` — `prosemirror-history` の `undo` / `redo`。
@@ -158,8 +195,8 @@ import GiracleTextinput from "~/components/unique/GiracleTextinput/index.tsx";
 - メンション直後に空白なしで文字が続く場合（NBSP を消してから入力した場合など）、送信文字列では `serializeInline` が半角空白を 1 個補う。受信側 `urlPattern` の `\b` 境界（`@<user-id>https://…` をリンク化させる）のため。
 - メンション検索の API が応答しない(ハング)場合、Enter は最大 3 秒握りつぶされる。watchdog（`searchUser` 内）が `isSearching` を戻せば通常動作に復帰する。
 - コピー時のテキスト化は `clipboardTextSerializer` を明示している。PM 既定の `Fragment.textBetween` は atom を空文字にするため、指定しないとコピーしたチップがテキストから消える（HTML 側には残る）。
-- ペーストは基本的に plain text 固定（`<br>`・`<li>` の取りこぼし回避）。ただし HTML に `data-mention-user-id` を含む場合（＝自前のコピー）だけは PM にパースさせ、`parseDOM` でチップへ戻す。
-- 巨大ペースト対策の上限が 2 つある。URL 下線は段落 `content.size` が 20,000 超で付かない（`pmUrlUnderline.ts`。装飾のみで機能に影響しない）。メンション検出はカーソル直前 128 文字だけを見る（`getMentionQuery`。それ以上のクエリはどのユーザー名にも一致しないため、窓先頭で切れた場合は未検出扱い）。
+- ペーストは基本的に plain text 固定（`<br>`・`<li>` の取りこぼし回避）。ただし HTML に `data-mention-user-id` か `data-channel-id` を含む場合（＝自前のコピー）だけは PM にパースさせ、`parseDOM` でチップへ戻す。
+- 巨大ペースト対策の上限が 2 つある。URL 下線は段落 `content.size` が 20,000 超で付かない（`pmUrlUnderline.ts`。装飾のみで機能に影響しない）。トリガー検出はカーソル直前 128 文字だけを見る（`getTriggerQuery`。それ以上のクエリは候補名に一致しないため、窓先頭で切れた場合は未検出扱い）。
 - contentDOM は `id="messageInput"` を保つこと。`ChannelContents`（↑ キーで編集モード、入力有無は `textContent` で判定）と `EditMessage`（編集の保存・キャンセル後のフォーカス復帰）が `document.getElementById("messageInput")` で参照している。`<textarea>` 前提の `.value` 判定は div では常に `undefined` になりガードが効かない。
 - 送信・確定・メニュー操作のキー処理は keymap に載せず `handleKeyDown` 1 個に集約すること。`handleKeyDown` は plugin より先に評価され、先頭の composition ガードが IME 変換中の誤送信・誤挿入を防いでいる。`keymap(baseKeymap)` は編集系キー専用。
 - スキーマに `marks` を足すと、ペースト経路や Ctrl+B で書式が流入する。装飾を増やす場合も `Decoration`（表示のみ）で行うこと。

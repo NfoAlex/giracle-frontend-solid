@@ -54,6 +54,36 @@ const mentionSpec: NodeSpec = {
   ],
 };
 
+const channelMentionSpec: NodeSpec = {
+  inline: true,
+  group: "inline",
+  atom: true,
+  selectable: false,
+  attrs: { channelId: {}, name: {} },
+  toDOM: (node) => [
+    "span",
+    {
+      class: "mention-node",
+      "data-channel-id": node.attrs.channelId,
+      "data-channel-name": node.attrs.name,
+    },
+    `#${node.attrs.name}`,
+  ],
+  parseDOM: [
+    {
+      tag: "span[data-channel-id]",
+      getAttrs: (dom) => {
+        const channelId = (dom as HTMLElement).getAttribute("data-channel-id");
+        // 受信側 channelPattern と同じ文字種のみ受け付ける(`>` 注入・偽装防止)
+        if (!channelId || !USER_ID_PATTERN.test(channelId)) return false;
+        const rawName =
+          (dom as HTMLElement).getAttribute("data-channel-name") ?? channelId;
+        return { channelId, name: sanitizeMentionName(rawName, channelId) };
+      },
+    },
+  ],
+};
+
 export const pmSchema = new Schema({
   nodes: {
     doc: { content: "block+" },
@@ -65,6 +95,7 @@ export const pmSchema = new Schema({
     },
     text: { group: "inline" },
     mention: mentionSpec,
+    channelMention: channelMentionSpec,
   },
 });
 
@@ -82,21 +113,27 @@ function serializeInline(block: PMNode): string {
       out += `@<${child.attrs.userId}>`;
       continue;
     }
+    if (child.type === pmSchema.nodes.channelMention) {
+      out += `#<${child.attrs.channelId}>`;
+      continue;
+    }
     // Chrome はメンション隣の空白を NBSP に化けさせる。表示上は同じなので
     // 送信文字列では通常の空白へ戻す(`\b` のリンク境界が崩れるため)
     const text = (child.text ?? "").replaceAll("\u00a0", " ");
     // メンション直後にスペース無しで文字が続く場合、受信側は `@<id>` と本文の
     // リンク境界が崩れるため送信時だけ半角空白を補う
+    const prevType = i > 0 ? block.child(i - 1).type : null;
     if (
-      i > 0 &&
-      block.child(i - 1).type === pmSchema.nodes.mention &&
+      (prevType === pmSchema.nodes.mention ||
+        prevType === pmSchema.nodes.channelMention) &&
       !/^\s/.test(text)
     ) {
       out += " ";
     }
-    // 素テキスト中の `@<` は受信側 mentionPattern に偽メンションとして解釈されるため、
-    // ゼロ幅スペースを挟んでエスケープする(表示上は変化なし)
-    out += text.replaceAll("@<", "@\u200B<");
+    // 素テキスト中の `@<` / `#<` は受信側の mentionPattern / channelPattern に
+    // 偽メンションとして解釈されるため、ゼロ幅スペースを挟んでエスケープする
+    // (表示上は変化なし)
+    out += text.replaceAll("@<", "@\u200B<").replaceAll("#<", "#\u200B<");
   }
   return out;
 }
@@ -113,43 +150,82 @@ export function getMessageText(doc: PMNode): string {
   return lines.join("\n");
 }
 
-export interface IMentionQuery {
+export type TTriggerKind = "user" | "channel" | "emoji";
+
+export interface ITriggerQuery {
+  kind: TTriggerKind;
   query: string;
-  /** `@` の開始位置(doc 座標) */
+  /** トリガー文字を含む開始位置(doc 座標) */
   from: number;
   /** カーソル位置(doc 座標) */
   to: number;
 }
 
-/** カーソル直前の未確定 `@query` を取得する(確定済み `@<user-id>` は対象外) */
-export function getMentionQuery(state: EditorState): IMentionQuery | null {
+/**
+ * トリガー文字ごとの検出パターン。
+ * boundary はトリガー直前の ASCII 英数字を除外するか(`foo@bar` を除く)
+ */
+const TRIGGER_PATTERNS: {
+  kind: TTriggerKind;
+  pattern: RegExp;
+  boundary: boolean;
+}[] = [
+  { kind: "user", pattern: /@(\S*)$/, boundary: true },
+  { kind: "channel", pattern: /#(\S*)$/, boundary: true },
+  // 絵文字コードは英数字のみ。URL(`://`)や時刻(`12:30`)のコロンは候補になり得るが、
+  // 通常の候補として扱う(Esc で閉じられるため特別除外しない)
+  { kind: "emoji", pattern: /:([A-Za-z0-9_+-]*)$/, boundary: false },
+];
+
+/** カーソル直前の未確定トリガー(`@user` / `#channel` / `:emoji`)を取得する */
+export function getTriggerQuery(state: EditorState): ITriggerQuery | null {
   const { selection } = state;
   if (!selection.empty) return null;
   const $from = selection.$from;
   if (!$from.parent.isTextblock) return null;
 
   // メンション(atom)は 1 文字分の空白として扱う。
-  // これにより `@` の後にチップが挟まる場合は \S* が途切れて検出されない
+  // これによりトリガー文字の後にチップが挟まる場合は \S* が途切れて検出されない
   // 段落全体ではなくカーソル直前の窓だけを見る(巨大ペーストで毎キー O(n)
-  // の文字列確保が走るのを防ぐ)。128 文字超のクエリはユーザー名に一致しない
+  // の文字列確保が走るのを防ぐ)。128 文字超のクエリは候補名に一致しない
   const end = $from.parentOffset;
   const start = Math.max(0, end - 128);
   const before = $from.parent.textBetween(start, end, undefined, () => " ");
-  const match = /@(\S*)$/.exec(before);
-  if (!match || match[1].startsWith("<")) return null;
-  // `$` は末尾の改行の直前にもマッチするため、真の末尾でなければ検出しない
-  if (match.index + match[0].length !== before.length) return null;
-
-  // `foo@bar` (メール/URL内の@) をメンション開始とみなさない。
-  // CJKは \p{L} に含まれるためUnicodeクラスでなくASCII文字種判定にする
-  // (日本語の「こんにちは@田中」のようなスペースなしメンションを殺さないため)
-  const at = before.length - match[0].length;
-  // 窓の先頭で切れている = 直前の文字が確認できない 128 文字超のクエリ
-  if (at === 0 && start > 0) return null;
-  if (at > 0 && /[A-Za-z0-9_]/.test(before[at - 1])) return null;
-
   const to = $from.pos;
-  return { query: match[1], from: to - match[0].length, to };
+
+  // 複数トリガーが窓内にあっても、カーソルに最も近い(末尾にマッチした)1 件だけを返す
+  let best: {
+    kind: TTriggerKind;
+    query: string;
+    index: number;
+    length: number;
+  } | null = null;
+  for (const { kind, pattern, boundary } of TRIGGER_PATTERNS) {
+    const match = pattern.exec(before);
+    if (!match) continue;
+    // `$` は末尾の改行の直前にもマッチするため、真の末尾でなければ検出しない
+    if (match.index + match[0].length !== before.length) continue;
+    // 確定済みの `@<user-id>` / `#<channel-id>` は対象外
+    if (match[1].startsWith("<")) continue;
+    if (boundary) {
+      // `foo@bar` (メール/URL内の@) をメンション開始とみなさない。
+      // CJKは \p{L} に含まれるためUnicodeクラスでなくASCII文字種判定にする
+      // (日本語の「こんにちは@田中」のようなスペースなしメンションを殺さないため)
+      // 窓の先頭で切れている = 直前の文字が確認できない 128 文字超のクエリ
+      if (match.index === 0 && start > 0) continue;
+      if (match.index > 0 && /[A-Za-z0-9_]/.test(before[match.index - 1]))
+        continue;
+    }
+    if (best && best.index >= match.index) continue;
+    best = {
+      kind,
+      query: match[1],
+      index: match.index,
+      length: match[0].length,
+    };
+  }
+  if (!best) return null;
+  return { kind: best.kind, query: best.query, from: to - best.length, to };
 }
 
 /**
