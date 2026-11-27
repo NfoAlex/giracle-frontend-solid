@@ -19,13 +19,18 @@ export const searchEmojiCodes = (query: string, ctx: ISearchContext): void => {
 
 export const emojiMenuItem = (code: string): IMentionMenuItem => ({
   id: code,
-  name: `:${code}:`,
+  // バッジ側で `:` を出すため、ラベルは素のコード名にする(二重コロン回避)
+  name: code,
   fallbackGlyph: ":",
 });
 
 /**
  * カーソル直前の `:query` を `:code:` + 空白の素テキストへ置換する
  * (受信側にインライン絵文字描画が無いためチップ化しない)
+ *
+ * TODO: 入力欄でのカスタム絵文字の画像表示(emoji-picker-element 連携)は未実装。
+ * 実装するなら pmSchema に emoji atom ノードを追加し、storeCustomEmoji /
+ * emojiDB の画像 URL を描画、getMessageText では `:code:` に戻す
  */
 export const insertEmoji = (view: EditorView, code: string): void => {
   if (view.composing) return;
