@@ -121,6 +121,7 @@ export default function GiracleTextinput(props: {
     if (current.kind === "channel")
       return current.channels.map(channelMenuItem);
     if (current.kind === "emoji") return current.emojiCodes.map(emojiMenuItem);
+
     return current.users.map(userMenuItem);
   });
 
@@ -309,6 +310,7 @@ export default function GiracleTextinput(props: {
             return `@${node.attrs.name}`;
           if (node.type === pmSchema.nodes.channelMention)
             return `#${node.attrs.name}`;
+
           return "";
         }),
       handleDOMEvents: {
@@ -321,6 +323,7 @@ export default function GiracleTextinput(props: {
           if (!clipboardData) return false;
           if (clipboardData.files.length > 0)
             props.onPasteFiles?.([...clipboardData.files]);
+
           // 自前のコピーだけは PM に解釈させる(parseDOM でチップへ戻る)。
           // data-pm-slice は PM のコピー経路でのみ付く
           const html = clipboardData.getData("text/html");
@@ -329,7 +332,9 @@ export default function GiracleTextinput(props: {
             (html.includes("data-mention-user-id") ||
               html.includes("data-channel-id"));
           if (isOwnChip) return false;
+
           event.preventDefault();
+
           const text = plainTextFrom(clipboardData);
           if (text !== "")
             view.dispatch(
@@ -356,12 +361,15 @@ export default function GiracleTextinput(props: {
           if (dt.getData("text/html").includes("data-pm-slice")) return false;
           const at = view.posAtCoords({ left: event.clientX, top: event.clientY });
           if (!at) return false;
+
           event.preventDefault();
+
           const tr = view.state.tr;
           tr.setSelection(TextSelection.create(tr.doc, at.pos));
           view.dispatch(
             tr.replaceSelection(plainTextSlice(text)).scrollIntoView(),
           );
+
           return true;
         },
       },
