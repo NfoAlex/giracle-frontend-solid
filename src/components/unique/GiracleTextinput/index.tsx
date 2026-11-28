@@ -348,8 +348,16 @@ export default function GiracleTextinput(props: {
         drop: (view, event) => {
           if (!(event instanceof DragEvent)) return false;
           const dt = event.dataTransfer;
-          // ファイルは親(onDropFiles 相当)の担当なので既定処理に任せる
-          if (!dt || dt.files.length > 0) return false;
+          if (!dt) return false;
+
+          //ファイルドロップはブラウザの画面遷移を防ぎ親へ渡す
+          if (dt.files.length > 0) {
+            event.preventDefault();
+            props.onPasteFiles?.([...dt.files]);
+
+            return true;
+          }
+
           // 同一エディタ内の移動は PM の move に任せる(ここで拾うと複製になる)
           if (view.dragging) return false;
           const text = plainTextFrom(dt);
