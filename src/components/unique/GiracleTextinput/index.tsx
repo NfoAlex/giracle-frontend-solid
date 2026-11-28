@@ -185,20 +185,20 @@ export default function GiracleTextinput(props: {
   };
 
   /** 本文を空段落へ置換する */
-  const clearDoc = (v: EditorView) => {
-    const tr = v.state.tr.replaceWith(
+  const clearDoc = (view: EditorView) => {
+    const tr = view.state.tr.replaceWith(
       0,
-      v.state.doc.content.size,
+      view.state.doc.content.size,
       pmSchema.node("paragraph"),
     );
     tr.setSelection(TextSelection.create(tr.doc, 1));
-    v.dispatch(tr);
+    view.dispatch(tr);
     setSuggestionState(EMPTY_SUGGESTION_STATE);
   };
 
-  const handleKeyDown = (v: EditorView, event: KeyboardEvent): boolean => {
+  const handleKeyDown = (view: EditorView, event: KeyboardEvent): boolean => {
     // IME 変換中のキーは一切横取りしない(変換確定 Enter の誤送信・誤挿入防止)
-    if (v.composing || event.isComposing || event.keyCode === 229) return false;
+    if (view.composing || event.isComposing || event.keyCode === 229) return false;
     const current = suggestionState();
 
     if (event.key === "Enter") {
@@ -209,19 +209,19 @@ export default function GiracleTextinput(props: {
         if (current.kind === "user") {
           const user = current.users[index];
           if (user) {
-            insertUserMention(v, user);
+            insertUserMention(view, user);
             inserted = true;
           }
         } else if (current.kind === "channel") {
           const channel = current.channels[index];
           if (channel) {
-            insertChannelMention(v, channel);
+            insertChannelMention(view, channel);
             inserted = true;
           }
         } else if (current.kind === "emoji") {
           const code = current.emojiCodes[index];
           if (code) {
-            insertEmoji(v, code);
+            insertEmoji(view, code);
             inserted = true;
           }
         }
@@ -241,10 +241,10 @@ export default function GiracleTextinput(props: {
       }
       // 改行: Shift+Enter / onEnter 未指定 / Ctrl 送信モードでの素の Enter
       if (event.shiftKey || !props.onEnter)
-        return splitBlock(v.state, (tr) => v.dispatch(tr));
+        return splitBlock(view.state, (tr) => view.dispatch(tr));
       if (props.sendWithCtrlKey?.() && !event.ctrlKey)
-        return splitBlock(v.state, (tr) => v.dispatch(tr));
-      const text = getMessageText(v.state.doc);
+        return splitBlock(view.state, (tr) => view.dispatch(tr));
+      const text = getMessageText(view.state.doc);
       event.preventDefault();
       // 空行(空白のみ含む)の Enter は何もしない。改行も入れない
       // canSendEmpty が true ならファイル添付のみの送信を許可する
@@ -252,7 +252,7 @@ export default function GiracleTextinput(props: {
       props.onEnter(text);
       // 送信後のクリア。ChannelTextInput の sendMsg と同じく送信成否に依らず
       // 無条件に消す(API 失敗時の復元は親の責任とする)
-      clearDoc(v);
+      clearDoc(view);
       return true;
     }
 
@@ -315,7 +315,7 @@ export default function GiracleTextinput(props: {
         // PM 既定は text/html を優先し、<br> を段落内の改行文字、<li> を区切り無しの
         // 連結にしてしまう(表示と送信文字列が食い違う)。メンションを含まない HTML は
         // 旧実装同様 plain text 固定にする
-        paste: (v, event) => {
+        paste: (view, event) => {
           const clipboardData =
             event instanceof ClipboardEvent ? event.clipboardData : null;
           if (!clipboardData) return false;
@@ -332,21 +332,21 @@ export default function GiracleTextinput(props: {
           event.preventDefault();
           const text = plainTextFrom(clipboardData);
           if (text !== "")
-            v.dispatch(
-              v.state.tr
+            view.dispatch(
+              view.state.tr
                 .replaceSelection(plainTextSlice(text))
                 .scrollIntoView(),
             );
           return true;
         },
         // 外部からのドロップも plain text の段落 Slice にする(PM 既定は HTML 優先)
-        drop: (v, event) => {
+        drop: (view, event) => {
           if (!(event instanceof DragEvent)) return false;
           const dt = event.dataTransfer;
           // ファイルは親(onDropFiles 相当)の担当なので既定処理に任せる
           if (!dt || dt.files.length > 0) return false;
           // 同一エディタ内の移動は PM の move に任せる(ここで拾うと複製になる)
-          if (v.dragging) return false;
+          if (view.dragging) return false;
           const text = plainTextFrom(dt);
           if (text === "") {
             event.preventDefault();
@@ -354,12 +354,12 @@ export default function GiracleTextinput(props: {
           }
           // PM 由来の HTML(自前チップ含む)は parseDOM で取り込ませる
           if (dt.getData("text/html").includes("data-pm-slice")) return false;
-          const at = v.posAtCoords({ left: event.clientX, top: event.clientY });
+          const at = view.posAtCoords({ left: event.clientX, top: event.clientY });
           if (!at) return false;
           event.preventDefault();
-          const tr = v.state.tr;
+          const tr = view.state.tr;
           tr.setSelection(TextSelection.create(tr.doc, at.pos));
-          v.dispatch(
+          view.dispatch(
             tr.replaceSelection(plainTextSlice(text)).scrollIntoView(),
           );
           return true;
