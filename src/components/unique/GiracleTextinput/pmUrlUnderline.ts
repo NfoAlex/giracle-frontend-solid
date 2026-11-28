@@ -26,13 +26,14 @@ function buildDecorations(doc: PMNode): DecorationSet {
     if (!node.isTextblock) return true;
     // 文字列化の前にサイズで弾く(巨大な textBetween を避ける)
     if (node.content.size > MAX_DECORATE_CHARS) return false;
-    // メンション(atom)は 1 文字の代替文字として扱い、オフセットと doc 座標を 1:1 にする
+
     const text = node.textBetween(
       0,
       node.content.size,
       undefined,
-      () => "\u0000",
+      () => "\u0000", //他の装飾処理で1文字扱いさせるために代替文字
     );
+
     for (const [start, end] of findUrlRanges(text)) {
       if (decorations.length >= MAX_DECORATIONS) {
         overflow = true;
@@ -44,6 +45,7 @@ function buildDecorations(doc: PMNode): DecorationSet {
         }),
       );
     }
+
     // 段落の子は走査しない
     return false;
   });
