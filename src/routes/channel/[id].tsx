@@ -38,12 +38,10 @@ export default function Channel() {
   const inputComponentChooser = () => {
     //未参加だとプレビュー
     if (
-      !storeMyUserinfo.ChannelJoin.some((c) => c.channelId === params.channelId,)
+      !storeMyUserinfo.ChannelJoin.some((c) => c.channelId === params.channelId)
     ) {
       return (
-        <Show
-          when={storeChannelFetchStatus[params.channelId] === "AVAILABLE"}
-        >
+        <Show when={storeChannelFetchStatus[params.channelId] === "AVAILABLE"}>
           <Card class="p-4 flex items-center gap-2">
             <IconEye />
             チャンネルプレビュー中
@@ -58,11 +56,11 @@ export default function Channel() {
 
     //旧式を使う
     if (storeClientConfig.chat.useOldInput) {
-      return (<ChannelTextInputOld />);
+      return <ChannelTextInputOld />;
     }
 
-    return (<ChannelTextInput />);
-  }
+    return <ChannelTextInput />;
+  };
 
   return (
     <div class="w-full h-screen mx-auto p-2 flex flex-col">

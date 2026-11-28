@@ -38,7 +38,7 @@ export default function ChannelContents() {
   const [editingMsgId, setEditingMsgId] = createSignal("");
 
   const historyElementId = "history";
-  let [stateFetchingHistory, setStateFetchingHistory] = createSignal(false);
+  const [stateFetchingHistory, setStateFetchingHistory] = createSignal(false);
   let globalStateChannelMoveDone = false;
 
   const FnBrowserApis = {
@@ -236,7 +236,9 @@ export default function ChannelContents() {
 
       //3回以上試行しているなら３秒待機
       if (fetchFalingCount >= 3) {
-        console.error("ChannelContents :: FnHistoryControllers.fetchHistory : 履歴が取得に失敗しています...");
+        console.error(
+          "ChannelContents :: FnHistoryControllers.fetchHistory : 履歴が取得に失敗しています...",
+        );
         retryFetchTimer = setTimeout(() => {
           retryFetchTimer = undefined;
           fetchFalingCount = 0;
