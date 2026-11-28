@@ -5,6 +5,8 @@ export interface IMentionMenuItem {
   id: string;
   name: string;
   iconUrl?: string;
+  /** アイコン画像が無い項目の丸バッジ文字(既定 `#`) */
+  fallbackGlyph?: string;
 }
 
 export default function MentionMenu(props: {
@@ -37,7 +39,7 @@ export default function MentionMenu(props: {
                 when={item.iconUrl}
                 fallback={
                   <span class="w-8 h-8 rounded-full bg-border flex items-center justify-center text-sm shrink-0">
-                    #
+                    {item.fallbackGlyph ?? "#"}
                   </span>
                 }
               >

@@ -147,7 +147,7 @@ html {
   }
 }
 
-/* メンションノード(Lexical) */
+/* メンションノード(ProseMirror の mention atom) */
 .mention-node {
   color: hsl(var(--primary));
   background: hsl(var(--accent));

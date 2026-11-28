@@ -1,15 +1,17 @@
-import { buildEditorFromExtensions, HMRExtension } from "@lexical/extension";
-import { HistoryExtension } from "@lexical/history";
+import { baseKeymap, splitBlock } from "prosemirror-commands";
+import { history, redo, undo } from "prosemirror-history";
+import { keymap } from "prosemirror-keymap";
+import { Fragment, Slice } from "prosemirror-model";
 import {
-  $createParagraphNode,
-  $getRoot,
-  COMMAND_PRIORITY_CRITICAL,
-  COMMAND_PRIORITY_NORMAL,
-  configExtension,
-  KEY_ENTER_COMMAND,
-  PASTE_COMMAND,
-  type LexicalEditorWithDispose,
-} from "lexical";
+  EditorState,
+  TextSelection,
+  type Transaction,
+} from "prosemirror-state";
+import { EditorView } from "prosemirror-view";
+// 同梱 CSS 未 import だと Tailwind preflight の `img { display: block }` が
+// `img.ProseMirror-separator`(atom 段落末のキャレット確保用)に効き、
+// チップ直後に空行が出る。必ず import する
+import "prosemirror-view/style/prosemirror.css";
 import {
   createEffect,
   createMemo,
@@ -18,29 +20,81 @@ import {
   onMount,
   Show,
 } from "solid-js";
-import type { IUser } from "~/types/User.ts";
-import {
-  $insertMention,
-  defineMentionExtension,
-  EMPTY_MENTION_STATE,
-  getMessageText,
-  type MentionState,
-} from "./MentionExtension.ts";
 import MentionMenu from "./MentionMenu.tsx";
-import { definePlainTextOnlyExtension } from "./PlainTextOnlyExtension.ts";
-import { defineUrlUnderlineExtension } from "./UrlUnderlineExtension.ts";
+import {
+  createEmptyDoc,
+  getMessageText,
+  getTriggerQuery,
+  pmSchema,
+  type TTriggerKind,
+} from "./pmSchema.ts";
+import { urlUnderlinePlugin } from "./pmUrlUnderline.ts";
+import {
+  channelMenuItem,
+  insertChannelMention,
+  searchChannels,
+} from "./suggestions/channel.ts";
+import {
+  candidateCount,
+  EMPTY_SUGGESTION_STATE,
+  type ISearchContext,
+  type ISuggestionState,
+} from "./suggestions/common.ts";
+import {
+  emojiMenuItem,
+  insertEmoji,
+  searchEmojiCodes,
+} from "./suggestions/emoji.ts";
+import {
+  createUserSearch,
+  insertUserMention,
+  userMenuItem,
+} from "./suggestions/user.ts";
 
 export interface IGiracleTextinputHandle {
-  /** getMessageText(ed) 相当の送信文字列(@名前 → @<user-id> 変換済み) */
+  /** getMessageText 相当の送信文字列(@名前 → @<user-id> 変換済み) */
   getText(): string;
-  /** エディタ本文クリア + mentionState リセット */
+  /** エディタ本文クリア + suggestionState リセット */
   clear(): void;
   focus(): void;
+}
+
+/** DataTransfer から書式を落としたテキストだけを取り出す */
+function plainTextFrom(dt: DataTransfer): string {
+  let text = dt.getData("text/plain") || dt.getData("text/uri-list");
+  // text/plain を持たないデータソース向けに text/html から
+  // テキストのみ取り出す(書式・要素は落とす)
+  if (text === "") {
+    const html = dt.getData("text/html");
+    if (html !== "") {
+      text =
+        new DOMParser().parseFromString(html, "text/html").body.textContent ??
+        "";
+    }
+  }
+  return text;
+}
+
+/** 改行を保ったまま段落 Slice にする(PM の DOM 再パースで空白が潰れるのを防ぐ) */
+function plainTextSlice(text: string): Slice {
+  const lines = text.split(/\r\n|\r|\n/);
+  return new Slice(
+    Fragment.from(
+      lines.map((line) =>
+        line
+          ? pmSchema.node("paragraph", null, pmSchema.text(line))
+          : pmSchema.node("paragraph"),
+      ),
+    ),
+    1,
+    1,
+  );
 }
 
 export default function GiracleTextinput(props: {
   channelId?: string;
   displayMentionAtBottom?: boolean;
+  disabledSuggests?: TTriggerKind[];
   onEnter?: (text: string) => void;
   /** クリップボードからのファイル添付を親へ渡す(未指定なら無視) */
   onPasteFiles?: (files: File[]) => void;
@@ -51,123 +105,323 @@ export default function GiracleTextinput(props: {
   /** onMount 時にハンドルを渡す(送信ボタン等、親から本文取得/クリアする用) */
   ref?: (handle: IGiracleTextinputHandle) => void;
 }) {
-  let editor: LexicalEditorWithDispose | undefined;
+  let view: EditorView | undefined;
   let editorRoot: HTMLDivElement | undefined;
 
-  const [mentionState, setMentionState] =
-    createSignal<MentionState>(EMPTY_MENTION_STATE);
+  const [suggestionState, setSuggestionState] = createSignal<ISuggestionState>(
+    EMPTY_SUGGESTION_STATE,
+  );
 
   // チャンネルを跨いだ古い候補が残らないよう、切替時に即座に閉じる
   createEffect(() => {
     void props.channelId;
-    setMentionState(EMPTY_MENTION_STATE);
+    setSuggestionState(EMPTY_SUGGESTION_STATE);
   });
 
-  const menuItems = createMemo(() =>
-    mentionState().users.map((u) => ({
-      id: u.id,
-      name: u.name,
-      iconUrl: `/api/user/icon/${encodeURIComponent(u.id)}`,
-    })),
-  );
+  const menuItems = createMemo(() => {
+    const current = suggestionState();
+    if (current.kind === "channel")
+      return current.channels.map(channelMenuItem);
+    if (current.kind === "emoji") return current.emojiCodes.map(emojiMenuItem);
 
-  const insertMention = (user: IUser) => {
-    if (!editor) return;
-    $insertMention(editor, user);
-    setMentionState(EMPTY_MENTION_STATE);
+    return current.users.map(userMenuItem);
+  });
+
+  /** ドメイン検索が結果を反映する口。古い結果・切替後の結果はここで捨てる */
+  const searchContext: ISearchContext = {
+    channelId: () => props.channelId,
+    apply: (kind, query, patch) => {
+      const current = suggestionState();
+      if (
+        !current.isEnabled ||
+        current.kind !== kind ||
+        current.query !== query ||
+        current.channelId !== props.channelId
+      )
+        return;
+      setSuggestionState({ ...current, ...patch });
+    },
+  };
+
+  // debounce/watchdog のタイマーはインスタンスごとに持つ
+  const userSearch = createUserSearch(searchContext);
+
+  /** カーソル直前の未確定トリガーをメニュー状態へ反映する */
+  const syncSuggestionState = (state: EditorState) => {
+    const found = getTriggerQuery(state, props.disabledSuggests);
+    const prev = suggestionState();
+    if (!found) {
+      if (prev.isEnabled) setSuggestionState(EMPTY_SUGGESTION_STATE);
+      return;
+    }
+    const channelId = props.channelId;
+    // 同じトリガー・同じクエリかつ同一チャンネルなら検索結果や選択位置を維持する
+    if (
+      prev.isEnabled &&
+      prev.kind === found.kind &&
+      prev.query === found.query &&
+      prev.channelId === channelId
+    )
+      return;
+    setSuggestionState({
+      isEnabled: true,
+      kind: found.kind,
+      query: found.query,
+      users: [],
+      channels: [],
+      emojiCodes: [],
+      selectIndex: 0,
+      channelId,
+      // 非同期検索が走るのは user だけ(Enter 消費の判定に使う)
+      isSearching: found.kind === "user",
+    });
+    if (found.kind === "user") userSearch.search(found.query, channelId);
+    else if (found.kind === "channel")
+      searchChannels(found.query, searchContext);
+    else searchEmojiCodes(found.query, searchContext);
+  };
+
+  const dispatchTransaction = (tr: Transaction) => {
+    if (!view) return;
+    view.updateState(view.state.apply(tr));
+    syncSuggestionState(view.state);
+  };
+
+  /** 本文を空段落へ置換する */
+  const clearDoc = (view: EditorView) => {
+    const tr = view.state.tr.replaceWith(
+      0,
+      view.state.doc.content.size,
+      pmSchema.node("paragraph"),
+    );
+    tr.setSelection(TextSelection.create(tr.doc, 1));
+    view.dispatch(tr);
+    setSuggestionState(EMPTY_SUGGESTION_STATE);
+  };
+
+  const handleKeyDown = (view: EditorView, event: KeyboardEvent): boolean => {
+    // IME 変換中のキーは一切横取りしない(変換確定 Enter の誤送信・誤挿入防止)
+    if (view.composing || event.isComposing || event.keyCode === 229)
+      return false;
+    const current = suggestionState();
+
+    if (event.key === "Enter") {
+      // メニュー確定が最優先。未消費の Enter だけが送信へ流れる
+      if (current.isEnabled) {
+        const index = current.selectIndex;
+        let inserted = false;
+        if (current.kind === "user") {
+          const user = current.users[index];
+          if (user) {
+            insertUserMention(view, user);
+            inserted = true;
+          }
+        } else if (current.kind === "channel") {
+          const channel = current.channels[index];
+          if (channel) {
+            insertChannelMention(view, channel);
+            inserted = true;
+          }
+        } else if (current.kind === "emoji") {
+          const code = current.emojiCodes[index];
+          if (code) {
+            insertEmoji(view, code);
+            inserted = true;
+          }
+        }
+        if (inserted) {
+          event.preventDefault();
+          setSuggestionState(EMPTY_SUGGESTION_STATE);
+          return true;
+        }
+        // user の debounce 検索が未完了の間は、確定も送信もせず Enter を消費する。
+        // channel/emoji は同期候補のみなので候補0件はそのまま送信へ流す
+        if (current.isSearching) {
+          event.preventDefault();
+          return true;
+        }
+        // 候補0件で検索も完了 → 未確定の @query を本文として送信へ流す。
+        // ここで false を返すと PM が Enter を preventDefault して無反応になる
+      }
+      // 改行: Shift+Enter / onEnter 未指定 / Ctrl 送信モードでの素の Enter
+      if (event.shiftKey || !props.onEnter)
+        return splitBlock(view.state, (tr) => view.dispatch(tr));
+      if (props.sendWithCtrlKey?.() && !event.ctrlKey)
+        return splitBlock(view.state, (tr) => view.dispatch(tr));
+      const text = getMessageText(view.state.doc);
+      event.preventDefault();
+      // 空行(空白のみ含む)の Enter は何もしない。改行も入れない
+      // canSendEmpty が true ならファイル添付のみの送信を許可する
+      if (text.trim() === "" && !props.canSendEmpty?.()) return true;
+      props.onEnter(text);
+      // 送信後のクリア。ChannelTextInput の sendMsg と同じく送信成否に依らず
+      // 無条件に消す(API 失敗時の復元は親の責任とする)
+      clearDoc(view);
+      return true;
+    }
+
+    if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+      // 未処理なら false を返し、親の ArrowUp 編集ショートカットへ流す
+      const count = candidateCount(current);
+      if (!current.isEnabled || count === 0) return false;
+      event.preventDefault();
+      const next =
+        event.key === "ArrowDown"
+          ? Math.min(current.selectIndex + 1, count - 1)
+          : Math.max(current.selectIndex - 1, 0);
+      setSuggestionState({ ...current, selectIndex: next });
+      return true;
+    }
+
+    if (event.key === "Escape") {
+      if (!current.isEnabled) return false;
+      event.preventDefault();
+      setSuggestionState(EMPTY_SUGGESTION_STATE);
+      return true;
+    }
+
+    return false;
   };
 
   onMount(() => {
-    const MentionExtension = defineMentionExtension(
-      { channelId: () => props.channelId },
-      { signal: mentionState, set: setMentionState },
-    );
+    if (!editorRoot) return;
 
-    editor = buildEditorFromExtensions(
-      definePlainTextOnlyExtension(),
-      MentionExtension,
-      defineUrlUnderlineExtension(),
-      // Undo/Redo (Ctrl+Z / Ctrl+Shift+Z)。maxDepthで履歴の肥大化を防ぐ
-      configExtension(HistoryExtension, { maxDepth: 100 }),
-      configExtension(HMRExtension, { hot: import.meta.hot ?? null }),
-    );
-    const ed = editor;
-    ed.setRootElement(editorRoot ?? null);
-    // メンション確定(HIGH)が先に処理され、未消費の Enter だけがここに届く
-    ed.registerCommand(
-      KEY_ENTER_COMMAND,
-      (event) => {
-        if (!props.onEnter) return false;
-        if (ed.isComposing()) return false;
-        if (event?.shiftKey) return false;
-        // event が null(プログラム発火)の場合も送信しない側に倒す
-        if (props.sendWithCtrlKey?.() && !event?.ctrlKey) return false;
-        const text = getMessageText(ed);
-        event?.preventDefault();
-        // 空行(空白のみ含む)の Enter は何もしない。改行も入れない
-        // canSendEmpty が true ならファイル添付のみの送信を許可する
-        if (text.trim() === "" && !props.canSendEmpty?.()) return true;
-        props.onEnter(text);
-        // 送信後のクリア。ChannelTextInput の sendMsg と同じく送信成否に依らず
-        // 無条件に消す(API 失敗時の復元は親の責任とする)
-        ed.update(() => {
-          const root = $getRoot();
-          root.clear();
-          root.append($createParagraphNode());
-        });
-        setMentionState(EMPTY_MENTION_STATE);
-        return true;
+    view = new EditorView(editorRoot, {
+      state: EditorState.create({
+        doc: createEmptyDoc(),
+        schema: pmSchema,
+        plugins: [
+          history(),
+          keymap({ "Mod-z": undo, "Shift-Mod-z": redo, "Mod-y": redo }),
+          keymap(baseKeymap),
+          urlUnderlinePlugin(),
+        ],
+      }),
+      dispatchTransaction,
+      // 親(ChannelContents / EditMessage)は id で textContent 参照・focus する
+      attributes: {
+        id: "messageInput",
+        class:
+          "min-h-10 max-h-40 overflow-y-auto p-2 bg-background border rounded-md whitespace-pre-wrap",
       },
-      COMMAND_PRIORITY_NORMAL,
-    );
-    // PlainTextOnlyExtension(HIGH) より先に走らせ、ファイルだけ横取りする
-    ed.registerCommand(
-      PASTE_COMMAND,
-      (event) => {
-        const dt = event instanceof ClipboardEvent ? event.clipboardData : null;
-        if (dt && dt.files.length > 0) props.onPasteFiles?.([...dt.files]);
-        // 消費しない: テキスト挿入は PlainTextOnlyExtension に任せる
-        return false;
+      handleKeyDown,
+      // PM 既定のテキスト化は atom を空文字にするため、コピーしたチップが
+      // 消える。移行前(Lexical)同様、名前でコピーする
+      clipboardTextSerializer: (slice) =>
+        slice.content.textBetween(0, slice.content.size, "\n", (node) => {
+          if (node.type === pmSchema.nodes.mention)
+            return `@${node.attrs.name}`;
+          if (node.type === pmSchema.nodes.channelMention)
+            return `#${node.attrs.name}`;
+
+          return "";
+        }),
+      handleDOMEvents: {
+        // PM 既定は text/html を優先し、<br> を段落内の改行文字、<li> を区切り無しの
+        // 連結にしてしまう(表示と送信文字列が食い違う)。メンションを含まない HTML は
+        // 旧実装同様 plain text 固定にする
+        paste: (view, event) => {
+          const clipboardData =
+            event instanceof ClipboardEvent ? event.clipboardData : null;
+          if (!clipboardData) return false;
+          if (clipboardData.files.length > 0)
+            props.onPasteFiles?.([...clipboardData.files]);
+
+          // 自前のコピーだけは PM に解釈させる(parseDOM でチップへ戻る)。
+          // data-pm-slice は PM のコピー経路でのみ付く
+          const html = clipboardData.getData("text/html");
+          const isOwnChip =
+            html.includes("data-pm-slice") &&
+            (html.includes("data-mention-user-id") ||
+              html.includes("data-channel-id"));
+          if (isOwnChip) return false;
+
+          event.preventDefault();
+
+          const text = plainTextFrom(clipboardData);
+          if (text !== "")
+            view.dispatch(
+              view.state.tr
+                .replaceSelection(plainTextSlice(text))
+                .scrollIntoView(),
+            );
+          return true;
+        },
+        // 外部からのドロップも plain text の段落 Slice にする(PM 既定は HTML 優先)
+        drop: (view, event) => {
+          if (!(event instanceof DragEvent)) return false;
+          const dt = event.dataTransfer;
+          if (!dt) return false;
+
+          //ファイルドロップはブラウザの画面遷移を防ぎ親へ渡す
+          if (dt.files.length > 0) {
+            event.preventDefault();
+            props.onPasteFiles?.([...dt.files]);
+
+            return true;
+          }
+
+          // 同一エディタ内の移動は PM の move に任せる(ここで拾うと複製になる)
+          if (view.dragging) return false;
+          const text = plainTextFrom(dt);
+          if (text === "") {
+            event.preventDefault();
+            return true;
+          }
+          // PM 由来の HTML(自前チップ含む)は parseDOM で取り込ませる
+          if (dt.getData("text/html").includes("data-pm-slice")) return false;
+          const at = view.posAtCoords({
+            left: event.clientX,
+            top: event.clientY,
+          });
+          if (!at) return false;
+
+          event.preventDefault();
+
+          const tr = view.state.tr;
+          tr.setSelection(TextSelection.create(tr.doc, at.pos));
+          view.dispatch(
+            tr.replaceSelection(plainTextSlice(text)).scrollIntoView(),
+          );
+
+          return true;
+        },
       },
-      COMMAND_PRIORITY_CRITICAL,
-    );
-    props.ref?.({
-      getText: () => getMessageText(ed),
-      clear: () => {
-        ed.update(() => {
-          const root = $getRoot();
-          root.clear();
-          root.append($createParagraphNode());
-        });
-        setMentionState(EMPTY_MENTION_STATE);
-      },
-      focus: () => ed.focus(),
     });
-    if (import.meta.hot && editor !== undefined) {
-      import.meta.hot.accept();
-      import.meta.hot.dispose(() => editor?.dispose());
-    }
+    props.ref?.({
+      getText: () => (view ? getMessageText(view.state.doc) : ""),
+      clear: () => {
+        if (view) clearDoc(view);
+      },
+      focus: () => view?.focus(),
+    });
   });
 
   onCleanup(() => {
-    editor?.dispose();
+    userSearch.dispose();
+    view?.destroy();
   });
 
   return (
     <div class="w-full relative">
-      <div
-        id="messageInput"
-        class="min-h-10 max-h-40 overflow-y-auto p-2 bg-background border rounded-md"
-        ref={editorRoot}
-        contentEditable
-      />
-      <Show when={mentionState().isEnabled}>
+      <div ref={editorRoot} />
+      <Show when={suggestionState().isEnabled}>
         <MentionMenu
           items={menuItems()}
-          selectIndex={mentionState().selectIndex}
+          selectIndex={suggestionState().selectIndex}
           onSelect={(item) => {
-            const user = mentionState().users.find((u) => u.id === item.id);
-            if (user) insertMention(user);
+            if (!view) return;
+            const current = suggestionState();
+            if (current.kind === "channel") {
+              const channel = current.channels.find((c) => c.id === item.id);
+              if (channel) insertChannelMention(view, channel);
+            } else if (current.kind === "emoji") {
+              insertEmoji(view, item.id);
+            } else {
+              const user = current.users.find((u) => u.id === item.id);
+              if (user) insertUserMention(view, user);
+            }
+            setSuggestionState(EMPTY_SUGGESTION_STATE);
           }}
           displayBottom={props.displayMentionAtBottom}
         />
