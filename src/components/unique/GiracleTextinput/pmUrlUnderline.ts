@@ -32,7 +32,7 @@ function buildUrlDecorations(doc: PMNode): DecorationSet {
       0,
       node.content.size,
       undefined,
-      () => "\u0000", //他の装飾処理で1文字扱いさせるために代替文字
+      () => "\u0000", //絵文字Nodeなどを１文字扱いするために置き換え
     );
 
     for (const [start, end] of findUrlRanges(text)) {
