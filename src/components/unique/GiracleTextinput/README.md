@@ -84,8 +84,11 @@ flowchart LR
 - `getMessageText(doc)` — トップレベルのブロックを `\n` で結合。`mention` は `@<user-id>`、
   `channelMention` は `#<channel-id>`。素テキスト中の `@<` / `#<` は `@\u200B<` / `#\u200B<`
   （ゼロ幅スペース）にエスケープし、受信側で偽メンションとして描画されるのを防ぐ。
-- `getTriggerQuery(state)` — カーソル直前の未確定トリガーを
+- `getTriggerQuery(state, disabledSuggests?)` — カーソル直前の未確定トリガーを
   `{ kind, query, from, to }`（doc 座標）で返す。`kind` は `"user"` / `"channel"` / `"emoji"`。
+  `disabledSuggests`（`TTriggerKind[]`）に含まれる種別はパターン照合ごとスキップする。
+  トリガー文字自体は素テキストとして入力・送信される
+  （`disabledSuggests={["user"]}` なら `@foo` はメニューを出さずそのまま本文になる）。
   - 選択が collapsed な text cursor のときだけ。
   - 段落内のカーソル前テキストを `textBetween` で取り、チップ（atom）は 1 文字分の空白として扱う。
     これによりトリガー文字の後ろにチップが挟まる場合は検出されない。
@@ -179,6 +182,9 @@ import GiracleTextinput from "~/components/unique/GiracleTextinput/index.tsx";
 - `channelId` を渡すと `api.user.list` の `joinedChannel` に載り、そのチャンネル参加者に絞られる。省略時は全ユーザー検索。
 - `onEnter` に渡るのは `getMessageText(doc)` の戻り値（`@名前` → `@<user-id>` 変換済みの送信文字列）。コールバック後、コンポーネントが本文をクリアする（エディタは外に出さない）。
 - `onPasteFiles(files)`: クリップボードにファイルがある場合に呼ばれる（テキスト挿入は通常どおり継続）。
+- `disabledSuggests`: 候補メニューを出さない種別（`"user"` / `"channel"` / `"emoji"`）。省略時は全部有効。
+  あくまでサジェストの停止で、`mention` / `channelMention` ノードのスキーマ登録を外すものではない
+  （自前チップのコピペは `parseDOM` で復元され得る。下記「落とし穴」参照）。
 - `sendWithCtrlKey()`: true を返す間は Ctrl+Enter でのみ送信する。
 - `canSendEmpty()`: true を返す間は本文が空でも Enter を `onEnter("")` へ流す（添付のみ送信用）。
 - `ref(handle)`: `{ getText(), clear(), focus() }` を受け取る。送信ボタン等から本文取得・クリア・フォーカスに使う。
@@ -195,6 +201,7 @@ import GiracleTextinput from "~/components/unique/GiracleTextinput/index.tsx";
 - メンション検索の API が応答しない(ハング)場合、Enter は最大 3 秒握りつぶされる。watchdog（`searchUser` 内）が `isSearching` を戻せば通常動作に復帰する。
 - コピー時のテキスト化は `clipboardTextSerializer` を明示している。PM 既定の `Fragment.textBetween` は atom を空文字にするため、指定しないとコピーしたチップがテキストから消える（HTML 側には残る）。
 - ペーストは基本的に plain text 固定（`<br>`・`<li>` の取りこぼし回避）。ただし HTML に `data-pm-slice` と `data-mention-user-id` / `data-channel-id` を含む場合（＝自前のコピー）だけは PM にパースさせ、`parseDOM` でチップへ戻す。
+- `disabledSuggests` はトリガー検出だけを止める。`insertChip` / `insertEmoji`（`suggestions/*`）は `view.state` からトリガーを**引き直す**際に `disabledSuggests` を渡しておらず、自前チップのコピペは `parseDOM` で mention / channelMention ノードに復元される。欄ごとにチップを構造的に禁止したい場合は、スキーマからノードを外した別 `Schema`（`createEmptyDoc` / `insert*` / `getMessageText` もそのスキーマから引く）か、paste 時の strip が必要。
 - 巨大ペースト対策の上限が 3 つある。URL 下線は段落 `content.size` が 20,000 超の段落に付かず、装飾総数が 1,000 を超えるとそのメッセージ全体で付かない（`pmUrlUnderline.ts`。装飾のみで機能に影響しない。総数上限は実測で 10,000 装飾 ≒ 100ms/キーになるため）。トリガー検出はカーソル直前 128 文字だけを見る（`getTriggerQuery`。それ以上のクエリは候補名に一致しないため、窓先頭で切れた場合は未検出扱い）。
 - contentDOM は `id="messageInput"` を保つこと。`ChannelContents`（↑ キーで編集モード、入力有無は `textContent` で判定）と `EditMessage`（編集の保存・キャンセル後のフォーカス復帰）が `document.getElementById("messageInput")` で参照している。`<textarea>` 前提の `.value` 判定は div では常に `undefined` になりガードが効かない。
 - 送信・確定・メニューのキー処理は handleKeyDown に集約し 1 個にまとめること。`handleKeyDown` は plugin より先に評価され、先頭の composition ガードが IME 変換中の誤送信・誤挿入を防いでいる。`keymap(baseKeymap)` と Undo/Redo の keymap は編集系キー専用。
