@@ -91,8 +91,6 @@ function plainTextSlice(text: string): Slice {
   );
 }
 
-export type TSuggests = "emoji" | "channel" | "mention";
-
 export default function GiracleTextinput(props: {
   channelId?: string;
   displayMentionAtBottom?: boolean;
