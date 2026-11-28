@@ -21,6 +21,7 @@ const MAX_DECORATIONS = 1000;
 function buildUrlDecorations(doc: PMNode): DecorationSet {
   const decorations: Decoration[] = [];
   let overflow = false;
+
   doc.descendants((node, pos) => {
     if (overflow) return false;
     if (!node.isTextblock) return true;
@@ -49,6 +50,7 @@ function buildUrlDecorations(doc: PMNode): DecorationSet {
     // 段落の子は走査しない
     return false;
   });
+
   return overflow
     ? DecorationSet.empty
     : DecorationSet.create(doc, decorations);
