@@ -26,6 +26,7 @@ import {
   getMessageText,
   getTriggerQuery,
   pmSchema,
+  type TTriggerKind,
 } from "./pmSchema.ts";
 import { urlUnderlinePlugin } from "./pmUrlUnderline.ts";
 import {
@@ -90,9 +91,12 @@ function plainTextSlice(text: string): Slice {
   );
 }
 
+export type TSuggests = "emoji" | "channel" | "mention";
+
 export default function GiracleTextinput(props: {
   channelId?: string;
   displayMentionAtBottom?: boolean;
+  disabledSuggests?: TTriggerKind[];
   onEnter?: (text: string) => void;
   /** クリップボードからのファイル添付を親へ渡す(未指定なら無視) */
   onPasteFiles?: (files: File[]) => void;
@@ -146,7 +150,7 @@ export default function GiracleTextinput(props: {
 
   /** カーソル直前の未確定トリガーをメニュー状態へ反映する */
   const syncSuggestionState = (state: EditorState) => {
-    const found = getTriggerQuery(state);
+    const found = getTriggerQuery(state, props.disabledSuggests);
     const prev = suggestionState();
     if (!found) {
       if (prev.isEnabled) setSuggestionState(EMPTY_SUGGESTION_STATE);
@@ -199,7 +203,8 @@ export default function GiracleTextinput(props: {
 
   const handleKeyDown = (view: EditorView, event: KeyboardEvent): boolean => {
     // IME 変換中のキーは一切横取りしない(変換確定 Enter の誤送信・誤挿入防止)
-    if (view.composing || event.isComposing || event.keyCode === 229) return false;
+    if (view.composing || event.isComposing || event.keyCode === 229)
+      return false;
     const current = suggestionState();
 
     if (event.key === "Enter") {
@@ -367,7 +372,10 @@ export default function GiracleTextinput(props: {
           }
           // PM 由来の HTML(自前チップ含む)は parseDOM で取り込ませる
           if (dt.getData("text/html").includes("data-pm-slice")) return false;
-          const at = view.posAtCoords({ left: event.clientX, top: event.clientY });
+          const at = view.posAtCoords({
+            left: event.clientX,
+            top: event.clientY,
+          });
           if (!at) return false;
 
           event.preventDefault();

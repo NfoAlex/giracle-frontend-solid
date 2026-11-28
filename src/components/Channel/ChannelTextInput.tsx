@@ -118,6 +118,7 @@ export default function ChannelTextInput() {
           <GiracleTextinput
             channelId={params.channelId}
             onEnter={(text) => sendMsg(text)}
+            disabledSuggests={["channel", "emoji"]}
             onPasteFiles={(files) => setFileInput([...fileInput(), ...files])}
             sendWithCtrlKey={() => storeClientConfig.chat.sendWithCtrlKey}
             canSendEmpty={() => fileIds().length > 0}

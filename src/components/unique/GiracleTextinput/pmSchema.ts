@@ -170,7 +170,10 @@ const TRIGGER_PATTERNS: {
 ];
 
 /** カーソル直前の未確定トリガー(`@user` / `#channel` / `:emoji`)を取得する */
-export function getTriggerQuery(state: EditorState): ITriggerQuery | null {
+export function getTriggerQuery(
+  state: EditorState,
+  disabledSuggests?: TTriggerKind[],
+): ITriggerQuery | null {
   const { selection } = state;
   if (!selection.empty) return null;
   const $from = selection.$from;
@@ -193,6 +196,11 @@ export function getTriggerQuery(state: EditorState): ITriggerQuery | null {
     length: number;
   } | null = null;
   for (const { kind, pattern, boundary } of TRIGGER_PATTERNS) {
+    //もし無効化されているならスキップ
+    if (disabledSuggests?.includes(kind)) {
+      continue;
+    }
+
     const match = pattern.exec(before);
     if (!match) continue;
     // `$` は末尾の改行の直前にもマッチするため、真の末尾でなければ検出しない
