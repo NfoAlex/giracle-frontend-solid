@@ -18,7 +18,7 @@ const MAX_DECORATIONS = 1000;
  * 段落ごとに URL 範囲を求め `underline` クラスを付ける。
  * 受信側 MessageTextRender と同じ URL パターンなので下線範囲とリンク範囲が一致する。
  */
-function buildDecorations(doc: PMNode): DecorationSet {
+function buildUrlDecorations(doc: PMNode): DecorationSet {
   const decorations: Decoration[] = [];
   let overflow = false;
   doc.descendants((node, pos) => {
@@ -63,8 +63,8 @@ export function urlUnderlinePlugin(): Plugin<DecorationSet> {
   return new Plugin<DecorationSet>({
     key: urlUnderlineKey,
     state: {
-      init: (_config, state) => buildDecorations(state.doc),
-      apply: (tr, set) => (tr.docChanged ? buildDecorations(tr.doc) : set),
+      init: (_config, state) => buildUrlDecorations(state.doc),
+      apply: (tr, set) => (tr.docChanged ? buildUrlDecorations(tr.doc) : set),
     },
     props: {
       decorations: (state) => urlUnderlineKey.getState(state),
